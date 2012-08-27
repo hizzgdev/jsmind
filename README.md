@@ -1,4 +1,4 @@
 jsmind
 ======
 
-Mind mapping of javascript version
+Javascript version of mind mapping
