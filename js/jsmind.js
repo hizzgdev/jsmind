@@ -1104,7 +1104,7 @@ return {
 
 (function(jm){
 	if(jm.logger){return;}
-	if(console){
+	if(typeof(console) != 'undefined'){
 		jm.logger = {
 			log : function(){console.log(arguments);},
 			info : function(){console.info(arguments);},
