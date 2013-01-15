@@ -1,5 +1,18 @@
-(function(jm,T,$w){
+
+(function(jm,$w,T){
 	if(!!jm.Editor){return;}
+
+	if(!T){
+		T={
+			Editor:{
+				Topic				:	'Topic',
+				CreateSubTopic		:	'Create Subtopic',
+   				EditTopic			:	'Edit Topic',
+				DeleteNodeConfirm	:	'Are you sure to remove this node?',
+				DeleteNotAllowed	:	'Can not remove root node'
+			}
+		};
+	}
 
 	// Global Variables
 	var _curr_mind_id = null;
@@ -31,19 +44,20 @@
 	var $input_summary = null;
 
 	var _persistence = {
-		add : function(minidId,parentNodeId,sTopic,sSummary,fnCallback){
+		add : function(mindId,parentNodeId,sTopic,sSummary,fnCallback){
+			var nodeId = 'xxxx';
 			if(fnCallback){
-				fnCallback('success',mindId,parentNodeId,sTopic.sSummary);
+				fnCallback(mindId,parentNodeId,nodeId,sTopic,sSummary);
 			}
 		},
-		update : function(nodeId,sTopic,sSummary,fnCallback){
+		update : function(mindId,nodeId,sTopic,sSummary,fnCallback){
 			if(fnCallback){
-				fnCallback('success',nodeId,sTopic,sSummary);
+				fnCallback(mindId,nodeId,sTopic,sSummary);
 			}
 		},
-		remove : function(nodeId,fnCallback){
+		remove : function(mindId,nodeId,fnCallback){
 			if(fnCallback){
-				fnCallback('success',nodeId);
+				fnCallback(mindId,nodeId);
 			}
 		}
 	};
@@ -284,7 +298,7 @@
 		}else if(_edit_panel_action == 'edit'){
 			var topic = $input_topic.value;
 			var summary = $input_summary.value;
-			_persistence.update(nodeid,topic,summary,function(result,nodeid,topic,summary){
+			_persistence.update(_curr_mind_id,nodeid,topic,summary,function(mindid,nodeid,topic,summary){
 				_view_engine.UpdateNode({
 					Id:nodeid,
 					Topic:topic,
@@ -293,14 +307,14 @@
 		}else if(_edit_panel_action == 'add'){
 			var topic = $input_topic.value;
 			var summary = $input_summary.value;
-			_persistence.add(_curr_mind_id,nodeid,topic,summary,function(result,minid,nodeid,topic,summary){
+			_persistence.add(_curr_mind_id,nodeid,topic,summary,function(mindid,parentid,nodeid,topic,summary){
 				_view_engine.AddNode({
-					Id:parentid,
+					Id:nodeid,
 					Topic:topic,
-					Summary:summary},nodeid);
+					Summary:summary},parentid);
 			});
 		}else if(_edit_panel_action == 'delete'){
-			_persistence.remove(nodeid,function(result,nodeid){
+			_persistence.remove(_curr_mind_id,nodeid,function(mindid,nodeid){
 				_view_engine.RemoveNode(nodeid);
 				$toolbar.style.visibility = 'hidden';
 			});
@@ -368,4 +382,4 @@
 	}
 
 	
-})(jsMind,jsMindText,window);
+})(jsMind,window,null);

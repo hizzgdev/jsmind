@@ -4,7 +4,7 @@ Core:
 Define Direct[-1,0,1] as Left,Center,Right
 Define HSpace,VSpace
 
-/* | Node
+ * | Node
  * |---------------------------------
  * | Direct [-1,0,1]
  * | Children
@@ -70,7 +70,7 @@ var SetCanvasStyle = function(c){
 	c.strokeStyle = '#555';
 	c.lineWidth = 2;
 	c.lineCap='round';
-}
+};
 var easingztf = function(t,b,c,d){var x=t*4/d;return (1-Math.pow(Math.E,-(x*x)/2))*c+b;};
 var ztLineTo = function(ctx,x1,y1,x2,y2){
 	ctx.moveTo(x1,y1);
@@ -88,6 +88,7 @@ var ztLineTo = function(ctx,x1,y1,x2,y2){
 
 // Enum
 var _ViewDirect = {Left:-1,Center:0,Right:1};
+var _ViewMode = {Both:0,Right:1};
 
 // Struct
 var _Size = function(iWidth,iHeight){
@@ -266,13 +267,13 @@ _ViewNode.prototype = {
 	}
 };
 
-var _ViewEngine = function(sName,oTarget,bHalfSide){
+var _ViewEngine = function(sName,oTarget,eViewMode){
 	this.EngineName=sName;
 	this.Version = '0.1';
 	this.Target = oTarget;
 	this.Width = oTarget.clientWidth;
 	this.Height = oTarget.clientHeight;
-	this.HalfSide = !!bHalfSide;
+	this.HalfSide = (eViewMode == _ViewMode.Right);
 	
 	this.RootViewNode = null;
 	
@@ -562,6 +563,9 @@ _ViewEngine.prototype = {
 	GetViewNodePosition : function(oViewNode){
 		var offsetWidth = this._OffsetWidth/2;
 		var offsetHeight = this._OffsetHeight/2;
+		if(this.HalfSide){
+			offsetWidth = this._OffsetWidth/4;
+		}
 		return oViewNode.GetNWPosition(offsetWidth,offsetHeight);
 	},
 	
@@ -921,6 +925,9 @@ _ViewEngine.prototype = {
 	DrawLine : function(){
 		var offsetWidth = this._OffsetWidth/2;
 		var offsetHeight = this._OffsetHeight/2;
+		if(this.HalfSide){
+			offsetWidth = this._OffsetWidth/4;
+		}
 		var ctx = this.GetCanvasCtx();
 		var viewNodes = this._ViewNodes;
 		var viewNode = null;
@@ -1033,6 +1040,7 @@ return {
 	Node:_Node,
 	View:{
 		Direct: _ViewDirect,
+		Mode:	_ViewMode,
 		Engine:	_ViewEngine
 	},
 	Util:{

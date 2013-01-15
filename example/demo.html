@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>极速灵感</title>
-	<link type="text/css" rel="stylesheet" href="style/jsmind.css" />
+	<title>jsMind</title>
+	<link type="text/css" rel="stylesheet" href="../style/jsmind.css" />
 	<style type="text/css">
 		body{
 			background-color:#aaa;
@@ -21,7 +21,6 @@
 <div id="jsmind_container" class="jsmind-container"></div>
 
 </body>
-<script type="text/javascript" src="../js/jsmind.lang.en.js"></script>
 <script type="text/javascript" src="../js/jsmind.js"></script>
 <script type="text/javascript">
 	var jm = jsMind;
@@ -60,7 +59,7 @@
 	];
 	jm.logger.log(rootNode);
 	
-	var ve = new jm.View.Engine('',$container,false);
+	var ve = new jm.View.Engine('jsMind',$container,jm.View.Mode.Both);
 	ve.Layout(rootNode);
 </script>
 </html>

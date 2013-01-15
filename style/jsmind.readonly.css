@@ -7,7 +7,7 @@ header{height:60px;background-color:#eee;border-bottom:solid 1px #aaa;position:r
 header h1{margin:0 15px;color:#444;text-shadow:1px 1px 1px #fff;font:bold 32px/60px "Microsoft YaHei",simhei,STHeiTi,sans-serif,Verdana;}
 header h1:first-letter{font-family:Webdings;line-height:54px;color:#090;} /* Wingdings v */
 header nav{position:absolute;left:240px;top:30px;}
-header nav a{color:#333;text-decoration:none;text-shadow:1px 1px 1px #fff;margin-left:15px;font-size:14px;}
+header nav a{color:#333;text-decoration:none;text-shadow:1px 1px 1px #fff;margin-left:15px;font:normal 14px/1 Verdana,Arial,Helvetica,sans-serif;}
 header nav a:visited{color:#333;}
 header nav a:hover{color:#0a0;}
 
