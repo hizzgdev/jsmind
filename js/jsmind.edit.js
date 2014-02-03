@@ -45,7 +45,7 @@
 
 	var _persistence = {
 		add : function(mindId,parentNodeId,sTopic,sSummary,fnCallback){
-			var nodeId = 'xxxx';
+			var nodeId = new Date();
 			if(fnCallback){
 				fnCallback(mindId,parentNodeId,nodeId,sTopic,sSummary);
 			}
