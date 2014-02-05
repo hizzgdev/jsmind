@@ -20,46 +20,33 @@
 <body>
 <div id="jsmind_container" class="jsmind-container"></div>
 
-</body>
 <script type="text/javascript" src="../js/jsmind.js"></script>
 <script type="text/javascript">
-	var jm = jsMind;
-	var $container = document.getElementById('jsmind_container');
-	//jm.Util.AddEvent($w,'resize',ReSetContainerSize);
-	//jm.Util.AddEvent($d,'click',PageClickEvent);
-	var rootNode = new jm.Node('rootNode',0,'RootNode','Summary',null);
-	rootNode.Children = [
-		new jm.Node('node1',0,'Node1','Node1',rootNode),
-		new jm.Node('node2',1,'Node2','Node2',rootNode),
-		new jm.Node('node3',2,'Node3','Node3',rootNode),
-		new jm.Node('node4',3,'Node4','Node4',rootNode),
-		new jm.Node('node5',4,'Node5','Node5',rootNode)
-	];
-	var n = rootNode.Children[0];
-	n.Children=[
-		new jm.Node('node11',0,'Node11','Node11',n),
-		new jm.Node('node13',0,'Node13','Node11',n),
-		new jm.Node('node12',0,'Node12','Node12',n)
-	];
-	var n = rootNode.Children[1];
-	n.Children=[
-		new jm.Node('node21',0,'Node21','Node11',n),
-		new jm.Node('node22',0,'Node22','Node12',n)
-	];
-	var n = rootNode.Children[3];
-	n.Children=[
-		new jm.Node('node41',0,'Node41','Node11',n),
-		new jm.Node('node42',0,'Node42','Node12',n),
-		new jm.Node('node43',0,'Node43','Node12',n)
-	];
-	var n = rootNode.Children[4];
-	n.Children=[
-		new jm.Node('node51',0,'Node51','Node11',n),
-		new jm.Node('node52',0,'Node52','Node12',n)
-	];
-	jm.logger.log(rootNode);
-	
-	var ve = new jm.View.Engine('jsMind',$container,jm.View.Mode.Both);
-	ve.Layout(rootNode);
+    var myConfig = {
+        data:{
+            type :'url',
+            data :'http://localhost:8080/example/data.json',
+            sync : false
+        },
+        layout:{
+            mode :'side',
+            width:80,
+            height:30
+        },
+        viewer:{
+            container:'jsmind_container',
+            resize:'auto'
+        },
+        theme:{
+            name:'default'
+        }
+    };
+
+    var jm = new jsMind(myConfig);
+    jm.show();
+// ==== OR =========================
+//  var jm = jsMind.show(myConfig);
+
 </script>
+</body>
 </html>
