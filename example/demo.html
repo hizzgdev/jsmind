@@ -22,11 +22,10 @@
 
 <script type="text/javascript" src="../js/jsmind.js"></script>
 <script type="text/javascript">
-    var myConfig = {
+    var myOptions = {
         data:{
             type :'url',
             data :'http://localhost:8080/example/data.json',
-            sync : false
         },
         layout:{
             mode :'side',
@@ -42,10 +41,10 @@
         }
     };
 
-    var jm = new jsMind(myConfig);
+    var jm = new jsMind(myOptions);
     jm.show();
 // ==== OR =========================
-//  var jm = jsMind.show(myConfig);
+//  var jm = jsMind.show(myOptions);
 
 </script>
 </body>
