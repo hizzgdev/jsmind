@@ -1,7 +1,4 @@
-(function($w,jm){
-
-if(!!jm){alert("pas de viewEng");}
-
+(function(jm,$w){
 var $d = $w.document;
 var $g = function(id){return $d.getElementById(id);};
 var $gtn = function(tag){return $d.getElementsByTagName(tag);};
@@ -11,14 +8,13 @@ var $float_toolbar = $g('float_toolbar');
 var $jsmind_edit_panel = $g('jsmind_edit_panel');
 var $bt_ok = $g('bt_ok');
 var $bt_cancel = $g('bt_cancel');
-var _view_engine = null;
 
 // Class
-var _Event = function(){
+jm.Event = function(){
 	this.Id = null;
 };
 
-_Event.prototype = {
+jm.Event.prototype = {
 	handleKeyPressEvent : function(e){
 		var charCode;
 		if(e && e.which){charCode = e.which;}
@@ -39,33 +35,29 @@ _Event.prototype = {
 	}
 }
 	
-	var returnKeyEvent = function(){
-		var selectedNodeId = getSelectedNodeObject();
-		//alert(selectedNodeId.Id);
-		/*if($jsmind_edit_panel.style.visibility == 'visible'){
-			$bt_ok.click();
-			$float_toolbar.style.visibility = 'hidden';
-		}else if(selectedNodeId){
-			$float_toolbar.style.visibility = 'hidden';
-			_view_engine.AddNode({Id:new Date(),Topic:"NewNode",Summary:""},selectedNodeId.Parent.Id);
-		}*/
-	};
+var returnKeyEvent = function(){
+	var selectedNodeId = getSelectedNodeObject();
+	/*if($jsmind_edit_panel.style.visibility == 'visible'){
+		$bt_ok.click();
+		$float_toolbar.style.visibility = 'hidden';
+	}else if(selectedNodeId){
+		$float_toolbar.style.visibility = 'hidden';
+		_view_engine.AddNode({Id:new Date(),Topic:"NewNode",Summary:""},selectedNodeId.Parent.Id);
+	}*/
+};
 
-	var getSelectedNodeObject = function(){
-		_view_engine = new jm.View.Engine('jsMind',$container,jm.View.Mode.Both);
-		var nodes = $d.getElementsByTagName('jmnode');
-		for(var i = 0;i<nodes.length;i++){
-			var nodeClass = nodes[i].getAttribute('class');
-			if(nodeClass && nodeClass.indexOf("selected") != -1){
-				var selectedNodeId = nodes[i].getAttribute('nodeid');
-				var node = _view_engine.FindNode(selectedNodeId);
-				alert(node);
-				return node;
-			}
+var getSelectedNodeObject = function(){
+	var nodes = $d.getElementsByTagName('jmnode');
+	for(var i = 0;i<nodes.length;i++){
+		var nodeClass = nodes[i].getAttribute('class');
+		if(nodeClass && nodeClass.indexOf("selected") != -1){
+			var selectedNodeId = nodes[i].getAttribute('nodeid');
+			var _view_engine = new jm.View.Engine('jsMind',$container,jm.View.Mode.Both);
+			var node = _view_engine.FindNode(selectedNodeId);
+			alert(node);
+			return node;
 		}
-	};
-	
-	return {
-		Event:_Event
-	};
-})(window,jsMind);
+	}
+};
+
+})(jsMind,window);

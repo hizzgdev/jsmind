@@ -1,4 +1,4 @@
-(function($w,jm,jms){
+(function($w,jm){
 	var $d = $w.document;
 	var $g = function(id){return $d.getElementById(id);};
 	var $gtn = function(tag){return $d.getElementsByTagName(tag);};
@@ -20,7 +20,7 @@
 	var _editor = null;
 	
 	function Page_Load(){
-		var shortCutEvent = new jms.Event();
+		var shortCutEvent = new jm.Event();
 		SetContainerSize();
 		jm.Util.AddEvent($w,'resize',ReSetContainerSize);
 		jm.Util.AddEvent($w,'keydown',shortCutEvent.handleKeyPressEvent);
@@ -123,6 +123,6 @@
 
 	Page_Load();
 
-})(window,jsMind,jsMindShortCut);
+})(window,jsMind);
 
 
