@@ -40,7 +40,7 @@
 
     // check global variables
     if(typeof($w[__jsMindName__])!='undefined'){
-        _console.log('jsMind is already exist.');
+        _console.log('jsMind has been already exist.');
         return;
     }
 
@@ -67,9 +67,9 @@
             //data : 'http://localhost:8080/example/default_data.json'
             type : 'local',
             data : [
-                    {nodeid:'a001', isroot:true, topic:'root node', nodeindex:0},
-                    {nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1', nodeindex:1 },
-                    {nodeid:'b002', parentid:'a001', topic:'sub node #2', summary:'summary of node #2', nodeindex:2 }
+                    {nodeid:'a001', isroot:true, topic:'root node'},
+                    {nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1', sn:10 },
+                    {nodeid:'b002', parentid:'a001', topic:'sub node #2', summary:'summary of node #2'}
                    ]
         },
         view:{
@@ -157,6 +157,8 @@
     // ============== static object ==============================================
 
     jsMind.Node = function(sId,iIndex,sTopic,sSummary,bIsRoot,oParent){
+        if(!sId){_console.error('invalid nodeid');return;}
+        if(typeof(iIndex) != 'number'){_console.error('invalid node index');return;}
         this.Id = sId;
         this.Index = iIndex;
         this.Topic = sTopic;
@@ -166,13 +168,18 @@
         this.Children = [];
         this.Data = {};
     };
+    jsMind.Node.Compare=function(node1,node2){
+        var i1 = node1.Index;
+        var i2 = node2.Index;
+        return i1-i2;
+    };
 
     // data provider
     jsMind.data_provider = function(jm, options){
         this.jsMind = jm;
         this.opts = options;
         this.root = null;
-        this.nodes = [];
+        this.nodes = {};
         this.load_success_callback = null;
     };
     jsMind.data_provider.prototype={
@@ -194,7 +201,6 @@
             }else{
                 _console.error('unsupported data type :'+data_type);
             }
-            _console.debug(this);
         },
         fetch:function(url){
             // do ajax ....
@@ -205,10 +211,10 @@
             // reverse array for improving looping performance
             node_array.reverse();
             var root_node = this._parse_extract_root(node_array);
-            _console.debug(root_node);
             if(!!root_node){
                 this.root = root_node;
                 this._parse_extract_subnode(node_array, root_node);
+                this.reindex(root_node);
             }else{
                 _console.error('the root node can not be found');
             }
@@ -220,7 +226,12 @@
             var o = node_json;
             var p = parent_node || null;
             var r = isroot || false;
-            var node = new jsMind.Node(o.nodeid,o.nodeindex,o.topic,o.summary,r,p);
+            if(!r && !p){
+                _console.error('node has not parent');
+                return null;
+            }
+            var sn = o.sn || 0;
+            var node = new jsMind.Node(o.nodeid,sn,o.topic,o.summary,r,p);
             return node;
         },
         _parse_extract_root:function(node_array){
@@ -230,8 +241,12 @@
                     var root_json = node_array[i];
                     node_array.splice(i,1);
                     var root_node = this._parse_node(root_json,null,true);
-                    this.nodes.push(root_node);
-                    return root_node;
+                    if(this.putNode(root_node)){
+                        return root_node;
+                    }else{
+                        delete root_node;
+                        _console.warn('root node has an not unique id, and this node has been skipped');
+                    }
                 }
             }
             return null;
@@ -244,10 +259,18 @@
             var extract_count = 0;
             while(i--){
                 node_json = node_array[i];
+                if(!('sn' in node_json)){
+                    node_json.sn = extract_count;
+                }
                 if(node_json.parentid == pid){
                     node = this._parse_node(node_json,parent_node);
-                    parent_node.Children.push(node);
-                    this.nodes.push(node);
+                    if(this.putNode(node)){
+                        parent_node.Children.push(node);
+                    }else{
+                        delete node;
+                        _console.warn('some node has skipped');
+                        break;
+                    }
                     node_array.splice(i,1);
                     extract_count ++;
                     var sub_extract_count = this._parse_extract_subnode(node_array,node);
@@ -256,16 +279,121 @@
                         i = node_array.length;
                         extract_count += sub_extract_count;
                     }
+                    this.reindex(node);
                 }
             }
             return extract_count;
         },
-        getRootNode:function(){},
-        getSubNodes:function(nodeId){},
-        getNode:function(nodeId){},
-        addNode:function(node, parentid){},
-        removeNodes:function(nodeIdArray){},
+        putNode:function(node){
+            if(node.Id in this.nodes){
+                _console.warn('the nodeid \''+nodeid+'\' has been already exist.');
+                return false;
+            }else{
+                this.nodes[node.Id] = node;
+                return true;
+            }
+        },
+        getNode:function(nodeId){
+            if(nodeId in this.nodes){
+                return this.nodes[nodeId];
+            }else{
+                _console.error('the node[id='+nodeid+'] can not be found');
+                return null;
+            }
+        },
+        getRootNode:function(){
+            return this.node;
+        },
+        getSubNodes:function(nodeId){
+            var node = this.getNode(nodeId);
+            return node.Children;
+        },
+        addNode:function(node_json, before){
+            var parent_node = this.getNode(node_json.parentid);
+            if(!!parent_node){
+                var node = this._parse_node(node, parent_node);
+                if(this.putNode(node)){
+                    parent_node.Children.push(node);
+                    this.reindex(parent_node);
+                    return true;
+                }else{
+                    _console.error('fail, the nodeid has been already exist');
+                    delete node;
+                    return false;
+                }
+            }
+        },
+
+        removeNode:function(node){
+            if(!(node instanceof jsMind.Node)){
+                node = this.getNode(node);
+            }
+            if(!node){return;}
+            if(node.IsRoot){
+                _console.error('fail, can not remove the root node');
+                return;
+            }
+            // clean all subordinate nodes
+            var children = node.Children;
+            var ci = children.length;
+            while(ci--){
+                this.removeNode(children[ci]);
+            }
+            // remove from parent's children
+            var sibling = node.Parent.Children;
+            var si = sibling.length;
+            while(si--){
+                if(sibling[si].Id == node.Id){
+                    sibling.splice(si,1);
+                    break;
+                }
+            }
+            // remove from global nodes
+            delete this.nodes[node.Id];
+            // clean all properties
+            for(var k in node){
+                delete node[k];
+            }
+            // remove it's self
+            delete node;
+        },
+
+        reindex:function(node){
+            if(node instanceof jsMind.Node){
+                node.Children.sort(jsMind.Node.Compare);
+                for(var i=0;i<node.Children.length;i++){
+                    node.Children[i].Index = i;
+                }
+            }
+        },
+
+        _getJsonArray:function(node,json_array){
+            if(!(node instanceof jsMind.Node)){return;}
+            if(!json_array){
+                json_array = [];
+            }
+            var o = {
+                nodeid : node.Id,
+                isroot : node.IsRoot,
+                parentid : (!!node.Parent)?node.Parent.Id:null,
+                topic : node.Topic,
+                summary : node.Sumary,
+                sn : node.Index
+            };
+            json_array.push(o);
+            var ci = node.Children.length;
+            for(var i=0;i<ci;i++){
+                this._getJsonArray(node.Children[i],json_array);
+            }
+            return json_array;
+        },
+
         getJsonArray:function(){
+            var json = this._getJsonArray(this.root,[]);
+            //_console.debug(json);
+            //var json_str = JSON.stringify(json);
+            //_console.debug(json_str);
+            return json;
         }
     };
 
