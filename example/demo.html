@@ -22,24 +22,36 @@
 
 <script type="text/javascript" src="../js/jsmind.js"></script>
 <script type="text/javascript">
+    /*
+    var my_data_provider = jsMind.data_provider;
+    my_data_provider.prototype.load = function(fnCallback){
+        alert('hahah');
+        fnCallback();
+    };
+    */
+
     var myOptions = {
         data:{
-            type :'url',
-            data :'http://localhost:8080/example/data.json',
+            //type :'remote',
+            //data :'http://localhost:8080/example/data.json'
         },
         layout:{
             mode :'side',
             width:80,
             height:30
         },
-        viewer:{
+        view:{
             container:'jsmind_container',
             resize:'auto'
         },
         theme:{
             name:'default'
-        }
+        }/*,
+        provider:{
+            data:my_data_provider
+        }*/
     };
+
 
     var jm = new jsMind(myOptions);
     jm.show();
