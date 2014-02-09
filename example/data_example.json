@@ -1,0 +1,5 @@
+[
+{nodeid:'a001', isroot:true, topic:'root node'},
+{nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1', sn:10 },
+{nodeid:'b002', parentid:'a001', topic:'sub node #2', summary:'summary of node #2'}
+]

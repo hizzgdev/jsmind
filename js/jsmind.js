@@ -1,11 +1,15 @@
-
 /*
  * example:
- *     var myConfig = {
+ *     var options = {
  *         data:{
- *             type :'url',
- *             data :'http://localhost:8080/example.json'
- *             sync : false,
+ *             type : 'remote',
+ *             data : 'http://localhost:8080/example/data_example.json'
+ *             //type : 'local',
+ *             //data : [
+ *             //    {nodeid:'a001', isroot:true, topic:'root node'},
+ *             //    {nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1', sn:10 },
+ *             //    {nodeid:'b002', parentid:'a001', topic:'sub node #2', summary:'summary of node #2'}
+ *             //]
  *         },
  *         view:{
  *             container:containerid or dom object,
@@ -21,10 +25,10 @@
  *         }
  *     };
  *
- *     var jm = new jsMind(myConfig);
+ *     var jm = new jsMind(options);
  *     jm.show()
  *     === OR =======================
- *     var jm = jsMind.show(myConfig);
+ *     var jm = jsMind.show(options);
  *
  * editor is not a built-in compose, you should enable editor extra.
  */
@@ -63,14 +67,14 @@
      */
     var DEFAULT_OPTIONS = {
         data:{
-            //type : 'remote',
-            //data : 'http://localhost:8080/example/default_data.json'
-            type : 'local',
-            data : [
-                    {nodeid:'a001', isroot:true, topic:'root node'},
-                    {nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1', sn:10 },
-                    {nodeid:'b002', parentid:'a001', topic:'sub node #2', summary:'summary of node #2'}
-                   ]
+            type : 'remote',
+            data : 'http://localhost:8080/example/data_example.json'
+            //type : 'local',
+            //data : [
+            //        {nodeid:'a001', isroot:true, topic:'root node'},
+            //        {nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1', sn:10 },
+            //        {nodeid:'b002', parentid:'a001', topic:'sub node #2', summary:'summary of node #2'}
+            //       ]
         },
         view:{
             resize:'auto'
@@ -154,7 +158,7 @@
         return jm;
     };
 
-    // ============== static object ==============================================
+    // ============= static object =============================================
 
     jsMind.Node = function(sId,iIndex,sTopic,sSummary,bIsRoot,oParent){
         if(!sId){_console.error('invalid nodeid');return;}
@@ -174,7 +178,68 @@
         return i1-i2;
     };
 
-    // data provider
+    jsMind.Util = {
+        Ajax:{
+            _xhr:function(){
+                var xhr = null;
+                if(window.XMLHttpRequest){
+                    xhr = new XMLHttpRequest();
+                }else{
+                    try{
+                        xhr = new ActiveXObject("Microsoft.XMLHTTP");
+                    }catch(e){}
+                }
+                return xhr;
+            },
+            _eurl:function(url){
+                return encodeURIComponent(url);
+            },
+            request:function(url,param,method,callback){
+                var a = jsMind.Util.Ajax;
+                var p = null;
+                var tmp_param = [];
+                for(k in param){
+                    tmp_param.push(a._eurl(k)+'='+a._eurl(param[k]));
+                }
+                if(tmp_param.length>0){
+                    p = tmp_param.join('&');
+                }
+                var xhr = a._xhr();
+                if(xhr == null){return;}
+                xhr.onreadystatechange = function(){
+                    if(xhr.readyState == 4){
+                        if(xhr.status == 200 || xhr.status == 0){
+                            if(typeof(callback) == 'function'){
+                                var data = eval('('+xhr.responseText+')');
+                                callback(data);
+                            }
+                        }else{
+                            var w = $w.open('');
+                            w.document.write(xhr.responseText);
+                            //alert(xhr.responseText);
+                        }
+                    }
+                }
+                method = method || 'GET';
+                xhr.open(method,url,true);
+                xhr.setRequestHeader('If-Modified-Since','0');
+                if(method == 'POST'){
+                    xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded;charset=utf-8');
+                    xhr.send(p);
+                }else{
+                    xhr.send();
+                }
+            },
+            get:function(url,callback){
+                return jsMind.Util.Ajax.request(url,{},'GET',callback);
+            },
+            post:function(url,param,callback){
+                return jsMind.Util.Ajax.request(url,param,'POST',callback);
+            }
+        }
+    };
+
+    // ============= data provider =============================================
     jsMind.data_provider = function(jm, options){
         this.jsMind = jm;
         this.opts = options;
@@ -203,9 +268,10 @@
             }
         },
         fetch:function(url){
-            // do ajax ....
-            var node_array = [];
-            this.parse(node_array);
+            var jmData = this;
+            jsMind.Util.Ajax.get(url,function(data){
+                jmData.parse(data);
+            });
         },
         parse:function(node_array){
             // reverse array for improving looping performance
