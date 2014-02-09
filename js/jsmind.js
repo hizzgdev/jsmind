@@ -7,7 +7,7 @@
  *             //type : 'local',
  *             //data : [
  *             //    {nodeid:'a001', isroot:true, topic:'root node'},
- *             //    {nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1', sn:10 },
+ *             //    {nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1', nodeindex:10 },
  *             //    {nodeid:'b002', parentid:'a001', topic:'sub node #2', summary:'summary of node #2'}
  *             //]
  *         },
@@ -72,7 +72,7 @@
             //type : 'local',
             //data : [
             //        {nodeid:'a001', isroot:true, topic:'root node'},
-            //        {nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1', sn:10 },
+            //        {nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1', nodeindex:10 },
             //        {nodeid:'b002', parentid:'a001', topic:'sub node #2', summary:'summary of node #2'}
             //       ]
         },
@@ -173,9 +173,23 @@
         this.Data = {};
     };
     jsMind.Node.Compare=function(node1,node2){
+        // '-1' is alwary the last
+        var r = 0;
         var i1 = node1.Index;
         var i2 = node2.Index;
-        return i1-i2;
+        if(i1>=0 && i2>=0){
+            r = i1-i2;
+        }else if(i1==-1 && i2==-1){
+            r = 0;
+        }else if(i1==-1){
+            r = 1;
+        }else if(i2==-1){
+            r = -1;
+        }else{
+            r = 0;
+        }
+        //_console.debug(i1+' <> '+i2+'  =  '+r);
+        return r;
     };
 
     jsMind.Util = {
@@ -290,14 +304,14 @@
         },
         _parse_node:function(node_json, parent_node, isroot){
             var o = node_json;
-            var p = parent_node || null;
-            var r = isroot || false;
+            var p = parent_node;
+            var r = !!isroot;
             if(!r && !p){
                 _console.error('node has not parent');
                 return null;
             }
-            var sn = o.sn || 0;
-            var node = new jsMind.Node(o.nodeid,sn,o.topic,o.summary,r,p);
+            var idx = ('nodeindex' in o)?o.nodeindex:-1;
+            var node = new jsMind.Node(o.nodeid,idx,o.topic,o.summary,r,p);
             return node;
         },
         _parse_extract_root:function(node_array){
@@ -325,8 +339,8 @@
             var extract_count = 0;
             while(i--){
                 node_json = node_array[i];
-                if(!('sn' in node_json)){
-                    node_json.sn = extract_count;
+                if(!('nodeindex' in node_json)){
+                    node_json.nodeindex = extract_count;
                 }
                 if(node_json.parentid == pid){
                     node = this._parse_node(node_json,parent_node);
@@ -363,7 +377,7 @@
             if(nodeId in this.nodes){
                 return this.nodes[nodeId];
             }else{
-                _console.error('the node[id='+nodeid+'] can not be found');
+                _console.error('the node[id='+nodeId+'] can not be found');
                 return null;
             }
         },
@@ -374,22 +388,59 @@
             var node = this.getNode(nodeId);
             return node.Children;
         },
-        addNode:function(node_json, before){
+        // watch out the nodeindex item, the position of node is determined by it.
+        addNode:function(node_json){
+            var result = false;
             var parent_node = this.getNode(node_json.parentid);
             if(!!parent_node){
-                var node = this._parse_node(node, parent_node);
+                if(!('nodeindex' in node_json)){
+                    node_json.nodeindex = -1;
+                }
+                var node = this._parse_node(node_json, parent_node);
                 if(this.putNode(node)){
                     parent_node.Children.push(node);
                     this.reindex(parent_node);
-                    return true;
+                    result = true;
                 }else{
                     _console.error('fail, the nodeid has been already exist');
                     delete node;
-                    return false;
                 }
             }
+            return result;
         },
-
+        // this method while rewrite the nodeindex in node_json
+        addNodeAt:function(node_json, node_index){
+            node_json.nodeindex = node_index-0.5;
+            return this.addNode(node_json);
+        },
+        // this method while rewrite the nodeindex in node_json
+        addNodeBefore:function(node_json, before_id){
+            var node_before = (!!before_id)?this.getNode(before_id):null;
+            if(!!node_before){
+                if(node_before.Parent!=null && node_before.Parent.Id == node_json.parentid){
+                    node_json.nodeindex = node_before.Index-0.5;
+                }else{
+                    node_json.nodeindex = -1;
+                }
+            }else{
+                node_json.nodeindex = -1;
+            }
+            return this.addNode(node_json);
+        },
+        // this method while rewrite the nodeindex in node_json
+        addNodeAfter:function(node_json, after_id){
+            var node_after = (!!after_id)?this.getNode(after_id):null;
+            if(!!node_after){
+                if(node_after.Parent!=null && node_after.Parent.Id==node_json.parentid){
+                    node_json.nodeindex = node_after.Index + 0.5;
+                }else{
+                    node_json.nodeindex = -1;
+                }
+            }else{
+                node_json.nodeindex = -1;
+            }
+            return this.addNode(node_json);
+        },
         removeNode:function(node){
             if(!(node instanceof jsMind.Node)){
                 node = this.getNode(node);
@@ -428,7 +479,7 @@
             if(node instanceof jsMind.Node){
                 node.Children.sort(jsMind.Node.Compare);
                 for(var i=0;i<node.Children.length;i++){
-                    node.Children[i].Index = i;
+                    node.Children[i].Index = i+1;
                 }
             }
         },
@@ -439,12 +490,12 @@
                 json_array = [];
             }
             var o = {
+                _nodeindex_ : node.Index,
                 nodeid : node.Id,
                 isroot : node.IsRoot,
                 parentid : (!!node.Parent)?node.Parent.Id:null,
                 topic : node.Topic,
-                summary : node.Sumary,
-                sn : node.Index
+                summary : node.Sumary
             };
             json_array.push(o);
             var ci = node.Children.length;

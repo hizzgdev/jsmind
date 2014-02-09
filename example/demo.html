@@ -56,11 +56,19 @@
     var jm = new jsMind(myOptions);
     jm.show();
     //jm.data.removeNode('b001');
-// ==== OR =========================
-//  var jm = jsMind.show(myOptions);
+    // ==== OR =========================
+    //  var jm = jsMind.show(myOptions);
 
-    var d = jm.data.getJsonArray();
-
+    function xxxx(){
+        var newNode = {nodeid:'b00X', parentid:'a001', topic:'sub node #X', summary:'summary of node #X'};
+        var newNode1 = {nodeid:'b00Y', parentid:'a001', topic:'sub node #X', summary:'summary of node #X'};
+        jm.data.addNodeAfter(newNode,'a001');
+        jm.data.addNodeAt(newNode1,5);
+        var d = jm.data.getJsonArray();
+        console.log(d);
+        console.log(JSON.stringify(d));
+    }
+    setTimeout(xxxx,1000);
 
 </script>
 </body>
