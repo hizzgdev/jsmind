@@ -20,10 +20,10 @@
 	var _editor = null;
 	
 	function Page_Load(){
-		var shortCutEvent = new jm.Event();
+		var shortCutEvent = new jm.EventHandler();
 		SetContainerSize();
 		jm.Util.AddEvent($w,'resize',ReSetContainerSize);
-		jm.Util.AddEvent($w,'keydown',shortCutEvent.handleKeyPressEvent);
+		jm.Util.AddEvent($w,'keydown',shortCutEvent.HandleKeyPressEvent);
 		_view_engine = new jm.View.Engine('jsMind',$container,jm.View.Mode.Both);
 		LoadMind();
 		enableEdit();

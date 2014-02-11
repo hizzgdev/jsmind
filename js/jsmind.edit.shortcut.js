@@ -1,7 +1,6 @@
 (function(jm,$w){
 var $d = $w.document;
 var $g = function(id){return $d.getElementById(id);};
-var $gtn = function(tag){return $d.getElementsByTagName(tag);};
 
 var $container = $g('jsmind_container');
 var $float_toolbar = $g('float_toolbar');
@@ -10,12 +9,11 @@ var $bt_ok = $g('bt_ok');
 var $bt_cancel = $g('bt_cancel');
 
 // Class
-jm.Event = function(){
-	this.Id = null;
+jm.EventHandler = function(){
 };
 
-jm.Event.prototype = {
-	handleKeyPressEvent : function(e){
+jm.EventHandler.prototype = {
+	HandleKeyPressEvent : function(e){
 		var charCode;
 		if(e && e.which){charCode = e.which;}
 		else if(window.event){e = window.event;charCode = e.keyCode;}
@@ -36,27 +34,19 @@ jm.Event.prototype = {
 }
 	
 var returnKeyEvent = function(){
-	var selectedNodeId = getSelectedNodeObject();
-	/*if($jsmind_edit_panel.style.visibility == 'visible'){
+	var _view_engine = new jm.View.Engine('jsMind',$container,jm.View.Mode.Both);
+	
+	//var nodeid = _view_engine.GetSelectedNode();
+	//alert(nodeid); --> return null ???
+	
+	var nodeid = _view_engine.GetSelectedNodeFromElement();
+	 _view_engine.SetSelectedNode(nodeid); // TypeError: oNode is undefined
+	if($jsmind_edit_panel.style.visibility == 'visible'){
 		$bt_ok.click();
 		$float_toolbar.style.visibility = 'hidden';
 	}else if(selectedNodeId){
 		$float_toolbar.style.visibility = 'hidden';
-		_view_engine.AddNode({Id:new Date(),Topic:"NewNode",Summary:""},selectedNodeId.Parent.Id);
-	}*/
-};
-
-var getSelectedNodeObject = function(){
-	var nodes = $d.getElementsByTagName('jmnode');
-	for(var i = 0;i<nodes.length;i++){
-		var nodeClass = nodes[i].getAttribute('class');
-		if(nodeClass && nodeClass.indexOf("selected") != -1){
-			var selectedNodeId = nodes[i].getAttribute('nodeid');
-			var _view_engine = new jm.View.Engine('jsMind',$container,jm.View.Mode.Both);
-			var node = _view_engine.FindNode(selectedNodeId);
-			alert(node);
-			return node;
-		}
+		_view_engine.AddNode({Id:new Date(),Topic:"NewNode",Summary:""},"b00001");
 	}
 };
 

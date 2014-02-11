@@ -961,12 +961,25 @@ _ViewEngine.prototype = {
 	},
 	
 	SetSelectedNode : function(sNodeId){
+		alert("parameter in : " + sNodeId);
 		var oNode = this.FindNode(sNodeId);
+		alert("oNode : " + oNode);
 		this._SelectedViewNode = oNode.View;
 	},
 	
 	GetSelectedNode : function(){
 		return this._SelectedViewNode;
+	},
+	
+	GetSelectedNodeFromElement : function(){
+		var nodes = $d.getElementsByTagName('jmnode');
+		for(var i = 0;i<nodes.length;i++){
+			var nodeClass = nodes[i].getAttribute('class');
+			if(nodeClass && nodeClass.indexOf("selected") != -1){
+				this.SetSelectedNode(nodes[i].getAttribute('nodeid'));
+				return nodes[i].getAttribute('nodeid');
+			}
+		}
 	},
 	
 	onNodeEnter : function(e){
@@ -1006,7 +1019,7 @@ _ViewEngine.prototype = {
 					t.className = c + ' selected';
 				}
 			}else{
-				this.SetSelectedNode(id);
+				this.SetSelectedNode("c00011");
 				t.className = c + ' selected';
 			}
 		}else if(tagName == 'jmexpander'){
