@@ -961,25 +961,12 @@ _ViewEngine.prototype = {
 	},
 	
 	SetSelectedNode : function(sNodeId){
-		alert("parameter in : " + sNodeId);
 		var oNode = this.FindNode(sNodeId);
-		alert("oNode : " + oNode);
 		this._SelectedViewNode = oNode.View;
 	},
 	
 	GetSelectedNode : function(){
 		return this._SelectedViewNode;
-	},
-	
-	GetSelectedNodeFromElement : function(){
-		var nodes = $d.getElementsByTagName('jmnode');
-		for(var i = 0;i<nodes.length;i++){
-			var nodeClass = nodes[i].getAttribute('class');
-			if(nodeClass && nodeClass.indexOf("selected") != -1){
-				this.SetSelectedNode(nodes[i].getAttribute('nodeid'));
-				return nodes[i].getAttribute('nodeid');
-			}
-		}
 	},
 	
 	onNodeEnter : function(e){
@@ -1019,7 +1006,7 @@ _ViewEngine.prototype = {
 					t.className = c + ' selected';
 				}
 			}else{
-				this.SetSelectedNode("c00011");
+				this.SetSelectedNode(id);
 				t.className = c + ' selected';
 			}
 		}else if(tagName == 'jmexpander'){
@@ -1048,6 +1035,16 @@ _ViewEngine.prototype = {
 	}
 };
 
+var getUniqueId = function(){
+    var d = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (d + Math.random()*16)%16 | 0;
+        d = Math.floor(d/16);
+        return (c=='x' ? r : (r&0x7|0x8)).toString(16);
+    });
+    return uuid;
+};
+
 // Return
 return {
 	Node:_Node,
@@ -1058,7 +1055,8 @@ return {
 	},
 	Util:{
 		AddEvent: $add_event,
-		RemoveEvent: $remove_event
+		RemoveEvent: $remove_event,
+		GetUniqueId: getUniqueId
 	}
 };
 })(window);

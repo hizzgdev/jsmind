@@ -13,41 +13,48 @@ jm.EventHandler = function(){
 };
 
 jm.EventHandler.prototype = {
-	HandleKeyPressEvent : function(e){
+	HandleKeyPressEvent : function(e,view_engine){
 		var charCode;
 		if(e && e.which){charCode = e.which;}
 		else if(window.event){e = window.event;charCode = e.keyCode;}
 		
-		var availableShortCuts = [ 13, 27, 32, 37, 38, 39, 40 ];
+		var availableShortCuts = [ 13, 27, 32, 37, 38, 39, 40];
 		if(availableShortCuts.indexOf(charCode) != -1){
 			switch(charCode) {
-				case 13: returnKeyEvent(); 	break;
-				case 27: /*escape key*/		break;
-				case 32: /*space key*/     	break;
-				case 37: /*rigth down*/		break;
-				case 38: /*up down*/		break;
-				case 39: /*left down*/ 		break;
-				case 40: /*down down*/ 		break;
+				case 13: returnKeyEvent(view_engine); 	break;
+				case 27: escapeKeyEvent();				break;
+				case 32: /*space key*/     				break;
+				case 37: /*rigth down*/					break;
+				case 38: /*up down*/					break;
+				case 39: /*left down*/ 					break;
+				case 40: /*down down*/ 					break;
 			}   	
 		}
 	}
 }
-	
-var returnKeyEvent = function(){
-	var _view_engine = new jm.View.Engine('jsMind',$container,jm.View.Mode.Both);
-	
-	//var nodeid = _view_engine.GetSelectedNode();
-	//alert(nodeid); --> return null ???
-	
-	var nodeid = _view_engine.GetSelectedNodeFromElement();
-	 _view_engine.SetSelectedNode(nodeid); // TypeError: oNode is undefined
+
+// submit edit panel or create a browser node	
+var returnKeyEvent = function(view_engine){
+	var _view_engine = view_engine;
+	var nodeid = _view_engine.GetSelectedNode();
 	if($jsmind_edit_panel.style.visibility == 'visible'){
 		$bt_ok.click();
 		$float_toolbar.style.visibility = 'hidden';
-	}else if(selectedNodeId){
+	}else if(nodeid){
 		$float_toolbar.style.visibility = 'hidden';
-		_view_engine.AddNode({Id:new Date(),Topic:"NewNode",Summary:""},"b00001");
+		var newNodeId =  jm.Util.GetUniqueId();
+		_view_engine.AddNode({Id:newNodeId,Topic:"NewNode",Summary:""},nodeid.Node.Parent.Id);
+		nodeid.Element.removeAttribute("class");
+		_view_engine.SetSelectedNode(newNodeId);
+		var newNode = _view_engine.GetSelectedNode();
+		newNode.Element.className = "selected";
 	}
 };
 
+// cancel edit panel
+var escapeKeyEvent = function(){
+	if($jsmind_edit_panel.style.visibility == 'visible'){
+		$bt_cancel.click();
+	}
+};
 })(jsMind,window);
