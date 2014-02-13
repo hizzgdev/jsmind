@@ -45,7 +45,7 @@
 
 	var _persistence = {
 		add : function(mindId,parentNodeId,sTopic,sSummary,fnCallback){
-			var nodeId = new Date();
+			var nodeId =  jm.Util.GetUniqueId();
 			if(fnCallback){
 				fnCallback(mindId,parentNodeId,nodeId,sTopic,sSummary);
 			}
