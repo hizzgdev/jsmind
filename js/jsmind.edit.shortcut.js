@@ -1,4 +1,6 @@
 (function(jm,$w){
+if(!jm.Editor || !!jm.Editor.EventHandler){return;}
+
 var $d = $w.document;
 var $g = function(id){return $d.getElementById(id);};
 
@@ -9,10 +11,10 @@ var $bt_ok = $g('bt_ok');
 var $bt_cancel = $g('bt_cancel');
 
 // Class
-jm.EventHandler = function(){
+jm.Editor.EventHandler = function(){
 };
 
-jm.EventHandler.prototype = {
+jm.Editor.EventHandler.prototype = {
 	HandleKeyPressEvent : function(e,view_engine){
 		var charCode;
 		if(e && e.which){charCode = e.which;}
