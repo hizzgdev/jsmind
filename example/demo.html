@@ -64,9 +64,8 @@
         var newNode1 = {nodeid:'b00Y', parentid:'a001', topic:'sub node #X', summary:'summary of node #X'};
         jm.data.addNodeAfter(newNode,'a001');
         jm.data.addNodeAt(newNode1,5);
-        var d = jm.data.getJsonArray();
+        var d = jm.data.getJsonString();
         console.log(d);
-        console.log(JSON.stringify(d));
     }
     setTimeout(xxxx,1000);
 

@@ -192,6 +192,8 @@
         return r;
     };
 
+    // ============= utility object =============================================
+
     jsMind.Util = {
         Ajax:{
             _xhr:function(){
@@ -254,6 +256,7 @@
     };
 
     // ============= data provider =============================================
+
     jsMind.data_provider = function(jm, options){
         this.jsMind = jm;
         this.opts = options;
@@ -505,16 +508,19 @@
             return json_array;
         },
 
-        getJsonArray:function(){
+        getJson:function(){
             var json = this._getJsonArray(this.root,[]);
-            //_console.debug(json);
-            //var json_str = JSON.stringify(json);
-            //_console.debug(json_str);
             return json;
-        }
+        },
+
+        getJsonString:function(){
+            var json = getJson();
+            var json_str = JSON.stringify(json);
+            return json_str;
     };
 
-    // layout provider
+    // ============= layout provider ===========================================
+
     jsMind.layout_provider = function(jm, options){this.jsMind = jm; this.opts = options;};
     jsMind.layout_provider.prototype={
         layout:function(fnCallback){
@@ -523,6 +529,9 @@
                 fnCallback();
             }
         }
+        // calculate the relative coordinate of every Node
+        // every node has 4 properties: basepoint(left,right,center), rel x, rel y, state(open,close,hidden)
+        // 
     };
 
     // view provider
