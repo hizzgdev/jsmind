@@ -10,12 +10,16 @@ var $jsmind_edit_panel = $g('jsmind_edit_panel');
 var $bt_ok = $g('bt_ok');
 var $bt_cancel = $g('bt_cancel');
 
+var shortCutEnabled = false;
+
 // Class
 jm.ShortCut = function(){
 };
 
 jm.ShortCut.prototype = {
 	HandleKeyPressEvent : function(e,view_engine){
+		if(!shortCutEnabled){return;}
+		
 		var charCode;
 		if(e && e.which){charCode = e.which;}
 		else if(window.event){e = window.event;charCode = e.keyCode;}
@@ -32,6 +36,14 @@ jm.ShortCut.prototype = {
 				case 40: /*down down*/ 					break;
 			}   	
 		}
+	},
+	
+	EnableShortCut : function(){
+		shortCutEnabled = true;
+	},
+	
+	DisableShortCut : function(){
+		shortCutEnabled = false;
 	}
 }
 
