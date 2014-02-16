@@ -12,7 +12,7 @@ jmnode.selected{background-color:#11f;color:#fff;}
 jmnode.root{padding:10px;font-size:24px;}
 jmnode.shine{background-color:#f03;}
 
-jmexpander{position:absolute;z-index:2;width:11px;height:11px;display:block;overflow:hidden;line-height:11px;font-size:12px;/*text-indent:2px;*/text-align:center;border-radius:6px;border:solid 1px gray;cursor:pointer;}
+jmexpander{position:absolute;z-index:2;width:11px;height:11px;display:block;overflow:hidden;line-height:12px;font-size:12px;/*text-indent:2px;*/text-align:center;border-radius:6px;border:solid 1px gray;cursor:pointer;}
 jmexpander:hover{border-color:#000;}
 
 /* z-index:10 */

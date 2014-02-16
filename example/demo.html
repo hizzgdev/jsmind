@@ -10,7 +10,7 @@
             background-color:#aaa;
         }
         #jsmind_container{
-            width:1200px;
+            width:1002px;
             height:600px;
             border:solid 1px #333;
             background:#eee;
@@ -19,9 +19,15 @@
 </head>
 <body>
 <div id="jsmind_container" class="jsmind-container"></div>
-
+<button onclick="resize_container();"> resize tester </button>
+<button onclick="resize_jsmind();"> resize tester </button>
 <script type="text/javascript" src="../js/jsmind.js"></script>
 <script type="text/javascript">
+    function resize_container(){
+        var c = document.getElementById('jsmind_container');
+        c.style.width = '400px';
+        c.style.height = '200px';
+    }
     /*
     var my_data_provider = jsMind.data_provider;
     my_data_provider.prototype.load = function(fnCallback){
@@ -59,6 +65,10 @@
         console.log(d);
     }
     //setTimeout(xxxx,1000);
+
+    function resize_jsmind(){
+        jm.resize();
+    }
 
 </script>
 </body>
