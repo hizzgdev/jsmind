@@ -1,5 +1,9 @@
 [
 {nodeid:'a001', isroot:true, topic:'root node'},
 {nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1', sn:10 },
-{nodeid:'b002', parentid:'a001', topic:'sub node #2', summary:'summary of node #2'}
+{nodeid:'b002', parentid:'a001', topic:'sub node #2', summary:'summary of node #2'},
+{nodeid:'c0021', parentid:'b002', topic:'sub node #21', summary:'summary of node #2'},
+{nodeid:'c0022', parentid:'b002', topic:'sub node #22', summary:'summary of node #2'},
+{nodeid:'c0023', parentid:'b002', topic:'sub node #23', summary:'summary of node #2'},
+{nodeid:'b003', parentid:'a001', topic:'sub node #3', summary:'summary of node #2'},
 ]

@@ -35,15 +35,6 @@
             type :'remote',
             data :'http://localhost:8080/example/data_example.json'
         },
-        layout:{
-            mode :'side',
-            width:80,
-            height:30
-        },
-        view:{
-            container:'jsmind_container',
-            resize:'auto'
-        },
         theme:{
             name:'default'
         }/*,
@@ -62,12 +53,12 @@
     function xxxx(){
         var newNode = {nodeid:'b00X', parentid:'a001', topic:'sub node #X', summary:'summary of node #X'};
         var newNode1 = {nodeid:'b00Y', parentid:'a001', topic:'sub node #X', summary:'summary of node #X'};
-        jm.data.addNodeAfter(newNode,'a001');
-        jm.data.addNodeAt(newNode1,5);
-        var d = jm.data.getJsonString();
+        jm.data.add_node_after(newNode,'a001');
+        jm.data.add_node_at(newNode1,5);
+        var d = jm.data.get_json_string();
         console.log(d);
     }
-    setTimeout(xxxx,1000);
+    //setTimeout(xxxx,1000);
 
 </script>
 </body>

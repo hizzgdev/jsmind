@@ -35,16 +35,16 @@
 
 (function($w){
     // set 'jsMind' as the library name.
-    // __jsMindName__ should be a const value, Never try to change it easily.
-    var __jsMindName__ = 'jsMind';
+    // __name__ should be a const value, Never try to change it easily.
+    var __name__ = 'jsMind';
     // library version
     var __version__    = '0.2';
     // debug mode
     var __debug__      = true;
 
     // check global variables
-    if(typeof($w[__jsMindName__])!='undefined'){
-        _console.log('jsMind has been already exist.');
+    if(typeof($w[__name__])!='undefined'){
+        _console.log(__name__+' has been already exist.');
         return;
     }
 
@@ -58,6 +58,8 @@
     // dom method's shortcut
     var $d = $w.document;
     var $g = function(id){return $d.getElementById(id);};
+    var $c = function(tag){return $d.createElement(tag);};
+    var $t = function(n,t){if(n.hasChildNodes()){n.firstChild.nodeValue = t;}else{n.appendChild($d.createTextNode(t));}};
 
 
     /*
@@ -72,17 +74,18 @@
             //type : 'local',
             //data : [
             //        {nodeid:'a001', isroot:true, topic:'root node'},
-            //        {nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1', nodeindex:10 },
+            //        {nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1'},
             //        {nodeid:'b002', parentid:'a001', topic:'sub node #2', summary:'summary of node #2'}
             //       ]
         },
         view:{
+            container:'jsmind_container',
             resize:'auto'
         },
         layout:{
-            mode :'side',
-            width:80,
-            height:30
+            mode :'full', // full or side
+            hspace:30,
+            vspace:20,
         },
         theme:{
             name:'default'
@@ -95,8 +98,8 @@
         }
     };
 
-    // jsMind core object
-    var jsMind = function(options){
+    // core object
+    var jm = function(options){
         this.version = __version__;
         /*
          * merge DEFAULT_OPTIONS and options
@@ -105,6 +108,7 @@
         var opts = {};
         for (var o in DEFAULT_OPTIONS) {opts[o] = DEFAULT_OPTIONS[o];}
         for (var o in options) {if(o in opts){for (var k in options[o]){opts[o][k] = options[o][k];}}else{opts[o]=options[o];}}
+        opts.layout.pspace=13;
         this.options = opts;
 
         // function provider
@@ -117,15 +121,15 @@
         this.init();
     };
 
-    jsMind.prototype={
+    jm.prototype={
         init : function(){
             var opts = this.options;
             var provider = opts.provider;
 
-            var _data_provider = (!!provider.data)? provider.data : jsMind.data_provider;
-            var _layout_provider = (!!provider.layout)? provider.layout : jsMind.layout_provider;
-            var _view_provider = (!!provider.view)? provider.view : jsMind.view_provider;
-            var _theme_provider = (!!provider.theme)? provider.theme : jsMind.theme_provider;
+            var _data_provider = (!!provider.data)? provider.data : jm.data_provider;
+            var _layout_provider = (!!provider.layout)? provider.layout : jm.layout_provider;
+            var _view_provider = (!!provider.view)? provider.view : jm.view_provider;
+            var _theme_provider = (!!provider.theme)? provider.theme : jm.theme_provider;
 
             // create instance of function provider 
             this.data = new _data_provider(this, opts.data);
@@ -139,10 +143,13 @@
             var jm = this;
             jm.data.load(function(){
                 _console.debug('data.load ok');
-                jm.layout.layout(function(){
-                    _console.debug('layout.layout ok');
-                    jm.view.show(function(){
-                        _console.debug('view.show ok');
+                jm.view.init(function(){
+                    _console.debug('view.init ok');
+                    jm.layout.layout(function(){
+                        _console.debug('layout.layout ok');
+                        jm.view.show(function(){
+                            _console.debug('view.show ok');
+                        });
                     });
                 });
             });
@@ -152,31 +159,33 @@
         }
     };
 
-    jsMind.show = function(options){
-        var jm = new jsMind(options);
+    jm.show = function(options){
+        var jm = new jm(options);
         jm.show();
         return jm;
     };
 
     // ============= static object =============================================
+    jm.direction = {left:-1,center:0,right:1};
 
-    jsMind.Node = function(sId,iIndex,sTopic,sSummary,bIsRoot,oParent){
+    jm.node = function(sId,iIndex,sTopic,sSummary,bIsRoot,oParent){
         if(!sId){_console.error('invalid nodeid');return;}
         if(typeof(iIndex) != 'number'){_console.error('invalid node index');return;}
-        this.Id = sId;
-        this.Index = iIndex;
-        this.Topic = sTopic;
-        this.Summary = sSummary;
-        this.IsRoot = bIsRoot;
-        this.Parent = oParent;
-        this.Children = [];
-        this.Data = {};
+        this.id = sId;
+        this.index = iIndex;
+        this.topic = sTopic;
+        this.summary = sSummary;
+        this.isroot = bIsRoot;
+        this.parent = oParent;
+        this.children = [];
+        this.data = {};
+        this._data = {};
     };
-    jsMind.Node.Compare=function(node1,node2){
+    jm.node.compare=function(node1,node2){
         // '-1' is alwary the last
         var r = 0;
-        var i1 = node1.Index;
-        var i2 = node2.Index;
+        var i1 = node1.index;
+        var i2 = node2.index;
         if(i1>=0 && i2>=0){
             r = i1-i2;
         }else if(i1==-1 && i2==-1){
@@ -194,8 +203,8 @@
 
     // ============= utility object =============================================
 
-    jsMind.Util = {
-        Ajax:{
+    jm.util = {
+        ajax:{
             _xhr:function(){
                 var xhr = null;
                 if(window.XMLHttpRequest){
@@ -211,7 +220,7 @@
                 return encodeURIComponent(url);
             },
             request:function(url,param,method,callback){
-                var a = jsMind.Util.Ajax;
+                var a = jm.util.ajax;
                 var p = null;
                 var tmp_param = [];
                 for(k in param){
@@ -247,28 +256,45 @@
                 }
             },
             get:function(url,callback){
-                return jsMind.Util.Ajax.request(url,{},'GET',callback);
+                return jm.util.ajax.request(url,{},'GET',callback);
             },
             post:function(url,param,callback){
-                return jsMind.Util.Ajax.request(url,param,'POST',callback);
+                return jm.util.ajax.request(url,param,'POST',callback);
+            }
+        },
+        canvas:{
+            easingztf : function(t,b,c,d){var x=t*4/d;return (1-Math.pow(Math.E,-(x*x)/2))*c+b;},
+            lineto : function(ctx,x1,y1,x2,y2){
+                var ztf = jm.util.canvas.easingztf;
+                ctx.moveTo(x1,y1);
+                ctx.beginPath();
+                var l = x2-x1;
+                var c = y1-y2;
+                var absl = Math.abs(l);
+                var t = 0;
+                for(var t=0;t<absl+1;t++){
+                    y2 = y1-ztf(t,0,c,l);
+                    ctx.lineTo(t*(Math.abs(l)/l)+x1,y2);
+                }
+                ctx.stroke();
             }
         }
     };
 
     // ============= data provider =============================================
 
-    jsMind.data_provider = function(jm, options){
-        this.jsMind = jm;
+    jm.data_provider = function(jm, options){
+        this.jm = jm;
         this.opts = options;
         this.root = null;
         this.nodes = {};
         this.load_success_callback = null;
     };
-    jsMind.data_provider.prototype={
-        load:function(fnCallback){
+    jm.data_provider.prototype={
+        load:function(fn_callback){
             _console.debug('data.load');
-            if(typeof(fnCallback) === 'function'){
-                this.load_success_callback = fnCallback;
+            if(typeof(fn_callback) === 'function'){
+                this.load_success_callback = fn_callback;
             }else{
                 this.load_success_callback = null;
                 _console.error('callback is not a function:'+data_type);
@@ -285,9 +311,9 @@
             }
         },
         fetch:function(url){
-            var jmData = this;
-            jsMind.Util.Ajax.get(url,function(data){
-                jmData.parse(data);
+            var jd = this;
+            jm.util.ajax.get(url,function(data){
+                jd.parse(data);
             });
         },
         parse:function(node_array){
@@ -314,7 +340,7 @@
                 return null;
             }
             var idx = ('nodeindex' in o)?o.nodeindex:-1;
-            var node = new jsMind.Node(o.nodeid,idx,o.topic,o.summary,r,p);
+            var node = new jm.node(o.nodeid,idx,o.topic,o.summary,r,p);
             return node;
         },
         _parse_extract_root:function(node_array){
@@ -324,7 +350,7 @@
                     var root_json = node_array[i];
                     node_array.splice(i,1);
                     var root_node = this._parse_node(root_json,null,true);
-                    if(this.putNode(root_node)){
+                    if(this.put_node(root_node)){
                         return root_node;
                     }else{
                         delete root_node;
@@ -335,7 +361,7 @@
             return null;
         },
         _parse_extract_subnode:function(node_array,parent_node){
-            var pid = parent_node.Id;
+            var pid = parent_node.id;
             var i = node_array.length;
             var node_json = null;
             var node = null;
@@ -347,8 +373,8 @@
                 }
                 if(node_json.parentid == pid){
                     node = this._parse_node(node_json,parent_node);
-                    if(this.putNode(node)){
-                        parent_node.Children.push(node);
+                    if(this.put_node(node)){
+                        parent_node.children.push(node);
                     }else{
                         delete node;
                         _console.warn('some node has skipped');
@@ -367,41 +393,41 @@
             }
             return extract_count;
         },
-        putNode:function(node){
-            if(node.Id in this.nodes){
+        put_node:function(node){
+            if(node.id in this.nodes){
                 _console.warn('the nodeid \''+nodeid+'\' has been already exist.');
                 return false;
             }else{
-                this.nodes[node.Id] = node;
+                this.nodes[node.id] = node;
                 return true;
             }
         },
-        getNode:function(nodeId){
-            if(nodeId in this.nodes){
-                return this.nodes[nodeId];
+        get_node:function(nodeid){
+            if(nodeid in this.nodes){
+                return this.nodes[nodeid];
             }else{
-                _console.error('the node[id='+nodeId+'] can not be found');
+                _console.error('the node[id='+nodeid+'] can not be found');
                 return null;
             }
         },
-        getRootNode:function(){
+        get_root:function(){
             return this.node;
         },
-        getSubNodes:function(nodeId){
-            var node = this.getNode(nodeId);
-            return node.Children;
+        get_subnodes:function(nodeid){
+            var node = this.get_node(nodeid);
+            return node.children;
         },
         // watch out the nodeindex item, the position of node is determined by it.
-        addNode:function(node_json){
+        add_node:function(node_json){
             var result = false;
-            var parent_node = this.getNode(node_json.parentid);
+            var parent_node = this.get_node(node_json.parentid);
             if(!!parent_node){
                 if(!('nodeindex' in node_json)){
                     node_json.nodeindex = -1;
                 }
                 var node = this._parse_node(node_json, parent_node);
-                if(this.putNode(node)){
-                    parent_node.Children.push(node);
+                if(this.put_node(node)){
+                    parent_node.children.push(node);
                     this.reindex(parent_node);
                     result = true;
                 }else{
@@ -412,64 +438,64 @@
             return result;
         },
         // this method while rewrite the nodeindex in node_json
-        addNodeAt:function(node_json, node_index){
+        add_node_at:function(node_json, node_index){
             node_json.nodeindex = node_index-0.5;
-            return this.addNode(node_json);
+            return this.add_node(node_json);
         },
         // this method while rewrite the nodeindex in node_json
-        addNodeBefore:function(node_json, before_id){
-            var node_before = (!!before_id)?this.getNode(before_id):null;
+        add_node_before:function(node_json, before_id){
+            var node_before = (!!before_id)?this.get_node(before_id):null;
             if(!!node_before){
-                if(node_before.Parent!=null && node_before.Parent.Id == node_json.parentid){
-                    node_json.nodeindex = node_before.Index-0.5;
+                if(node_before.parent!=null && node_before.parent.id == node_json.parentid){
+                    node_json.nodeindex = node_before.index-0.5;
                 }else{
                     node_json.nodeindex = -1;
                 }
             }else{
                 node_json.nodeindex = -1;
             }
-            return this.addNode(node_json);
+            return this.add_node(node_json);
         },
         // this method while rewrite the nodeindex in node_json
-        addNodeAfter:function(node_json, after_id){
-            var node_after = (!!after_id)?this.getNode(after_id):null;
+        add_node_after:function(node_json, after_id){
+            var node_after = (!!after_id)?this.get_node(after_id):null;
             if(!!node_after){
-                if(node_after.Parent!=null && node_after.Parent.Id==node_json.parentid){
-                    node_json.nodeindex = node_after.Index + 0.5;
+                if(node_after.parent!=null && node_after.parent.id==node_json.parentid){
+                    node_json.nodeindex = node_after.index + 0.5;
                 }else{
                     node_json.nodeindex = -1;
                 }
             }else{
                 node_json.nodeindex = -1;
             }
-            return this.addNode(node_json);
+            return this.add_node(node_json);
         },
-        removeNode:function(node){
-            if(!(node instanceof jsMind.Node)){
-                node = this.getNode(node);
+        remove_node:function(node){
+            if(!(node instanceof jm.node)){
+                node = this.get_node(node);
             }
             if(!node){return;}
-            if(node.IsRoot){
+            if(node.isroot){
                 _console.error('fail, can not remove the root node');
                 return;
             }
             // clean all subordinate nodes
-            var children = node.Children;
+            var children = node.children;
             var ci = children.length;
             while(ci--){
-                this.removeNode(children[ci]);
+                this.remove_node(children[ci]);
             }
             // remove from parent's children
-            var sibling = node.Parent.Children;
+            var sibling = node.parent.children;
             var si = sibling.length;
             while(si--){
-                if(sibling[si].Id == node.Id){
+                if(sibling[si].id == node.id){
                     sibling.splice(si,1);
                     break;
                 }
             }
             // remove from global nodes
-            delete this.nodes[node.Id];
+            delete this.nodes[node.id];
             // clean all properties
             for(var k in node){
                 delete node[k];
@@ -479,78 +505,411 @@
         },
 
         reindex:function(node){
-            if(node instanceof jsMind.Node){
-                node.Children.sort(jsMind.Node.Compare);
-                for(var i=0;i<node.Children.length;i++){
-                    node.Children[i].Index = i+1;
+            if(node instanceof jm.node){
+                node.children.sort(jm.node.compare);
+                for(var i=0;i<node.children.length;i++){
+                    node.children[i].index = i+1;
                 }
             }
         },
 
-        _getJsonArray:function(node,json_array){
-            if(!(node instanceof jsMind.Node)){return;}
+        _get_json_array:function(node,json_array){
+            if(!(node instanceof jm.node)){return;}
             if(!json_array){
                 json_array = [];
             }
             var o = {
-                _nodeindex_ : node.Index,
-                nodeid : node.Id,
-                isroot : node.IsRoot,
-                parentid : (!!node.Parent)?node.Parent.Id:null,
-                topic : node.Topic,
-                summary : node.Sumary
+                _nodeindex_ : node.index,
+                nodeid : node.id,
+                isroot : node.isroot,
+                parentid : (!!node.parent)?node.parent.id:null,
+                topic : node.topic,
+                summary : node.sumary
             };
             json_array.push(o);
-            var ci = node.Children.length;
+            var ci = node.children.length;
             for(var i=0;i<ci;i++){
-                this._getJsonArray(node.Children[i],json_array);
+                this._get_json_array(node.children[i],json_array);
             }
             return json_array;
         },
 
-        getJson:function(){
-            var json = this._getJsonArray(this.root,[]);
+        get_json:function(){
+            var json = this._get_json_array(this.root,[]);
             return json;
         },
 
-        getJsonString:function(){
-            var json = getJson();
+        get_json_string:function(){
+            var json = get_json();
             var json_str = JSON.stringify(json);
             return json_str;
+        }
     };
 
     // ============= layout provider ===========================================
 
-    jsMind.layout_provider = function(jm, options){this.jsMind = jm; this.opts = options;};
-    jsMind.layout_provider.prototype={
-        layout:function(fnCallback){
+    jm.layout_provider = function(jm, options){
+        this.opts = options;
+        this.jm = jm;
+        this.data= this.jm.data;
+        this.isside = (this.opts.mode == 'side');
+    };
+    jm.layout_provider.prototype={
+        layout:function(fn_callback){
             _console.debug('layout.layout');
-            if(typeof(fnCallback) === 'function'){
-                fnCallback();
+            this.layout_direction();
+            this.layout_offset();
+            if(typeof(fn_callback) === 'function'){
+                fn_callback();
             }
+            //_console.debug(this.data.root);
+        },
+        layout_direction:function(){
+            this._layout_direction_root();
+        },
+
+        _layout_direction_root:function(){
+            var node = this.data.root;
+            var layout_data = null;
+            if('layout' in node._data){
+                layout_data = node._data.layout;
+            }else{
+                layout_data = {};
+                node._data.layout = layout_data;
+            }
+            var children = node.children;
+            var children_count = children.length;
+            layout_data.direction = jm.direction.center;
+            layout_data.side_index = 0;
+            if(this.isside){
+                layout_data.left_count = 0;
+                layout_data.right_count = children_count;
+                var i = children_count;
+                while(i--){
+                    this._layout_direction_side(children[i], jm.direction.right, i);
+                }
+            }else{
+                var boundary = Math.ceil(children_count/2);
+                layout_data.left_count = children_count - boundary;
+                layout_data.right_count = boundary;
+                var i = children_count;
+                while(i--){
+                    if(i>=boundary){
+                        this._layout_direction_side(children[i],jm.direction.left, children_count-i-1);
+                    }else{
+                        this._layout_direction_side(children[i],jm.direction.right, i);
+                    }
+                }
+            }
+        },
+
+        _layout_direction_side:function(node, direction, side_index){
+            var layout_data = null;
+            if('layout' in node._data){
+                layout_data = node._data.layout;
+            }else{
+                layout_data = {};
+                node._data.layout = layout_data;
+            }
+            var children = node.children;
+            var children_count = children.length;
+
+            layout_data.direction = direction;
+            layout_data.side_index = side_index;
+            if(direction == jm.direction.right){
+                layout_data.right_count = children_count;
+                layout_data.left_count = 0;
+            }else{
+                layout_data.left_count = children_count;
+                layout_data.right_count = 0;
+            }
+            var i = children_count;
+            while(i--){
+                this._layout_direction_side(children[i], direction, i);
+            }
+        },
+        layout_offset:function(){
+            var node = this.data.root;
+            var layout_data = node._data.layout;
+            layout_data.offset_x = 0;
+            layout_data.offset_y = 0;
+            layout_data.outer_height = 0;
+            var children = node.children;
+            var i = children.length;
+            var left_nodes = [];
+            var right_nodes = [];
+            var node = null;
+            while(i--){
+                node = children[i];
+                if(node._data.layout.direction == jm.direction.right){
+                    right_nodes.unshift(node);
+                }else{
+                    left_nodes.push(node);
+                }
+            }
+            layout_data.outer_height_left = this._layout_offset_subnodes(left_nodes);
+            layout_data.outer_height_right = this._layout_offset_subnodes(right_nodes);
+        },
+        _layout_offset_subnodes:function(nodes){
+            var total_height = 0;
+            var nodes_count = nodes.length;
+            var i = nodes_count;
+            var node = null;
+            var node_outer_height = 0;
+            var layout_data = null;
+            var base_y = 0;
+            var pd = null; // parent._data
+            while(i--){
+                node = nodes[i];
+                layout_data = node._data.layout;
+                if(pd == null){
+                    pd = node.parent._data;
+                }
+//_console.debug(base_y);
+                node_outer_height = this._layout_offset_subnodes(node.children);
+                node_outer_height = Math.max(node._data.view.height,node_outer_height);
+//_console.debug(node_outer_height);
+                layout_data.outer_height = node_outer_height;
+                layout_data.offset_y = base_y - node_outer_height/2;
+                layout_data.offset_x = this.opts.hspace * layout_data.direction + pd.view.width * (pd.layout.direction + layout_data.direction)/2;
+                if(!node.parent.isroot){
+                    layout_data.offset_x += this.opts.pspace * layout_data.direction;
+                }
+
+                base_y = base_y - node_outer_height - this.opts.vspace;
+                total_height += node_outer_height;
+            }
+            if(nodes_count>1){
+                total_height += this.opts.vspace * (nodes_count-1);
+            }
+            i = nodes_count;
+            var middle_height = total_height/2;
+            while(i--){
+                node = nodes[i];
+                node._data.layout.offset_y += middle_height;
+            }
+            return total_height;
+        },
+
+        get_node_offset:function(node){
+            var layout_data = node._data.layout;
+            var offset_cache = null;
+            if('_offset_' in layout_data){
+                offset_cache = layout_data._offset_;
+            }else{
+                offset_cache = {x:-1, y:-1};
+                layout_data._offset_ = offset_cache;
+            }
+            if(offset_cache.x == -1 || offset_cache.y == -1){
+                var x = layout_data.offset_x;
+                var y = layout_data.offset_y;
+                if(!node.isroot){
+                    var offset_p = this.get_node_offset(node.parent);
+                    x += offset_p.x;
+                    y += offset_p.y;
+                }
+                offset_cache.x = x;
+                offset_cache.y = y;
+            }
+            return offset_cache;
+        },
+
+        get_node_point:function(node){
+            var view_data = node._data.view;
+            var offset_p = this.get_node_offset(node);
+            //_console.debug(offset_p);
+            var p = {};
+            p.x = offset_p.x + view_data.width*(node._data.layout.direction-1)/2;
+            p.y = offset_p.y-view_data.height/2;
+            //_console.debug(p);
+            return p;
+        },
+
+        get_node_point_in:function(node){
+            var p = this.get_node_offset(node);
+            return p;
+        },
+
+        get_node_point_out:function(node){
+            var p = {x:0,y:0};
+            if(!node.isroot){
+                var view_data = node._data.view;
+                var offset_p = this.get_node_offset(node);
+                p.x = offset_p.x + (view_data.width+this.opts.pspace)*node._data.layout.direction;
+                p.y = offset_p.y;
+                //_console.debug(p);
+            }
+            return p;
+        },
+
+        get_expander_point:function(node){
+            var p = this.get_node_point_out(node);
+            p.x -= this.opts.pspace*node._data.layout.direction;
+            p.y -= Math.ceil(this.opts.pspace/2);
+            return p;
         }
-        // calculate the relative coordinate of every Node
-        // every node has 4 properties: basepoint(left,right,center), rel x, rel y, state(open,close,hidden)
-        // 
     };
 
     // view provider
-    jsMind.view_provider= function(jm, options){this.jsMind = jm; this.opts = options;};
-    jsMind.view_provider.prototype={
-        show:function(fnCallback){
-            _console.debug('view.show');
-            if(typeof(fnCallback) === 'function'){
-                fnCallback();
+    jm.view_provider= function(jm, options){
+        this.opts = options;
+        this.jm = jm;
+        this.data= jm.data;
+        this.layout = jm.layout;
+
+        this.container = null;
+        this.e_panel = null;
+        this.e_nodes= null;
+        this.e_canvas = null;
+
+        this.canvas_ctx = null;
+        this.size = {x:0,y:0};
+    };
+
+    jm.view_provider.prototype={
+        init:function(fn_callback){
+            _console.debug('view.init');
+
+            this.container = $g(this.opts.container);
+            if(!this.container){
+                _console.error('the options.view.container was not be found in dom');
+                return;
             }
+            this.e_panel = $c('div');
+            this.e_nodes = $c('jmnodes');
+            this.e_canvas = $c('canvas');
+
+            this.e_panel.className = 'jsmind-inner';
+            this.e_panel.appendChild(this.e_canvas);
+            this.e_panel.appendChild(this.e_nodes);
+            this.container.appendChild(this.e_panel);
+
+            this.size.w = this.e_panel.offsetWidth;
+            this.size.h = this.e_panel.offsetHeight;
+
+            this.init_canvas();
+            this.init_nodes();
+
+            if(typeof(fn_callback) === 'function'){
+                fn_callback();
+            }
+        },
+
+        init_canvas:function(){
+            this.e_canvas.width = this.size.w;
+            this.e_canvas.height = this.size.h;
+            var ctx = this.e_canvas.getContext('2d');
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            this.canvas_ctx = ctx;
+        },
+
+        init_nodes:function(){
+            var nodes = this.data.nodes;
+            for(var nodeid in nodes){
+                this.create_node_element(nodes[nodeid]);
+            }
+        },
+
+        create_node_element:function(node){
+            var view_data = null;
+            if('view' in node._data){
+                view_data = node._data.view;
+            }else{
+                view_data = {};
+                node._data.view = view_data;
+            }
+
+            var d = $c('jmnode');
+            if(node.isroot){
+                d.className = 'root';
+            }else{
+                if(node.children.length > 0){
+                    var d_e = $c('jmexpander');
+                    $t(d_e,'-');
+                    d_e.setAttribute('nodeid',node.id);
+                    d_e.style.visibility = 'hidden';
+                    this.e_nodes.appendChild(d_e);
+                    view_data.expander = d_e;
+                }
+            }
+            $t(d,node.topic);
+            d.setAttribute('nodeid',node.id);
+            d.style.visibility='hidden';
+            this.e_nodes.appendChild(d);
+            view_data.element = d;
+            view_data.width = d.offsetWidth;
+            view_data.height = d.offsetHeight;
+        },
+
+        show:function(fn_callback){
+            _console.debug('view.show');
+            this.show_nodes();
+            this.show_lines();
+        },
+
+        show_nodes:function(){
+            var nodes = this.data.nodes;
+            var node = null;
+            var node_element = null;
+            var expander = null;
+            var p = null;
+            var p_out = null;
+            var _offset_x = this.size.w / 2;
+            var _offset_y = this.size.h / 2;
+            for(var nodeid in nodes){
+                node = nodes[nodeid];
+                node_element = node._data.view.element;
+                expander = node._data.view.expander;
+                p = this.layout.get_node_point(node);
+                p_expander= this.layout.get_expander_point(node);
+                node_element.style.visibility = 'visible';
+                node_element.style.left = (_offset_x+p.x) + 'px';
+                node_element.style.top = (_offset_y+p.y) + 'px';
+                if(!!expander){
+                    expander.style.visibility = 'visible';
+                    expander.style.left = (_offset_x + p_expander.x) + 'px';
+                    expander.style.top = (_offset_y + p_expander.y) + 'px';
+                }
+            }
+            if(typeof(fn_callback) === 'function'){
+                fn_callback();
+            }
+        },
+
+        show_lines:function(){
+            var nodes = this.data.nodes;
+            var node = null;
+            var pin = null;
+            var pout = null;
+            for(var nodeid in nodes){
+                node = nodes[nodeid];
+                if(!!node.isroot){continue;}
+                pin = this.layout.get_node_point_in(node);
+                pout = this.layout.get_node_point_out(node.parent);
+                this.draw_line(pout,pin);
+            }
+        },
+
+        draw_line:function(pin,pout){
+            var _offset_x = this.size.w / 2;
+            var _offset_y = this.size.h / 2;
+            jm.util.canvas.lineto(
+                this.canvas_ctx,
+                pin.x + _offset_x,
+                pin.y + _offset_y,
+                pout.x + _offset_x,
+                pout.y + _offset_y);
         }
     };
 
     // theme provider
-    jsMind.theme_provider= function(jm, options){this.jsMind = jm; this.opts = options;};
-    jsMind.theme_provider.prototype={
+    jm.theme_provider= function(jm, options){this.jm = jm; this.opts = options;};
+    jm.theme_provider.prototype={
 
     };
 
     // register global variables
-    $w[__jsMindName__] = jsMind;
+    $w[__name__] = jm;
 })(window);
