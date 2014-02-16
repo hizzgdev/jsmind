@@ -11,10 +11,10 @@ var $bt_ok = $g('bt_ok');
 var $bt_cancel = $g('bt_cancel');
 
 // Class
-jm.Editor.EventHandler = function(){
+jm.ShortCut = function(){
 };
 
-jm.Editor.EventHandler.prototype = {
+jm.ShortCut.prototype = {
 	HandleKeyPressEvent : function(e,view_engine){
 		var charCode;
 		if(e && e.which){charCode = e.which;}
@@ -46,10 +46,11 @@ var returnKeyEvent = function(view_engine){
 		$float_toolbar.style.visibility = 'hidden';
 		var newNodeId =  jm.Util.GetUniqueId();
 		_view_engine.AddNode({Id:newNodeId,Topic:"NewNode",Summary:""},nodeid.Node.Parent.Id);
-		nodeid.Element.removeAttribute("class");
+		var viewNode = nodeid.Node.View;
+		viewNode.Element.className = viewNode.Element.className.replace(/\s*selected\s*/i,'');
 		_view_engine.SetSelectedNode(newNodeId);
 		var newNode = _view_engine.GetSelectedNode();
-		newNode.Element.className = "selected";
+		newNode.Element.className += "selected";
 	}
 };
 

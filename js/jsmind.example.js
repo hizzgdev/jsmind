@@ -57,8 +57,8 @@
 	}
 
     function enableEditShortCut(){
-		_editor_shortcut = new jm.Editor.EventHandler();
-		jm.Util.AddEvent($w,'keydown',function(e){_editor_shortcut.HandleKeyPressEvent(e,_view_engine);});
+		_shortcut = new jm.ShortCut();
+		jm.Util.AddEvent($w,'keydown',function(e){_shortcut.HandleKeyPressEvent(e,_view_engine);});
     }
 
 
