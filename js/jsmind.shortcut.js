@@ -44,6 +44,10 @@ jm.ShortCut.prototype = {
 	
 	DisableShortCut : function(){
 		shortCutEnabled = false;
+	},
+	
+	IsShortcutEnabled : function(){
+		return shortCutEnabled;
 	}
 }
 
