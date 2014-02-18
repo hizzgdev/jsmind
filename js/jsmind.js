@@ -60,6 +60,10 @@
     var $c = function(tag){return $d.createElement(tag);};
     var $t = function(n,t){if(n.hasChildNodes()){n.firstChild.nodeValue = t;}else{n.appendChild($d.createTextNode(t));}};
 
+    var __not_ie = !!$d.body.addEventListener;
+    //target,eventType,handler
+    var $add_event=__not_ie?function(t,e,h){t.addEventListener(e,h,false);}:function(t,e,h){t.attachEvent('on'+e,h);};
+
 
     /*
      * !! ATTENTION !!
@@ -68,8 +72,9 @@
      */
     var DEFAULT_OPTIONS = {
         data:{
-            type : 'remote',
-            data : 'http://localhost:8080/example/data_example.json'
+            format:'json_array'
+            //type : 'remote',
+            //data : 'http://localhost:8080/example/data_example.json'
             //type : 'local',
             //data : [
             //        {nodeid:'a001', isroot:true, topic:'root node'},
@@ -84,6 +89,7 @@
             mode :'full', // full or side
             hspace:30,
             vspace:20,
+            pspace:13
         },
         theme:{
             name:'default'
@@ -106,24 +112,17 @@
         var opts = {};
         for (var o in DEFAULT_OPTIONS) {opts[o] = DEFAULT_OPTIONS[o];}
         for (var o in options) {if(o in opts){for (var k in options[o]){opts[o][k] = options[o][k];}}else{opts[o]=options[o];}}
-        opts.layout.pspace=13;
+
         this.options = opts;
-
-        // function provider
-        this.data = null;
-        this.layout = null;
-        this.view = null;
-        this.theme = null;
-
-        // init
-        this.init();
+        this._init_ = false;
     };
 
     jm.prototype={
         init : function(){
+            if(this._init_){return;}
+            this._init_ = true;
             var opts = this.options;
             var provider = opts.provider;
-
             var _data_provider = (!!provider.data)? provider.data : jm.data_provider;
             var _layout_provider = (!!provider.layout)? provider.layout : jm.layout_provider;
             var _view_provider = (!!provider.view)? provider.view : jm.view_provider;
@@ -134,36 +133,56 @@
             this.layout = new _layout_provider(this, opts.layout);
             this.view = new _view_provider(this, opts.view);
             this.theme = new _theme_provider(this, opts.theme);
+
+            this.data.init();
+            this.layout.init();
+            this.view.init();
+            this.theme.init();
         },
 
-        // show mindmap async
-        _show : function(){
-            var jm = this;
-            jm.data.load(function(){
-                _console.debug('data.load ok');
-                jm.view.init(function(){
-                    _console.debug('view.init ok');
-                    jm.layout.layout(function(){
-                        _console.debug('layout.layout ok');
-                        jm.view.show(function(){
-                            _console.debug('view.show ok');
-                        });
-                    });
-                });
-            });
+        _reset:function(){
+            this.theme.reset();
+            this.view.reset();
+            this.layout.reset();
+            this.data.reset();
         },
-        show : function(){
-            this._show();
+
+        _show:function(mind){
+            this.data.load(mind);
+            _console.debug('data.load ok');
+
+            this.view.load();
+            _console.debug('view.load ok');
+
+            this.layout.layout();
+            _console.debug('layout.layout ok');
+
+            this.view.show();
+            _console.debug('view.show ok');
+
+        },
+
+        show : function(mind){
+            if(!this._init_){
+                this.init();
+            }
+            this._reset();
+            this._show(mind.slice(0));
         },
 
         resize:function(){
             this.view.resize();
-        }
+        },
+
+        click_handle:function(e){
+            _console.debug(e);
+        },
+
     };
 
-    jm.show = function(options){
+    jm.show = function(mind,options){
         var jm = new jm(options);
-        jm.show();
+        jm.show(mind);
         return jm;
     };
 
@@ -294,38 +313,28 @@
         this.opts = options;
         this.root = null;
         this.nodes = {};
-        this.load_success_callback = null;
     };
 
     jm.data_provider.prototype={
-        load:function(fn_callback){
+        init:function(){
+            _console.debug('data.init');
+        },
+        reset:function(){
+            _console.debug('data.reset');
+            this.root = null;
+            this.nodes = {};
+        },
+        load:function(mind){
+            if(this.opts.format == 'json_array'){
+                this.load_json_array(mind);
+            }else{
+                _console.error('unsupported data format');
+            }
+        },
+
+        load_json_array:function(json_array){
             _console.debug('data.load');
-            if(typeof(fn_callback) === 'function'){
-                this.load_success_callback = fn_callback;
-            }else{
-                this.load_success_callback = null;
-                _console.error('callback is not a function:'+data_type);
-            }
-
-            var data_type = this.opts.type;
-            var data = this.opts.data;
-            if(data_type == 'local'){
-                this.parse(data);
-            }else if(data_type == 'remote'){
-                this.fetch(data);
-            }else{
-                _console.error('unsupported data type :'+data_type);
-            }
-        },
-
-        fetch:function(url){
-            var jd = this;
-            jm.util.ajax.get(url,function(data){
-                jd.parse(data);
-            });
-        },
-
-        parse:function(node_array){
+            var node_array = json_array;
             // reverse array for improving looping performance
             node_array.reverse();
             var root_node = this._parse_extract_root(node_array);
@@ -335,9 +344,6 @@
                 this.reindex(root_node);
             }else{
                 _console.error('the root node can not be found');
-            }
-            if(!!this.load_success_callback){
-                this.load_success_callback();
             }
         },
 
@@ -408,7 +414,7 @@
 
         put_node:function(node){
             if(node.id in this.nodes){
-                _console.warn('the nodeid \''+nodeid+'\' has been already exist.');
+                _console.warn('the nodeid \''+node.id+'\' has been already exist.');
                 return false;
             }else{
                 this.nodes[node.id] = node;
@@ -574,16 +580,21 @@
         this.jm = jm;
         this.data= this.jm.data;
         this.isside = (this.opts.mode == 'side');
-        this.bounds = {n:0,s:0,w:0,e:0};
+        this.bounds = null;
     };
     jm.layout_provider.prototype={
-        layout:function(fn_callback){
+        init:function(){
+            _console.debug('layout.init');
+            this.bounds = {n:0,s:0,w:0,e:0};
+        },
+        reset:function(){
+            _console.debug('layout.reset');
+            this.init();
+        },
+        layout:function(){
             _console.debug('layout.layout');
             this.layout_direction();
             this.layout_offset();
-            if(typeof(fn_callback) === 'function'){
-                fn_callback();
-            }
             //_console.debug(this.data.root);
         },
 
@@ -787,6 +798,8 @@
             var ex_p = {};
             if(node._data.layout.direction == jm.direction.right){
                 ex_p.x = p.x - this.opts.pspace;
+            }else{
+                ex_p.x = p.x;
             }
             ex_p.y = p.y - Math.ceil(this.opts.pspace/2);
             return ex_p;
@@ -806,6 +819,12 @@
                 w:this.bounds.e - this.bounds.w + this.opts.hspace*4,
                 h:this.bounds.s - this.bounds.n + this.opts.vspace*4
             }
+        },
+
+        collapse:function(nodeid){
+        },
+
+        expand:function(nodeid){
         }
     };
 
@@ -826,7 +845,7 @@
     };
 
     jm.view_provider.prototype={
-        init:function(fn_callback){
+        init:function(){
             _console.debug('view.init');
 
             this.container = $g(this.opts.container);
@@ -844,14 +863,26 @@
             this.container.appendChild(this.e_panel);
 
             this.init_canvas();
-            this.init_nodes();
-
-            if(typeof(fn_callback) === 'function'){
-                fn_callback();
-            }
+            
+            //var _jm = this.jm;
+            //$add_event(this.e_nodes,'mouseover',function(e){_jm.onmouseover(e);});
+            //$add_event(this.e_nodes,'mouseout',function(e){_jm.onclick(e);});
+            //$add_event(this.e_nodes,'click',function(e){_jm.onclick(e);});
+            //$add_event(this.e_nodes,'keydown',function(e){_jm.onclick(e);});
         },
 
-        zoom_size:function(times){
+        reset:function(){
+            _console.debug('view.reset');
+            this.clear_lines();
+            this.clear_nodes();
+        },
+
+        load:function(){
+            _console.debug('view.load');
+            this.init_nodes();
+        },
+
+        expand_size:function(times){
             var min_size = this.layout.get_min_size();
             var client_w = this.e_panel.offsetWidth;
             var client_h = this.e_panel.offsetHeight;
@@ -909,19 +940,6 @@
             view_data.height = d.offsetHeight;
         },
 
-        resize:function(){
-            this.e_canvas.width = 1;
-            this.e_canvas.height = 1;
-
-            this.zoom_size(1);
-
-            this.e_canvas.width = this.size.w;
-            this.e_canvas.height = this.size.h;
-
-            this.show_nodes();
-            this.show_lines();
-        },
-
         get_view_offset:function(){
             var bounds = this.layout.bounds;
             var _x = (this.size.w - bounds.e - bounds.w)/2
@@ -931,9 +949,48 @@
             };
         },
 
-        show:function(fn_callback){
+        resize:function(){
+            this.e_canvas.width = 1;
+            this.e_canvas.height = 1;
+
+            this.expand_size(1);
+            this._show();
+        },
+
+        _show:function(){
+            this.e_canvas.width = this.size.w;
+            this.e_canvas.height = this.size.h;
+
+            this.show_nodes();
+            this.show_lines();
+
+            // center root node
+            var outer_w = this.e_panel.clientWidth;
+            var outer_h = this.e_panel.clientHeight;
+            if(this.size.w > outer_w){
+                var _offset = this.get_view_offset();
+                this.e_panel.scrollLeft = _offset.x - outer_w/2;
+            }
+            if(this.size.h > outer_h){
+                this.e_panel.scrollTop = (this.size.h - outer_h)/2;
+            }
+        },
+
+        show:function(){
             _console.debug('view.show');
-            this.resize();
+            this.expand_size(1);
+            this._show();
+        },
+
+        clear_nodes:function(){
+            var nodes = this.data.nodes;
+            var node = null;
+            for(var nodeid in nodes){
+                node = nodes[nodeid];
+                node._data.view.element = null;
+                node._data.view.expander = null;
+            }
+            this.e_nodes.innerHTML = '';
         },
 
         show_nodes:function(){
@@ -959,14 +1016,14 @@
                     expander.style.top = (_offset.y + p_expander.y) + 'px';
                 }
             }
-            if(typeof(fn_callback) === 'function'){
-                fn_callback();
-            }
+        },
+
+        clear_lines:function(){
+            jm.util.canvas.clear(this.canvas_ctx,0,0,this.size.w,this.size.h);
         },
 
         show_lines:function(){
-            jm.util.canvas.clear(this.canvas_ctx,0,0,this.size.w,this.size.h);
-
+            this.clear_lines();
             var nodes = this.data.nodes;
             var node = null;
             var pin = null;
@@ -994,7 +1051,12 @@
     // theme provider
     jm.theme_provider= function(jm, options){this.jm = jm; this.opts = options;};
     jm.theme_provider.prototype={
-
+        init:function(){
+            _console.debug('theme.init');
+        },
+        reset:function(){
+            _console.debug('theme.reset');
+        }
     };
 
     // register global variables

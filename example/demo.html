@@ -10,51 +10,46 @@
             background-color:#aaa;
         }
         #jsmind_container{
-            width:1002px;
-            height:600px;
+            width:800px;
+            height:500px;
             border:solid 1px #333;
             background:#eee;
         }
     </style>
 </head>
 <body>
+<button onclick="load_jsmind();"> load ajax mind </button>
+<button onclick="load_jsmind1();"> load mind #1 </button>
+<button onclick="load_jsmind2();"> load mind #2 </button>
+<button onclick="resize_container();"> resize container </button>
+<button onclick="resize_jsmind();"> resize jsmind </button>
 <div id="jsmind_container" class="jsmind-container"></div>
-<button onclick="resize_container();"> resize tester </button>
-<button onclick="resize_jsmind();"> resize tester </button>
 <script type="text/javascript" src="../js/jsmind.js"></script>
+<script type="text/javascript" src="../js/jsmind.data.js"></script>
 <script type="text/javascript">
-    function resize_container(){
-        var c = document.getElementById('jsmind_container');
-        c.style.width = '400px';
-        c.style.height = '200px';
-    }
-    /*
-    var my_data_provider = jsMind.data_provider;
-    my_data_provider.prototype.load = function(fnCallback){
-        alert('hahah');
-        fnCallback();
-    };
-    */
 
-    var myOptions = {
-        data:{
-            type :'remote',
-            data :'http://localhost:8080/example/data_example.json'
-        },
-        theme:{
-            name:'default'
-        }/*,
-        provider:{
-            data:my_data_provider
-        }*/
-    };
+var mind_ajax = {url:'/example/data_example.json'};
 
+var mind1 = [
+    {nodeid:'a001', isroot:true, topic:'root node'},
+    {nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1', sn:10 },
+    {nodeid:'b002', parentid:'a001', topic:'sub node #2', summary:'summary of node #2'},
+    {nodeid:'c0021', parentid:'b002', topic:'sub node #21', summary:'summary of node #2'},
+    {nodeid:'c0022', parentid:'b002', topic:'sub node #22', summary:'summary of node #2'},
+    {nodeid:'c0023', parentid:'b002', topic:'sub node #23', summary:'summary of node #2'},
+    ];
+var mind2 = [
+    {nodeid:'a001', isroot:true, topic:'root node'},
+    {nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1', sn:10 },
+    {nodeid:'b002', parentid:'a001', topic:'sub node #2', summary:'summary of node #2'},
+    {nodeid:'b003', parentid:'a001', topic:'sub node #3', summary:'summary of node #2'},
+    ];
 
-    var jm = new jsMind(myOptions);
-    jm.show();
+    var jm = new jsMind();
+    jm.init();
     //jm.data.removeNode('b001');
     // ==== OR =========================
-    //  var jm = jsMind.show(myOptions);
+    //  var jm = jsMind.show(mind,[myOptions]);
 
     function xxxx(){
         var newNode = {nodeid:'b00X', parentid:'a001', topic:'sub node #X', summary:'summary of node #X'};
@@ -66,10 +61,31 @@
     }
     //setTimeout(xxxx,1000);
 
+    function load_jsmind(){
+        load_mind_ajax(mind_ajax,function(mind){
+            jm.show(mind);
+        });
+    }
+
+    function load_jsmind1(){
+        jm.show(mind1);
+    }
+
+    function load_jsmind2(){
+        jm.show(mind2);
+    }
+
+    function resize_container(){
+        var c = document.getElementById('jsmind_container');
+        c.style.width = '400px';
+        c.style.height = '200px';
+    }
+
     function resize_jsmind(){
         jm.resize();
     }
 
+    load_jsmind1();
 </script>
 </body>
 </html>
