@@ -39,9 +39,6 @@ jmexpander:hover{border-color:#000;}
 .jsmind-edit-panel textarea.readonly{overflow:visible;}
 .jsmind-edit-panel p{display:none;min-width:300px;min-height:30px;text-align:center;}
 
-button#settingsbutton{ float:right;border:1px solid #007aa7; background-color:#3f3;padding:5px 30px;margin-left:600px;margin-top:0px; -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; -webkit-box-shadow: 0 0 4px rgba(0,0,0, .75); -moz-box-shadow: 0 0 4px rgba(0,0,0, .75); box-shadow: 0 0 4px rgba(0,0,0, .75); color:black; font-size:1em; cursor:pointer;}
-button#settingsbutton:hover {box-shadow:2px 2px 8px #000;}
-
 /* z-index:12 */
 .jsmind-settings-panel{width:200px;height:100px;position:absolute;z-index:12;padding:10px;top:300px;left:300px;visibility:hidden;background:#eee;border-radius:5px;box-shadow:1px 1px 4px #000;}
 .jsmind-settings-panel .button-panel{text-align:center;}
