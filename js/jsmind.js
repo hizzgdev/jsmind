@@ -33,6 +33,7 @@
  */
 
 (function($w){
+    "use strict";       
     // set 'jsMind' as the library name.
     // __name__ should be a const value, Never try to change it easily.
     var __name__ = 'jsMind';
@@ -138,6 +139,49 @@
             this.layout.init();
             this.view.init();
             this.theme.init();
+
+            this.event_bind();
+        },
+
+        event_bind:function(){
+            this.view.event_bind(this,null,null,this.click_handle,null);
+        },
+
+        // not finish
+        // how to deal with event register
+        // how to toggle a node
+        click_handle:function(e){
+            var element = e.target || e.srcElement;
+            var nodeid = this.view.get_nodeid(element);
+            var isnode = this.view.is_node(element);
+            var isexpander = this.view.is_expander(element);
+            if(isexpander){
+                this.toggle_node(nodeid);
+            }
+        },
+
+        toggle_node:function(nodeid){
+            var node = this.data.get_node(nodeid);
+            if(!!node){
+                this.layout.toggle_node(node);
+                this.view.show();
+            }
+        },
+
+        expand_node:function(nodeid){
+            var node = this.data.get_node(nodeid);
+            if(!!node){
+                this.layout.expand_node(node);
+                this.view.show();
+            }
+        },
+
+        collapse_node:function(nodeid){
+            var node = this.data.get_node(nodeid);
+            if(!!node){
+                this.layout.collapse_node(node);
+                this.view.show();
+            }
         },
 
         _reset:function(){
@@ -173,11 +217,6 @@
         resize:function(){
             this.view.resize();
         },
-
-        click_handle:function(e){
-            _console.debug(e);
-        },
-
     };
 
     jm.show = function(mind,options){
@@ -370,7 +409,8 @@
                     if(this.put_node(root_node)){
                         return root_node;
                     }else{
-                        delete root_node;
+                        //delete root_node;
+                        root_node = null;
                         _console.warn('root node has an not unique id, and this node has been skipped');
                     }
                 }
@@ -394,7 +434,7 @@
                     if(this.put_node(node)){
                         parent_node.children.push(node);
                     }else{
-                        delete node;
+                        //delete node;
                         _console.warn('some node has skipped');
                         break;
                     }
@@ -454,8 +494,9 @@
                     this.reindex(parent_node);
                     result = true;
                 }else{
+                    //delete node;
+                    node = null;
                     _console.error('fail, the nodeid has been already exist');
-                    delete node;
                 }
             }
             return result;
@@ -528,7 +569,8 @@
                 delete node[k];
             }
             // remove it's self
-            delete node;
+            node = null;
+            //delete node;
         },
 
         reindex:function(node){
@@ -581,6 +623,8 @@
         this.data= this.jm.data;
         this.isside = (this.opts.mode == 'side');
         this.bounds = null;
+
+        this.cache_valid = false;
     };
     jm.layout_provider.prototype={
         init:function(){
@@ -673,15 +717,17 @@
             var i = children.length;
             var left_nodes = [];
             var right_nodes = [];
-            var node = null;
+            var subnode = null;
             while(i--){
-                node = children[i];
-                if(node._data.layout.direction == jm.direction.right){
-                    right_nodes.unshift(node);
+                subnode = children[i];
+                if(subnode._data.layout.direction == jm.direction.right){
+                    right_nodes.unshift(subnode);
                 }else{
-                    left_nodes.push(node);
+                    left_nodes.push(subnode);
                 }
             }
+            layout_data.left_nodes = left_nodes;
+            layout_data.right_nodes = right_nodes;
             layout_data.outer_height_left = this._layout_offset_subnodes(left_nodes);
             layout_data.outer_height_right = this._layout_offset_subnodes(right_nodes);
             this.bounds.n=0;
@@ -725,6 +771,48 @@
             while(i--){
                 node = nodes[i];
                 node._data.layout.offset_y += middle_height;
+                //_console.debug(node._data.layout.offset_y);
+            }
+            return total_height;
+        },
+
+        _layout_offset_subnodes_height:function(nodes){
+            var total_height = 0;
+            var nodes_count = nodes.length;
+            var i = nodes_count;
+            var node = null;
+            var node_outer_height = 0;
+            var layout_data = null;
+            var base_y = 0;
+            var pd = null; // parent._data
+            while(i--){
+                node = nodes[i];
+                layout_data = node._data.layout;
+                if(pd == null){
+                    pd = node.parent._data;
+                }
+
+                node_outer_height = this._layout_offset_subnodes_height(node.children);
+                if(('isexpand' in layout_data) && !layout_data.isexpand){
+                    node_outer_height=0;
+                }
+                node_outer_height = Math.max(node._data.view.height,node_outer_height);
+
+                layout_data.outer_height = node_outer_height;
+                layout_data.offset_y = base_y - node_outer_height/2;
+                base_y = base_y - node_outer_height - this.opts.vspace;
+                total_height += node_outer_height;
+            }
+            if(nodes_count>1){
+                total_height += this.opts.vspace * (nodes_count-1);
+            }
+            i = nodes_count;
+            var middle_height = total_height/2;
+            while(i--){
+                node = nodes[i];
+                node._data.layout.offset_y += middle_height;
+                //_console.debug(node.topic);
+                //_console.debug(node._data.layout.offset_y);
             }
             return total_height;
         },
@@ -732,7 +820,7 @@
         get_node_offset:function(node){
             var layout_data = node._data.layout;
             var offset_cache = null;
-            if('_offset_' in layout_data){
+            if(('_offset_' in layout_data) && this.cache_valid){
                 offset_cache = layout_data._offset_;
             }else{
                 offset_cache = {x:-1, y:-1};
@@ -748,6 +836,10 @@
                 }
                 offset_cache.x = x;
                 offset_cache.y = y;
+            }
+            if(node.id == 'b001'){
+                //_console.debug(layout_data);
+                //_console.debug(offset_cache);
             }
             return offset_cache;
         },
@@ -771,7 +863,7 @@
         get_node_point_out:function(node){
             var layout_data = node._data.layout;
             var pout_cache = null;
-            if('_pout_' in layout_data){
+            if(('_pout_' in layout_data) && this.cache_valid){
                 pout_cache = layout_data._pout_;
             }else{
                 pout_cache = {x:-1, y:-1};
@@ -821,11 +913,62 @@
             }
         },
 
-        collapse:function(nodeid){
+        toggle_node:function(node){
+            var layout_data = node._data.layout;
+            var isexpand = true;
+            if('isexpand' in layout_data){
+                isexpand = layout_data.isexpand;
+            }
+            if(isexpand){
+                this.collapse_node(node);
+            }else{
+                this.expand_node(node);
+            }
+            //_console.debug(this.data.root);
         },
 
-        expand:function(nodeid){
-        }
+        expand_node:function(node){
+            //_console.debug('expand');
+            node._data.layout.isexpand = true;
+            this.part_layout(node);
+            this.set_visible(node.children,true);
+        },
+
+        collapse_node:function(node){
+            //_console.debug('collapse');
+            node._data.layout.isexpand = false;
+            this.part_layout(node);
+            this.set_visible(node.children,false);
+        },
+
+        part_layout:function(node){
+            //_console.debug('part_layout');
+            var root_layout_data = this.data.root._data.layout;
+            if(node._data.layout.direction == jm.direction.right){
+                root_layout_data.outer_height_right=this._layout_offset_subnodes_height(root_layout_data.right_nodes);
+            }else{
+                root_layout_data.outer_height_left=this._layout_offset_subnodes_height(root_layout_data.left_nodes);
+            }
+            this.bounds.s = Math.max(root_layout_data.outer_height_left,root_layout_data.outer_height_right);
+            this.cache_valid = false;
+        },
+
+        set_visible:function(nodes,visible){
+            var i = nodes.length;
+            var node = null;
+            var layout_data = null;
+            while(i--){
+                node = nodes[i];
+                layout_data = node._data.layout;
+                if(('isexpand' in layout_data) && !layout_data.isexpand){
+                    this.set_visible(node.children,false);
+                }else{
+                    this.set_visible(node.children,visible);
+                }
+                node._data.layout.visible = visible;
+            }
+        },
+
     };
 
     // view provider
@@ -863,12 +1006,30 @@
             this.container.appendChild(this.e_panel);
 
             this.init_canvas();
+        },
             
-            //var _jm = this.jm;
-            //$add_event(this.e_nodes,'mouseover',function(e){_jm.onmouseover(e);});
-            //$add_event(this.e_nodes,'mouseout',function(e){_jm.onclick(e);});
-            //$add_event(this.e_nodes,'click',function(e){_jm.onclick(e);});
-            //$add_event(this.e_nodes,'keydown',function(e){_jm.onclick(e);});
+        event_bind:function(obj,fn_mouseover,fn_mouseout,fn_click){
+            if(!!fn_mouseover){
+                $add_event(this.e_nodes,'mouseover',function(e){fn_mouseover.call(obj,e);});
+            }
+            if(!!fn_mouseout){
+                $add_event(this.e_nodes,'mouseout',function(e){fn_mouseout.call(obj,e);});
+            }
+            if(!!fn_click){
+                $add_event(this.e_nodes,'click',function(e){fn_click.call(obj,e);});
+            }
+        },
+
+        get_nodeid:function(element){
+            return element.getAttribute('nodeid');
+        },
+
+        is_node:function(element){
+            return (element.tagName.toLowerCase() == 'jmnode');
+        },
+
+        is_expander:function(element){
+            return (element.tagName.toLowerCase() == 'jmexpander');
         },
 
         reset:function(){
@@ -974,6 +1135,7 @@
             if(this.size.h > outer_h){
                 this.e_panel.scrollTop = (this.size.h - outer_h)/2;
             }
+            //this.layout.cache_valid = true;
         },
 
         show:function(){
@@ -1000,20 +1162,32 @@
             var expander = null;
             var p = null;
             var p_expander= null;
+            var expander_text = '-';
             var _offset = this.get_view_offset();
+            var layout_data = null;
             for(var nodeid in nodes){
                 node = nodes[nodeid];
+                layout_data = node._data.layout;
                 node_element = node._data.view.element;
+                expander = node._data.view.expander;
+                if(('visible' in layout_data) && !layout_data.visible){
+                    node_element.style.display = 'none';
+                    expander.style.display = 'none';
+                    continue;
+                }
                 p = this.layout.get_node_point(node);
+                node_element.style.display = '';
                 node_element.style.visibility = 'visible';
                 node_element.style.left = (_offset.x+p.x) + 'px';
                 node_element.style.top = (_offset.y+p.y) + 'px';
                 if(!node.isroot && node.children.length>0){
-                    expander = node._data.view.expander;
+                    expander_text = (('isexpand' in layout_data) && !layout_data.isexpand)?'+':'-';
                     p_expander= this.layout.get_expander_point(node);
+                    expander.style.display = '';
                     expander.style.visibility = 'visible';
                     expander.style.left = (_offset.x + p_expander.x) + 'px';
                     expander.style.top = (_offset.y + p_expander.y) + 'px';
+                    $t(expander,expander_text);
                 }
             }
         },
@@ -1032,6 +1206,7 @@
             for(var nodeid in nodes){
                 node = nodes[nodeid];
                 if(!!node.isroot){continue;}
+                if(('visible' in node._data.layout) && !node._data.layout.visible){continue;}
                 pin = this.layout.get_node_point_in(node);
                 pout = this.layout.get_node_point_out(node.parent);
                 this.draw_line(pout,pin,_offset);
