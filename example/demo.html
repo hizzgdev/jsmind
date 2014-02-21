@@ -10,8 +10,8 @@
             background-color:#aaa;
         }
         #jsmind_container{
-            width:800px;
-            height:500px;
+            width:1200px;
+            height:650px;
             border:solid 1px #333;
             background:#eee;
         }
@@ -23,6 +23,8 @@
 <button onclick="load_jsmind2();"> load mind #2 </button>
 <button onclick="resize_container();"> resize container </button>
 <button onclick="resize_jsmind();"> resize jsmind </button>
+<button onclick="add_node();"> add node </button>
+<button onclick="remove_node();"> remove node </button>
 <div id="jsmind_container" class="jsmind-container"></div>
 <script type="text/javascript" src="../js/jsmind.js"></script>
 <script type="text/javascript" src="../js/jsmind.data.js"></script>
@@ -51,15 +53,6 @@ var mind2 = [
     // ==== OR =========================
     //  var jm = jsMind.show(mind,[myOptions]);
 
-    function xxxx(){
-        var newNode = {nodeid:'b00X', parentid:'a001', topic:'sub node #X', summary:'summary of node #X'};
-        var newNode1 = {nodeid:'b00Y', parentid:'a001', topic:'sub node #X', summary:'summary of node #X'};
-        jm.data.add_node_after(newNode,'a001');
-        jm.data.add_node_at(newNode1,5);
-        var d = jm.data.get_json_string();
-        console.log(d);
-    }
-    //setTimeout(xxxx,1000);
 
     function load_jsmind(){
         load_mind_ajax(mind_ajax,function(mind){
@@ -77,12 +70,26 @@ var mind2 = [
 
     function resize_container(){
         var c = document.getElementById('jsmind_container');
-        c.style.width = '400px';
-        c.style.height = '200px';
+        c.style.width = '800px';
+        c.style.height = '500px';
     }
 
     function resize_jsmind(){
         jm.resize();
+    }
+
+    function add_node(){
+        var newNode = {nodeid:'b00X', parentid:'a001', topic:'sub node #X', summary:'summary of node #X'};
+        var newNode1 = {nodeid:'b00Y', parentid:'a001', topic:'sub node #X', summary:'summary of node #X'};
+        //jm.add_node(newNode);
+        jm.add_node(newNode,'b002');
+        //jm.data.add_node_at(newNode1,5);
+        //var d = jm.data.get_json_string();
+        //console.log(d);
+    }
+
+    function remove_node(){
+        jm.remove_node('b002');
     }
 
     load_jsmind1();
