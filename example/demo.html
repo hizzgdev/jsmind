@@ -24,7 +24,10 @@
 <button onclick="resize_container();"> resize container </button>
 <button onclick="resize_jsmind();"> resize jsmind </button>
 <button onclick="add_node();"> add node </button>
+<button onclick="edit_node();"> edit node </button>
 <button onclick="remove_node();"> remove node </button>
+<button onclick="select_node();"> select node </button>
+<button onclick="get_selected();"> get select </button>
 <div id="jsmind_container" class="jsmind-container"></div>
 <script type="text/javascript" src="../js/jsmind.js"></script>
 <script type="text/javascript" src="../js/jsmind.data.js"></script>
@@ -33,7 +36,7 @@
 var mind_ajax = {url:'/example/data_example.json'};
 
 var mind1 = [
-    {nodeid:'a001', isroot:true, topic:'root node'},
+    {nodeid:'a001', isroot:true, topic:'root node root node root node root node root node'},
     {nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1', sn:10 },
     {nodeid:'b002', parentid:'a001', topic:'sub node #2', summary:'summary of node #2'},
     {nodeid:'c0021', parentid:'b002', topic:'sub node #21', summary:'summary of node #2'},
@@ -49,6 +52,7 @@ var mind2 = [
 
     var jm = new jsMind();
     jm.init();
+    jm.set_readonly(false);
     //jm.data.removeNode('b001');
     // ==== OR =========================
     //  var jm = jsMind.show(mind,[myOptions]);
@@ -79,7 +83,7 @@ var mind2 = [
     }
 
     function add_node(){
-        var newNode = {nodeid:'b00X', parentid:'a001', topic:'sub node #X', summary:'summary of node #X'};
+        var newNode = {nodeid:'b00X', parentid:'a001', topic:'sub node #X<button>hello</button>', summary:'summary of node #X'};
         var newNode1 = {nodeid:'b00Y', parentid:'a001', topic:'sub node #X', summary:'summary of node #X'};
         //jm.add_node(newNode);
         jm.add_node(newNode,'b002');
@@ -88,8 +92,25 @@ var mind2 = [
         //console.log(d);
     }
 
+    function edit_node(){
+        jm.update_node('b001','我被修改了','This is a Chinese test');
+    }
+
     function remove_node(){
         jm.remove_node('b002');
+    }
+
+    function select_node(){
+        jm.select_node('b002');
+    }
+
+    function get_selected(){
+        var node = jm.get_selected_node();
+        if(!!node){
+            alert(node.id);
+        }else{
+            alert('nothing');
+        }
     }
 
     load_jsmind1();

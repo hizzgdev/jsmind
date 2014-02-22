@@ -41,17 +41,11 @@
         data:{
             format:'json_array',
             readonly:true
-            //type : 'remote',
-            //data : 'http://localhost:8080/example/data_example.json'
-            //type : 'local',
-            //data : [
-            //        {nodeid:'a001', isroot:true, topic:'root node'},
-            //        {nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1'},
-            //        {nodeid:'b002', parentid:'a001', topic:'sub node #2', summary:'summary of node #2'}
-            //       ]
         },
         view:{
-            container:'jsmind_container'
+            container:'jsmind_container',
+            hmargin:100,
+            vmargin:50
         },
         layout:{
             mode :'full', // full or side
@@ -85,6 +79,127 @@
         this._init_ = false;
     };
 
+    // ============= static object =============================================
+    jm.direction = {left:-1,center:0,right:1};
+
+    jm.node = function(sId,iIndex,sTopic,sSummary,bIsRoot,oParent){
+        if(!sId){_console.error('invalid nodeid');return;}
+        if(typeof(iIndex) != 'number'){_console.error('invalid node index');return;}
+        this.id = sId;
+        this.index = iIndex;
+        this.topic = sTopic;
+        this.summary = sSummary;
+        this.isroot = bIsRoot;
+        this.parent = oParent;
+        this.children = [];
+        this.data = {};
+        this._data = {};
+    };
+
+    jm.node.compare=function(node1,node2){
+        // '-1' is alwary the last
+        var r = 0;
+        var i1 = node1.index;
+        var i2 = node2.index;
+        if(i1>=0 && i2>=0){
+            r = i1-i2;
+        }else if(i1==-1 && i2==-1){
+            r = 0;
+        }else if(i1==-1){
+            r = 1;
+        }else if(i2==-1){
+            r = -1;
+        }else{
+            r = 0;
+        }
+        //_console.debug(i1+' <> '+i2+'  =  '+r);
+        return r;
+    };
+
+    // ============= utility object =============================================
+
+    jm.util = {
+        ajax:{
+            _xhr:function(){
+                var xhr = null;
+                if(window.XMLHttpRequest){
+                    xhr = new XMLHttpRequest();
+                }else{
+                    try{
+                        xhr = new ActiveXObject("Microsoft.XMLHTTP");
+                    }catch(e){}
+                }
+                return xhr;
+            },
+            _eurl:function(url){
+                return encodeURIComponent(url);
+            },
+            request:function(url,param,method,callback){
+                var a = jm.util.ajax;
+                var p = null;
+                var tmp_param = [];
+                for(k in param){
+                    tmp_param.push(a._eurl(k)+'='+a._eurl(param[k]));
+                }
+                if(tmp_param.length>0){
+                    p = tmp_param.join('&');
+                }
+                var xhr = a._xhr();
+                if(xhr == null){return;}
+                xhr.onreadystatechange = function(){
+                    if(xhr.readyState == 4){
+                        if(xhr.status == 200 || xhr.status == 0){
+                            if(typeof(callback) == 'function'){
+                                var data = eval('('+xhr.responseText+')');
+                                callback(data);
+                            }
+                        }else{
+                            var w = $w.open('');
+                            w.document.write(xhr.responseText);
+                            //alert(xhr.responseText);
+                        }
+                    }
+                }
+                method = method || 'GET';
+                xhr.open(method,url,true);
+                xhr.setRequestHeader('If-Modified-Since','0');
+                if(method == 'POST'){
+                    xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded;charset=utf-8');
+                    xhr.send(p);
+                }else{
+                    xhr.send();
+                }
+            },
+            get:function(url,callback){
+                return jm.util.ajax.request(url,{},'GET',callback);
+            },
+            post:function(url,param,callback){
+                return jm.util.ajax.request(url,param,'POST',callback);
+            }
+        },
+
+        canvas:{
+            easingztf : function(t,b,c,d){var x=t*4/d;return (1-Math.pow(Math.E,-(x*x)/2))*c+b;},
+            lineto : function(ctx,x1,y1,x2,y2){
+                var ztf = jm.util.canvas.easingztf;
+                ctx.moveTo(x1,y1);
+                ctx.beginPath();
+                var l = x2-x1;
+                var c = y1-y2;
+                var absl = Math.abs(l);
+                var t = 0;
+                for(var t=0;t<absl+1;t++){
+                    y2 = y1-ztf(t,0,c,l);
+                    ctx.lineTo(t*(Math.abs(l)/l)+x1,y2);
+                }
+                ctx.stroke();
+            },
+            clear:function(ctx,x1,y1,x2,y2){
+                ctx.clearRect(x1,y1,x2,y2);
+            }
+        }
+    };
+
     jm.prototype={
         init : function(){
             if(this._init_){return;}
@@ -110,6 +225,10 @@
             this.event_bind();
         },
 
+        set_readonly:function(readonly){
+            this.options.data.readonly = readonly;
+        },
+
         event_bind:function(){
             this.view.event_bind(this,null,null,this.click_handle,null);
         },
@@ -119,11 +238,16 @@
         // how to toggle a node
         click_handle:function(e){
             var element = e.target || e.srcElement;
-            var nodeid = this.view.get_nodeid(element);
             var isnode = this.view.is_node(element);
             var isexpander = this.view.is_expander(element);
-            if(isexpander){
+
+            var nodeid = this.view.get_nodeid(element);
+            if(isnode){
+                this.select_node(nodeid);
+            }else if(isexpander){
                 this.toggle_node(nodeid);
+            }else{
+                this.select_clear();
             }
         },
 
@@ -185,6 +309,10 @@
             this.view.resize();
         },
 
+        get_node:function(nodeid){
+            return this.data.get_node(nodeid);
+        },
+
         add_node:function(node_json,beforeid){
             if(this.data.is_readonly()){
                 _console.error('fail, this mind map is readonly');
@@ -208,7 +336,7 @@
                 _console.error('fail, this mind map is readonly');
                 return;
             }
-            var node = this.data.get_node(nodeid);
+            var node = this.get_node(nodeid);
             if(!!node){
                 this.view.remove_node(node);
                 this.data.remove_node(node);
@@ -216,133 +344,37 @@
                 this.view.show();
             }
         },
+
+        update_node:function(nodeid, topic, summary){
+            if(this.data.is_readonly()){
+                _console.error('fail, this mind map is readonly');
+                return;
+            }
+            var node = this.data.update_node(nodeid,topic,summary);
+            if(!!node){
+                this.view.update_node(node);
+                this.layout.layout();
+                this.view.show();
+            }
+        },
+
+        select_node:function(nodeid){
+            var node = this.data.select_node(nodeid);
+            if(!!node){
+                this.view.select_node(node);
+            }
+        },
+
+        get_selected_node:function(){
+            var node = this.data.get_selected_node();
+            return node;
+        },
+
+        select_clear:function(){
+            this.data.select_clear();
+            this.view.select_clear();
+        },
     };
-
-jm.show = function(mind,options){
-    var jm = new jm(options);
-    jm.show(mind);
-    return jm;
-};
-
-// ============= static object =============================================
-jm.direction = {left:-1,center:0,right:1};
-
-jm.node = function(sId,iIndex,sTopic,sSummary,bIsRoot,oParent){
-    if(!sId){_console.error('invalid nodeid');return;}
-    if(typeof(iIndex) != 'number'){_console.error('invalid node index');return;}
-    this.id = sId;
-    this.index = iIndex;
-    this.topic = sTopic;
-    this.summary = sSummary;
-    this.isroot = bIsRoot;
-    this.parent = oParent;
-    this.children = [];
-    this.data = {};
-    this._data = {};
-};
-jm.node.compare=function(node1,node2){
-    // '-1' is alwary the last
-    var r = 0;
-    var i1 = node1.index;
-    var i2 = node2.index;
-    if(i1>=0 && i2>=0){
-        r = i1-i2;
-    }else if(i1==-1 && i2==-1){
-        r = 0;
-    }else if(i1==-1){
-        r = 1;
-    }else if(i2==-1){
-        r = -1;
-    }else{
-        r = 0;
-    }
-    //_console.debug(i1+' <> '+i2+'  =  '+r);
-    return r;
-};
-
-// ============= utility object =============================================
-
-jm.util = {
-    ajax:{
-        _xhr:function(){
-            var xhr = null;
-            if(window.XMLHttpRequest){
-                xhr = new XMLHttpRequest();
-            }else{
-                try{
-                    xhr = new ActiveXObject("Microsoft.XMLHTTP");
-                }catch(e){}
-            }
-            return xhr;
-        },
-        _eurl:function(url){
-            return encodeURIComponent(url);
-        },
-        request:function(url,param,method,callback){
-            var a = jm.util.ajax;
-            var p = null;
-            var tmp_param = [];
-            for(k in param){
-                tmp_param.push(a._eurl(k)+'='+a._eurl(param[k]));
-            }
-            if(tmp_param.length>0){
-                p = tmp_param.join('&');
-            }
-            var xhr = a._xhr();
-            if(xhr == null){return;}
-            xhr.onreadystatechange = function(){
-                if(xhr.readyState == 4){
-                    if(xhr.status == 200 || xhr.status == 0){
-                        if(typeof(callback) == 'function'){
-                            var data = eval('('+xhr.responseText+')');
-                            callback(data);
-                        }
-                    }else{
-                        var w = $w.open('');
-                        w.document.write(xhr.responseText);
-                        //alert(xhr.responseText);
-                    }
-                }
-            }
-            method = method || 'GET';
-            xhr.open(method,url,true);
-            xhr.setRequestHeader('If-Modified-Since','0');
-            if(method == 'POST'){
-                xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded;charset=utf-8');
-                xhr.send(p);
-            }else{
-                xhr.send();
-            }
-        },
-        get:function(url,callback){
-            return jm.util.ajax.request(url,{},'GET',callback);
-        },
-        post:function(url,param,callback){
-            return jm.util.ajax.request(url,param,'POST',callback);
-        }
-    },
-
-    canvas:{
-        easingztf : function(t,b,c,d){var x=t*4/d;return (1-Math.pow(Math.E,-(x*x)/2))*c+b;},
-        lineto : function(ctx,x1,y1,x2,y2){
-            var ztf = jm.util.canvas.easingztf;
-            ctx.moveTo(x1,y1);
-            ctx.beginPath();
-            var l = x2-x1;
-            var c = y1-y2;
-            var absl = Math.abs(l);
-            var t = 0;
-            for(var t=0;t<absl+1;t++){
-                y2 = y1-ztf(t,0,c,l);
-                ctx.lineTo(t*(Math.abs(l)/l)+x1,y2);
-            }
-            ctx.stroke();
-        },
-        clear:function(ctx,x1,y1,x2,y2){
-            ctx.clearRect(x1,y1,x2,y2);
-        }
-    }
-};
 
 // ============= data provider =============================================
 
@@ -350,6 +382,7 @@ jm.util = {
         this.jm = jm;
         this.opts = options;
         this.root = null;
+        this.selected = null;
         this.nodes = {};
     };
 
@@ -360,6 +393,7 @@ jm.util = {
         reset:function(){
             _console.debug('data.reset');
             this.root = null;
+            this.selected = null;
             this.nodes = {};
         },
         load:function(mind){
@@ -539,6 +573,17 @@ jm.util = {
             return this.add_node(node_json);
         },
 
+        update_node:function(nodeid,topic,summary){
+            if(this.is_readonly()){
+                _console.error('fail, the mindmap is readonly');
+                return null;
+            }
+            var node = this.get_node(nodeid);
+            node.topic = topic;
+            node.summary = summary;
+            return node;
+        },
+
         remove_node:function(node){
             if(this.is_readonly()){
                 _console.error('fail, the mindmap is readonly');
@@ -551,6 +596,9 @@ jm.util = {
             if(node.isroot){
                 _console.error('fail, can not remove the root node');
                 return;
+            }
+            if(this.selected != null && this.selected.id == node.id){
+                this.selected = null;
             }
             // clean all subordinate nodes
             var children = node.children;
@@ -578,6 +626,22 @@ jm.util = {
             // remove it's self
             node = null;
             //delete node;
+        },
+
+        select_node:function(nodeid){
+            var node = this.get_node(nodeid);
+            if(!!node){
+                this.selected = node;
+            }
+            return node;
+        },
+
+        get_selected_node:function(){
+            return this.selected;
+        },
+
+        select_clear:function(){
+            this.selected = null;
         },
 
         is_readonly:function(){
@@ -741,6 +805,9 @@ jm.util = {
             layout_data.right_nodes = right_nodes;
             layout_data.outer_height_left = this._layout_offset_subnodes(left_nodes);
             layout_data.outer_height_right = this._layout_offset_subnodes(right_nodes);
+            this.bounds.e=node._data.view.width/2;
+            this.bounds.w=0-this.bounds.e;
+            //_console.debug(this.bounds.w);
             this.bounds.n=0;
             this.bounds.s = Math.max(layout_data.outer_height_left,layout_data.outer_height_right);
         },
@@ -915,12 +982,13 @@ jm.util = {
             for(var nodeid in nodes){
                 node = nodes[nodeid];
                 pout = this.get_node_point_out(node);
+                //_console.debug(pout.x);
                 if(pout.x > this.bounds.e){this.bounds.e = pout.x;}
                 if(pout.x < this.bounds.w){this.bounds.w = pout.x;}
             }
             return {
-                w:this.bounds.e - this.bounds.w + this.opts.hspace*4,
-                h:this.bounds.s - this.bounds.n + this.opts.vspace*4
+                w:this.bounds.e - this.bounds.w,
+                h:this.bounds.s - this.bounds.n
             }
         },
 
@@ -1013,6 +1081,8 @@ jm.util = {
 
         this.canvas_ctx = null;
         this.size = {w:0,h:0};
+
+        this.selected = null;
     };
 
     jm.view_provider.prototype={
@@ -1062,6 +1132,7 @@ jm.util = {
 
         reset:function(){
             _console.debug('view.reset');
+            this.selected = null;
             this.clear_lines();
             this.clear_nodes();
         },
@@ -1071,21 +1142,19 @@ jm.util = {
             this.init_nodes();
         },
 
-        expand_size:function(times){
+        expand_size:function(){
             var min_size = this.layout.get_min_size();
-            var client_w = this.e_panel.offsetWidth;
-            var client_h = this.e_panel.offsetHeight;
-            if(client_w < min_size.w*times){client_w = min_size.w*times;}
-            if(client_h < min_size.h*times){client_h = min_size.h*times;}
-            this.e_panel.offsetWidth = client_w;
-            this.e_panel.offsetHeight = client_h;
+            var min_width = min_size.w + this.opts.hmargin*2;
+            var min_height = min_size.h + this.opts.vmargin*2;
+            var client_w = this.e_panel.clientWidth;
+            var client_h = this.e_panel.clientHeight;
+            if(client_w < min_width){client_w = min_width;}
+            if(client_h < min_height){client_h = min_height;}
             this.size.w = client_w;
             this.size.h = client_h;
         },
 
         init_canvas:function(){
-            //this.e_canvas.width = this.size.w;
-            //this.e_canvas.height = this.size.h;
             var ctx = this.e_canvas.getContext('2d');
             ctx.strokeStyle = '#555';
             ctx.lineWidth = 2;
@@ -1134,6 +1203,9 @@ jm.util = {
         },
 
         remove_node:function(node){
+            if(this.selected != null && this.selected.id == node.id){
+                this.selected = null;
+            }
             var children = node.children;
             var i = children.length;
             while(i--){
@@ -1149,27 +1221,47 @@ jm.util = {
             }
         },
 
+        update_node:function(node){
+            $t(node._data.view.element,node.topic);
+        },
+
+        select_node:function(node){
+            if(!!this.selected){
+                this.selected._data.view.element.className =
+                this.selected._data.view.element.className.replace(/\s*selected\s*/i,'');
+            }
+            if(!!node){
+                this.selected = node;
+                node._data.view.element.className += ' selected';
+            }
+        },
+
+        select_clear:function(){
+            this.select_node(null);
+        },
+
         get_view_offset:function(){
             var bounds = this.layout.bounds;
-            var _x = (this.size.w - bounds.e - bounds.w)/2
-            return{
-                x: _x,
-                y: this.size.h / 2
-            };
+            var _x = (this.size.w - bounds.e - bounds.w)/2;
+            var _y = this.size.h / 2;
+            return{x:_x, y:_y};
         },
 
         resize:function(){
             this.e_canvas.width = 1;
             this.e_canvas.height = 1;
+            this.e_nodes.style.width = '1px';
+            this.e_nodes.style.height = '1px';
 
-            this.expand_size(1);
+            this.expand_size();
             this._show();
         },
 
         _show:function(){
             this.e_canvas.width = this.size.w;
             this.e_canvas.height = this.size.h;
-
+            this.e_nodes.style.width = this.size.w+'px';
+            this.e_nodes.style.height = this.size.h+'px';
             this.show_nodes();
             this.show_lines();
 
@@ -1188,7 +1280,7 @@ jm.util = {
 
         show:function(){
             _console.debug('view.show');
-            this.expand_size(1);
+            this.expand_size();
             this._show();
         },
 
@@ -1222,17 +1314,17 @@ jm.util = {
                     continue;
                 }
                 p = this.layout.get_node_point(node);
-                node_element.style.display = '';
-                node_element.style.visibility = 'visible';
                 node_element.style.left = (_offset.x+p.x) + 'px';
                 node_element.style.top = (_offset.y+p.y) + 'px';
+                node_element.style.display = '';
+                node_element.style.visibility = 'visible';
                 if(!node.isroot && node.children.length>0){
                     expander_text = this.layout.is_expand(node)?'-':'+';
                     p_expander= this.layout.get_expander_point(node);
-                    expander.style.display = '';
-                    expander.style.visibility = 'visible';
                     expander.style.left = (_offset.x + p_expander.x) + 'px';
                     expander.style.top = (_offset.y + p_expander.y) + 'px';
+                    expander.style.display = '';
+                    expander.style.visibility = 'visible';
                     $t(expander,expander_text);
                 }
             }
@@ -1278,6 +1370,13 @@ jm.util = {
         reset:function(){
             _console.debug('theme.reset');
         }
+    };
+
+
+    jm.show = function(mind,options){
+        var jm = new jm(options);
+        jm.show(mind);
+        return jm;
     };
 
     // register global variables
