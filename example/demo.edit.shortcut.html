@@ -15,6 +15,7 @@
 	<a name="top"></a>
 	<nav>
 		<a href="https://github.com/hizzgdev/jsmind" target="_blank">[jsMind@GitHub]</a> 
+		<button id="settingsbutton" onClick="showSettingsPanel(_shortcut)">Settings</button>
 	</nav>
 </header>
 
@@ -36,6 +37,17 @@
 </div>
 
 <div id="jsmind_settings_panel" class="jsmind-settings-panel">
+	<dl>
+		<dt>Shortcut</dt>
+		<dd>
+			<input type="radio" name="shortcut" value="enable"> Enable
+			<input type="radio" name="shortcut" value="disable"> Disable
+		</dd>
+	</dl>
+	<div class="button-panel">
+		<button onClick="performEditSettings(_shortcut)"><img src="../img/ok.png" />OK</button>
+		<button onClick="cancelEditSettings()"><img src="../img/cancel.png" />Cancel</button>
+	</div>
 </div>
 
 
@@ -51,5 +63,6 @@
 <script type="text/javascript" src="../js/jsmind.js"></script>
 <script type="text/javascript" src="../js/jsmind.edit.js"></script>
 <script type="text/javascript" src="../js/jsmind.shortcut.js"></script>
+<script language="JavaScript" src="../js/jsmind.settings.js"></script>
 <script type="text/javascript" src="../js/jsmind.example.js"></script>
 </html>
