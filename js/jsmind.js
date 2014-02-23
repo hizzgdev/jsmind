@@ -5,8 +5,6 @@
     var __name__ = 'jsMind';
     // library version
     var __version__    = '0.2';
-    // debug mode
-    var __debug__      = true;
 
     // check global variables
     if(typeof($w[__name__])!='undefined'){
@@ -16,34 +14,28 @@
 
     // an noop function define
     var _noop = function(){};
-    // remove console object for ie6/7/8
     var _console = (typeof(console) == 'undefined')?{
             log:_noop, debug:_noop, error:_noop, warn:_noop, info:_noop
         }:console;
 
-    // dom method's shortcut
+    // shortcut of methods in dom
     var $d = $w.document;
     var $g = function(id){return $d.getElementById(id);};
     var $c = function(tag){return $d.createElement(tag);};
     var $t = function(n,t){if(n.hasChildNodes()){n.firstChild.nodeValue = t;}else{n.appendChild($d.createTextNode(t));}};
 
-    var __not_ie = !!$d.body.addEventListener;
-    //target,eventType,handler
-    var $add_event=__not_ie?function(t,e,h){t.addEventListener(e,h,false);}:function(t,e,h){t.attachEvent('on'+e,h);};
-
-
     /*
      * !! ATTENTION !!
-     * DO NOT EXPAND IT TO 3 LEVEL OR MORE.
+     * DO NOT EXPAND OPTIONS TO 3 LEVEL OR MORE.
      * LOWER OPTIONS WILL NOT BE MERGE BUT REWRITE
      */
     var DEFAULT_OPTIONS = {
         data:{
-            format:'json_array',
-            readonly:true
+            format:'json_array',            // now, 'json_array' is the only supported data format, never change it
+            readonly:true                   // you can change it in your options, or use 'set_readonly'
         },
         view:{
-            container:'jsmind_container',
+            container:'jsmind_container',   // id of the container
             hmargin:100,
             vmargin:50
         },
@@ -145,7 +137,7 @@
                     p = tmp_param.join('&');
                 }
                 var xhr = a._xhr();
-                if(xhr == null){return;}
+                if(!xhr){return;}
                 xhr.onreadystatechange = function(){
                     if(xhr.readyState == 4){
                         if(xhr.status == 200 || xhr.status == 0){
@@ -175,6 +167,17 @@
             },
             post:function(url,param,callback){
                 return jm.util.ajax.request(url,param,'POST',callback);
+            }
+        },
+
+        dom:{
+            //target,eventType,handler
+            add_event:function(t,e,h){
+                if(!!t.addEventListener){
+                    t.addEventListener(e,h,false);
+                }else{
+                    t.attachEvent('on'+e,h);
+                }
             }
         },
 
@@ -212,26 +215,26 @@
 
             save:function(file_data, type, name) {
                 var blob;
-                if (typeof window.Blob == "function") {
+                if (typeof $w.Blob == "function") {
                     blob = new Blob([file_data], {type: type});
                 } else {
-                    var BlobBuilder = window.BlobBuilder || window.MozBlobBuilder || window.WebKitBlobBuilder || window.MSBlobBuilder;
+                    var BlobBuilder = $w.BlobBuilder || $w.MozBlobBuilder || $w.WebKitBlobBuilder || $w.MSBlobBuilder;
                     var bb = new BlobBuilder();
                     bb.append(file_data);
                     blob = bb.getBlob(type);
                 }
-                var URL = window.URL || window.webkitURL;
+                var URL = $w.URL || $w.webkitURL;
                 var bloburl = URL.createObjectURL(blob);
-                var anchor = document.createElement("a");
+                var anchor = $c('a');
                 if ('download' in anchor) {
                     anchor.style.visibility = "hidden";
                     anchor.href = bloburl;
                     anchor.download = name;
-                    document.body.appendChild(anchor);
-                    var evt = document.createEvent("MouseEvents");
+                    $d.body.appendChild(anchor);
+                    var evt = $d.createEvent("MouseEvents");
                     evt.initEvent("click", true, true);
                     anchor.dispatchEvent(evt);
-                    document.body.removeChild(anchor);
+                    $d.body.removeChild(anchor);
                 } else if (navigator.msSaveBlob) {
                     navigator.msSaveBlob(blob, name);
                 } else {
@@ -239,6 +242,7 @@
                 }
             }
         },
+
         json:{
             json2string:function(json){
                 var json_str = JSON.stringify(json);
@@ -247,6 +251,18 @@
             string2json:function(json_str){
                 var json = JSON.parse(json_str);
                 return json;
+            }
+        },
+
+        uuid:{
+            newid:function(){
+                var d = new Date().getTime();
+                var _uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    var r = (d + Math.random()*16)%16 | 0;
+                    d = Math.floor(d/16);
+                    return (c=='x' ? r : (r&0x7|0x8)).toString(16);
+                });
+                return _uuid;
             }
         }
     };
@@ -382,7 +398,7 @@
             }
             this._reset();
             if(!mind){
-                mind = [{nodeid:'root',topic:'jsMind Example',isroot:true}];
+                mind = [{nodeid:'root',topic:'Empty Mindmap',isroot:true}];
             }
             this._show(mind.slice(0));
         },
@@ -401,22 +417,23 @@
             return this.data.get_node(nodeid);
         },
 
-        add_node:function(node_json,beforeid){
+        add_node:function(nodeid, parentid, topic, summary, beforeid){
             if(this.is_readonly()){
                 _console.error('fail, this mind map is readonly');
                 return;
             }
             var node = null;
             if(!!beforeid){
-                node = this.data.add_node_before(node_json,beforeid);
+                node = this.data.add_node_before(nodeid, parentid, topic, summary, beforeid);
             }else{
-                node = this.data.add_node(node_json);
+                node = this.data.add_node(nodeid, parentid, topic, summary);
             };
             if(!!node){
                 this.view.add_node(node);
                 this.layout.layout();
                 this.view.show();
             }
+            return node;
         },
 
         remove_node:function(nodeid){
@@ -601,18 +618,15 @@
             return node.children;
         },
 
-        // watch out the nodeindex item, the position of node is determined by it.
-        add_node:function(node_json){
+        add_node:function(nodeid, parentid, topic, summary, idx){
             if(this.is_readonly()){
                 _console.error('fail, this mind map is readonly');
                 return null;
             }
-            var parent_node = this.get_node(node_json.parentid);
+            var nodeindex = idx || -1;
+            var parent_node = this.get_node(parentid);
             if(!!parent_node){
-                if(!('nodeindex' in node_json)){
-                    node_json.nodeindex = -1;
-                }
-                var node = this._parse_node(node_json, parent_node);
+                var node = new jm.node(nodeid,nodeindex,topic,summary,false,parent_node);
                 if(this.put_node(node)){
                     parent_node.children.push(node);
                     this.reindex(parent_node);
@@ -625,50 +639,45 @@
             return node;
         },
 
-        // this method while rewrite the nodeindex in node_json
-        add_node_at:function(node_json, node_index){
-            node_json.nodeindex = node_index-0.5;
-            return this.add_node(node_json);
-        },
-
-        // this method while rewrite the nodeindex in node_json
-        add_node_before:function(node_json, before_id){
+        add_node_before:function(nodeid, parentid, topic, summary, before_id){
             var node_before = (!!before_id)?this.get_node(before_id):null;
+            var node_index = -1;
             if(!!node_before){
-                if(node_before.parent!=null && node_before.parent.id == node_json.parentid){
-                    node_json.nodeindex = node_before.index-0.5;
-                }else{
-                    node_json.nodeindex = -1;
+                if(node_before.parent!=null && node_before.parent.id == parentid){
+                    node_index = node_before.index-0.5;
                 }
-            }else{
-                node_json.nodeindex = -1;
             }
-            return this.add_node(node_json);
+            return this.add_node(nodeid, parentid, topic, summary, node_index);
         },
 
-        // this method while rewrite the nodeindex in node_json
-        add_node_after:function(node_json, after_id){
+        add_node_after:function(nodeid, parentid, topic, summary, after_id){
             var node_after = (!!after_id)?this.get_node(after_id):null;
+            var node_index = -1;
             if(!!node_after){
-                if(node_after.parent!=null && node_after.parent.id==node_json.parentid){
-                    node_json.nodeindex = node_after.index + 0.5;
-                }else{
-                    node_json.nodeindex = -1;
+                if(node_after.parent!=null && node_after.parent.id==parentid){
+                    node_index = node_after.index + 0.5;
                 }
-            }else{
-                node_json.nodeindex = -1;
             }
-            return this.add_node(node_json);
+            return this.add_node(nodeid, parentid, topic, summary, node_index);
         },
 
-        update_node:function(nodeid,topic,summary){
+        update_node:function(nodeid, topic, summary, before_id){
             if(this.is_readonly()){
                 _console.error('fail, the mindmap is readonly');
                 return null;
             }
             var node = this.get_node(nodeid);
             node.topic = topic;
-            node.summary = summary;
+            if(typeof(summary) != 'undefined'){
+                node.summary = summary;
+            }
+            if(!!before_id){
+                var node_after = (!!after_id)?this.get_node(after_id):null;
+                if(node_after.parent!=null && node_after.parent.id==node.parent.id){
+                    node.index = node_before.index - 0.5;
+                    this.reindex(node.parent);
+                }
+            }
             return node;
         },
 
@@ -757,9 +766,9 @@
                 //_nodeindex_ : node.index,
                 nodeid : node.id,
                 isroot : node.isroot,
-                parentid : (!!node.parent)?node.parent.id:null,
+                parentid : (!!node.parent)?node.parent.id:undefined,
                 topic : node.topic,
-                summary : node.sumary
+                summary : node.summary
             };
             json_array.push(o);
             var ci = node.children.length;
@@ -1000,10 +1009,6 @@
                 offset_cache.x = x;
                 offset_cache.y = y;
             }
-            if(node.id == 'b001'){
-                //_console.debug(layout_data);
-                //_console.debug(offset_cache);
-            }
             return offset_cache;
         },
 
@@ -1193,10 +1198,10 @@
             this.e_editor.type = 'text';
 
             var v = this;
-            $add_event(this.e_editor,'keydown',function(e){
+            jm.util.dom.add_event(this.e_editor,'keydown',function(e){
                 if(e.keyCode == 13){v.edit_node_end();}
             });
-            $add_event(this.e_editor,'blur',function(e){
+            jm.util.dom.add_event(this.e_editor,'blur',function(e){
                 v.edit_node_end();
             });
 
@@ -1207,16 +1212,16 @@
             
         event_bind:function(obj,fn_mouseover,fn_mouseout,fn_click,fn_dblclick){
             if(!!fn_mouseover){
-                $add_event(this.e_nodes,'mouseover',function(e){fn_mouseover.call(obj,e);});
+                jm.util.dom.add_event(this.e_nodes,'mouseover',function(e){fn_mouseover.call(obj,e);});
             }
             if(!!fn_mouseout){
-                $add_event(this.e_nodes,'mouseout',function(e){fn_mouseout.call(obj,e);});
+                jm.util.dom.add_event(this.e_nodes,'mouseout',function(e){fn_mouseout.call(obj,e);});
             }
             if(!!fn_click){
-                $add_event(this.e_nodes,'click',function(e){fn_click.call(obj,e);});
+                jm.util.dom.add_event(this.e_nodes,'click',function(e){fn_click.call(obj,e);});
             }
             if(!!fn_dblclick){
-                $add_event(this.e_nodes,'dblclick',function(e){fn_dblclick.call(obj,e);});
+                jm.util.dom.add_event(this.e_nodes,'dblclick',function(e){fn_dblclick.call(obj,e);});
             }
         },
 
@@ -1300,8 +1305,8 @@
             d.style.visibility='hidden';
             this.e_nodes.appendChild(d);
             view_data.element = d;
-            view_data.width = d.offsetWidth;
-            view_data.height = d.offsetHeight;
+            view_data.width = d.clientWidth;
+            view_data.height = d.clientHeight;
         },
 
         remove_node:function(node){
@@ -1327,8 +1332,8 @@
             var view_data = node._data.view;
             var element = view_data.element;
             $t(element,node.topic);
-            view_data.width = element.offsetWidth;
-            view_data.height = element.offsetHeight;
+            view_data.width = element.clientWidth;
+            view_data.height = element.clientHeight;
         },
 
         select_node:function(node){
@@ -1357,6 +1362,7 @@
             this.e_editor.value = topic;
             element.innerHTML = '';
             element.appendChild(this.e_editor);
+            element.style.zIndex = 5;
             this.e_editor.focus();
             this.e_editor.select();
         },
@@ -1368,6 +1374,7 @@
                 var view_data = node._data.view;
                 var element = view_data.element;
                 var topic = this.e_editor.value;
+                element.style.zIndex = 'auto';
                 element.removeChild(this.e_editor);
                 this.jm.update_node(node.id,topic,node.summary);
             }
@@ -1506,10 +1513,10 @@
     };
 
 
-    jm.show = function(mind,options){
-        var jm = new jm(options);
-        jm.show(mind);
-        return jm;
+    jm.show = function(options,mind){
+        var _jm = new jm(options);
+        _jm.show(mind);
+        return _jm;
     };
 
     // register global variables

@@ -1,5 +1,4 @@
-function load_mind_ajax(options,fn_callback){
-    var url = options.url;
+function read_from_ajax(url,fn_callback){
     jsMind.util.ajax.get(url,function(data){
         if(typeof(fn_callback) === 'function'){
             fn_callback(data);
@@ -7,12 +6,13 @@ function load_mind_ajax(options,fn_callback){
     });
 }
 
-function save_mind_ajax(options,mind,fn_callback){
+function save_to_ajax(options,mind,fn_callback){
     // not support yet
 }
 
-function load_mind_localfile(options,fn_callback){
-    jsMind.util.file.read(options.data,function(data){
+// filedata: the file object in html5
+function read_from_localfile(filedata,fn_callback){
+    jsMind.util.file.read(filedata,function(data){
         var mind = jsMind.util.json.string2json(data);
         if(typeof(fn_callback) === 'function'){
             fn_callback(mind);
@@ -20,9 +20,12 @@ function load_mind_localfile(options,fn_callback){
     });
 }
 
-function save_mind_localfile(options,mind,fn_callback){
-    var mind_str = jsMind.util.json.json2string(mind.data);
-    jsMind.util.file.save(mind_str,'text/jsmind',mind.name+'.jm');
+function save_to_localfile(mind_data,mind_name,fn_callback){
+    var mind_str = jsMind.util.json.json2string(mind_data);
+    jsMind.util.file.save(mind_str,'text/jsmind',mind_name+'.jm');
+    if(typeof(fn_callback) === 'function'){
+        fn_callback('success');
+    }
 }
 
 function load_mind_dropbox(options,fn_callback){

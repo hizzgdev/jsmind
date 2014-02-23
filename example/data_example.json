@@ -1,16 +1,22 @@
 [
-{nodeid:'a001', isroot:true, topic:'root node'},
-{nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1', sn:10 },
-{nodeid:'b002', parentid:'a001', topic:'sub node #2', summary:'summary of node #2'},
-{nodeid:'c0021', parentid:'b002', topic:'sub node #21', summary:'summary of node #2'},
-{nodeid:'c0022', parentid:'b002', topic:'sub node #22', summary:'summary of node #2'},
-{nodeid:'c0023', parentid:'b002', topic:'sub node #23', summary:'summary of node #2'},
-{nodeid:'d00231', parentid:'c0023', topic:'sub node #231', summary:'summary of node #2'},
-{nodeid:'d00232', parentid:'c0023', topic:'sub node #232', summary:'summary of node #2'},
-{nodeid:'b003', parentid:'a001', topic:'sub node #3', summary:'summary of node #3'},
-{nodeid:'c0031', parentid:'b003', topic:'sub node #31', summary:'summary of node #2'},
-{nodeid:'c0032', parentid:'b003', topic:'sub node #32', summary:'summary of node #2'},
-{nodeid:'c0033', parentid:'b003', topic:'sub node #33', summary:'summary of node #2'},
-{nodeid:'b004', parentid:'a001', topic:'sub node #2', summary:'summary of node #2'},
-{nodeid:'b005', parentid:'a001', topic:'sub node #2', summary:'summary of node #2'},
+{'nodeid':'root', 'isroot':true, 'topic':'jsMind'},
+
+{'nodeid':'easy', 'parentid':'root', 'topic':'Easy'},
+{'nodeid':'easy1', 'parentid':'easy', 'topic':'Easy to show'},
+{'nodeid':'easy2', 'parentid':'easy', 'topic':'Easy to edit'},
+{'nodeid':'easy3', 'parentid':'easy', 'topic':'Easy to store'},
+{'nodeid':'easy4', 'parentid':'easy', 'topic':'Easy to embed'},
+
+{'nodeid':'open', 'parentid':'root', 'topic':'Open Source'},
+{'nodeid':'open1', 'parentid':'open', 'topic':'on GitHub'},
+{'nodeid':'open2', 'parentid':'open', 'topic':'BSD License'},
+
+{'nodeid':'powerful', 'parentid':'root', 'topic':'Powerful'},
+{'nodeid':'powerful1', 'parentid':'powerful', 'topic':'Base on Javascript'},
+{'nodeid':'powerful2', 'parentid':'powerful', 'topic':'Base on HTML5'},
+{'nodeid':'powerful3', 'parentid':'powerful', 'topic':'Depends on you'},
+
+{'nodeid':'other', 'parentid':'root', 'topic':'test node'},
+{'nodeid':'other1', 'parentid':'other', 'topic':'I\'m from ajax'},
+{'nodeid':'other2', 'parentid':'other', 'topic':'I can do everything'},
 ]

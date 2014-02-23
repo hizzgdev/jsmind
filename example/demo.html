@@ -35,50 +35,49 @@
 <script type="text/javascript" src="../js/jsmind.data.js"></script>
 <script type="text/javascript">
 
-var mind_ajax = {url:'/example/data_example.json'};
 
-var mind1 = [
-    {nodeid:'a001', isroot:true, topic:'root node'},
-    {nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1', sn:10 },
-    {nodeid:'b002', parentid:'a001', topic:'sub node #2', summary:'summary of node #2'},
-    {nodeid:'c0021', parentid:'b002', topic:'sub node #21', summary:'summary of node #2'},
-    {nodeid:'c0022', parentid:'b002', topic:'sub node #22', summary:'summary of node #2'},
-    {nodeid:'c0023', parentid:'b002', topic:'sub node #23', summary:'summary of node #2'},
-    ];
-var mind2 = [
-    {nodeid:'a001', isroot:true, topic:'root node root node root node root node root node'},
-    {nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1', sn:10 },
-    {nodeid:'b002', parentid:'a001', topic:'sub node #2', summary:'summary of node #2'},
-    {nodeid:'b003', parentid:'a001', topic:'sub node #3', summary:'summary of node #2'},
-    ];
 
-    var jm = new jsMind();
-    jm.init();
-    jm.set_readonly(false);
-    jm.show();
-    //jm.data.removeNode('b001');
+    //var jm = new jsMind();
+    //jm.init();//optional
+    //jm.set_readonly(false);
+    //jm.show();
     // ==== OR =========================
-    //  var jm = jsMind.show(mind,[myOptions]);
+    var jm = jsMind.show();
 
 
     function load_jsmind(){
-        load_mind_ajax(mind_ajax,function(mind){
+        var url = '/example/data_example.json';
+        read_from_ajax(url,function(mind){
             jm.show(mind);
         });
     }
 
     function load_jsmind1(){
-        jm.show(mind1);
+        var mind = [
+            {nodeid:'a001', isroot:true, topic:'root node'},
+            {nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1'},
+            {nodeid:'b002', parentid:'a001', topic:'sub node #2', summary:'summary of node #2'},
+            {nodeid:'c0021', parentid:'b002', topic:'sub node #21', summary:'summary of node #2'},
+            {nodeid:'c0022', parentid:'b002', topic:'sub node #22', summary:'summary of node #2'},
+            {nodeid:'c0023', parentid:'b002', topic:'sub node #23', summary:'summary of node #2'},
+        ];
+        jm.show(mind);
     }
 
     function load_jsmind2(){
-        jm.show(mind2);
+        var mind = [
+            {nodeid:'a001', isroot:true, topic:'root node root node root node root node root node'},
+            {nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1'},
+            {nodeid:'b002', parentid:'a001', topic:'sub node #2', summary:'summary of node #2'},
+            {nodeid:'b003', parentid:'a001', topic:'sub node #3', summary:'summary of node #2'},
+        ];
+        jm.show(mind);
     }
 
     function load_jsmind3(evt){
         var files = evt.target.files;
-        var options = {data:files[0]};
-        load_mind_localfile(options,function(mind){
+        var file_data = files[0];
+        read_from_localfile(file_data,function(mind){
             jm.show(mind);
         });
     }

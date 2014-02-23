@@ -1,0 +1,168 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>jsMind</title>
+    <link type="text/css" rel="stylesheet" href="../style/jsmind.css" />
+    <style type="text/css">
+        li{margin-top:2px; margin-bottom:2px;}
+        button{width:140px;}
+        #layout{width:1210px;}
+        #jsmind_nav{width:200px;float:left;}
+        #file_input{width:140px;}
+
+        #jsmind_container{
+            float:left;
+            width:1000px;
+            height:600px;
+            border:solid 1px #333;
+            background:#eee;
+        }
+    </style>
+</head>
+<body>
+<div id="layout">
+    <div id="jsmind_nav">
+        <div>1. Open &amp; Save</div>
+        <ol type='A'>
+            <li><button onclick="open_json();">open from variable</button></li>
+            <li><button onclick="open_ajax();">open from ajax</button></li>
+            <li><button onclick="save_file();">save to local file</button></li>
+            <li><div><input id="file_input" type="file"/></div><button onclick="open_file();">open from local file</button></li>
+            <li><button onclick="show_data();">get mindmap data</button></li>
+        </ol>
+        <div>2. Select &amp; Edit</div>
+        <ol type='A'>
+            <li><button onclick="select_node();">select a node</button></li>
+            <li>try click a node</li>
+            <li><button onclick="show_selected();">get the selected</button></li>
+            <li><button onclick="add_node();">add a node</button></li>
+            <li><button onclick="modify_node();">modify a node</button></li>
+            <li>try double click</li>
+            <li><button onclick="remove_node();">remove a node</button></li>
+        </ol>
+        <div>4. Setting &amp; Adjusting</div>
+        <ol type='A'>
+            <li><button onclick="change_container();">change size</button></li>
+            <li><button onclick="resize_jsmind();">adusting it</button></li>
+        </ol>
+    </div>
+    <div id="jsmind_container"></div>
+</div>
+<script type="text/javascript" src="../js/jsmind.js"></script>
+<script type="text/javascript" src="../js/jsmind.data.js"></script>
+<script type="text/javascript">
+    var _jm = null;
+    function open_empty(){
+        var options = {
+            data:{readonly:false},
+            view:{container:'jsmind_container'}
+        }
+        _jm = jsMind.show(options);
+        // _jm = jsMind.show(options,mind);
+        // _jm.set_readonly(true);
+        // var mind_data = _jm.get_mind();
+        // var name = mind_data.name;
+        // var data = mind_data.data;
+    }
+
+    function open_json(){
+        var mind = [
+            {'nodeid':'root', 'isroot':true, 'topic':'jsMind'},
+
+            {'nodeid':'easy', 'parentid':'root', 'topic':'Easy'},
+            {'nodeid':'easy1', 'parentid':'easy', 'topic':'Easy to show'},
+            {'nodeid':'easy2', 'parentid':'easy', 'topic':'Easy to edit'},
+            {'nodeid':'easy3', 'parentid':'easy', 'topic':'Easy to store'},
+            {'nodeid':'easy4', 'parentid':'easy', 'topic':'Easy to embed'},
+
+            {'nodeid':'open', 'parentid':'root', 'topic':'Open Source'},
+            {'nodeid':'open1', 'parentid':'open', 'topic':'on GitHub'},
+            {'nodeid':'open2', 'parentid':'open', 'topic':'BSD License'},
+
+            {'nodeid':'other', 'parentid':'root', 'topic':'test node'},
+            {'nodeid':'other1', 'parentid':'other', 'topic':'I\'m from js variable'},
+            {'nodeid':'other2', 'parentid':'other', 'topic':'I can do everything'},
+
+            {'nodeid':'powerful', 'parentid':'root', 'topic':'Powerful'},
+            {'nodeid':'powerful1', 'parentid':'powerful', 'topic':'Base on Javascript'},
+            {'nodeid':'powerful2', 'parentid':'powerful', 'topic':'Base on HTML5'},
+            {'nodeid':'powerful3', 'parentid':'powerful', 'topic':'Depends on you'},
+        ];
+        _jm.show(mind);
+    }
+
+    function open_ajax(){
+        var mind_url = '/example/data_example.json';
+        read_from_ajax(mind_url,function(mind){
+            _jm.show(mind);
+        });
+    }
+
+    function save_file(){
+        var mind = _jm.get_mind();
+        save_to_localfile(mind.data, mind.name);
+    }
+    
+    function open_file(){
+        var file_input = document.getElementById('file_input');
+        var files = file_input.files;
+        if(files.length > 0){
+            var file_data = files[0];
+            read_from_localfile(file_data,function(mind){
+                _jm.show(mind);
+            });
+        }
+    }
+
+    function show_data(){
+        var mind = _jm.get_mind();
+        var mind_string = jsMind.util.json.json2string(mind.data);
+        alert(mind_string);
+    }
+
+    function select_node(){
+        var nodeid = 'other';
+        _jm.select_node(nodeid);
+    }
+
+    function show_selected(){
+        var selected_node = _jm.get_selected_node();
+        if(!!selected_node){
+            alert(selected_node.topic);
+        }else{
+            alert('nothing');
+        }
+    }
+
+    function add_node(){
+        var nodeid = jsMind.util.uuid.newid();
+        var topic = 'NewNode_'+nodeid.substr(0,5)
+        var node = _jm.add_node(nodeid, 'other', topic, 'This is New Node', 'other1');
+    }
+
+    function modify_node(){
+        _jm.update_node('other', '--- modified ---');
+        //_jm.update_node('other', '--- modified ---', 'modify summary at the same time');
+    }
+
+    function remove_node(){
+        _jm.remove_node('other');
+    }
+
+    // this method change size of container, perpare for adjusting jsmind
+    function change_container(){
+        var c = document.getElementById('jsmind_container');
+        c.style.width = '800px';
+        c.style.height = '500px';
+    }
+
+    function resize_jsmind(){
+        _jm.resize();
+    }
+
+    open_empty();
+</script>
+</body>
+</html>
