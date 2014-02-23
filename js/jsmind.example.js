@@ -10,10 +10,6 @@
 	var _h_footer = $footer.clientHeight;
 
 	var $container = $g('jsmind_container');
-	var $float_toolbar = $g('float_toolbar');
-	var $jsmind_edit_panel = $g('jsmind_edit_panel');
-	var $bt_ok = $g('bt_ok');
-	var $bt_cancel = $g('bt_cancel');
 	var MINDID = 'abcd';
 	var _view_engine = null;
 	var _editor = null;
@@ -57,8 +53,8 @@
 	}
 
     function enableEditShortCut(){
-		_editor_shortcut = new jm.Editor.EventHandler();
-		jm.Util.AddEvent($w,'keydown',function(e){_editor_shortcut.HandleKeyPressEvent(e,_view_engine);});
+		_shortcut = new jm.ShortCut();
+		jm.Util.AddEvent($w,'keydown',function(e){_shortcut.HandleKeyPressEvent(e,_view_engine);});
     }
 
 

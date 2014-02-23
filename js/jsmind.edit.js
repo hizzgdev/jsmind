@@ -89,9 +89,10 @@
 				$toolbar = $g('float_toolbar');
 				_toolbar_h = $toolbar.offsetHeight;
 				$edit_panel = $g('jsmind_edit_panel');
+				$settings_panel = $g('jsmind_settings_panel');
 				this.ViewEngine.AddAttachElement($toolbar);
 				this.ViewEngine.AddAttachElement($edit_panel);
-				
+				this.ViewEngine.AddAttachElement($settings_panel);
 				$edit_form = $g('edit_form');
 				$confirm_p = $g('confirm_p');
 				$label_topic = $g('label_topic');
