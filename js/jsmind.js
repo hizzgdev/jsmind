@@ -179,9 +179,9 @@
         },
 
         canvas:{
-            easingztf : function(t,b,c,d){var x=t*4/d;return (1-Math.pow(Math.E,-(x*x)/2))*c+b;},
+            easing_gauss: function(t,b,c,d){var x=t*4/d;return (1-Math.pow(Math.E,-(x*x)/2))*c+b;},
             lineto : function(ctx,x1,y1,x2,y2){
-                var ztf = jm.util.canvas.easingztf;
+                var ztf = jm.util.canvas.easing_gauss;
                 ctx.moveTo(x1,y1);
                 ctx.beginPath();
                 var l = x2-x1;
@@ -196,6 +196,57 @@
             },
             clear:function(ctx,x1,y1,x2,y2){
                 ctx.clearRect(x1,y1,x2,y2);
+            }
+        },
+
+        file:{
+            read:function(file_data,fn_callback){
+                var reader = new FileReader();
+                reader.onload = function(){
+                    if(typeof(fn_callback) == 'function'){
+                        fn_callback(this.result);
+                    }
+                };
+                reader.readAsText(file_data);
+            },
+
+            save:function(file_data, type, name) {
+                var blob;
+                if (typeof window.Blob == "function") {
+                    blob = new Blob([file_data], {type: type});
+                } else {
+                    var BlobBuilder = window.BlobBuilder || window.MozBlobBuilder || window.WebKitBlobBuilder || window.MSBlobBuilder;
+                    var bb = new BlobBuilder();
+                    bb.append(file_data);
+                    blob = bb.getBlob(type);
+                }
+                var URL = window.URL || window.webkitURL;
+                var bloburl = URL.createObjectURL(blob);
+                var anchor = document.createElement("a");
+                if ('download' in anchor) {
+                    anchor.style.visibility = "hidden";
+                    anchor.href = bloburl;
+                    anchor.download = name;
+                    document.body.appendChild(anchor);
+                    var evt = document.createEvent("MouseEvents");
+                    evt.initEvent("click", true, true);
+                    anchor.dispatchEvent(evt);
+                    document.body.removeChild(anchor);
+                } else if (navigator.msSaveBlob) {
+                    navigator.msSaveBlob(blob, name);
+                } else {
+                    location.href = bloburl;
+                }
+            }
+        },
+        json:{
+            json2string:function(json){
+                var json_str = JSON.stringify(json);
+                return json_str;
+            },
+            string2json:function(json_str){
+                var json = JSON.parse(json_str);
+                return json;
             }
         }
     };
@@ -229,13 +280,14 @@
             this.options.data.readonly = readonly;
         },
 
-        event_bind:function(){
-            this.view.event_bind(this,null,null,this.click_handle,null);
+        is_readonly:function(){
+            return this.options.data.readonly;
         },
 
-        // not finish
-        // how to deal with event register
-        // how to toggle a node
+        event_bind:function(){
+            this.view.event_bind(this,null,null,this.click_handle,this.dblclick_handle);
+        },
+
         click_handle:function(e){
             var element = e.target || e.srcElement;
             var isnode = this.view.is_node(element);
@@ -249,6 +301,33 @@
             }else{
                 this.select_clear();
             }
+        },
+
+        dblclick_handle:function(e){
+            if(this.is_readonly()){return;}
+            var element = e.target || e.srcElement;
+            var isnode = this.view.is_node(element);
+            if(isnode){
+                var nodeid = this.view.get_nodeid(element);
+                this.begin_edit(nodeid);
+            }
+        },
+
+        begin_edit:function(nodeid){
+            if(this.is_readonly()){
+                _console.error('fail, this mind map is readonly');
+                return;
+            }
+            var node = this.get_node(nodeid);
+            if(!!node){
+                this.view.edit_node_begin(node);
+            }else{
+                _console.error('the node[id='+nodeid+'] can not be found');
+            }
+        },
+
+        end_edit:function(){
+            this.view.edit_node_end();
         },
 
         toggle_node:function(nodeid){
@@ -302,7 +381,16 @@
                 this.init();
             }
             this._reset();
+            if(!mind){
+                mind = [{nodeid:'root',topic:'jsMind Example',isroot:true}];
+            }
             this._show(mind.slice(0));
+        },
+
+        get_mind : function(){
+            var mind_data = this.data.get_json();
+            var mind_name = this.data.get_root().topic;
+            return{name:mind_name,data:mind_data};
         },
 
         resize:function(){
@@ -314,7 +402,7 @@
         },
 
         add_node:function(node_json,beforeid){
-            if(this.data.is_readonly()){
+            if(this.is_readonly()){
                 _console.error('fail, this mind map is readonly');
                 return;
             }
@@ -332,7 +420,7 @@
         },
 
         remove_node:function(nodeid){
-            if(this.data.is_readonly()){
+            if(this.is_readonly()){
                 _console.error('fail, this mind map is readonly');
                 return;
             }
@@ -346,7 +434,7 @@
         },
 
         update_node:function(nodeid, topic, summary){
-            if(this.data.is_readonly()){
+            if(this.is_readonly()){
                 _console.error('fail, this mind map is readonly');
                 return;
             }
@@ -382,7 +470,7 @@
         this.jm = jm;
         this.opts = options;
         this.root = null;
-        this.selected = null;
+        this.selected_node = null;
         this.nodes = {};
     };
 
@@ -393,7 +481,7 @@
         reset:function(){
             _console.debug('data.reset');
             this.root = null;
-            this.selected = null;
+            this.selected_node = null;
             this.nodes = {};
         },
         load:function(mind){
@@ -505,7 +593,7 @@
         },
 
         get_root:function(){
-            return this.node;
+            return this.root;
         },
 
         get_subnodes:function(nodeid){
@@ -597,8 +685,11 @@
                 _console.error('fail, can not remove the root node');
                 return;
             }
-            if(this.selected != null && this.selected.id == node.id){
-                this.selected = null;
+            if(this.selected_node != null && this.selected_node.id == node.id){
+                this.selected_node = null;
+            }
+            if(this.editing_node!= null && this.editing_node.id == node.id){
+                this.editing_node = null;
             }
             // clean all subordinate nodes
             var children = node.children;
@@ -631,17 +722,17 @@
         select_node:function(nodeid){
             var node = this.get_node(nodeid);
             if(!!node){
-                this.selected = node;
+                this.selected_node = node;
             }
             return node;
         },
 
         get_selected_node:function(){
-            return this.selected;
+            return this.selected_node;
         },
 
         select_clear:function(){
-            this.selected = null;
+            this.selected_node = null;
         },
 
         is_readonly:function(){
@@ -663,7 +754,7 @@
                 json_array = [];
             }
             var o = {
-                _nodeindex_ : node.index,
+                //_nodeindex_ : node.index,
                 nodeid : node.id,
                 isroot : node.isroot,
                 parentid : (!!node.parent)?node.parent.id:null,
@@ -682,12 +773,6 @@
             var json = this._get_json_array(this.root,[]);
             return json;
         },
-
-        get_json_string:function(){
-            var json = this.get_json();
-            var json_str = JSON.stringify(json);
-            return json_str;
-        }
     };
 
     // ============= layout provider ===========================================
@@ -1082,7 +1167,8 @@
         this.canvas_ctx = null;
         this.size = {w:0,h:0};
 
-        this.selected = null;
+        this.selected_node = null;
+        this.editing_node = null;
     };
 
     jm.view_provider.prototype={
@@ -1097,16 +1183,29 @@
             this.e_panel = $c('div');
             this.e_canvas = $c('canvas');
             this.e_nodes = $c('jmnodes');
+            this.e_editor = $c('input');
 
             this.e_panel.className = 'jsmind-inner';
             this.e_panel.appendChild(this.e_canvas);
             this.e_panel.appendChild(this.e_nodes);
+
+            this.e_editor.className = 'jsmind-editor';
+            this.e_editor.type = 'text';
+
+            var v = this;
+            $add_event(this.e_editor,'keydown',function(e){
+                if(e.keyCode == 13){v.edit_node_end();}
+            });
+            $add_event(this.e_editor,'blur',function(e){
+                v.edit_node_end();
+            });
+
             this.container.appendChild(this.e_panel);
 
             this.init_canvas();
         },
             
-        event_bind:function(obj,fn_mouseover,fn_mouseout,fn_click){
+        event_bind:function(obj,fn_mouseover,fn_mouseout,fn_click,fn_dblclick){
             if(!!fn_mouseover){
                 $add_event(this.e_nodes,'mouseover',function(e){fn_mouseover.call(obj,e);});
             }
@@ -1115,6 +1214,9 @@
             }
             if(!!fn_click){
                 $add_event(this.e_nodes,'click',function(e){fn_click.call(obj,e);});
+            }
+            if(!!fn_dblclick){
+                $add_event(this.e_nodes,'dblclick',function(e){fn_dblclick.call(obj,e);});
             }
         },
 
@@ -1132,7 +1234,7 @@
 
         reset:function(){
             _console.debug('view.reset');
-            this.selected = null;
+            this.selected_node = null;
             this.clear_lines();
             this.clear_nodes();
         },
@@ -1203,8 +1305,8 @@
         },
 
         remove_node:function(node){
-            if(this.selected != null && this.selected.id == node.id){
-                this.selected = null;
+            if(this.selected_node != null && this.selected_node.id == node.id){
+                this.selected_node = null;
             }
             var children = node.children;
             var i = children.length;
@@ -1222,22 +1324,53 @@
         },
 
         update_node:function(node){
-            $t(node._data.view.element,node.topic);
+            var view_data = node._data.view;
+            var element = view_data.element;
+            $t(element,node.topic);
+            view_data.width = element.offsetWidth;
+            view_data.height = element.offsetHeight;
         },
 
         select_node:function(node){
-            if(!!this.selected){
-                this.selected._data.view.element.className =
-                this.selected._data.view.element.className.replace(/\s*selected\s*/i,'');
+            if(!!this.selected_node){
+                this.selected_node._data.view.element.className =
+                this.selected_node._data.view.element.className.replace(/\s*selected\s*/i,'');
             }
             if(!!node){
-                this.selected = node;
+                this.selected_node = node;
                 node._data.view.element.className += ' selected';
             }
         },
 
         select_clear:function(){
             this.select_node(null);
+        },
+
+        edit_node_begin:function(node){
+            if(this.editing_node != null){
+                this.edit_node_end();
+            }
+            this.editing_node = node;
+            var view_data = node._data.view;
+            var element = view_data.element;
+            var topic = node.topic;
+            this.e_editor.value = topic;
+            element.innerHTML = '';
+            element.appendChild(this.e_editor);
+            this.e_editor.focus();
+            this.e_editor.select();
+        },
+
+        edit_node_end:function(){
+            if(this.editing_node != null){
+                var node = this.editing_node;
+                this.editing_node = null;
+                var view_data = node._data.view;
+                var element = view_data.element;
+                var topic = this.e_editor.value;
+                element.removeChild(this.e_editor);
+                this.jm.update_node(node.id,topic,node.summary);
+            }
         },
 
         get_view_offset:function(){

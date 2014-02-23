@@ -18,9 +18,10 @@
     </style>
 </head>
 <body>
-<button onclick="load_jsmind();"> load ajax mind </button>
-<button onclick="load_jsmind1();"> load mind #1 </button>
-<button onclick="load_jsmind2();"> load mind #2 </button>
+<button onclick="load_jsmind1();"> mind #1 </button>
+<button onclick="load_jsmind2();"> mind #2 </button>
+<button onclick="load_jsmind();"> mind ajax </button>
+<input type="file" onchange="load_jsmind3(event);"/>
 <button onclick="resize_container();"> resize container </button>
 <button onclick="resize_jsmind();"> resize jsmind </button>
 <button onclick="add_node();"> add node </button>
@@ -28,6 +29,7 @@
 <button onclick="remove_node();"> remove node </button>
 <button onclick="select_node();"> select node </button>
 <button onclick="get_selected();"> get select </button>
+<button onclick="save_as();"> save as </button>
 <div id="jsmind_container" class="jsmind-container"></div>
 <script type="text/javascript" src="../js/jsmind.js"></script>
 <script type="text/javascript" src="../js/jsmind.data.js"></script>
@@ -36,7 +38,7 @@
 var mind_ajax = {url:'/example/data_example.json'};
 
 var mind1 = [
-    {nodeid:'a001', isroot:true, topic:'root node root node root node root node root node'},
+    {nodeid:'a001', isroot:true, topic:'root node'},
     {nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1', sn:10 },
     {nodeid:'b002', parentid:'a001', topic:'sub node #2', summary:'summary of node #2'},
     {nodeid:'c0021', parentid:'b002', topic:'sub node #21', summary:'summary of node #2'},
@@ -44,7 +46,7 @@ var mind1 = [
     {nodeid:'c0023', parentid:'b002', topic:'sub node #23', summary:'summary of node #2'},
     ];
 var mind2 = [
-    {nodeid:'a001', isroot:true, topic:'root node'},
+    {nodeid:'a001', isroot:true, topic:'root node root node root node root node root node'},
     {nodeid:'b001', parentid:'a001', topic:'sub node #1', summary:'summary of node #1', sn:10 },
     {nodeid:'b002', parentid:'a001', topic:'sub node #2', summary:'summary of node #2'},
     {nodeid:'b003', parentid:'a001', topic:'sub node #3', summary:'summary of node #2'},
@@ -53,6 +55,7 @@ var mind2 = [
     var jm = new jsMind();
     jm.init();
     jm.set_readonly(false);
+    jm.show();
     //jm.data.removeNode('b001');
     // ==== OR =========================
     //  var jm = jsMind.show(mind,[myOptions]);
@@ -72,6 +75,14 @@ var mind2 = [
         jm.show(mind2);
     }
 
+    function load_jsmind3(evt){
+        var files = evt.target.files;
+        var options = {data:files[0]};
+        load_mind_localfile(options,function(mind){
+            jm.show(mind);
+        });
+    }
+
     function resize_container(){
         var c = document.getElementById('jsmind_container');
         c.style.width = '800px';
@@ -88,8 +99,6 @@ var mind2 = [
         //jm.add_node(newNode);
         jm.add_node(newNode,'b002');
         //jm.data.add_node_at(newNode1,5);
-        //var d = jm.data.get_json_string();
-        //console.log(d);
     }
 
     function edit_node(){
@@ -113,7 +122,11 @@ var mind2 = [
         }
     }
 
-    load_jsmind1();
+    function save_as(){
+        var mind = jm.get_mind();
+        save_mind_localfile(null,mind);
+    }
+
 </script>
 </body>
 </html>

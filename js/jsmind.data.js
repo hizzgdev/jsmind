@@ -12,11 +12,17 @@ function save_mind_ajax(options,mind,fn_callback){
 }
 
 function load_mind_localfile(options,fn_callback){
-    // not support yet
+    jsMind.util.file.read(options.data,function(data){
+        var mind = jsMind.util.json.string2json(data);
+        if(typeof(fn_callback) === 'function'){
+            fn_callback(mind);
+        }
+    });
 }
 
 function save_mind_localfile(options,mind,fn_callback){
-    // not support yet
+    var mind_str = jsMind.util.json.json2string(mind.data);
+    jsMind.util.file.save(mind_str,'text/jsmind',mind.name+'.jm');
 }
 
 function load_mind_dropbox(options,fn_callback){
