@@ -1,4 +1,4 @@
-(function($w,jm){
+var view_engine = (function($w,jm){
 	var $d = $w.document;
 	var $g = function(id){return $d.getElementById(id);};
 	var $c = function(tag){return $d.createElement(tag);};
@@ -13,7 +13,6 @@
 	var MINDID = 'abcd';
 	var _view_engine = null;
 	var _editor = null;
-    var _editor_shortcut = null;
 	
 	function Page_Load(){
 		SetContainerSize();
@@ -21,7 +20,6 @@
 		_view_engine = new jm.View.Engine('jsMind',$container,jm.View.Mode.Both);
 		LoadMind();
 		enableEdit();
-        enableEditShortCut();
 	}
 
 	function LoadMind(){
@@ -51,12 +49,6 @@
 		_editor.Begin(MINDID);
 		_editor.EditMind(MINDID);
 	}
-
-    function enableEditShortCut(){
-		_shortcut = new jm.ShortCut();
-		jm.Util.AddEvent($w,'keydown',function(e){_shortcut.HandleKeyPressEvent(e,_view_engine);});
-    }
-
 
 	function parseNodeTree(sMindId,oDataList){
 		var arr = oDataList.slice(0).reverse();
@@ -133,6 +125,8 @@
 	}
 
 	Page_Load();
+
+    return _view_engine;
 
 })(window,jsMind);
 

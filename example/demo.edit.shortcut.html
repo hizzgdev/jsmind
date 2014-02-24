@@ -15,7 +15,7 @@
 	<a name="top"></a>
 	<nav>
 		<a href="https://github.com/hizzgdev/jsmind" target="_blank">[jsMind@GitHub]</a> 
-		<button id="settingsbutton" onClick="showSettingsPanel(_shortcut)">Settings</button>
+		<button id="settingsbutton" onClick="show_settings_panel()">Settings</button>
 	</nav>
 </header>
 
@@ -63,6 +63,18 @@
 <script type="text/javascript" src="../js/jsmind.js"></script>
 <script type="text/javascript" src="../js/jsmind.edit.js"></script>
 <script type="text/javascript" src="../js/jsmind.shortcut.js"></script>
-<script language="JavaScript" src="../js/jsmind.settings.js"></script>
+<script type="text/javascript" src="../js/jsmind.settings.js"></script>
 <script type="text/javascript" src="../js/jsmind.example.js"></script>
+<script type="text/javascript">
+    var _shortcut = null;
+    function show_settings_panel(){
+        showSettingsPanel(_shortcut);
+    }
+
+    function enableEditShortCut(){
+		_shortcut = new jsMind.ShortCut();
+		jsMind.Util.AddEvent(window,'keydown',function(e){_shortcut.HandleKeyPressEvent(e,view_engine);});
+    }
+    enableEditShortCut();
+</script>
 </html>

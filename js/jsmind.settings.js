@@ -4,15 +4,6 @@ var $g = function(id){return $d.getElementById(id);};
 var $settings_panel = $g('jsmind_settings_panel');
 var shortcutRadios = document.getElementsByName('shortcut');
 
-function enableShortCut(shortcut){
-	
-}
-
-function disableShortCut(shortcut){
-	
-	$settings_panel.style.visibility = 'hidden';
-}
-
 function showSettingsPanel(shortcut){
 	var curr_width = $settings_panel.offsetWidth;
 	var curr_height = $settings_panel.offsetHeight;
