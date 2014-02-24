@@ -122,8 +122,8 @@
     }
 
     function save_as(){
-        var mind = jm.get_mind();
-        save_mind_localfile(null,mind);
+        var mind_data = jm.get_data();
+        save_to_localfile(mind_data,'test.jm');
     }
 
 </script>

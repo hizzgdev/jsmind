@@ -31,7 +31,6 @@
      */
     var DEFAULT_OPTIONS = {
         data:{
-            format:'json_array',            // now, 'json_array' is the only supported data format, never change it
             readonly:true                   // you can change it in your options, or use 'set_readonly'
         },
         view:{
@@ -377,8 +376,11 @@
             this.data.reset();
         },
 
-        _show:function(mind){
-            this.data.load(mind);
+        _show:function(mind,data_format){
+            var m = mind || [{nodeid:'root',topic:'Empty Mindmap',isroot:true}];
+            var df = data_format || 'json_array';
+
+            this.data.load(m,df);
             _console.debug('data.load ok');
 
             this.view.load();
@@ -392,25 +394,21 @@
 
         },
 
-        show : function(mind){
+        show : function(mind,data_format){
             if(!this._init_){
                 this.init();
             }
             this._reset();
-            if(!mind){
-                mind = [{nodeid:'root',topic:'Empty Mindmap',isroot:true}];
-            }
-            this._show(mind.slice(0));
+            this._show(mind,data_format);
         },
 
-        get_mind : function(){
-            var mind_data = this.data.get_json();
-            var mind_name = this.data.get_root().topic;
-            return{name:mind_name,data:mind_data};
+        get_data: function(data_format){
+            var df = data_format || 'json_array';
+            return this.data.get_data(df);
         },
 
-        resize:function(){
-            this.view.resize();
+        get_root:function(){
+            return this.data.get_root();
         },
 
         get_node:function(nodeid){
@@ -463,6 +461,19 @@
             }
         },
 
+        move_node:function(nodeid, beforeid){
+            if(this.is_readonly()){
+                _console.error('fail, this mind map is readonly');
+                return;
+            }
+            var node = this.data.update_node(nodeid,null,null,beforeid);
+            if(!!node){
+                this.view.update_node(node);
+                this.layout.layout();
+                this.view.show();
+            }
+        },
+
         select_node:function(nodeid){
             var node = this.data.select_node(nodeid);
             if(!!node){
@@ -478,6 +489,10 @@
         select_clear:function(){
             this.data.select_clear();
             this.view.select_clear();
+        },
+
+        resize:function(){
+            this.view.resize();
         },
     };
 
@@ -495,23 +510,27 @@
         init:function(){
             _console.debug('data.init');
         },
+
         reset:function(){
             _console.debug('data.reset');
             this.root = null;
             this.selected_node = null;
             this.nodes = {};
         },
-        load:function(mind){
-            if(this.opts.format == 'json_array'){
+
+        // now, 'json_array' is the only supported data format, never change it
+        load:function(mind,data_format){
+            if(data_format == 'json_array'){
                 this.load_json_array(mind);
             }else{
-                _console.error('unsupported data format');
+                _console.error('unsupported '+data_format+' format');
             }
         },
 
         load_json_array:function(json_array){
             _console.debug('data.load');
-            var node_array = json_array;
+            // copy array for preventing to effect the origin data
+            var node_array = json_array.slice(0);
             // reverse array for improving looping performance
             node_array.reverse();
             var root_node = this._parse_extract_root(node_array);
@@ -667,15 +686,25 @@
                 return null;
             }
             var node = this.get_node(nodeid);
-            node.topic = topic;
-            if(typeof(summary) != 'undefined'){
+            if(!!topic){
+                node.topic = topic;
+            }
+            if(!!summary){
                 node.summary = summary;
             }
             if(!!before_id){
-                var node_after = (!!after_id)?this.get_node(after_id):null;
-                if(node_after.parent!=null && node_after.parent.id==node.parent.id){
-                    node.index = node_before.index - 0.5;
+                if(before_id == '_last_'){
+                    node.index = -1;
                     this.reindex(node.parent);
+                }else if(before_id == '_first_'){
+                    node.index = 0;
+                    this.reindex(node.parent);
+                }else{
+                    var node_before = (!!before_id)?this.get_node(before_id):null;
+                    if(node_before!=null && node_before.parent!=null && node_before.parent.id==node.parent.id){
+                        node.index = node_before.index - 0.5;
+                        this.reindex(node.parent);
+                    }
                 }
             }
             return node;
@@ -781,6 +810,16 @@
         get_json:function(){
             var json = this._get_json_array(this.root,[]);
             return json;
+        },
+
+        get_data:function(data_format){
+            var data = null;
+            if(data_format == 'json_array'){
+                data = this.get_json();
+            }else{
+                _console.error('unsupported '+data_format+' format');
+            }
+            return data;
         },
     };
 
@@ -906,6 +945,7 @@
             this.bounds.s = Math.max(layout_data.outer_height_left,layout_data.outer_height_right);
         },
 
+        // layout both the x and y axis
         _layout_offset_subnodes:function(nodes){
             var total_height = 0;
             var nodes_count = nodes.length;
@@ -923,6 +963,9 @@
                 }
 
                 node_outer_height = this._layout_offset_subnodes(node.children);
+                if(('isexpand' in layout_data) && !layout_data.isexpand){
+                    node_outer_height=0;
+                }
                 node_outer_height = Math.max(node._data.view.height,node_outer_height);
 
                 layout_data.outer_height = node_outer_height;
@@ -948,7 +991,9 @@
             return total_height;
         },
 
+        // layout the y axis only, for collapse/expand a node
         _layout_offset_subnodes_height:function(nodes){
+            return this._layout_offset_subnodes(nodes);
             var total_height = 0;
             var nodes_count = nodes.length;
             var i = nodes_count;
@@ -1513,9 +1558,9 @@
     };
 
 
-    jm.show = function(options,mind){
+    jm.show = function(options,mind,data_format){
         var _jm = new jm(options);
-        _jm.show(mind);
+        _jm.show(mind,data_format);
         return _jm;
     };
 

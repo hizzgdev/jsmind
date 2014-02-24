@@ -41,11 +41,15 @@
             <li><button onclick="modify_node();">modify a node</button></li>
             <li>try double click</li>
             <li><button onclick="remove_node();">remove a node</button></li>
+            <li><button onclick="move_node();">move a node</button></li>
+            <li><button onclick="move_to_first();">move to first</button></li>
+            <li><button onclick="move_to_last();">move to last</button></li>
         </ol>
         <div>4. Setting &amp; Adjusting</div>
         <ol type='A'>
-            <li><button onclick="change_container();">change size</button></li>
-            <li><button onclick="resize_jsmind();">adusting it</button></li>
+            <li><button onclick="toggle_readonly(this);">set readonly</button></li>
+            <li><button onclick="change_container();">change size</button>
+            <button onclick="resize_jsmind();">adusting it</button></li>
         </ol>
     </div>
     <div id="jsmind_container"></div>
@@ -61,10 +65,6 @@
         }
         _jm = jsMind.show(options);
         // _jm = jsMind.show(options,mind);
-        // _jm.set_readonly(true);
-        // var mind_data = _jm.get_mind();
-        // var name = mind_data.name;
-        // var data = mind_data.data;
     }
 
     function open_json(){
@@ -101,8 +101,9 @@
     }
 
     function save_file(){
-        var mind = _jm.get_mind();
-        save_to_localfile(mind.data, mind.name);
+        var mind_data = _jm.get_data();
+        var mind_name = _jm.get_root().topic;
+        save_to_localfile(mind_data, mind_name);
     }
     
     function open_file(){
@@ -117,8 +118,8 @@
     }
 
     function show_data(){
-        var mind = _jm.get_mind();
-        var mind_string = jsMind.util.json.json2string(mind.data);
+        var mind_data = _jm.get_data();
+        var mind_string = jsMind.util.json.json2string(mind_data);
         alert(mind_string);
     }
 
@@ -149,6 +150,24 @@
 
     function remove_node(){
         _jm.remove_node('other');
+    }
+
+    function move_to_first(){
+        _jm.move_node('other','_first_');
+    }
+
+    function move_to_last(){
+        _jm.move_node('other','_last_');
+    }
+
+    function move_node(){
+        _jm.move_node('other','open');
+    }
+
+    function toggle_readonly(btn){
+        var readonly = _jm.is_readonly();
+        _jm.set_readonly(!readonly);
+        btn.innerHTML = readonly?'set readonly':'unset readonly';
     }
 
     // this method change size of container, perpare for adjusting jsmind
