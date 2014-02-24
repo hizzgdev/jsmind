@@ -40,10 +40,10 @@
             <li><button onclick="add_node();">add a node</button></li>
             <li><button onclick="modify_node();">modify a node</button></li>
             <li>try double click</li>
-            <li><button onclick="remove_node();">remove a node</button></li>
             <li><button onclick="move_node();">move a node</button></li>
             <li><button onclick="move_to_first();">move to first</button></li>
             <li><button onclick="move_to_last();">move to last</button></li>
+            <li><button onclick="remove_node();">remove a node</button></li>
         </ol>
         <div>4. Setting &amp; Adjusting</div>
         <ol type='A'>
@@ -148,10 +148,6 @@
         //_jm.update_node('other', '--- modified ---', 'modify summary at the same time');
     }
 
-    function remove_node(){
-        _jm.remove_node('other');
-    }
-
     function move_to_first(){
         _jm.move_node('other','_first_');
     }
@@ -162,6 +158,10 @@
 
     function move_node(){
         _jm.move_node('other','open');
+    }
+
+    function remove_node(){
+        _jm.remove_node('other');
     }
 
     function toggle_readonly(btn){
