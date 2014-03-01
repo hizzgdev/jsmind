@@ -1,1143 +1,1593 @@
-/*
-Core:
-
-Define Direct[-1,0,1] as Left,Center,Right
-Define HSpace,VSpace
-
- * | Node
- * |---------------------------------
- * | Direct [-1,0,1]
- * | Children
- * | IndexOfSide
- * | CountOfRight,CountOfLeft
- * | Index
- * | BaseX,BaseY
- * | Left,Right,Top,Bottom
- * | Width,Height
-
-
-Level1(RootNode):
-	Direct = 0
-	Index = 0
-	BaseX = 0
-	BaseY = 0
-
-LevelN
-	Direct = 
-		Parent.Direct											(Parent.Direct != 0)
-		(2 * Index - Parent.Children.Count + 1) > 0 ? -1 : 1	(Parent.Direct = 0)
-	
-	CountOfRight = (Parent.Direct==0)?Math.ceil(Count/2) : (1+Direct)*Count/2;
-	CountOfLeft = Count - CountOfRight;
-	
-	IndexOfSide =
-		Index														(Parent.Direct != 0)
-		(1-Direct) * Count / 2 + Direct * Index + (Direct -1) / 2	(Parent.Direct = 0)
-
-	BaseX = (1 - Direct) * Parent.Left / 2 + (1+Direct) * Parent.Right / 2 + Direct * HSpace
-	BaseY = (2 * IndexOfSide - (1-Direct)*CountOfLeft/2 + (1+Direct)*CountOfRight/2 + 1) * (this.Height + VSpace) / 2 + Parent.BaseY
-
-	Infact
-	Parent.BaseY = (Parent.Top + Parent.Bottom) / 2
-
-	Left	= BaseX + (Direct - 1) * Width / 2
-	Right	= BaseX + (Direct + 1) * Width / 2
-	Top		= BaseY - Height / 2
-	Bottom	= BaseY + Height / 2
-
-*/
-
-var jsMind = (function($w){
-// Config
-var _ViewNodeSpaceH = 30;
-var _ViewNodeSpaceV = 20;
-var _ViewNodeHeight = _ViewNodeSpaceV * 4;
-var _ViewNodeExpanderSize = 13;
-
-// Global Variables
-var $d = $w.document;
-var $g = function(id){return $d.getElementById(id);};
-var $c = function(tag){return $d.createElement(tag);};
-var $t = function(n,t){if(n.hasChildNodes()){n.firstChild.nodeValue = t;}else{n.appendChild($d.createTextNode(t));}};
-
-var __not_ie = !!$d.body.addEventListener;
-//target,eventType,handler
-var $add_event=__not_ie?function(t,e,h){t.addEventListener(e,h,false);}:function(t,e,h){t.attachEvent('on'+e,h);};
-var $remove_event=__not_ie?function(t,e,h){t.removeEventListener(e,h,false);}:function(t,e,h){t.detachEvent('on'+e,h);};
-
-// Import Method
-var SetCanvasStyle = function(c){
-	c.strokeStyle = '#555';
-	c.lineWidth = 2;
-	c.lineCap='round';
-};
-var easingztf = function(t,b,c,d){var x=t*4/d;return (1-Math.pow(Math.E,-(x*x)/2))*c+b;};
-var ztLineTo = function(ctx,x1,y1,x2,y2){
-	ctx.moveTo(x1,y1);
-	ctx.beginPath();
-	var l = x2-x1;
-	var c = y1-y2;
-	var absl = Math.abs(l);
-	var t = 0;
-	for(var t=0;t<absl+1;t++){
-		y2 = y1-easingztf(t,0,c,l);
-		ctx.lineTo(t*(Math.abs(l)/l)+x1,y2);
-	}
-	ctx.stroke();
-};
-
-// Enum
-var _ViewDirect = {Left:-1,Center:0,Right:1};
-var _ViewMode = {Both:0,Right:1};
-
-// Struct
-var _Size = function(iWidth,iHeight){
-	this.Width = iWidth || 0;
-	this.Height = iHeight || 0;
-};
-
-var _Position = function(iLeft,iRight,iTop,iBottom){
-	this.Left = iLeft || 0;
-	this.Right = iRight || 0;
-	this.Top = iTop || 0;
-	this.Bottom = iBottom || 0;
-};
-
-// Class
-var _Node = function(sId,iIndex,sTopic,sSummary,oParent){
-	this.Id = sId;
-	this.Index = iIndex;
-	this.Topic = sTopic;
-	this.Summary = sSummary;
-	this.Parent = oParent;
-	this.Children = [];
-	this.View = null;
-};
-
-var _ViewNode = function(oNode,oParent){
-	if(!!oNode){
-		// init
-		this.Node = oNode;
-		this.Index = oNode.Index;
-		this.Parent = oParent;
-		oNode.View = this;
-		// parse
-		this.Children = [];
-		this.Direct = _ViewDirect.Center;
-		this.IndexOfSide = 0;
-		this.CountOfLeft = 0;
-		this.CountOfRight = 0;
-		// PreDraw
-		this.Element = null;
-		this.Expander = null;
-		this.Size = null;
-		this.BaseX = 0;
-		this.BaseY = 0;
-		this.Position = null;
-		// Lazy Calculate
-		this._SpaceHeight = -1;
-		this._SpaceHeightL = -1; // Root Node Only
-		// Internal
-		this.__Visible = true;
-	}
-};
-
-_ViewNode.prototype = {
-
-	HasChildren : function(){
-		return this.Children != null && this.Children.length > 0;
-	},
-
-	IsRoot : function(){
-		return !this.Parent;
-	},
-
-	IsNotRoot : function(){
-		return !!this.Parent;
-	},
-
-	GetNWPosition : function(iOffsetWidth,iOffsetHeight){
-		var p = {Top:this.Position.Top,Left:this.Position.Left};
-		p.Top += iOffsetHeight;
-		p.Left += iOffsetWidth;
-		return p;
-	},
-
-	GetExpanderPosition : function(iOffsetWidth,iOffsetHeight){
-		var p = {Top:this.BaseY,Left:this.BaseX};
-		p.Top += iOffsetHeight-_ViewNodeExpanderSize/2;
-		p.Left += iOffsetWidth+this.Direct*this.Size.Width-(1-this.Direct)*_ViewNodeExpanderSize/2;
-		return p;
-	},
-	
-	GetOutPosition : function(iOffsetWidth,iOffsetHeight){
-		var p = {Top:this.BaseY,Left:this.BaseX};
-		p.Top += iOffsetHeight;
-		p.Left += iOffsetWidth+this.Direct*(this.Size.Width + _ViewNodeExpanderSize);
-		return p;
-	},
-	
-	GetInPosition : function(iOffsetWidth,iOffsetHeight){
-		var p = {Top:this.BaseY,Left:this.BaseX};
-		p.Top += iOffsetHeight;
-		p.Left += iOffsetWidth;
-		return p;
-	},
-	
-	GetSpaceHeightRoot : function(eDirect,bRefresh){
-		var refresh = bRefresh || false;
-		var oldValue = (eDirect == _ViewDirect.Left)? this._SpaceHeightL:this._SpaceHeight;
-		if(refresh || oldValue == -1){
-			var children = this.Children;
-			var childCount = (!!children)?children.length:0;
-			var viewNode = null;
-			var validCount = 0;
-			var newValue = 0;
-			while(childCount--){
-				viewNode = children[childCount];
-				if(viewNode.Direct == eDirect){
-					validCount++;
-					newValue += viewNode.GetSpaceHeight(refresh);
-				}
-			}
-			newValue += (validCount-1) * _ViewNodeSpaceV;
-			if(eDirect == _ViewDirect.Left){
-				this._SpaceHeightL = newValue;
-			}else{
-				this._SpaceHeight = newValue;
-			}
-			return newValue;
-		}else{
-			return oldValue;
-		}
-	},
-	
-	ClearSpaceHeightCache : function(){
-		var p=this;
-		while(p){
-			p._SpaceHeight = -1;
-			p._SpaceHeightL = -1;
-			p=p.Parent;
-		}
-	},
-	
-	GetSpaceHeight : function(bRefresh){
-		var refresh = bRefresh || false;
-		if(refresh || this._SpaceHeight==-1){
-			this._SpaceHeight = this._CalculateSpaceHeight(refresh);
-		}
-		return this._SpaceHeight;
-	},
-	
-	_CalculateSpaceHeight : function(bRefresh){
-		var refresh = bRefresh || false;
-		var children = this.Children;
-		var childCount = (!!children)?children.length:0;
-		var allChildrenHeight = (childCount-1) * _ViewNodeSpaceV;
-		var child = null
-		while(childCount--){
-			child = children[childCount];
-			if(!child.__Visible){
-				allChildrenHeight -= _ViewNodeSpaceV;
-				continue;
-			}
-			allChildrenHeight += children[childCount].GetSpaceHeight(refresh);
-		}
-		var spaceHeight = Math.max(this.Size.Height,allChildrenHeight);
-		return spaceHeight;
-	},
-
-	CalculatePosition : function(){
-		if(this.Direct == _ViewDirect.Center){
-			this.Position = new _Position(
-				this.BaseX - this.Size.Width / 2,
-				this.BaseX + this.Size.Width / 2,
-				this.BaseY - this.Size.Height / 2,
-				this.BaseY + this.Size.Height / 2
-			);
-		}else{
-			this.Position = new _Position(
-				this.BaseX - (1 - this.Direct) * this.Size.Width / 2,
-				this.BaseX + (1 + this.Direct) * this.Size.Width / 2,
-				this.BaseY - this.Size.Height / 2,
-				this.BaseY + this.Size.Height / 2
-			);
-		}
-		return this.Position;
-	}
-};
-
-var _ViewEngine = function(sName,oTarget,eViewMode){
-	this.EngineName=sName;
-	this.Version = '0.1';
-	this.Target = oTarget;
-	this.Width = oTarget.clientWidth;
-	this.Height = oTarget.clientHeight;
-	this.HalfSide = (eViewMode == _ViewMode.Right);
-	
-	this.RootViewNode = null;
-	
-	this._IsReady = false;	// IsReady
-	this._Container = null;	// Container
-	this._Panel = null;		// Panel
-	this._Canvas = null;	// Canvas
-	this._CanvasCtx = null;	// Canvas 2d Context
-	this._Nodes = {};		// ALL Nodes
-	this._ViewNodes = {};	// ViewNodes
-	this._SelectedViewNode = null;
-	this._OffsetPosition = new _Position();
-	this._OffsetWidth = 0;
-	this._OffsetHeight = 0;
-	
-	this._Event = {
-		NodeEnter:null,
-		NodeLeave:null,
-		NodeClick:null
-	};
-};
-
-_ViewEngine.prototype = {
-
-	Init : function(){
-		if(!this._IsReady){
-			this._IsReady = true;
-			var l = $c('div');
-			l.className = 'jsmind-inner';
-			//l.style.width = this.Width+'px';
-			//l.style.height = this.Height+'px';
-			
-			var can = $c('canvas');
-			var panel = $c('jmnodes');
-			
-			l.appendChild(can);
-			l.appendChild(panel);
-			
-			this.Target.appendChild(l);
-			
-			this._Container = l;
-			this._Panel = panel;
-			this._Canvas = can;
-
-			var __ve = this;
-			$add_event(panel,'mouseover',function(e){__ve.onNodeEnter(e);});
-			$add_event(panel,'mouseout',function(e){__ve.onNodeLeave(e);});
-			$add_event(panel,'click',function(e){__ve.onNodeClick(e);});
-		}
-	},
-	
-	RegisterNodeEvent : function(e){
-		if(e.NodeEnter){this._Event.NodeEnter = e.NodeEnter;}
-		if(e.NodeLeave){this._Event.NodeLeave = e.NodeLeave;}
-		if(e.NodeClick){this._Event.NodeClick = e.NodeClick;}
-	},
-	
-	ClearNodeEvent : function(){
-		this._Event.NodeEnter = null;
-		this._Event.NodeLeave = null;
-		this._Event.NodeClick = null;
-	},
-	
-	GetCanvasCtx : function(){
-		if(!this._CanvasCtx){
-			var ctx = this._Canvas.getContext('2d');
-			this.ResetCanvasStyle(ctx);
-			this._CanvasCtx = ctx;
-		}
-		return this._CanvasCtx;
-	},
-	
-	ResetCanvasStyle : function(oCanvasCtx){
-		var c = oCanvasCtx || this._CanvasCtx;
-		if(c){
-			SetCanvasStyle(c);
-		}
-	},
-
-	Clear : function(){
-		alert('not supported');
-		this._Nodes = {};		// ALL Nodes
-		this._ViewNodes = {};	// ViewNodes
-		this._SelectedViewNode = null;
-		this.ClearLine();
-	},
-	
-	Layout : function(oData){
-		this.Init();
-		var oNodeTree = this.ParseNode(oData);
-		this.RootViewNode = this.ParseViewNode(oNodeTree);
-		this._SlideNodes();
-		this.PreDraw();
-		this.ResizeCanvas();
-		//debugger;
-		this.Draw();
-		this.DrawLine();
-		//this.LayoutRoot(oNodeTree);
-	},
-	
-	FindNode : function(sId){
-		return this._Nodes[sId];
-	},
-
-	IsRootNode : function(sId){
-		return sId == this.RootViewNode.Node.Id;
-	},
-
-	ParseNode : function(oData,oParent,iIndex){
-		var parent = oParent || null;
-		var idx = iIndex || 0;
-		if(oData){
-			if(oData instanceof _Node){
-				return oData;
-			}
-			
-			var node = new _Node(oData.Id,idx,oData.Topic,oData.Summary,parent);
-			var nodeChildren = node.Children;
-			var children = oData.Children;
-			var childCount = (!!children)?children.length:0;
-			while(childCount--){
-				nodeChildren.unshift(this.ParseNode(children[childCount],node,childCount));
-			}
-			return node;
-		}
-	},
-
-	AddNode : function(oData,sParentId){
-		// Node
-		var oParent = this.FindNode(sParentId);
-		var oNode = null;
-		if((!!oParent) && (!!oData)){
-			var children = oParent.Children;
-			var childCount = 0;
-			if(children){
-				childCount = children.length;
-			}else{
-				oParent.Children = [];
-			}
-			var oNode = new _Node(oData.Id,childCount,oData.Topic,oData.Summary,oParent);
-			children.push(oNode);
-			this._Nodes[oData.Id] = oNode;
-		}else{
-			debugger;
-		}
-		// ViewNode
-		var viewNode = null;
-		if(oNode){
-			oViewNodeParent = oParent.View;
-			viewNode = this.ParseViewNode(oNode,oViewNodeParent);
-			oViewNodeParent.Children.push(viewNode);
-			
-			if(oViewNodeParent.Parent){
-				this._SlideNodes(viewNode);
-			}else{
-				this._SlideNodes();
-			}
-			viewNode.ClearSpaceHeightCache();
-			this._PreDrawViewNode(viewNode);
-			this.RefreshExpander(oViewNodeParent);
-			this.RefreshExpander(viewNode);
-			
-			this.ReDraw(true);
-		}
-	},
-	
-	UpdateNode : function(oData){
-		var node = this.FindNode(oData.Id);
-		if(node){
-			node.Topic = oData.Topic;
-			node.Summary = oData.Summary;
-			var viewNode = node.View;
-			var element = viewNode.Element;
-			$t(element,node.Topic);
-			viewNode.Size = new _Size(element.offsetWidth,element.offsetHeight);
-			this.ReDraw(true);
-		}
-	},
-	
-	RemoveNodeData : function(oNode,bReIndex){
-		var reIndex = (typeof(bReIndex) == 'undefined')?true:(!!bReIndex);
-		if(oNode){
-			var children = oNode.Children;
-			var childCount = (!!children)?children.length:0;
-			while(childCount--){
-				this.RemoveNodeData(children[childCount],false);
-			}
-			this.RemoveNodeElement(oNode.View);
-			this.HideExpander(oNode.View);
-			var id = oNode.Id;
-			delete this._Nodes[id];
-			delete this._ViewNodes[id];
-
-			if(reIndex){
-				var oParent = oNode.Parent;
-				var borthers = oParent.Children;
-				var viewBorthers = oParent.View.Children;
-				borthers.splice(oNode.Index,1);
-				viewBorthers.splice(oNode.Index,1);
-				var bortherCount = borthers.length;
-				while(bortherCount--){
-					borthers[bortherCount].Index = bortherCount;
-					viewBorthers[bortherCount].Index = bortherCount;
-				}
-			}
-		}
-	},
-
-	RemoveNode : function(sNodeId){
-		var oNode = this.FindNode(sNodeId);
-		
-		if(!!oNode){
-			var oParent = oNode.Parent;
-			if(!!oParent){
-				if(this._SelectedViewNode && this._SelectedViewNode.Node.Id === sNodeId){
-					this._SelectedViewNode = null;
-				}
-				oNode.View.ClearSpaceHeightCache();
-				this.RemoveNodeData(oNode,true);
-				delete oNode;
-				this._OffsetPosition = new _Position();
-
-				this._SlideNodes(oParent.View);
-				this.RefreshExpander(oParent.View);
-
-				this.ReDraw(true);
-			}
-		}
-	},
-
-	_Expand_Collapse : function(sNodeId,bExpand){
-		var oNode = this.FindNode(sNodeId);
-		var oViewNode = oNode.View;
-		var children = oViewNode.Children;
-		var len = children != null ? children.length : 0;
-		var child = null;
-		while(len--){
-			child = children[len];
-			child.__Visible = bExpand;
-			child.ClearSpaceHeightCache();
-			this._PreDrawViewNode(child);
-			//this.RefreshExpander(viewNode);
-		}
-		this.ReDraw(true);
-	},
-
-	Collapse : function(sNodeId){
-		this._Expand_Collapse(sNodeId,false);
-	},
-
-	Expand : function(sNodeId){
-		this._Expand_Collapse(sNodeId,true);
-	},
-	
-	ShineNode : function(sNodeId,iCount,iDuration){//iDuration millisecond
-		iCount = iCount || 4;
-		iDuration = iDuration || 3000;
-		var elem = null;
-		var tips = iCount * 2;
-		var tip = 0;
-		var intervalId = -1;
-		var elemClassName,elemClassNameShine;
-		
-		function shine(){
-			if(tip>=tips && intervalId>0){
-				clearInterval(intervalId);
-				intervalId = -1;
-			}
-			if(tip&1){
-				elem.className = elemClassNameShine;
-			}else{
-				elem.className = elemClassName;
-			}
-			tip++;
-		}
-	
-		var oNode = this.FindNode(sNodeId);
-		if(oNode){
-			elem = oNode.View.Element;
-			elemClassName = elem.className;
-			elemClassNameShine = elemClassName + ' shine';
-			var interval = Math.round(iDuration/iCount/2);
-			intervalId = setInterval(shine,interval);
-		}
-	},
-
-	GetViewNodePosition : function(oViewNode){
-		var offsetWidth = this._OffsetWidth/2;
-		var offsetHeight = this._OffsetHeight/2;
-		if(this.HalfSide){
-			offsetWidth = this._OffsetWidth/4;
-		}
-		return oViewNode.GetNWPosition(offsetWidth,offsetHeight);
-	},
-	
-	AddAttachElement : function(oElement){
-		if(this._Container){
-			this._Container.appendChild(oElement);
-		}
-	},
-	
-	ReDraw : function(bReLayout){
-		if(bReLayout){
-			this._PositionL0();
-		}
-		this.ClearLine();
-		this.ResizeCanvas();
-		this.Draw();
-		this.DrawLine();
-	},
-
-	ParseViewNode : function(oNode,oParent){
-		var parent = oParent || null;
-		if(oNode){
-			var viewNode = new _ViewNode(oNode,parent);
-			var viewNodeChildren = viewNode.Children;
-			var children = oNode.Children;
-			var index = children.length;
-			
-			while(index--){
-				var child = this.ParseViewNode(children[index],viewNode);
-				viewNodeChildren.unshift(child);
-			}
-			this._Nodes[oNode.Id] = oNode;
-			this._ViewNodes[oNode.Id] = viewNode;
-			return viewNode;
-		}
-	},
-
-	_SlideNodes : function(oViewNode){
-		var viewNode = oViewNode || this.RootViewNode;
-		var parent = viewNode.Parent;
-		
-		var children = viewNode.Children;
-		var childCount = (!!children)?children.length:0;
-		var changed = false;
-		
-		var cr = viewNode.CountOfRight;
-		var cl = viewNode.CountOfLeft;
-		var d = viewNode.Direct;
-		var is = viewNode.IndexOfSide;
-		
-		var ncr = childCount;
-		var ncl = childCount;
-		var nd = d;
-		var nis = is;
-
-		if(!!parent){
-			if(this.HalfSide){
-				nd = _ViewDirect.Right;
-				nis = viewNode.Index;
-			}else{
-				nd = (parent.Direct != _ViewDirect.Center) ? parent.Direct :
-					((2 * viewNode.Index - parent.Children.length + 1) > 0 ? _ViewDirect.Left : _ViewDirect.Right);
-				nis = (parent.Direct != _ViewDirect.Center) ? viewNode.Index :
-					((1-nd) * parent.Children.length / 2 + nd * viewNode.Index + (nd -1) / 2);
-			}
-		}else{
-			if(!this.HalfSide){
-				ncr = Math.ceil(childCount/2);
-				ncl = childCount - ncr;
-			}
-		}
-		
-		if(ncr != cr){
-			viewNode.CountOfRight = ncr;
-			changed = true;
-		}
-		if(ncl != cl){
-			viewNode.CountOfLeft = ncl;
-			changed = true;
-		}
-		if(nd != d){
-			viewNode.Direct = nd;
-			changed = true;
-		}
-		if(nis != is){
-			viewNode.IndexOfSide = nis;
-			changed = true;
-		}
-		
-		if(changed){
-			while(childCount--){
-				this._SlideNodes(children[childCount]);
-			}
-		}
-	},
-
-	ResizeCanvas : function(){
-		var h = Math.abs(this._OffsetPosition.Top - this._OffsetPosition.Bottom);
-		var w = Math.abs(this._OffsetPosition.Left - this._OffsetPosition.Right);
-		
-		var neww = (w>this.Width)? w + _ViewNodeSpaceH * 4 : this.Width;
-		var newh = (h>this.Height)? h + _ViewNodeSpaceV * 4 : this.Height;
-		
-		var resize = false;
-		if(this._OffsetWidth != neww){
-			this._OffsetWidth = neww;
-			resize = true;
-		}
-		if(this._OffsetHeight != newh){
-			this._OffsetHeight = newh;
-			resize = true;
-		}
-		if(resize){
-			var ww = this._OffsetWidth-22;
-			var hh = this._OffsetHeight;
-			this._Panel.style.width = ww+'px';
-			this._Panel.style.height = hh+'px';
-			this._Canvas.width = ww;
-			this._Canvas.height = hh;
-			this.ResetCanvasStyle();
-
-			var moreHeight = hh - this._Container.clientHeight;
-			var moreWidth = ww - this._Container.clientWidth;
-			if(moreHeight > 0){
-				this._Container.scrollTop = moreHeight/2;
-			}
-			if(moreWidth > 0){
-				this._Container.scrollLeft = moreWidth/2;
-			}
-		}
-	},
-
-	GetContainerHeight : function(){
-		return this._Container.clientHeight;
-	},
-
-	GetScrollHeight : function(){
-		return this._Container.scrollTop;
-	},
-
-	ScrollTo : function(iScrollTop){
-		this._Container.scrollTop = iScrollTop;
-	},
-
-	CalculateOffsetSize : function(oPosition){
-		if(oPosition.Left < this._OffsetPosition.Left){
-			this._OffsetPosition.Left = oPosition.Left;
-		}
-		if(oPosition.Right > this._OffsetPosition.Right){
-			this._OffsetPosition.Right = oPosition.Right;
-		}
-		if(oPosition.Top < this._OffsetPosition.Top){
-			this._OffsetPosition.Top = oPosition.Top;
-		}
-		if(oPosition.Bottom > this._OffsetPosition.Bottom){
-			this._OffsetPosition.Bottom = oPosition.Bottom;
-		}
-	},
-
-	PreDraw : function(){
-		var viewNodes = this._ViewNodes;
-		for(var p in viewNodes){
-			this._PreDrawViewNode(viewNodes[p]);
-			this.RefreshExpander(viewNodes[p]);
-		}
-		// Calculate BaseX,BaseY
-		this._PositionL0();
-	},
-
-	// Root Level
-	_PositionL0 : function(){
-		var oViewNode = this.RootViewNode;
-		oViewNode.BaseX = 0;
-		oViewNode.BaseY = 0;
-		var position = oViewNode.CalculatePosition();
-		this.CalculateOffsetSize(position);
-		
-		var children = oViewNode.Children;
-		var childCount = (!!children)?children.length:0;
-		var viewNode = null;
-		if(!this.HalfSide){
-			var leftChildren = [];
-			var rightChildren = [];
-			var leftHeight = oViewNode.GetSpaceHeightRoot(_ViewDirect.Left);
-			var rightHeight = oViewNode.GetSpaceHeightRoot(_ViewDirect.Right);
-			while(childCount--){
-				viewNode = children[childCount];
-				if(viewNode.Direct == _ViewDirect.Left){
-					leftChildren.push(viewNode);
-				}else{
-					rightChildren.unshift(viewNode);
-				}
-			}
-			this._PositionLN(leftChildren,-leftHeight/2);
-			this._PositionLN(rightChildren,-rightHeight/2);
-		}else{
-			var allHeight = oViewNode.GetSpaceHeight();
-			this._PositionLN(children,-allHeight/2);
-		}
-	},
-
-	// Second (Or Lower) Level
-	_PositionLN : function(oViewNodes,iOffsetHeight){
-		var len = oViewNodes.length;
-		var p = iOffsetHeight;
-		var viewNode = null;
-		var viewNodeHeight = 0;
-		var viewNodeHalfHeight = 0;
-		
-		for(var i=0;i<len;i++){
-			viewNode = oViewNodes[i];
-			if(!viewNode.__Visible){continue;}
-
-			viewNodeHeight = viewNode.GetSpaceHeight();
-			viewNodeHalfHeight = viewNodeHeight/2;
-			viewNode.BaseY = p+viewNodeHalfHeight;
-			p += viewNodeHeight + _ViewNodeSpaceV;
-			viewNode.BaseX = (1 - viewNode.Direct) * viewNode.Parent.Position.Left / 2 + (1+viewNode.Direct) * viewNode.Parent.Position.Right / 2 + viewNode.Direct * ( _ViewNodeSpaceH + _ViewNodeExpanderSize);
-
-			var position = viewNode.CalculatePosition();
-			this.CalculateOffsetSize(position);
-			
-			var children = viewNode.Children;
-			var childlen = children==null?0:children.length;
-			var children_v = [];
-			var child = null;
-			while(childlen--){
-				child = children[childlen];
-				if(child.__Visible){
-					children_v.unshift(child);	
-				}
-			}
-			this._PositionLN(children_v,viewNode.BaseY-viewNodeHalfHeight);
-		}
-	},
-
-	_PreDrawViewNode : function(oViewNode){
-		if(oViewNode.__Visible){
-			if(oViewNode.Element){
-				this._SetVisible(oViewNode,true,true);
-			}else{
-				var element = this.CreateNodeElement(oViewNode.Node);
-				var expander = this.CreateExpander(oViewNode.Node);
-				oViewNode.Element = element;
-				oViewNode.Expander = expander;
-				oViewNode.Size = new _Size(element.offsetWidth,element.offsetHeight);
-			}
-		}else{
-			if(oViewNode.Element){
-				this._SetVisible(oViewNode,false,true);
-			}
-		}
-	},
-
-	_SetVisible : function(oViewNode,bVisible,bRecursion){
-		//oViewNode.__Visible = bVisible;
-		if(bVisible){
-			var bVisible = oViewNode.__Visible;
-			oViewNode.Element.style.display = bVisible?'block':'none';
-			oViewNode.Expander.style.display = bVisible?'block':'none';
-		}else{
-			oViewNode.Element.style.display = 'none';
-			oViewNode.Expander.style.display = 'none';
-		}
-		if(!bRecursion){return;}
-
-		var children = oViewNode.Children;
-		var len = children == null ? 0 : children.length;
-		while(len--){
-			this._SetVisible(children[len],bVisible,bRecursion);
-		}
-	},
-
-	Draw : function(){
-		//this._Panel.style.display = 'none';
-		var offsetWidth = this._OffsetWidth/2;
-		var offsetHeight = this._OffsetHeight/2;
-		if(this.HalfSide){
-			offsetWidth = this._OffsetWidth/4;
-		}
-		var viewNodes = this._ViewNodes;
-		for(var p in viewNodes){
-			this.ShowViewNode(viewNodes[p],offsetWidth,offsetHeight);
-		}
-		//this._Panel.style.display = 'block';
-	},
-
-	CreateNodeElement : function(oNode){
-		var d = $c('jmnode');
-		if(!oNode.Parent){
-			d.className = 'root';
-		}
-		//d.className = (oNode.Parent)?'':'root';
-		$t(d,oNode.Topic);
-		//d.innerHTML=oNode.Topic;
-		d.setAttribute('nodeid',oNode.Id);
-		d.style.visibility='hidden';
-		this._Panel.appendChild(d);
-		return d;
-	},
-
-	CreateExpander : function(oNode){
-		var d = $c('jmexpander');
-		$t(d,'-');
-		d.setAttribute('nodeid',oNode.Id);
-		this._Panel.appendChild(d);
-		return d;
-	},
-
-	RefreshExpander : function(oViewNode){
-		if(oViewNode.IsNotRoot() && oViewNode.HasChildren()){
-			this.ShowExpander(oViewNode);
-		}else{
-			this.HideExpander(oViewNode);
-		}
-	},
-
-	ShowExpander : function(oViewNode){
-		oViewNode.Expander.style.visibility='visible';
-	},
-
-	HideExpander : function(oViewNode){
-		oViewNode.Expander.style.visibility='hidden';
-	},
-
-	RemoveNodeElement : function(oViewNode){
-		var children = oViewNode.Children;
-		var len = (!!children)?children.length:0;
-		while(len--){
-			this.RemoveNodeElement(children[len]);
-		}
-		var ele = oViewNode.Element;
-		if(ele){
-			this._Panel.removeChild(ele);
-			ele = null;
-			oViewNode.Element = null;
-		}
-	},
-
-	ShowViewNode : function(oViewNode,iOffsetWidth,iOffsetHeight){
-		if(oViewNode.__Visible){
-			var o = oViewNode.GetNWPosition(iOffsetWidth,iOffsetHeight);
-			oViewNode.Element.style.left = o.Left+'px';
-			oViewNode.Element.style.top = o.Top+'px';
-			oViewNode.Element.style.visibility='visible';
-			var eo = oViewNode.GetExpanderPosition(iOffsetWidth,iOffsetHeight);
-			oViewNode.Expander.style.left = eo.Left+'px';
-			oViewNode.Expander.style.top = eo.Top+'px';
-		}
-	},
-
-	ClearLine : function(){
-		var ctx = this.GetCanvasCtx();
-		ctx.clearRect(0,0,this._OffsetWidth,this._OffsetHeight);
-	},
-
-	DrawLine : function(){
-		var offsetWidth = this._OffsetWidth/2;
-		var offsetHeight = this._OffsetHeight/2;
-		if(this.HalfSide){
-			offsetWidth = this._OffsetWidth/4;
-		}
-		var ctx = this.GetCanvasCtx();
-		var viewNodes = this._ViewNodes;
-		var viewNode = null;
-		var child = null;
-
-		for(var p in viewNodes){
-			viewNode = viewNodes[p];
-			if(!viewNode.__Visible){
-				continue;
-			}
-			var children = viewNode.Children;
-			var childCount = (!!children)?children.length:0;
-			while(childCount--){
-				child = children[childCount];
-				if(!child.__Visible){
-					continue;
-				}
-				this.DrawSingleLine(ctx,
-					viewNode.GetOutPosition(offsetWidth,offsetHeight),
-					child.GetInPosition(offsetWidth,offsetHeight));
-			}
-		}
-	},
-	
-	DrawSingleLine : function(oCanvasCtx,oPosition1,oPosition2){
-		ztLineTo(oCanvasCtx,oPosition1.Left,oPosition1.Top,oPosition2.Left,oPosition2.Top);
-	},
-	
-	ClearSelectedNode : function(){
-		this._SelectedViewNode = null;
-	},
-	
-	SetSelectedNode : function(sNodeId){
-		var oNode = this.FindNode(sNodeId);
-		this._SelectedViewNode = oNode.View;
-	},
-	
-	GetSelectedNode : function(){
-		return this._SelectedViewNode;
-	},
-	
-	onNodeEnter : function(e){
-		var t = e.target || event.srcElement;
-		if(t.tagName.toLowerCase() != 'jmnode'){return;}
-		
-		if(typeof(this._Event.NodeEnter) == 'function'){
-			this._Event.NodeEnter(t,this);
-		}
-	},
-	
-	onNodeLeave : function(e){
-		var t = e.target || event.srcElement;
-		if(t.tagName.toLowerCase() != 'jmnode'){return;}
-		if(typeof(this._Event.NodeLeave) == 'function'){
-			this._Event.NodeLeave(t,this);
-		}
-	},
-	
-	onNodeClick : function(e){
-		var t = e.target || event.srcElement;
-		var selectedNode = this.GetSelectedNode();
-		var sne = selectedNode?selectedNode.Element:null;
-		var tagName = t.tagName.toLowerCase();
-		if(tagName == 'jmnodes'){
-			if(sne){
-				sne.className = sne.className.replace(/\s*selected\s*/i,'');
-				this.ClearSelectedNode();
-			}
-		}else if(tagName == 'jmnode'){
-			var c = t.className;
-			var id = t.getAttribute('nodeid');
-			if(selectedNode){
-				if(selectedNode.Node.Id != id){
-					sne.className = sne.className.replace(/\s*selected\s*/i,'');
-					this.SetSelectedNode(id);
-					t.className = c + ' selected';
-				}
-			}else{
-				this.SetSelectedNode(id);
-				t.className = c + ' selected';
-			}
-		}else if(tagName == 'jmexpander'){
-			var id = t.getAttribute('nodeid');
-			var isExpand = ('0' != t.getAttribute('expand'));
-			if(isExpand){
-				this.Collapse(id);
-				t.setAttribute('expand','0');
-				$t(t,'+');
-			}else{
-				this.Expand(id);
-				t.setAttribute('expand','1');
-				$t(t,'-');
-			}
-		}
-		
-		if(typeof(this._Event.NodeClick) == 'function'){
-			this._Event.NodeClick(t,this);
-		}
-	},
-	
-	ResizeMindPanel : function(){
-		this.Width = this.Target.clientWidth;
-		this.Height = this.Target.clientHeight;
-		this.ReDraw(false);
-	}
-};
-
-var getUniqueId = function(){
-    var d = new Date().getTime();
-    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = (d + Math.random()*16)%16 | 0;
-        d = Math.floor(d/16);
-        return (c=='x' ? r : (r&0x7|0x8)).toString(16);
-    });
-    return uuid;
-};
-
-// Return
-return {
-	Node:_Node,
-	View:{
-		Direct: _ViewDirect,
-		Mode:	_ViewMode,
-		Engine:	_ViewEngine
-	},
-	Util:{
-		AddEvent: $add_event,
-		RemoveEvent: $remove_event,
-		GetUniqueId: getUniqueId
-	}
-};
+(function($w){
+    "use strict";       
+    // set 'jsMind' as the library name.
+    // __name__ should be a const value, Never try to change it easily.
+    var __name__ = 'jsMind';
+    // library version
+    var __version__    = '0.2';
+
+    // check global variables
+    if(typeof($w[__name__])!='undefined'){
+        _console.log(__name__+' has been already exist.');
+        return;
+    }
+
+    // an noop function define
+    var _noop = function(){};
+    var _console = (typeof(console) == 'undefined')?{
+            log:_noop, debug:_noop, error:_noop, warn:_noop, info:_noop
+        }:console;
+
+    // shortcut of methods in dom
+    var $d = $w.document;
+    var $g = function(id){return $d.getElementById(id);};
+    var $c = function(tag){return $d.createElement(tag);};
+    var $t = function(n,t){if(n.hasChildNodes()){n.firstChild.nodeValue = t;}else{n.appendChild($d.createTextNode(t));}};
+
+    /*
+     * !! ATTENTION !!
+     * DO NOT EXPAND OPTIONS TO 3 LEVEL OR MORE.
+     * LOWER OPTIONS WILL NOT BE MERGE BUT REWRITE
+     */
+    var DEFAULT_OPTIONS = {
+        data:{
+            readonly:true                   // you can change it in your options, or use 'set_readonly'
+        },
+        view:{
+            container:'jsmind_container',   // id of the container
+            hmargin:100,
+            vmargin:50
+        },
+        layout:{
+            mode :'full', // full or side
+            hspace:30,
+            vspace:20,
+            pspace:13
+        },
+        theme:{
+            name:'default'
+        },
+        provider:{
+            data : null,
+            view : null,
+            layout : null,
+            theme : null
+        }
+    };
+
+    // core object
+    var jm = function(options){
+        this.version = __version__;
+        /*
+         * merge DEFAULT_OPTIONS and options
+         * only merge in 2 level, lower will be rewrite
+         */
+        var opts = {};
+        for (var o in DEFAULT_OPTIONS) {opts[o] = DEFAULT_OPTIONS[o];}
+        for (var o in options) {if(o in opts){for (var k in options[o]){opts[o][k] = options[o][k];}}else{opts[o]=options[o];}}
+
+        this.options = opts;
+        this._init_ = false;
+    };
+
+    // ============= static object =============================================
+    jm.direction = {left:-1,center:0,right:1};
+
+    jm.node = function(sId,iIndex,sTopic,sSummary,bIsRoot,oParent){
+        if(!sId){_console.error('invalid nodeid');return;}
+        if(typeof(iIndex) != 'number'){_console.error('invalid node index');return;}
+        this.id = sId;
+        this.index = iIndex;
+        this.topic = sTopic;
+        this.summary = sSummary;
+        this.isroot = bIsRoot;
+        this.parent = oParent;
+        this.children = [];
+        this.data = {};
+        this._data = {};
+    };
+
+    jm.node.compare=function(node1,node2){
+        // '-1' is alwary the last
+        var r = 0;
+        var i1 = node1.index;
+        var i2 = node2.index;
+        if(i1>=0 && i2>=0){
+            r = i1-i2;
+        }else if(i1==-1 && i2==-1){
+            r = 0;
+        }else if(i1==-1){
+            r = 1;
+        }else if(i2==-1){
+            r = -1;
+        }else{
+            r = 0;
+        }
+        //_console.debug(i1+' <> '+i2+'  =  '+r);
+        return r;
+    };
+
+    // ============= utility object =============================================
+
+    jm.util = {
+        ajax:{
+            _xhr:function(){
+                var xhr = null;
+                if(window.XMLHttpRequest){
+                    xhr = new XMLHttpRequest();
+                }else{
+                    try{
+                        xhr = new ActiveXObject("Microsoft.XMLHTTP");
+                    }catch(e){}
+                }
+                return xhr;
+            },
+            _eurl:function(url){
+                return encodeURIComponent(url);
+            },
+            request:function(url,param,method,callback){
+                var a = jm.util.ajax;
+                var p = null;
+                var tmp_param = [];
+                for(k in param){
+                    tmp_param.push(a._eurl(k)+'='+a._eurl(param[k]));
+                }
+                if(tmp_param.length>0){
+                    p = tmp_param.join('&');
+                }
+                var xhr = a._xhr();
+                if(!xhr){return;}
+                xhr.onreadystatechange = function(){
+                    if(xhr.readyState == 4){
+                        if(xhr.status == 200 || xhr.status == 0){
+                            if(typeof(callback) == 'function'){
+                                var data = eval('('+xhr.responseText+')');
+                                callback(data);
+                            }
+                        }else{
+                            var w = $w.open('');
+                            w.document.write(xhr.responseText);
+                            //alert(xhr.responseText);
+                        }
+                    }
+                }
+                method = method || 'GET';
+                xhr.open(method,url,true);
+                xhr.setRequestHeader('If-Modified-Since','0');
+                if(method == 'POST'){
+                    xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded;charset=utf-8');
+                    xhr.send(p);
+                }else{
+                    xhr.send();
+                }
+            },
+            get:function(url,callback){
+                return jm.util.ajax.request(url,{},'GET',callback);
+            },
+            post:function(url,param,callback){
+                return jm.util.ajax.request(url,param,'POST',callback);
+            }
+        },
+
+        dom:{
+            //target,eventType,handler
+            add_event:function(t,e,h){
+                if(!!t.addEventListener){
+                    t.addEventListener(e,h,false);
+                }else{
+                    t.attachEvent('on'+e,h);
+                }
+            }
+        },
+
+        canvas:{
+            easing_gauss: function(t,b,c,d){var x=t*4/d;return (1-Math.pow(Math.E,-(x*x)/2))*c+b;},
+            lineto : function(ctx,x1,y1,x2,y2){
+                var ztf = jm.util.canvas.easing_gauss;
+                ctx.moveTo(x1,y1);
+                ctx.beginPath();
+                var l = x2-x1;
+                var c = y1-y2;
+                var absl = Math.abs(l);
+                var t = 0;
+                for(var t=0;t<absl+1;t++){
+                    y2 = y1-ztf(t,0,c,l);
+                    ctx.lineTo(t*(Math.abs(l)/l)+x1,y2);
+                }
+                ctx.stroke();
+            },
+            clear:function(ctx,x1,y1,x2,y2){
+                ctx.clearRect(x1,y1,x2,y2);
+            }
+        },
+
+        file:{
+            read:function(file_data,fn_callback){
+                var reader = new FileReader();
+                reader.onload = function(){
+                    if(typeof(fn_callback) == 'function'){
+                        fn_callback(this.result);
+                    }
+                };
+                reader.readAsText(file_data);
+            },
+
+            save:function(file_data, type, name) {
+                var blob;
+                if (typeof $w.Blob == "function") {
+                    blob = new Blob([file_data], {type: type});
+                } else {
+                    var BlobBuilder = $w.BlobBuilder || $w.MozBlobBuilder || $w.WebKitBlobBuilder || $w.MSBlobBuilder;
+                    var bb = new BlobBuilder();
+                    bb.append(file_data);
+                    blob = bb.getBlob(type);
+                }
+                var URL = $w.URL || $w.webkitURL;
+                var bloburl = URL.createObjectURL(blob);
+                var anchor = $c('a');
+                if ('download' in anchor) {
+                    anchor.style.visibility = "hidden";
+                    anchor.href = bloburl;
+                    anchor.download = name;
+                    $d.body.appendChild(anchor);
+                    var evt = $d.createEvent("MouseEvents");
+                    evt.initEvent("click", true, true);
+                    anchor.dispatchEvent(evt);
+                    $d.body.removeChild(anchor);
+                } else if (navigator.msSaveBlob) {
+                    navigator.msSaveBlob(blob, name);
+                } else {
+                    location.href = bloburl;
+                }
+            }
+        },
+
+        json:{
+            json2string:function(json){
+                if(!!JSON){
+                    try{
+                        var json_str = JSON.stringify(json);
+                        return json_str;
+                    }catch(e){
+                        _console.warn(e);
+                        _console.warn('can not convert to string');
+                        return null;
+                    }
+                }
+            },
+            string2json:function(json_str){
+                if(!!JSON){
+                    try{
+                        var json = JSON.parse(json_str);
+                        return json;
+                    }catch(e){
+                        _console.warn(e);
+                        _console.warn('can not parse to json');
+                        return null;
+                    }
+                }
+            }
+        },
+
+        uuid:{
+            newid:function(){
+                var d = new Date().getTime();
+                var _uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    var r = (d + Math.random()*16)%16 | 0;
+                    d = Math.floor(d/16);
+                    return (c=='x' ? r : (r&0x7|0x8)).toString(16);
+                });
+                return _uuid;
+            }
+        }
+    };
+
+    jm.prototype={
+        init : function(){
+            if(this._init_){return;}
+            this._init_ = true;
+            var opts = this.options;
+            var provider = opts.provider;
+            var _data_provider = (!!provider.data)? provider.data : jm.data_provider;
+            var _layout_provider = (!!provider.layout)? provider.layout : jm.layout_provider;
+            var _view_provider = (!!provider.view)? provider.view : jm.view_provider;
+            var _theme_provider = (!!provider.theme)? provider.theme : jm.theme_provider;
+
+            // create instance of function provider 
+            this.data = new _data_provider(this, opts.data);
+            this.layout = new _layout_provider(this, opts.layout);
+            this.view = new _view_provider(this, opts.view);
+            this.theme = new _theme_provider(this, opts.theme);
+
+            this.data.init();
+            this.layout.init();
+            this.view.init();
+            this.theme.init();
+
+            this.event_bind();
+        },
+
+        set_readonly:function(readonly){
+            this.options.data.readonly = readonly;
+        },
+
+        is_readonly:function(){
+            return this.options.data.readonly;
+        },
+
+        event_bind:function(){
+            this.view.event_bind(this,null,null,this.click_handle,this.dblclick_handle);
+        },
+
+        click_handle:function(e){
+            var element = e.target || e.srcElement;
+            var isnode = this.view.is_node(element);
+            var isexpander = this.view.is_expander(element);
+
+            var nodeid = this.view.get_nodeid(element);
+            if(isnode){
+                this.select_node(nodeid);
+            }else if(isexpander){
+                this.toggle_node(nodeid);
+            }else{
+                this.select_clear();
+            }
+        },
+
+        dblclick_handle:function(e){
+            if(this.is_readonly()){return;}
+            var element = e.target || e.srcElement;
+            var isnode = this.view.is_node(element);
+            if(isnode){
+                var nodeid = this.view.get_nodeid(element);
+                this.begin_edit(nodeid);
+            }
+        },
+
+        begin_edit:function(nodeid){
+            if(this.is_readonly()){
+                _console.error('fail, this mind map is readonly');
+                return;
+            }
+            var node = this.get_node(nodeid);
+            if(!!node){
+                this.view.edit_node_begin(node);
+            }else{
+                _console.error('the node[id='+nodeid+'] can not be found');
+            }
+        },
+
+        end_edit:function(){
+            this.view.edit_node_end();
+        },
+
+        toggle_node:function(nodeid){
+            var node = this.data.get_node(nodeid);
+            if(!!node && !node.isroot){
+                this.layout.toggle_node(node);
+                this.view.show();
+            }
+        },
+
+        expand_node:function(nodeid){
+            var node = this.data.get_node(nodeid);
+            if(!!node && !node.isroot){
+                this.layout.expand_node(node);
+                this.view.show();
+            }
+        },
+
+        collapse_node:function(nodeid){
+            var node = this.data.get_node(nodeid);
+            if(!!node && !node.isroot){
+                this.layout.collapse_node(node);
+                this.view.show();
+            }
+        },
+
+        _reset:function(){
+            this.theme.reset();
+            this.view.reset();
+            this.layout.reset();
+            this.data.reset();
+        },
+
+        _show:function(mind,data_format){
+            var m = mind || [{nodeid:'root',topic:'Empty Mindmap',isroot:true}];
+            var df = data_format || 'json_array';
+
+            this.data.load(m,df);
+            _console.debug('data.load ok');
+
+            this.view.load();
+            _console.debug('view.load ok');
+
+            this.layout.layout();
+            _console.debug('layout.layout ok');
+
+            this.view.show();
+            _console.debug('view.show ok');
+
+        },
+
+        show : function(mind,data_format){
+            if(!this._init_){
+                this.init();
+            }
+            this._reset();
+            this._show(mind,data_format);
+        },
+
+        get_data: function(data_format){
+            var df = data_format || 'json_array';
+            return this.data.get_data(df);
+        },
+
+        get_root:function(){
+            return this.data.get_root();
+        },
+
+        get_node:function(nodeid){
+            return this.data.get_node(nodeid);
+        },
+
+        add_node:function(nodeid, parentid, topic, summary, beforeid){
+            if(this.is_readonly()){
+                _console.error('fail, this mind map is readonly');
+                return;
+            }
+            var node = null;
+            if(!!beforeid){
+                node = this.data.add_node_before(nodeid, parentid, topic, summary, beforeid);
+            }else{
+                node = this.data.add_node(nodeid, parentid, topic, summary);
+            };
+            if(!!node){
+                this.view.add_node(node);
+                this.layout.layout();
+                this.view.show();
+            }
+            return node;
+        },
+
+        remove_node:function(nodeid){
+            if(this.is_readonly()){
+                _console.error('fail, this mind map is readonly');
+                return;
+            }
+            var node = this.get_node(nodeid);
+            if(!!node){
+                if(node.isroot){
+                    _console.error('fail, can not remove the root node');
+                    return false;
+                }
+                this.view.remove_node(node);
+                this.data.remove_node(node);
+                this.layout.layout();
+                this.view.show();
+            }
+        },
+
+        update_node:function(nodeid, topic, summary){
+            if(this.is_readonly()){
+                _console.error('fail, this mind map is readonly');
+                return;
+            }
+            var node = this.data.update_node(nodeid,topic,summary);
+            if(!!node){
+                this.view.update_node(node);
+                this.layout.layout();
+                this.view.show();
+            }
+        },
+
+        move_node:function(nodeid, beforeid){
+            if(this.is_readonly()){
+                _console.error('fail, this mind map is readonly');
+                return;
+            }
+            var node = this.data.update_node(nodeid,null,null,beforeid);
+            if(!!node){
+                this.view.update_node(node);
+                this.layout.layout();
+                this.view.show();
+            }
+        },
+
+        select_node:function(nodeid){
+            var node = this.data.select_node(nodeid);
+            if(!!node){
+                this.view.select_node(node);
+            }
+        },
+
+        get_selected_node:function(){
+            var node = this.data.get_selected_node();
+            return node;
+        },
+
+        select_clear:function(){
+            this.data.select_clear();
+            this.view.select_clear();
+        },
+
+        resize:function(){
+            this.view.resize();
+        },
+    };
+
+// ============= data provider =============================================
+
+    jm.data_provider = function(jm, options){
+        this.jm = jm;
+        this.opts = options;
+        this.root = null;
+        this.selected_node = null;
+        this.nodes = {};
+    };
+
+    jm.data_provider.prototype={
+        init:function(){
+            _console.debug('data.init');
+        },
+
+        reset:function(){
+            _console.debug('data.reset');
+            this.root = null;
+            this.selected_node = null;
+            this.nodes = {};
+        },
+
+        // now, 'json_array' is the only supported data format, never change it
+        load:function(mind,data_format){
+            if(data_format == 'json_array'){
+                this.load_json_array(mind);
+            }else{
+                _console.error('unsupported '+data_format+' format');
+            }
+        },
+
+        load_json_array:function(json_array){
+            _console.debug('data.load');
+            // copy array for preventing to effect the origin data
+            var node_array = json_array.slice(0);
+            // reverse array for improving looping performance
+            node_array.reverse();
+            var root_node = this._parse_extract_root(node_array);
+            if(!!root_node){
+                this.root = root_node;
+                this._parse_extract_subnode(node_array, root_node);
+                this.reindex(root_node);
+            }else{
+                _console.error('the root node can not be found');
+            }
+        },
+
+        _parse_node:function(node_json, parent_node, isroot){
+            var o = node_json;
+            var p = parent_node;
+            var r = !!isroot;
+            if(!r && !p){
+                _console.error('node has not parent');
+                return null;
+            }
+            var idx = ('nodeindex' in o)?o.nodeindex:-1;
+            var node = new jm.node(o.nodeid,idx,o.topic,o.summary,r,p);
+            return node;
+        },
+
+        _parse_extract_root:function(node_array){
+            var i = node_array.length;
+            while(i--){
+                if('isroot' in node_array[i] && node_array[i].isroot){
+                    var root_json = node_array[i];
+                    node_array.splice(i,1);
+                    var root_node = this._parse_node(root_json,null,true);
+                    if(this.put_node(root_node)){
+                        return root_node;
+                    }else{
+                        //delete root_node;
+                        root_node = null;
+                        _console.warn('root node has an not unique id, and this node has been skipped');
+                    }
+                }
+            }
+            return null;
+        },
+
+        _parse_extract_subnode:function(node_array,parent_node){
+            var pid = parent_node.id;
+            var i = node_array.length;
+            var node_json = null;
+            var node = null;
+            var extract_count = 0;
+            while(i--){
+                node_json = node_array[i];
+                if(!('nodeindex' in node_json)){
+                    node_json.nodeindex = extract_count;
+                }
+                if(node_json.parentid == pid){
+                    node = this._parse_node(node_json,parent_node);
+                    if(this.put_node(node)){
+                        parent_node.children.push(node);
+                    }else{
+                        //delete node;
+                        _console.warn('some node has skipped');
+                        break;
+                    }
+                    node_array.splice(i,1);
+                    extract_count ++;
+                    var sub_extract_count = this._parse_extract_subnode(node_array,node);
+                    if(sub_extract_count > 0){
+                        // reset loop index after extract subordinate node
+                        i = node_array.length;
+                        extract_count += sub_extract_count;
+                    }
+                    this.reindex(node);
+                }
+            }
+            return extract_count;
+        },
+
+        put_node:function(node){
+            if(node.id in this.nodes){
+                _console.warn('the nodeid \''+node.id+'\' has been already exist.');
+                return false;
+            }else{
+                this.nodes[node.id] = node;
+                return true;
+            }
+        },
+
+        get_node:function(nodeid){
+            if(nodeid in this.nodes){
+                return this.nodes[nodeid];
+            }else{
+                _console.warn('the node[id='+nodeid+'] can not be found');
+                return null;
+            }
+        },
+
+        get_root:function(){
+            return this.root;
+        },
+
+        get_subnodes:function(nodeid){
+            var node = this.get_node(nodeid);
+            return node.children;
+        },
+
+        add_node:function(nodeid, parentid, topic, summary, idx){
+            if(this.is_readonly()){
+                _console.error('fail, this mind map is readonly');
+                return null;
+            }
+            var nodeindex = idx || -1;
+            var parent_node = this.get_node(parentid);
+            if(!!parent_node){
+                var node = new jm.node(nodeid,nodeindex,topic,summary,false,parent_node);
+                if(this.put_node(node)){
+                    parent_node.children.push(node);
+                    this.reindex(parent_node);
+                }else{
+                    _console.error('fail, the nodeid \''+node.id+'\' has been already exist.');
+                    //delete node;
+                    node = null;
+                }
+            }
+            return node;
+        },
+
+        add_node_before:function(nodeid, parentid, topic, summary, before_id){
+            var node_before = (!!before_id)?this.get_node(before_id):null;
+            var node_index = -1;
+            if(!!node_before){
+                if(node_before.parent!=null && node_before.parent.id == parentid){
+                    node_index = node_before.index-0.5;
+                }
+            }
+            return this.add_node(nodeid, parentid, topic, summary, node_index);
+        },
+
+        add_node_after:function(nodeid, parentid, topic, summary, after_id){
+            var node_after = (!!after_id)?this.get_node(after_id):null;
+            var node_index = -1;
+            if(!!node_after){
+                if(node_after.parent!=null && node_after.parent.id==parentid){
+                    node_index = node_after.index + 0.5;
+                }
+            }
+            return this.add_node(nodeid, parentid, topic, summary, node_index);
+        },
+
+        update_node:function(nodeid, topic, summary, before_id){
+            if(this.is_readonly()){
+                _console.error('fail, the mindmap is readonly');
+                return null;
+            }
+            var node = this.get_node(nodeid);
+            if(!!topic){
+                node.topic = topic;
+            }
+            if(!!summary){
+                node.summary = summary;
+            }
+            if(!!before_id){
+                if(before_id == '_last_'){
+                    node.index = -1;
+                    this.reindex(node.parent);
+                }else if(before_id == '_first_'){
+                    node.index = 0;
+                    this.reindex(node.parent);
+                }else{
+                    var node_before = (!!before_id)?this.get_node(before_id):null;
+                    if(node_before!=null && node_before.parent!=null && node_before.parent.id==node.parent.id){
+                        node.index = node_before.index - 0.5;
+                        this.reindex(node.parent);
+                    }
+                }
+            }
+            return node;
+        },
+
+        remove_node:function(node){
+            if(this.is_readonly()){
+                _console.error('fail, the mindmap is readonly');
+                return false;
+            }
+            if(!node){
+                _console.error('fail, can not found the node');
+                return false;
+            }
+            if(node.isroot){
+                _console.error('fail, can not remove the root node');
+                return false;
+            }
+            if(this.selected_node != null && this.selected_node.id == node.id){
+                this.selected_node = null;
+            }
+            if(this.editing_node!= null && this.editing_node.id == node.id){
+                this.editing_node = null;
+            }
+            // clean all subordinate nodes
+            var children = node.children;
+            var ci = children.length;
+            while(ci--){
+                this.remove_node(children[ci]);
+            }
+            // clean all children
+            children.length = 0;
+            // remove from parent's children
+            var sibling = node.parent.children;
+            var si = sibling.length;
+            while(si--){
+                if(sibling[si].id == node.id){
+                    sibling.splice(si,1);
+                    break;
+                }
+            }
+            // remove from global nodes
+            delete this.nodes[node.id];
+            // clean all properties
+            for(var k in node){
+                delete node[k];
+            }
+            // remove it's self
+            node = null;
+            //delete node;
+            return true;
+        },
+
+        select_node:function(nodeid){
+            var node = this.get_node(nodeid);
+            if(!!node){
+                this.selected_node = node;
+            }
+            return node;
+        },
+
+        get_selected_node:function(){
+            return this.selected_node;
+        },
+
+        select_clear:function(){
+            this.selected_node = null;
+        },
+
+        is_readonly:function(){
+            return !!this.opts.readonly;
+        },
+
+        reindex:function(node){
+            if(node instanceof jm.node){
+                node.children.sort(jm.node.compare);
+                for(var i=0;i<node.children.length;i++){
+                    node.children[i].index = i+1;
+                }
+            }
+        },
+
+        _get_json_array:function(node,json_array){
+            if(!(node instanceof jm.node)){return;}
+            if(!json_array){
+                json_array = [];
+            }
+            var o = {
+                //_nodeindex_ : node.index,
+                nodeid : node.id,
+                isroot : node.isroot,
+                parentid : (!!node.parent)?node.parent.id:undefined,
+                topic : node.topic,
+                summary : node.summary
+            };
+            json_array.push(o);
+            var ci = node.children.length;
+            for(var i=0;i<ci;i++){
+                this._get_json_array(node.children[i],json_array);
+            }
+            return json_array;
+        },
+
+        get_json:function(){
+            var json = this._get_json_array(this.root,[]);
+            return json;
+        },
+
+        get_data:function(data_format){
+            var data = null;
+            if(data_format == 'json_array'){
+                data = this.get_json();
+            }else{
+                _console.error('unsupported '+data_format+' format');
+            }
+            return data;
+        },
+    };
+
+    // ============= layout provider ===========================================
+
+    jm.layout_provider = function(jm, options){
+        this.opts = options;
+        this.jm = jm;
+        this.data= this.jm.data;
+        this.isside = (this.opts.mode == 'side');
+        this.bounds = null;
+
+        this.cache_valid = false;
+    };
+    jm.layout_provider.prototype={
+        init:function(){
+            _console.debug('layout.init');
+            this.bounds = {n:0,s:0,w:0,e:0};
+        },
+        reset:function(){
+            _console.debug('layout.reset');
+            this.init();
+        },
+        layout:function(){
+            _console.debug('layout.layout');
+            this.layout_direction();
+            this.layout_offset();
+            //_console.debug(this.data.root);
+        },
+
+        layout_direction:function(){
+            this._layout_direction_root();
+        },
+
+        _layout_direction_root:function(){
+            var node = this.data.root;
+            var layout_data = null;
+            if('layout' in node._data){
+                layout_data = node._data.layout;
+            }else{
+                layout_data = {};
+                node._data.layout = layout_data;
+            }
+            var children = node.children;
+            var children_count = children.length;
+            layout_data.direction = jm.direction.center;
+            layout_data.side_index = 0;
+            if(this.isside){
+                layout_data.left_count = 0;
+                layout_data.right_count = children_count;
+                var i = children_count;
+                while(i--){
+                    this._layout_direction_side(children[i], jm.direction.right, i);
+                }
+            }else{
+                var boundary = Math.ceil(children_count/2);
+                layout_data.left_count = children_count - boundary;
+                layout_data.right_count = boundary;
+                var i = children_count;
+                while(i--){
+                    if(i>=boundary){
+                        this._layout_direction_side(children[i],jm.direction.left, children_count-i-1);
+                    }else{
+                        this._layout_direction_side(children[i],jm.direction.right, i);
+                    }
+                }
+            }
+        },
+
+        _layout_direction_side:function(node, direction, side_index){
+            var layout_data = null;
+            if('layout' in node._data){
+                layout_data = node._data.layout;
+            }else{
+                layout_data = {};
+                node._data.layout = layout_data;
+            }
+            var children = node.children;
+            var children_count = children.length;
+
+            layout_data.direction = direction;
+            layout_data.side_index = side_index;
+            if(direction == jm.direction.right){
+                layout_data.right_count = children_count;
+                layout_data.left_count = 0;
+            }else{
+                layout_data.left_count = children_count;
+                layout_data.right_count = 0;
+            }
+            var i = children_count;
+            while(i--){
+                this._layout_direction_side(children[i], direction, i);
+            }
+        },
+
+        layout_offset:function(){
+            var node = this.data.root;
+            var layout_data = node._data.layout;
+            layout_data.offset_x = 0;
+            layout_data.offset_y = 0;
+            layout_data.outer_height = 0;
+            var children = node.children;
+            var i = children.length;
+            var left_nodes = [];
+            var right_nodes = [];
+            var subnode = null;
+            while(i--){
+                subnode = children[i];
+                if(subnode._data.layout.direction == jm.direction.right){
+                    right_nodes.unshift(subnode);
+                }else{
+                    left_nodes.push(subnode);
+                }
+            }
+            layout_data.left_nodes = left_nodes;
+            layout_data.right_nodes = right_nodes;
+            layout_data.outer_height_left = this._layout_offset_subnodes(left_nodes);
+            layout_data.outer_height_right = this._layout_offset_subnodes(right_nodes);
+            this.bounds.e=node._data.view.width/2;
+            this.bounds.w=0-this.bounds.e;
+            //_console.debug(this.bounds.w);
+            this.bounds.n=0;
+            this.bounds.s = Math.max(layout_data.outer_height_left,layout_data.outer_height_right);
+        },
+
+        // layout both the x and y axis
+        _layout_offset_subnodes:function(nodes){
+            var total_height = 0;
+            var nodes_count = nodes.length;
+            var i = nodes_count;
+            var node = null;
+            var node_outer_height = 0;
+            var layout_data = null;
+            var base_y = 0;
+            var pd = null; // parent._data
+            while(i--){
+                node = nodes[i];
+                layout_data = node._data.layout;
+                if(pd == null){
+                    pd = node.parent._data;
+                }
+
+                node_outer_height = this._layout_offset_subnodes(node.children);
+                if(('isexpand' in layout_data) && !layout_data.isexpand){
+                    node_outer_height=0;
+                }
+                node_outer_height = Math.max(node._data.view.height,node_outer_height);
+
+                layout_data.outer_height = node_outer_height;
+                layout_data.offset_y = base_y - node_outer_height/2;
+                layout_data.offset_x = this.opts.hspace * layout_data.direction + pd.view.width * (pd.layout.direction + layout_data.direction)/2;
+                if(!node.parent.isroot){
+                    layout_data.offset_x += this.opts.pspace * layout_data.direction;
+                }
+
+                base_y = base_y - node_outer_height - this.opts.vspace;
+                total_height += node_outer_height;
+            }
+            if(nodes_count>1){
+                total_height += this.opts.vspace * (nodes_count-1);
+            }
+            i = nodes_count;
+            var middle_height = total_height/2;
+            while(i--){
+                node = nodes[i];
+                node._data.layout.offset_y += middle_height;
+                //_console.debug(node._data.layout.offset_y);
+            }
+            return total_height;
+        },
+
+        // layout the y axis only, for collapse/expand a node
+        _layout_offset_subnodes_height:function(nodes){
+            return this._layout_offset_subnodes(nodes);
+            var total_height = 0;
+            var nodes_count = nodes.length;
+            var i = nodes_count;
+            var node = null;
+            var node_outer_height = 0;
+            var layout_data = null;
+            var base_y = 0;
+            var pd = null; // parent._data
+            while(i--){
+                node = nodes[i];
+                layout_data = node._data.layout;
+                if(pd == null){
+                    pd = node.parent._data;
+                }
+
+                node_outer_height = this._layout_offset_subnodes_height(node.children);
+                if(('isexpand' in layout_data) && !layout_data.isexpand){
+                    node_outer_height=0;
+                }
+                node_outer_height = Math.max(node._data.view.height,node_outer_height);
+
+                layout_data.outer_height = node_outer_height;
+                layout_data.offset_y = base_y - node_outer_height/2;
+                base_y = base_y - node_outer_height - this.opts.vspace;
+                total_height += node_outer_height;
+            }
+            if(nodes_count>1){
+                total_height += this.opts.vspace * (nodes_count-1);
+            }
+            i = nodes_count;
+            var middle_height = total_height/2;
+            while(i--){
+                node = nodes[i];
+                node._data.layout.offset_y += middle_height;
+                //_console.debug(node.topic);
+                //_console.debug(node._data.layout.offset_y);
+            }
+            return total_height;
+        },
+
+        get_node_offset:function(node){
+            var layout_data = node._data.layout;
+            var offset_cache = null;
+            if(('_offset_' in layout_data) && this.cache_valid){
+                offset_cache = layout_data._offset_;
+            }else{
+                offset_cache = {x:-1, y:-1};
+                layout_data._offset_ = offset_cache;
+            }
+            if(offset_cache.x == -1 || offset_cache.y == -1){
+                var x = layout_data.offset_x;
+                var y = layout_data.offset_y;
+                if(!node.isroot){
+                    var offset_p = this.get_node_offset(node.parent);
+                    x += offset_p.x;
+                    y += offset_p.y;
+                }
+                offset_cache.x = x;
+                offset_cache.y = y;
+            }
+            return offset_cache;
+        },
+
+        get_node_point:function(node){
+            var view_data = node._data.view;
+            var offset_p = this.get_node_offset(node);
+            //_console.debug(offset_p);
+            var p = {};
+            p.x = offset_p.x + view_data.width*(node._data.layout.direction-1)/2;
+            p.y = offset_p.y-view_data.height/2;
+            //_console.debug(p);
+            return p;
+        },
+
+        get_node_point_in:function(node){
+            var p = this.get_node_offset(node);
+            return p;
+        },
+
+        get_node_point_out:function(node){
+            var layout_data = node._data.layout;
+            var pout_cache = null;
+            if(('_pout_' in layout_data) && this.cache_valid){
+                pout_cache = layout_data._pout_;
+            }else{
+                pout_cache = {x:-1, y:-1};
+                layout_data._pout_ = pout_cache;
+            }
+            if(pout_cache.x == -1 || pout_cache.y == -1){
+                if(node.isroot){
+                    pout_cache.x = 0;
+                    pout_cache.y = 0;
+                }else{
+                    var view_data = node._data.view;
+                    var offset_p = this.get_node_offset(node);
+                    pout_cache.x = offset_p.x + (view_data.width+this.opts.pspace)*node._data.layout.direction;
+                    pout_cache.y = offset_p.y;
+                    //_console.debug('pout');
+                    //_console.debug(pout_cache);
+                }
+            }
+            return pout_cache;
+        },
+
+        get_expander_point:function(node){
+            var p = this.get_node_point_out(node);
+            var ex_p = {};
+            if(node._data.layout.direction == jm.direction.right){
+                ex_p.x = p.x - this.opts.pspace;
+            }else{
+                ex_p.x = p.x;
+            }
+            ex_p.y = p.y - Math.ceil(this.opts.pspace/2);
+            return ex_p;
+        },
+
+        get_min_size:function(){
+            var nodes = this.data.nodes;
+            var node = null;
+            var pout = null;
+            for(var nodeid in nodes){
+                node = nodes[nodeid];
+                pout = this.get_node_point_out(node);
+                //_console.debug(pout.x);
+                if(pout.x > this.bounds.e){this.bounds.e = pout.x;}
+                if(pout.x < this.bounds.w){this.bounds.w = pout.x;}
+            }
+            return {
+                w:this.bounds.e - this.bounds.w,
+                h:this.bounds.s - this.bounds.n
+            }
+        },
+
+        toggle_node:function(node){
+            if(node.isroot){
+                return;
+            }
+            var layout_data = node._data.layout;
+            var isexpand = true;
+            if('isexpand' in layout_data){
+                isexpand = layout_data.isexpand;
+            }
+            if(isexpand){
+                this.collapse_node(node);
+            }else{
+                this.expand_node(node);
+            }
+            //_console.debug(this.data.root);
+        },
+
+        expand_node:function(node){
+            //_console.debug('expand');
+            node._data.layout.isexpand = true;
+            this.part_layout(node);
+            this.set_visible(node.children,true);
+        },
+
+        collapse_node:function(node){
+            //_console.debug('collapse');
+            node._data.layout.isexpand = false;
+            this.part_layout(node);
+            this.set_visible(node.children,false);
+        },
+
+        part_layout:function(node){
+            //_console.debug('part_layout');
+            var root_layout_data = this.data.root._data.layout;
+            if(node._data.layout.direction == jm.direction.right){
+                root_layout_data.outer_height_right=this._layout_offset_subnodes_height(root_layout_data.right_nodes);
+            }else{
+                root_layout_data.outer_height_left=this._layout_offset_subnodes_height(root_layout_data.left_nodes);
+            }
+            this.bounds.s = Math.max(root_layout_data.outer_height_left,root_layout_data.outer_height_right);
+            this.cache_valid = false;
+        },
+
+        set_visible:function(nodes,visible){
+            var i = nodes.length;
+            var node = null;
+            var layout_data = null;
+            while(i--){
+                node = nodes[i];
+                layout_data = node._data.layout;
+                if(('isexpand' in layout_data) && !layout_data.isexpand){
+                    this.set_visible(node.children,false);
+                }else{
+                    this.set_visible(node.children,visible);
+                }
+                node._data.layout.visible = visible;
+            }
+        },
+
+        is_expand:function(node){
+            var layout_data = node._data.layout;
+            if(('isexpand' in layout_data) && !layout_data.isexpand){
+                return false;
+            }else{
+                return true;
+            }
+        },
+        
+        is_visible:function(node){
+            var layout_data = node._data.layout;
+            if(('visible' in layout_data) && !layout_data.visible){
+                return false;
+            }else{
+                return true;
+            }
+        },
+    };
+
+    // view provider
+    jm.view_provider= function(jm, options){
+        this.opts = options;
+        this.jm = jm;
+        this.data= jm.data;
+        this.layout = jm.layout;
+
+        this.container = null;
+        this.e_panel = null;
+        this.e_nodes= null;
+        this.e_canvas = null;
+
+        this.canvas_ctx = null;
+        this.size = {w:0,h:0};
+
+        this.selected_node = null;
+        this.editing_node = null;
+    };
+
+    jm.view_provider.prototype={
+        init:function(){
+            _console.debug('view.init');
+
+            this.container = $g(this.opts.container);
+            if(!this.container){
+                _console.error('the options.view.container was not be found in dom');
+                return;
+            }
+            this.e_panel = $c('div');
+            this.e_canvas = $c('canvas');
+            this.e_nodes = $c('jmnodes');
+            this.e_editor = $c('input');
+
+            this.e_panel.className = 'jsmind-inner';
+            this.e_panel.appendChild(this.e_canvas);
+            this.e_panel.appendChild(this.e_nodes);
+
+            this.e_editor.className = 'jsmind-editor';
+            this.e_editor.type = 'text';
+
+            var v = this;
+            jm.util.dom.add_event(this.e_editor,'keydown',function(e){
+                if(e.keyCode == 13){v.edit_node_end();}
+            });
+            jm.util.dom.add_event(this.e_editor,'blur',function(e){
+                v.edit_node_end();
+            });
+
+            this.container.appendChild(this.e_panel);
+
+            this.init_canvas();
+        },
+            
+        event_bind:function(obj,fn_mouseover,fn_mouseout,fn_click,fn_dblclick){
+            if(!!fn_mouseover){
+                jm.util.dom.add_event(this.e_nodes,'mouseover',function(e){fn_mouseover.call(obj,e);});
+            }
+            if(!!fn_mouseout){
+                jm.util.dom.add_event(this.e_nodes,'mouseout',function(e){fn_mouseout.call(obj,e);});
+            }
+            if(!!fn_click){
+                jm.util.dom.add_event(this.e_nodes,'click',function(e){fn_click.call(obj,e);});
+            }
+            if(!!fn_dblclick){
+                jm.util.dom.add_event(this.e_nodes,'dblclick',function(e){fn_dblclick.call(obj,e);});
+            }
+        },
+
+        get_nodeid:function(element){
+            return element.getAttribute('nodeid');
+        },
+
+        is_node:function(element){
+            return (element.tagName.toLowerCase() == 'jmnode');
+        },
+
+        is_expander:function(element){
+            return (element.tagName.toLowerCase() == 'jmexpander');
+        },
+
+        reset:function(){
+            _console.debug('view.reset');
+            this.selected_node = null;
+            this.clear_lines();
+            this.clear_nodes();
+        },
+
+        load:function(){
+            _console.debug('view.load');
+            this.init_nodes();
+        },
+
+        expand_size:function(){
+            var min_size = this.layout.get_min_size();
+            var min_width = min_size.w + this.opts.hmargin*2;
+            var min_height = min_size.h + this.opts.vmargin*2;
+            var client_w = this.e_panel.clientWidth;
+            var client_h = this.e_panel.clientHeight;
+            if(client_w < min_width){client_w = min_width;}
+            if(client_h < min_height){client_h = min_height;}
+            this.size.w = client_w;
+            this.size.h = client_h;
+        },
+
+        init_canvas:function(){
+            var ctx = this.e_canvas.getContext('2d');
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            this.canvas_ctx = ctx;
+        },
+
+        init_nodes:function(){
+            var nodes = this.data.nodes;
+            for(var nodeid in nodes){
+                this.create_node_element(nodes[nodeid]);
+            }
+        },
+
+        add_node:function(node){
+            this.create_node_element(node);
+        },
+
+        create_node_element:function(node){
+            var view_data = null;
+            if('view' in node._data){
+                view_data = node._data.view;
+            }else{
+                view_data = {};
+                node._data.view = view_data;
+            }
+
+            var d = $c('jmnode');
+            if(node.isroot){
+                d.className = 'root';
+            }else{
+                var d_e = $c('jmexpander');
+                $t(d_e,'-');
+                d_e.setAttribute('nodeid',node.id);
+                d_e.style.visibility = 'hidden';
+                this.e_nodes.appendChild(d_e);
+                view_data.expander = d_e;
+            }
+            $t(d,node.topic);
+            d.setAttribute('nodeid',node.id);
+            d.style.visibility='hidden';
+            this.e_nodes.appendChild(d);
+            view_data.element = d;
+            view_data.width = d.clientWidth;
+            view_data.height = d.clientHeight;
+        },
+
+        remove_node:function(node){
+            if(this.selected_node != null && this.selected_node.id == node.id){
+                this.selected_node = null;
+            }
+            var children = node.children;
+            var i = children.length;
+            while(i--){
+                this.remove_node(children[i]);
+            }
+            if(node._data.view){
+                var element = node._data.view.element;
+                var expander = node._data.view.expander;
+                this.e_nodes.removeChild(element);
+                this.e_nodes.removeChild(expander);
+                node._data.view.element = null;
+                node._data.view.expander = null;
+            }
+        },
+
+        update_node:function(node){
+            var view_data = node._data.view;
+            var element = view_data.element;
+            $t(element,node.topic);
+            view_data.width = element.clientWidth;
+            view_data.height = element.clientHeight;
+        },
+
+        select_node:function(node){
+            if(!!this.selected_node){
+                this.selected_node._data.view.element.className =
+                this.selected_node._data.view.element.className.replace(/\s*selected\s*/i,'');
+            }
+            if(!!node){
+                this.selected_node = node;
+                node._data.view.element.className += ' selected';
+            }
+        },
+
+        select_clear:function(){
+            this.select_node(null);
+        },
+
+        edit_node_begin:function(node){
+            if(this.editing_node != null){
+                this.edit_node_end();
+            }
+            this.editing_node = node;
+            var view_data = node._data.view;
+            var element = view_data.element;
+            var topic = node.topic;
+            this.e_editor.value = topic;
+            element.innerHTML = '';
+            element.appendChild(this.e_editor);
+            element.style.zIndex = 5;
+            this.e_editor.focus();
+            this.e_editor.select();
+        },
+
+        edit_node_end:function(){
+            if(this.editing_node != null){
+                var node = this.editing_node;
+                this.editing_node = null;
+                var view_data = node._data.view;
+                var element = view_data.element;
+                var topic = this.e_editor.value;
+                element.style.zIndex = 'auto';
+                element.removeChild(this.e_editor);
+                this.jm.update_node(node.id,topic,node.summary);
+            }
+        },
+
+        get_view_offset:function(){
+            var bounds = this.layout.bounds;
+            var _x = (this.size.w - bounds.e - bounds.w)/2;
+            var _y = this.size.h / 2;
+            return{x:_x, y:_y};
+        },
+
+        resize:function(){
+            this.e_canvas.width = 1;
+            this.e_canvas.height = 1;
+            this.e_nodes.style.width = '1px';
+            this.e_nodes.style.height = '1px';
+
+            this.expand_size();
+            this._show();
+        },
+
+        _show:function(){
+            this.e_canvas.width = this.size.w;
+            this.e_canvas.height = this.size.h;
+            this.e_nodes.style.width = this.size.w+'px';
+            this.e_nodes.style.height = this.size.h+'px';
+            this.show_nodes();
+            this.show_lines();
+
+            // center root node
+            var outer_w = this.e_panel.clientWidth;
+            var outer_h = this.e_panel.clientHeight;
+            if(this.size.w > outer_w){
+                var _offset = this.get_view_offset();
+                this.e_panel.scrollLeft = _offset.x - outer_w/2;
+            }
+            if(this.size.h > outer_h){
+                this.e_panel.scrollTop = (this.size.h - outer_h)/2;
+            }
+            //this.layout.cache_valid = true;
+        },
+
+        show:function(){
+            _console.debug('view.show');
+            this.expand_size();
+            this._show();
+        },
+
+        clear_nodes:function(){
+            var nodes = this.data.nodes;
+            var node = null;
+            for(var nodeid in nodes){
+                node = nodes[nodeid];
+                node._data.view.element = null;
+                node._data.view.expander = null;
+            }
+            this.e_nodes.innerHTML = '';
+        },
+
+        show_nodes:function(){
+            var nodes = this.data.nodes;
+            var node = null;
+            var node_element = null;
+            var expander = null;
+            var p = null;
+            var p_expander= null;
+            var expander_text = '-';
+            var _offset = this.get_view_offset();
+            for(var nodeid in nodes){
+                node = nodes[nodeid];
+                node_element = node._data.view.element;
+                expander = node._data.view.expander;
+                if(!this.layout.is_visible(node)){
+                    node_element.style.display = 'none';
+                    expander.style.display = 'none';
+                    continue;
+                }
+                p = this.layout.get_node_point(node);
+                node_element.style.left = (_offset.x+p.x) + 'px';
+                node_element.style.top = (_offset.y+p.y) + 'px';
+                node_element.style.display = '';
+                node_element.style.visibility = 'visible';
+                if(!node.isroot && node.children.length>0){
+                    expander_text = this.layout.is_expand(node)?'-':'+';
+                    p_expander= this.layout.get_expander_point(node);
+                    expander.style.left = (_offset.x + p_expander.x) + 'px';
+                    expander.style.top = (_offset.y + p_expander.y) + 'px';
+                    expander.style.display = '';
+                    expander.style.visibility = 'visible';
+                    $t(expander,expander_text);
+                }
+            }
+        },
+
+        clear_lines:function(){
+            jm.util.canvas.clear(this.canvas_ctx,0,0,this.size.w,this.size.h);
+        },
+
+        show_lines:function(){
+            this.clear_lines();
+            var nodes = this.data.nodes;
+            var node = null;
+            var pin = null;
+            var pout = null;
+            var _offset = this.get_view_offset();
+            for(var nodeid in nodes){
+                node = nodes[nodeid];
+                if(!!node.isroot){continue;}
+                if(('visible' in node._data.layout) && !node._data.layout.visible){continue;}
+                pin = this.layout.get_node_point_in(node);
+                pout = this.layout.get_node_point_out(node.parent);
+                this.draw_line(pout,pin,_offset);
+            }
+        },
+
+        draw_line:function(pin,pout,offset){
+            jm.util.canvas.lineto(
+                this.canvas_ctx,
+                pin.x + offset.x,
+                pin.y + offset.y,
+                pout.x + offset.x,
+                pout.y + offset.y);
+        }
+    };
+
+    // theme provider
+    jm.theme_provider= function(jm, options){this.jm = jm; this.opts = options;};
+    jm.theme_provider.prototype={
+        init:function(){
+            _console.debug('theme.init');
+        },
+        reset:function(){
+            _console.debug('theme.reset');
+        }
+    };
+
+
+    jm.show = function(options,mind,data_format){
+        var _jm = new jm(options);
+        _jm.show(mind,data_format);
+        return _jm;
+    };
+
+    // register global variables
+    $w[__name__] = jm;
 })(window);
-
-
-
-(function($w,jm){
-	if(jm.ajax){return;}
-	function genXHR(){
-		var xhr = null;
-		if(window.XMLHttpRequest){
-			xhr = new XMLHttpRequest();
-		}else{
-			try{
-				xhr = new ActiveXObject("Microsoft.XMLHTTP");
-			}catch(e){}
-		}
-		return xhr;
-	}
-
-	jm.ajax = {
-		_encURL:function(url){
-			return encodeURIComponent(url);
-		},
-		ajax:function(url,param,method,callback){
-			var p = null;
-			var tmp_param = [];
-			for(k in param){
-				tmp_param.push(this._encURL(k)+'='+this._encURL(param[k]));
-			}
-			if(tmp_param.length>0){
-				p = tmp_param.join('&');
-			}
-			var xhr = genXHR();
-			if(xhr == null){return;}
-			xhr.onreadystatechange = function(){
-				if(xhr.readyState == 4){
-					if(xhr.status == 200 || xhr.status == 0){
-						if(typeof(callback) == 'function'){
-							var data = eval('('+xhr.responseText+')');
-							callback(data);
-						}
-					}else{
-						var w = window.open('');
-						w.document.write(xhr.responseText);
-						//alert(xhr.responseText);
-					}
-				}
-			}
-			method = method || 'GET';
-			xhr.open(method,url,true);
-			if(method == 'POST'){
-				xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded;charset=utf-8');
-			}
-			xhr.setRequestHeader('If-Modified-Since','0');
-			xhr.send(p);
-		},
-		request:function(url,param,callback){
-			this.ajax(url,param,'POST',callback);
-		}
-	};
-
-})(window,jsMind);
-
-(function(jm){
-	if(jm.logger){return;}
-	if(typeof(console) != 'undefined'){
-		jm.logger = {
-			log : function(){console.log(arguments);},
-			info : function(){console.info(arguments);},
-			warn : function(){console.warn(arguments);},
-			error : function(){console.error(arguments);}
-		};
-	}else{
-		jm.logger = {
-			log : function(){},
-			info : function(){},
-			warn : function(){},
-			error : function(){}
-		};
-	}
-})(jsMind);
-
-

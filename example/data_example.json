@@ -1,0 +1,22 @@
+[
+{'nodeid':'root', 'isroot':true, 'topic':'jsMind'},
+
+{'nodeid':'easy', 'parentid':'root', 'topic':'Easy'},
+{'nodeid':'easy1', 'parentid':'easy', 'topic':'Easy to show'},
+{'nodeid':'easy2', 'parentid':'easy', 'topic':'Easy to edit'},
+{'nodeid':'easy3', 'parentid':'easy', 'topic':'Easy to store'},
+{'nodeid':'easy4', 'parentid':'easy', 'topic':'Easy to embed'},
+
+{'nodeid':'open', 'parentid':'root', 'topic':'Open Source'},
+{'nodeid':'open1', 'parentid':'open', 'topic':'on GitHub'},
+{'nodeid':'open2', 'parentid':'open', 'topic':'BSD License'},
+
+{'nodeid':'powerful', 'parentid':'root', 'topic':'Powerful'},
+{'nodeid':'powerful1', 'parentid':'powerful', 'topic':'Base on Javascript'},
+{'nodeid':'powerful2', 'parentid':'powerful', 'topic':'Base on HTML5'},
+{'nodeid':'powerful3', 'parentid':'powerful', 'topic':'Depends on you'},
+
+{'nodeid':'other', 'parentid':'root', 'topic':'test node'},
+{'nodeid':'other1', 'parentid':'other', 'topic':'I\'m from ajax'},
+{'nodeid':'other2', 'parentid':'other', 'topic':'I can do everything'},
+]
