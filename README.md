@@ -64,17 +64,21 @@ The difference is only the arguments of jsMind.show() .<br />
 It is very easy, is not it?
 
 ### 1.4. Data format
-
+To be continued
 
 ### 1.5. Options
+To be continued
 
 
 2. Apis
 ------
+To be continued
 
 3. Features
 ------
+To be continued
 
 4. Storage
 ------
+To be continued
 
