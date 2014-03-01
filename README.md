@@ -10,12 +10,12 @@ jsMind is under BSD license. So you embed it in any project, if only you retain 
 ### 1.1 required
 2 files (jsmind.css and jsmind.js) are required
 
-        <link type="text/css" rel="stylesheet" href="style/jsmind.css" />
-        <script type="text/javascript" src="js/jsmind.js"></script>
+    <link type="text/css" rel="stylesheet" href="style/jsmind.css" />
+    <script type="text/javascript" src="js/jsmind.js"></script>
 
 a div element should be in your HTML as container
 
-        <div id="jsmind_container"></div>
+    <div id="jsmind_container"></div>
 ### 1.2 an empty mindmap
     
 
