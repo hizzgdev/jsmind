@@ -4,7 +4,7 @@
     // __name__ should be a const value, Never try to change it easily.
     var __name__ = 'jsMind';
     // library version
-    var __version__    = '0.2';
+    var __version__    = '0.2a';
 
     // check global variables
     if(typeof($w[__name__])!='undefined'){
