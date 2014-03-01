@@ -26,10 +26,10 @@
     <div id="jsmind_nav">
         <div>1. Open &amp; Save</div>
         <ol type='A'>
-            <li><button onclick="open_json();">open from variable</button></li>
-            <li><button onclick="open_ajax();">open from ajax</button></li>
+            <li><button onclick="open_json();">open example</button></li>
+            <li><button onclick="open_ajax();">open remote</button></li>
             <li><button onclick="save_file();">save to local file</button></li>
-            <li><div><input id="file_input" type="file"/></div><button onclick="open_file();">open from local file</button></li>
+            <li><div><input id="file_input" type="file"/></div><button onclick="open_file();">open local file</button></li>
             <li><button onclick="show_data();">get mindmap data</button></li>
         </ol>
         <div>2. Select &amp; Edit</div>
@@ -38,12 +38,13 @@
             <li>try click a node</li>
             <li><button onclick="show_selected();">get the selected</button></li>
             <li><button onclick="add_node();">add a node</button></li>
-            <li><button onclick="modify_node();">modify a node</button></li>
+            <li><button onclick="modify_node();">modify node</button></li>
             <li>try double click</li>
             <li><button onclick="move_node();">move a node</button></li>
             <li><button onclick="move_to_first();">move to first</button></li>
             <li><button onclick="move_to_last();">move to last</button></li>
-            <li><button onclick="remove_node();">remove a node</button></li>
+            <li><button onclick="remove_node();">remove node</button></li>
+            <li><button onclick="toggle_node();">toggle node</button></li>
         </ol>
         <div>4. Setting &amp; Adjusting</div>
         <ol type='A'>
@@ -112,7 +113,11 @@
         if(files.length > 0){
             var file_data = files[0];
             read_from_localfile(file_data,function(mind){
-                _jm.show(mind);
+                if(!!mind){
+                    _jm.show(mind);
+                }else{
+                    alert('can not open this file as mindmap');
+                }
             });
         }
     }
@@ -137,31 +142,65 @@
         }
     }
 
+    function get_selected_nodeid(){
+        var selected_node = _jm.get_selected_node();
+        if(!!selected_node){
+            return selected_node.id;
+        }else{
+            return null;
+        }
+    }
+
     function add_node(){
+        var selected_id = get_selected_nodeid(); // as parent of new node
+        if(!selected_id){alert('please select a node first.');}
+
         var nodeid = jsMind.util.uuid.newid();
-        var topic = 'NewNode_'+nodeid.substr(0,5)
-        var node = _jm.add_node(nodeid, 'other', topic, 'This is New Node', 'other1');
+        var topic = '*** Node_'+nodeid.substr(0,5)
+        var node = _jm.add_node(nodeid, selected_id, topic, 'This is New Node');
     }
 
     function modify_node(){
-        _jm.update_node('other', '--- modified ---');
-        //_jm.update_node('other', '--- modified ---', 'modify summary at the same time');
+        var selected_id = get_selected_nodeid();
+        if(!selected_id){alert('please select a node first.');}
+
+        // modify the topic
+        _jm.update_node(selected_id, '--- modified ---');
+        // or modify the topic and summary
+        //_jm.update_node(selected_id, '--- modified ---', 'modify summary at the same time');
     }
 
     function move_to_first(){
-        _jm.move_node('other','_first_');
+        var selected_id = get_selected_nodeid();
+        if(!selected_id){alert('please select a node first.');}
+
+        _jm.move_node(selected_id,'_first_');
     }
 
     function move_to_last(){
-        _jm.move_node('other','_last_');
+        var selected_id = get_selected_nodeid();
+        if(!selected_id){alert('please select a node first.');}
+
+        _jm.move_node(selected_id,'_last_');
     }
 
     function move_node(){
+        // move a node before another
         _jm.move_node('other','open');
     }
 
     function remove_node(){
-        _jm.remove_node('other');
+        var selected_id = get_selected_nodeid();
+        if(!selected_id){alert('please select a node first.');}
+
+        _jm.remove_node(selected_id);
+    }
+
+    function toggle_node(){
+        var selected_id = get_selected_nodeid();
+        if(!selected_id){alert('please select a node first.');}
+
+        _jm.toggle_node(selected_id);
     }
 
     function toggle_readonly(btn){

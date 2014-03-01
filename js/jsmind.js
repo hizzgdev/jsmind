@@ -244,12 +244,28 @@
 
         json:{
             json2string:function(json){
-                var json_str = JSON.stringify(json);
-                return json_str;
+                if(!!JSON){
+                    try{
+                        var json_str = JSON.stringify(json);
+                        return json_str;
+                    }catch(e){
+                        _console.warn(e);
+                        _console.warn('can not convert to string');
+                        return null;
+                    }
+                }
             },
             string2json:function(json_str){
-                var json = JSON.parse(json_str);
-                return json;
+                if(!!JSON){
+                    try{
+                        var json = JSON.parse(json_str);
+                        return json;
+                    }catch(e){
+                        _console.warn(e);
+                        _console.warn('can not parse to json');
+                        return null;
+                    }
+                }
             }
         },
 
@@ -441,6 +457,10 @@
             }
             var node = this.get_node(nodeid);
             if(!!node){
+                if(node.isroot){
+                    _console.error('fail, can not remove the root node');
+                    return false;
+                }
                 this.view.remove_node(node);
                 this.data.remove_node(node);
                 this.layout.layout();
@@ -713,15 +733,15 @@
         remove_node:function(node){
             if(this.is_readonly()){
                 _console.error('fail, the mindmap is readonly');
-                return null;
+                return false;
             }
-            if(!(node instanceof jm.node)){
-                node = this.get_node(node);
+            if(!node){
+                _console.error('fail, can not found the node');
+                return false;
             }
-            if(!node){return;}
             if(node.isroot){
                 _console.error('fail, can not remove the root node');
-                return;
+                return false;
             }
             if(this.selected_node != null && this.selected_node.id == node.id){
                 this.selected_node = null;
@@ -755,6 +775,7 @@
             // remove it's self
             node = null;
             //delete node;
+            return true;
         },
 
         select_node:function(nodeid){
