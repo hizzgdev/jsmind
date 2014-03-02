@@ -10,8 +10,10 @@ jsMind is under BSD license. You can embed it in any project, if only you observ
 ### 1.1. Required
 2 files (jsmind.css and jsmind.js) are required
 
+    '''html
     <link type="text/css" rel="stylesheet" href="style/jsmind.css" />
     <script type="text/javascript" src="js/jsmind.js"></script>
+    '''
 
 a div element should be in your HTML as container
 
