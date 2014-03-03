@@ -45,7 +45,7 @@
             pspace:13
         },
         theme:{
-            name:'default'
+            name:null       // default/primary/action/highlight/caution/royal
         },
         provider:{
             data : null,
@@ -290,19 +290,19 @@
             var provider = opts.provider;
             var _data_provider = (!!provider.data)? provider.data : jm.data_provider;
             var _layout_provider = (!!provider.layout)? provider.layout : jm.layout_provider;
-            var _view_provider = (!!provider.view)? provider.view : jm.view_provider;
             var _theme_provider = (!!provider.theme)? provider.theme : jm.theme_provider;
+            var _view_provider = (!!provider.view)? provider.view : jm.view_provider;
 
             // create instance of function provider 
             this.data = new _data_provider(this, opts.data);
             this.layout = new _layout_provider(this, opts.layout);
-            this.view = new _view_provider(this, opts.view);
             this.theme = new _theme_provider(this, opts.theme);
+            this.view = new _view_provider(this, opts.view);
 
             this.data.init();
             this.layout.init();
-            this.view.init();
             this.theme.init();
+            this.view.init();
 
             this.event_bind();
         },
@@ -313,6 +313,14 @@
 
         is_readonly:function(){
             return this.options.data.readonly;
+        },
+
+        set_theme:function(theme_name){
+            if(!theme_name){
+                theme_name=null;
+            }
+            this.options.theme.name = theme_name;
+            this.view.reset_theme();
         },
 
         event_bind:function(){
@@ -855,6 +863,7 @@
 
         this.cache_valid = false;
     };
+
     jm.layout_provider.prototype={
         init:function(){
             _console.debug('layout.init');
@@ -1226,12 +1235,30 @@
         },
     };
 
+    // theme provider
+    jm.theme_provider= function(jm, options){this.jm = jm; this.opts = options;};
+    jm.theme_provider.prototype={
+        init:function(){
+            _console.debug('theme.init');
+        },
+        reset:function(){
+            _console.debug('theme.reset');
+        },
+        get_theme:function(){
+            return this.opts.name;
+        },
+        set_theme:function(theme_name){
+            this.opts.name = theme_name;
+        },
+    };
+
     // view provider
     jm.view_provider= function(jm, options){
         this.opts = options;
         this.jm = jm;
         this.data= jm.data;
         this.layout = jm.layout;
+        this.theme = jm.theme;
 
         this.container = null;
         this.e_panel = null;
@@ -1311,6 +1338,16 @@
             this.selected_node = null;
             this.clear_lines();
             this.clear_nodes();
+            this.reset_theme();
+        },
+
+        reset_theme:function(){
+            var theme_name = this.theme.get_theme();
+            if(!!theme_name){
+                this.e_nodes.className = theme_name;
+            }else{
+                this.e_nodes.className = '';
+            }
         },
 
         load:function(){
@@ -1567,17 +1604,6 @@
                 pin.y + offset.y,
                 pout.x + offset.x,
                 pout.y + offset.y);
-        }
-    };
-
-    // theme provider
-    jm.theme_provider= function(jm, options){this.jm = jm; this.opts = options;};
-    jm.theme_provider.prototype={
-        init:function(){
-            _console.debug('theme.init');
-        },
-        reset:function(){
-            _console.debug('theme.reset');
         }
     };
 

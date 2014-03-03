@@ -8,6 +8,7 @@
     <style type="text/css">
         li{margin-top:2px; margin-bottom:2px;}
         button{width:140px;}
+        select{width:140px;}
         #layout{width:1210px;}
         #jsmind_nav{width:200px;float:left;}
         #file_input{width:140px;}
@@ -16,8 +17,8 @@
             float:left;
             width:1000px;
             height:600px;
-            border:solid 1px #333;
-            background:#eee;
+            border:solid 1px #ccc;
+            background:#f4f4f4;
         }
     </style>
 </head>
@@ -46,7 +47,30 @@
             <li><button onclick="remove_node();">remove node</button></li>
             <li><button onclick="toggle_node();">toggle node</button></li>
         </ol>
-        <div>4. Setting &amp; Adjusting</div>
+        <div>4. Theme</div>
+        <ol type='A'>
+        <li>
+        <select onchange="set_theme(this.value);">
+            <option value="">default</option>
+            <option value="primary">primary</option>
+            <option value="warning">warning</option>
+            <option value="danger">danger</option>
+            <option value="success">success</option>
+            <option value="info">info</option>
+            <option value="greensea">greensea</option>
+            <option value="nephrite">nephrite</option>
+            <option value="belizehole">belizehole</option>
+            <option value="wisteria">wisteria</option>
+            <option value="asphalt">asphalt</option>
+            <option value="orange">orange</option>
+            <option value="pumpkin">pumpkin</option>
+            <option value="pomegranate">pomegranate</option>
+            <option value="clouds">clouds</option>
+            <option value="asbestos">asbestos</option>
+        </select>
+        </li>
+        </ol>
+        <div>5. Setting &amp; Adjusting</div>
         <ol type='A'>
             <li><button onclick="toggle_readonly(this);">set readonly</button></li>
             <li><button onclick="change_container();">change size</button>
@@ -202,6 +226,9 @@
         if(!selected_id){alert('please select a node first.');}
 
         _jm.toggle_node(selected_id);
+    }
+    function set_theme(theme_name){
+        _jm.set_theme(theme_name);
     }
 
     function toggle_readonly(btn){
