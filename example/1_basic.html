@@ -9,8 +9,9 @@
         #jsmind_container{
             width:800px;
             height:500px;
-            border:solid 1px #333;
-            background:#eee;
+            border:solid 1px #ccc;
+            /*background:#f4f4f4;*/
+            background:#f4f4f4;
         }
     </style>
 </head>
@@ -35,6 +36,7 @@
         ];
         var options = {
             data:{readonly:false},
+            theme:{name:'primary'},
             view:{container:'jsmind_container'}
         }
         var jm = jsMind.show(options,mind);
