@@ -20,7 +20,7 @@ jmexpander:hover{border-color:#000;}
 /* primary theme */
 jmnodes.primary jmnode{background-color:#428bca;color:#fff;border-color:#357ebd;}
 jmnodes.primary jmnode:hover{background-color:#3276b1;border-color:#285e8e;}
-jmnodes.primary jmnode.selected{background-color:#11f;color:#fff;}
+jmnodes.primary jmnode.selected{background-color:#f1c40f;color:#fff;}
 jmnodes.primary jmnode.root{}
 jmnodes.primary jmexpander{}
 jmnodes.primary jmexpander:hover{}

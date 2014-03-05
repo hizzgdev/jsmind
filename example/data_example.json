@@ -1,22 +1,30 @@
-[
-{'nodeid':'root', 'isroot':true, 'topic':'jsMind'},
+{
+    "meta":{
+        "name":"jsMind",
+        "author":"hizzgdev@163.com",
+        "version":"0.2",
+        "format":"node_array"
+    },
+    "nodes":[
+        {"id":"root", "isroot":true, "topic":"jsMind"},
 
-{'nodeid':'easy', 'parentid':'root', 'topic':'Easy'},
-{'nodeid':'easy1', 'parentid':'easy', 'topic':'Easy to show'},
-{'nodeid':'easy2', 'parentid':'easy', 'topic':'Easy to edit'},
-{'nodeid':'easy3', 'parentid':'easy', 'topic':'Easy to store'},
-{'nodeid':'easy4', 'parentid':'easy', 'topic':'Easy to embed'},
+        {"id":"easy", "parentid":"root", "topic":"Easy"},
+        {"id":"easy1", "parentid":"easy", "topic":"Easy to show"},
+        {"id":"easy2", "parentid":"easy", "topic":"Easy to edit"},
+        {"id":"easy3", "parentid":"easy", "topic":"Easy to store"},
+        {"id":"easy4", "parentid":"easy", "topic":"Easy to embed"},
 
-{'nodeid':'open', 'parentid':'root', 'topic':'Open Source'},
-{'nodeid':'open1', 'parentid':'open', 'topic':'on GitHub'},
-{'nodeid':'open2', 'parentid':'open', 'topic':'BSD License'},
+        {"id":"open", "parentid":"root", "topic":"Open Source"},
+        {"id":"open1", "parentid":"open", "topic":"on GitHub"},
+        {"id":"open2", "parentid":"open", "topic":"BSD License"},
 
-{'nodeid':'powerful', 'parentid':'root', 'topic':'Powerful'},
-{'nodeid':'powerful1', 'parentid':'powerful', 'topic':'Base on Javascript'},
-{'nodeid':'powerful2', 'parentid':'powerful', 'topic':'Base on HTML5'},
-{'nodeid':'powerful3', 'parentid':'powerful', 'topic':'Depends on you'},
+        {"id":"powerful", "parentid":"root", "topic":"Powerful"},
+        {"id":"powerful1", "parentid":"powerful", "topic":"Base on Javascript"},
+        {"id":"powerful2", "parentid":"powerful", "topic":"Base on HTML5"},
+        {"id":"powerful3", "parentid":"powerful", "topic":"Depends on you"},
 
-{'nodeid':'other', 'parentid':'root', 'topic':'test node'},
-{'nodeid':'other1', 'parentid':'other', 'topic':'I\'m from ajax'},
-{'nodeid':'other2', 'parentid':'other', 'topic':'I can do everything'},
-]
+        {"id":"other", "parentid":"root", "topic":"test node"},
+        {"id":"other1", "parentid":"other", "topic":"I'm from ajax"},
+        {"id":"other2", "parentid":"other", "topic":"I can do everything"},
+    ]
+}
