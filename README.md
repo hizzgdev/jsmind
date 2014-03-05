@@ -1,6 +1,9 @@
 jsMind
 ======
 
+** be careful **
+** the data format and options of jsMind have been changed in dev branch **
+
 jsMind is a pure javascript library for mindmap. It is easy to use, to understand, and to expand itself.<br />
 jsMind is very powerful. It base on javascript and HTML5(Canvas).<br />
 jsMind is under BSD license. You can embed it in any project, if only you observe the license.<br />
