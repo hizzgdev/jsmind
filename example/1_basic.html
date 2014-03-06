@@ -25,8 +25,8 @@
                 name:'demo',
                 author:'hizzgdev@163.com',
                 version:'0.2',
-                format:'node_array'
             },
+            format:'node_array',
             nodes:[
                 {"id":"root", "isroot":true, "topic":"jsMind"},
 
@@ -44,7 +44,7 @@
         };
         var options = {
             container:'jsmind_container',
-            readonly:false,
+            editable:true,
             theme:'primary'
         }
         var jm = jsMind.show(options,mind);
