@@ -9,10 +9,10 @@
         li{margin-top:2px; margin-bottom:2px;}
         button{width:140px;}
         select{width:140px;}
-        #layout{width:1210px;}
-        #jsmind_nav{width:200px;float:left;}
-        #file_input{width:100px;}
-        #file_open_btn{width:40px;}
+        #layout{width:1230px;}
+        #jsmind_nav{width:210px;height:600px;border:solid 1px #ccc;overflow:auto;float:left;}
+        .file_input{width:100px;}
+        button.sub{width:100px;}
 
         #jsmind_container{
             float:left;
@@ -32,7 +32,11 @@
             <li><button onclick="open_ajax();">open remote</button></li>
             <li><button onclick="show_data();">get mindmap data</button></li>
             <li><button onclick="save_file();">save to local file</button></li>
-            <li><input id="file_input" type="file"/><button id="file_open_btn" onclick="open_file();">open</button></li>
+            <li>open local file</li>
+            <ol>
+                <li><input class="file_input" type="file"/></li>
+                <li><button class="sub" onclick="open_file();">open</button></li>
+            </ol>
         </ol>
         <div>2. Select &amp; Toggle</div>
         <ol type='A'>
@@ -80,6 +84,16 @@
             <li><button onclick="change_container();">resize container</button>
             <button onclick="resize_jsmind();">adusting</button></li>
         </ol>
+        <div>6. Freemind(.mm) Support</div>
+        <ol type='A'>
+            <li><button onclick="prompt_info('not implement yet');">get freemind data</button></li>
+            <li><button onclick="prompt_info('not implement yet');">save as freemind</button></li>
+            <li>open a .mm file</li>
+            <ol>
+            <li><input class="file_input" type="file"/></li>
+            <li><button class="sub" onclick="prompt_info('not implement yet');">open</button></li>
+            </ol>
+        </ol>
     </div>
     <div id="jsmind_container"></div>
 </div>
@@ -99,7 +113,7 @@
     function open_json(){
         var mind = {
             "meta":{
-                "name":"jsMind",
+                "name":"jsMind Example",
                 "author":"hizzgdev@163.com",
                 "version":"0.2"
             },
@@ -145,7 +159,7 @@
 
     function save_file(){
         var mind_data = _jm.get_data();
-        var mind_name = mind_data.name;
+        var mind_name = mind_data.meta.name;
         var mind_str = jsMind.util.json.json2string(mind_data);
         jsMind.util.file.save(mind_str,'text/jsmind',mind_name+'.jm');
     }
