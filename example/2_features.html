@@ -34,7 +34,7 @@
             <li><button onclick="save_file();">save to local file</button></li>
             <li>open local file</li>
             <ol>
-                <li><input class="file_input" type="file"/></li>
+                <li><input id="file_input" class="file_input" type="file"/></li>
                 <li><button class="sub" onclick="open_file();">open</button></li>
             </ol>
         </ol>
@@ -90,8 +90,8 @@
             <li><button onclick="prompt_info('not implement yet');">save as freemind</button></li>
             <li>open a .mm file</li>
             <ol>
-            <li><input class="file_input" type="file"/></li>
-            <li><button class="sub" onclick="prompt_info('not implement yet');">open</button></li>
+            <li><input id="file_input_freemind" class="file_input" type="file"/></li>
+            <li><button class="sub" onclick="open_freemind();">open</button></li>
             </ol>
         </ol>
     </div>
@@ -169,7 +169,7 @@
         var files = file_input.files;
         if(files.length > 0){
             var file_data = files[0];
-            jsMind.util.file.read(file_data,function(jsmind_data){
+            jsMind.util.file.read(file_data,function(jsmind_data, jsmind_name){
                 var mind = jsMind.util.json.string2json(jsmind_data);
                 if(!!mind){
                     _jm.show(mind);
@@ -279,6 +279,23 @@
 
     function resize_jsmind(){
         _jm.resize();
+    }
+    
+    function open_freemind(){
+        var file_input = document.getElementById('file_input_freemind');
+        var files = file_input.files;
+        if(files.length > 0){
+            var file_data = files[0];
+            jsMind.util.file.read(file_data,function(jsmind_data, jsmind_name){
+                var mind = jsmind_data;
+                if(!!mind){
+                    _jm.show(mind);
+                    //_jm.mind.meta.name = jsmind_name;
+                }else{
+                    prompt_info('can not open this file as mindmap');
+                }
+            });
+        }
     }
 
     function prompt_info(msg){

@@ -127,7 +127,6 @@
             }else{
                 _console.error('root node is already exist');
             }
-            _console.log(this);
         },
 
         add_node:function(parent_node, nodeid, topic, data, idx){
@@ -401,8 +400,77 @@
         },
         freemind:{
             get_mind:function(xml){
+                var df = jm.format.freemind;
+                var xml_doc = df._parse_xml(xml);
+                var xml_root = df._find_root(xml_doc);
+                var mind = new jm.mind();
+                df._load_node(mind, null, xml_root);
+                //mind.name = source.meta.name;
+                //mind.author = source.meta.author;
+                //mind.version = source.meta.version;
+                return mind;
             },
+
             get_data:function(mind){
+
+            },
+
+            _parse_xml:function(xml){
+                var xml_doc = null;
+                if (window.DOMParser){
+                    var parser = new DOMParser();
+                    xml_doc = parser.parseFromString(xml,"text/xml");
+                }else{ // Internet Explorer
+                    xml_doc = new ActiveXObject("Microsoft.XMLDOM");
+                    xml_doc.async = false;
+                    xml_doc.loadXML(xml); 
+                }
+                return xml_doc;
+            },
+
+            _find_root:function(xml_doc){
+                var nodes = xml_doc.childNodes;
+                var node = null;
+                var root = null;
+                var n = null;
+                for(var i=0;i<nodes.length;i++){
+                    n = nodes[i];
+                    if(n.nodeType == 1 && n.tagName == 'map'){
+                        node = n;
+                        break;
+                    }
+                }
+                if(!!node){
+                    var ns = node.childNodes;
+                    node = null;
+                    for(var i=0;i<ns.length;i++){
+                        n = ns[i];
+                        if(n.nodeType == 1 && n.tagName == 'node'){
+                            node = n;
+                            break;
+                        }
+                    }
+                }
+                return node;
+            },
+
+            _load_node:function(mind, parent_id, xml_node){
+                var df = jm.format.freemind;
+                var node_id = xml_node.getAttribute('ID');
+                var node_topic = xml_node.getAttribute('TEXT');
+                if(!!parent_id){
+                    mind.add_node(parent_id, node_id, node_topic);
+                }else{
+                    mind.set_root(node_id, node_topic);
+                }
+                var children = xml_node.childNodes;
+                var child = null;
+                for(var i=0;i<children.length;i++){
+                    child = children[i];
+                    if(child.nodeType == 1 && child.tagName == 'node'){
+                        df._load_node(mind, node_id, child);
+                    }
+                }
             }
         },
     };
@@ -506,7 +574,7 @@
                 var reader = new FileReader();
                 reader.onload = function(){
                     if(typeof(fn_callback) == 'function'){
-                        fn_callback(this.result);
+                        fn_callback(this.result, file_data.name);
                     }
                 };
                 reader.readAsText(file_data);
@@ -713,7 +781,12 @@
             var m = mind || jm.format.node_array.example;
 
             this.mind = this.data.load(m);
-            _console.debug('data.load ok');
+            if(!this.mind){
+                _console.error('data.load error');
+                return;
+            }else{
+                _console.debug('data.load ok');
+            }
 
             this.view.load();
             _console.debug('view.load ok');
@@ -861,12 +934,18 @@
         },
 
         get_selected_node:function(){
-            return this.mind.selected;
+            if(!!this.mind){
+                return this.mind.selected;
+            }else{
+                return null;
+            }
         },
 
         select_clear:function(){
-            this.mind.selected = null;
-            this.view.select_clear();
+            if(!!this.mind){
+                this.mind.selected = null;
+                this.view.select_clear();
+            }
         },
 
         resize:function(){
