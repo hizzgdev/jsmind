@@ -67,7 +67,7 @@
     // ============= static object =============================================
     jm.direction = {left:-1,center:0,right:1};
 
-    jm.node = function(sId,iIndex,sTopic,oData,bIsRoot,oParent){
+    jm.node = function(sId,iIndex,sTopic,oData,bIsRoot,oParent,eDirection){
         if(!sId){_console.error('invalid nodeid');return;}
         if(typeof(iIndex) != 'number'){_console.error('invalid node index');return;}
         this.id = sId;
@@ -76,6 +76,7 @@
         this.data = oData;
         this.isroot = bIsRoot;
         this.parent = oParent;
+        this.direction = eDirection;
         this.children = [];
         this._data = {};
     };
@@ -122,20 +123,35 @@
 
         set_root:function(nodeid, topic, data){
             if(this.root == null){
-                this.root = new jm.node(nodeid, 0, topic, data, true, null);
+                this.root = new jm.node(nodeid, 0, topic, data, true);
                 this._put_node(this.root);
             }else{
                 _console.error('root node is already exist');
             }
         },
 
-        add_node:function(parent_node, nodeid, topic, data, idx){
+        add_node:function(parent_node, nodeid, topic, data, idx, direction){
             if(typeof parent_node == 'string'){
-                return this.add_node(this.get_node(parent_node), nodeid, topic, data, idx);
+                return this.add_node(this.get_node(parent_node), nodeid, topic, data, idx, direction);
             }
             var nodeindex = idx || -1;
             if(!!parent_node){
-                var node = new jm.node(nodeid,nodeindex,topic,data,false,parent_node);
+                _console.debug(parent_node);
+                var node = null;
+                if(parent_node.isroot){
+                    var d = jm.direction.left;
+                    if(isNaN(direction) || direction != jm.direction.left){
+                        d = jm.direction.right;
+                    }
+                    if(d == jm.direction.left){
+                        this._view.left_count++;
+                    }else{
+                        this._view.right_count++;
+                    }
+                    node = new jm.node(nodeid,nodeindex,topic,data,false,parent_node,d);
+                }else{
+                    node = new jm.node(nodeid,nodeindex,topic,data,false,parent_node);
+                }
                 if(this._put_node(node)){
                     parent_node.children.push(node);
                     this._reindex(parent_node);
@@ -178,7 +194,7 @@
 
         move_node:function(nodeid, beforeid){
             var node = this.get_node(nodeid);
-            if(!!beforeid){
+            if(!!node && !!beforeid){
                 if(beforeid == '_last_'){
                     node.index = -1;
                     this._reindex(node.parent);
@@ -273,7 +289,7 @@
                 },
                 "format":"node_array",
                 "nodes":[
-                    {"id":"root","topic":"jsMind Example", "isroot":true, "custom":"my value"}
+                    {"id":"root","topic":"jsMind Example", "isroot":true}
                 ]
             },
 
@@ -340,7 +356,12 @@
                     node_json = node_array[i];
                     if(node_json.parentid == parentid){
                         data = df._extract_data(node_json);
-                        mind.add_node(parentid, node_json.id, node_json.topic, data);
+                        var d = null;
+                        var node_direction = node_json.direction;
+                        if(!!node_direction){
+                            d = node_direction == 'left'?jm.direction.left:jm.direction.right;
+                        }
+                        mind.add_node(parentid, node_json.id, node_json.topic, data, null, d);
                         node_array.splice(i,1);
                         extract_count ++;
                         var sub_extract_count = df._extract_subnode(mind, node_json.id, node_array);
@@ -357,7 +378,7 @@
             _extract_data:function(node_json){
                 var data = {};
                 for(var k in node_json){
-                    if(k == 'id' || k=='topic' || k=='parentid' || k=='isroot'){
+                    if(k == 'id' || k=='topic' || k=='parentid' || k=='isroot' || k=='direction'){
                         continue;
                     }
                     data[k] = node_json[k];
@@ -373,11 +394,16 @@
             _array_node:function(node, node_array){
                 var df = jm.format.node_array;
                 if(!(node instanceof jm.node)){return;}
+                var d = undefined;
+                if(!!node.parent && node.parent.isroot){
+                    d = node.direction == jm.direction.left?'left':'right';
+                }
                 var o = {
                     id : node.id,
                     topic : node.topic,
                     parentid : (!!node.parent)?node.parent.id:undefined,
-                    isroot : node.isroot?true:undefined
+                    isroot : node.isroot?true:undefined,
+                    direction:d
                 };
                 if(node.data != null){
                     for(var k in node.data){
@@ -458,8 +484,14 @@
                 var df = jm.format.freemind;
                 var node_id = xml_node.getAttribute('ID');
                 var node_topic = xml_node.getAttribute('TEXT');
+                var node_position = xml_node.getAttribute('POSITION');
+                var node_direction = null;
+                if(!!node_position){
+                    node_direction = node_position=='left'?jm.direction.left:jm.direction.right;
+                }
+                _console.debug(node_position +':'+ node_direction);
                 if(!!parent_id){
-                    mind.add_node(parent_id, node_id, node_topic);
+                    mind.add_node(parent_id, node_id, node_topic, null, null, node_direction);
                 }else{
                     mind.set_root(node_id, node_topic);
                 }
@@ -1039,6 +1071,7 @@
 
         _layout_direction_root:function(){
             var node = this.jm.mind.root;
+            _console.debug(node);
             var layout_data = null;
             if('layout' in node._data){
                 layout_data = node._data.layout;
@@ -1051,16 +1084,23 @@
             layout_data.direction = jm.direction.center;
             layout_data.side_index = 0;
             if(this.isside){
-                layout_data.left_count = 0;
-                layout_data.right_count = children_count;
                 var i = children_count;
                 while(i--){
                     this._layout_direction_side(children[i], jm.direction.right, i);
                 }
             }else{
+                var i = children_count;
+                var subnode = null;
+                while(i--){
+                    subnode = children[i];
+                    if(subnode.direction == jm.direction.left){
+                        this._layout_direction_side(subnode,jm.direction.left, i);
+                    }else{
+                        this._layout_direction_side(subnode,jm.direction.right, i);
+                    }
+                }
+                /*
                 var boundary = Math.ceil(children_count/2);
-                layout_data.left_count = children_count - boundary;
-                layout_data.right_count = boundary;
                 var i = children_count;
                 while(i--){
                     if(i>=boundary){
@@ -1068,7 +1108,8 @@
                     }else{
                         this._layout_direction_side(children[i],jm.direction.right, i);
                     }
-                }
+                }*/
+
             }
         },
 
@@ -1085,13 +1126,6 @@
 
             layout_data.direction = direction;
             layout_data.side_index = side_index;
-            if(direction == jm.direction.right){
-                layout_data.right_count = children_count;
-                layout_data.left_count = 0;
-            }else{
-                layout_data.left_count = children_count;
-                layout_data.right_count = 0;
-            }
             var i = children_count;
             while(i--){
                 this._layout_direction_side(children[i], direction, i);
@@ -1114,7 +1148,7 @@
                 if(subnode._data.layout.direction == jm.direction.right){
                     right_nodes.unshift(subnode);
                 }else{
-                    left_nodes.push(subnode);
+                    left_nodes.unshift(subnode);
                 }
             }
             layout_data.left_nodes = left_nodes;

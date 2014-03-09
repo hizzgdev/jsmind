@@ -16,9 +16,11 @@
     </style>
 </head>
 <body>
+<input type="file" onchange="load_file(this);"/>
 <div id="jsmind_container"></div>
 <script type="text/javascript" src="../js/jsmind.js"></script>
 <script type="text/javascript">
+    var _jm = null;
     function load_jsmind(){
         var mind = {
             meta:{
@@ -47,12 +49,27 @@
             readonly:false,
             theme:'primary'
         }
-        var jm = jsMind.show(options,mind);
+        _jm = jsMind.show(options,mind);
         // jm.set_readonly(true);
         // var mind_data = jm.get_data();
         // alert(mind_data);
     }
     
+    function load_file(fi){
+        var files = fi.files;
+        if(files.length > 0){
+            var file_data = files[0];
+            jsMind.util.file.read(file_data, function(jsmind_data, jsmind_name){
+                var mind = jsmind_data;
+                if(!!mind){
+                    _jm.show(mind);
+                }else{
+                    console.error('can not open this file as mindmap');
+                }
+            });
+        }
+    }
+
     load_jsmind();
 </script>
 </body>
