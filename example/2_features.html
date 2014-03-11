@@ -9,9 +9,10 @@
         li{margin-top:2px; margin-bottom:2px;}
         button{width:140px;}
         select{width:140px;}
-        #layout{width:1210px;}
-        #jsmind_nav{width:200px;float:left;}
-        #file_input{width:140px;}
+        #layout{width:1230px;}
+        #jsmind_nav{width:210px;height:600px;border:solid 1px #ccc;overflow:auto;float:left;}
+        .file_input{width:100px;}
+        button.sub{width:100px;}
 
         #jsmind_container{
             float:left;
@@ -25,27 +26,31 @@
 <body>
 <div id="layout">
     <div id="jsmind_nav">
-        <div>1. Open &amp; Save</div>
+        <div>1. Open</div>
         <ol type='A'>
             <li><button onclick="open_json();">open example</button></li>
             <li><button onclick="open_ajax();">open remote</button></li>
-            <li><button onclick="save_file();">save to local file</button></li>
-            <li><div><input id="file_input" type="file"/></div><button onclick="open_file();">open local file</button></li>
-            <li><button onclick="show_data();">get mindmap data</button></li>
+            <li><button onclick="prompt_info('see 6.Multi Format');">open local file</button></li>
+            <li><button onclick="prompt_info('see 6.Multi Format');">save local file</button></li>
         </ol>
-        <div>2. Select &amp; Edit</div>
+        </ol>
+        <div>2. Select &amp; Toggle</div>
         <ol type='A'>
             <li><button onclick="select_node();">select a node</button></li>
-            <li>try click a node</li>
+            <li><button onclick="prompt_info('please try click a node');">try click a node</button></li>
             <li><button onclick="show_selected();">get the selected</button></li>
+            <li><button onclick="toggle_node();">toggle node</button></li>
+        </ol>
+        <div>3. Edit</div>
+        <ol type='A'>
+            <li><button onclick="toggle_editable(this);">disable editable</button></li>
             <li><button onclick="add_node();">add a node</button></li>
             <li><button onclick="modify_node();">modify node</button></li>
-            <li>try double click</li>
+            <li><button onclick="prompt_info('please try double click a node');">try double click</button></li>
             <li><button onclick="move_node();">move a node</button></li>
             <li><button onclick="move_to_first();">move to first</button></li>
             <li><button onclick="move_to_last();">move to last</button></li>
             <li><button onclick="remove_node();">remove node</button></li>
-            <li><button onclick="toggle_node();">toggle node</button></li>
         </ol>
         <div>4. Theme</div>
         <ol type='A'>
@@ -57,7 +62,7 @@
             <option value="danger">danger</option>
             <option value="success">success</option>
             <option value="info">info</option>
-            <option value="greensea">greensea</option>
+            <option value="greensea" selected="selected">greensea</option>
             <option value="nephrite">nephrite</option>
             <option value="belizehole">belizehole</option>
             <option value="wisteria">wisteria</option>
@@ -70,11 +75,34 @@
         </select>
         </li>
         </ol>
-        <div>5. Setting &amp; Adjusting</div>
+        <div>5. Adjusting</div>
         <ol type='A'>
-            <li><button onclick="toggle_readonly(this);">set readonly</button></li>
-            <li><button onclick="change_container();">change size</button>
-            <button onclick="resize_jsmind();">adusting it</button></li>
+            <li><button onclick="change_container();">resize container</button>
+            <button onclick="resize_jsmind();">adusting</button></li>
+        </ol>
+        <div>6. Multi Format</div>
+        <ol type='A'>
+            <li>node_tree(default)</li>
+            <ol>
+                <li><button class="sub" onclick="show_data();">show data</button></li>
+                <li><button class="sub" onclick="save_file();">save file</button></li>
+                <li><input id="file_input" class="file_input" type="file"/></li>
+                <li><button class="sub" onclick="open_file();">open file</button></li>
+            </ol>
+            <li>node_array</li>
+            <ol>
+                <li><button class="sub" onclick="get_nodearray_data();">show data</button></li>
+                <li><button class="sub" onclick="save_nodearray_file();">save file</button></li>
+                <li><input id="file_input_nodearray" class="file_input" type="file"/></li>
+                <li><button class="sub" onclick="open_nodearray();">open file</button></li>
+            </ol>
+            <li>freemind(.mm)</li>
+            <ol>
+                <li><button class="sub" onclick="get_freemind_data();">show data</button></li>
+                <li><button class="sub" onclick="save_freemind_file();">save file</button></li>
+                <li><input id="file_input_freemind" class="file_input" type="file"/></li>
+                <li><button class="sub" onclick="open_freemind();">open file</button></li>
+            </ol>
         </ol>
     </div>
     <div id="jsmind_container"></div>
@@ -84,36 +112,44 @@
     var _jm = null;
     function open_empty(){
         var options = {
-            data:{readonly:false},
-            view:{container:'jsmind_container'}
+            container:'jsmind_container',
+            theme:'greensea',
+            editable:true
         }
         _jm = jsMind.show(options);
         // _jm = jsMind.show(options,mind);
     }
 
     function open_json(){
-        var mind = [
-            {'nodeid':'root', 'isroot':true, 'topic':'jsMind'},
-
-            {'nodeid':'easy', 'parentid':'root', 'topic':'Easy'},
-            {'nodeid':'easy1', 'parentid':'easy', 'topic':'Easy to show'},
-            {'nodeid':'easy2', 'parentid':'easy', 'topic':'Easy to edit'},
-            {'nodeid':'easy3', 'parentid':'easy', 'topic':'Easy to store'},
-            {'nodeid':'easy4', 'parentid':'easy', 'topic':'Easy to embed'},
-
-            {'nodeid':'open', 'parentid':'root', 'topic':'Open Source'},
-            {'nodeid':'open1', 'parentid':'open', 'topic':'on GitHub'},
-            {'nodeid':'open2', 'parentid':'open', 'topic':'BSD License'},
-
-            {'nodeid':'other', 'parentid':'root', 'topic':'test node'},
-            {'nodeid':'other1', 'parentid':'other', 'topic':'I\'m from js variable'},
-            {'nodeid':'other2', 'parentid':'other', 'topic':'I can do everything'},
-
-            {'nodeid':'powerful', 'parentid':'root', 'topic':'Powerful'},
-            {'nodeid':'powerful1', 'parentid':'powerful', 'topic':'Base on Javascript'},
-            {'nodeid':'powerful2', 'parentid':'powerful', 'topic':'Base on HTML5'},
-            {'nodeid':'powerful3', 'parentid':'powerful', 'topic':'Depends on you'},
-        ];
+        var mind = {
+            "meta":{
+                "name":"jsMind remote",
+                "author":"hizzgdev@163.com",
+                "version":"0.2"
+            },
+            "format":"node_tree",
+            "data":{"id":"root","topic":"jsMind","children":[
+                {"id":"easy","topic":"Easy","direction":"left","children":[
+                    {"id":"easy1","topic":"Easy to show"},
+                    {"id":"easy2","topic":"Easy to edit"},
+                    {"id":"easy3","topic":"Easy to store"},
+                    {"id":"easy4","topic":"Easy to embed"}
+                ]},
+                {"id":"open","topic":"Open Source","direction":"right","children":[
+                    {"id":"open1","topic":"on GitHub"},
+                    {"id":"open2","topic":"BSD License"}
+                ]},
+                {"id":"powerful","topic":"Powerful","direction":"right","children":[
+                    {"id":"powerful1","topic":"Base on Javascript"},
+                    {"id":"powerful2","topic":"Base on HTML5"},
+                    {"id":"powerful3","topic":"Depends on you"}
+                ]},
+                {"id":"other","topic":"test node","direction":"left","children":[
+                    {"id":"other1","topic":"I'm from local variable"},
+                    {"id":"other2","topic":"I can do everything"}
+                ]}
+            ]}
+        }
         _jm.show(mind);
     }
 
@@ -124,9 +160,15 @@
         });
     }
 
+    function show_data(){
+        var mind_data = _jm.get_data();
+        var mind_string = jsMind.util.json.json2string(mind_data);
+        prompt_info(mind_string);
+    }
+
     function save_file(){
         var mind_data = _jm.get_data();
-        var mind_name = _jm.get_root().topic;
+        var mind_name = mind_data.meta.name;
         var mind_str = jsMind.util.json.json2string(mind_data);
         jsMind.util.file.save(mind_str,'text/jsmind',mind_name+'.jm');
     }
@@ -136,21 +178,17 @@
         var files = file_input.files;
         if(files.length > 0){
             var file_data = files[0];
-            jsMind.util.file.read(file_data,function(jsmind_data){
+            jsMind.util.file.read(file_data,function(jsmind_data, jsmind_name){
                 var mind = jsMind.util.json.string2json(jsmind_data);
                 if(!!mind){
                     _jm.show(mind);
                 }else{
-                    alert('can not open this file as mindmap');
+                    prompt_info('can not open this file as mindmap');
                 }
             });
+        }else{
+            prompt_info('please choose a file first')
         }
-    }
-
-    function show_data(){
-        var mind_data = _jm.get_data();
-        var mind_string = jsMind.util.json.json2string(mind_data);
-        alert(mind_string);
     }
 
     function select_node(){
@@ -161,10 +199,17 @@
     function show_selected(){
         var selected_node = _jm.get_selected_node();
         if(!!selected_node){
-            alert(selected_node.topic);
+            prompt_info(selected_node.topic);
         }else{
-            alert('nothing');
+            prompt_info('nothing');
         }
+    }
+
+    function toggle_node(){
+        var selected_id = get_selected_nodeid();
+        if(!selected_id){prompt_info('please select a node first.');}
+
+        _jm.toggle_node(selected_id);
     }
 
     function get_selected_nodeid(){
@@ -177,17 +222,17 @@
     }
 
     function add_node(){
-        var selected_id = get_selected_nodeid(); // as parent of new node
-        if(!selected_id){alert('please select a node first.');}
+        var selected_node = _jm.get_selected_node(); // as parent of new node
+        if(!selected_node){prompt_info('please select a node first.');}
 
         var nodeid = jsMind.util.uuid.newid();
-        var topic = '*** Node_'+nodeid.substr(0,5)
-        var node = _jm.add_node(nodeid, selected_id, topic, 'This is New Node');
+        var topic = '* Node_'+nodeid.substr(0,5)+' *';
+        var node = _jm.add_node(selected_node, nodeid, topic);
     }
 
     function modify_node(){
         var selected_id = get_selected_nodeid();
-        if(!selected_id){alert('please select a node first.');}
+        if(!selected_id){prompt_info('please select a node first.');}
 
         // modify the topic
         _jm.update_node(selected_id, '--- modified ---');
@@ -197,14 +242,14 @@
 
     function move_to_first(){
         var selected_id = get_selected_nodeid();
-        if(!selected_id){alert('please select a node first.');}
+        if(!selected_id){prompt_info('please select a node first.');}
 
         _jm.move_node(selected_id,'_first_');
     }
 
     function move_to_last(){
         var selected_id = get_selected_nodeid();
-        if(!selected_id){alert('please select a node first.');}
+        if(!selected_id){prompt_info('please select a node first.');}
 
         _jm.move_node(selected_id,'_last_');
     }
@@ -216,25 +261,24 @@
 
     function remove_node(){
         var selected_id = get_selected_nodeid();
-        if(!selected_id){alert('please select a node first.');}
+        if(!selected_id){prompt_info('please select a node first.');}
 
         _jm.remove_node(selected_id);
     }
 
-    function toggle_node(){
-        var selected_id = get_selected_nodeid();
-        if(!selected_id){alert('please select a node first.');}
-
-        _jm.toggle_node(selected_id);
-    }
     function set_theme(theme_name){
         _jm.set_theme(theme_name);
     }
 
-    function toggle_readonly(btn){
-        var readonly = _jm.is_readonly();
-        _jm.set_readonly(!readonly);
-        btn.innerHTML = readonly?'set readonly':'unset readonly';
+    function toggle_editable(btn){
+        var editable = _jm.get_editable();
+        if(editable){
+            _jm.disable_edit();
+            btn.innerHTML = 'enable editable';
+        }else{
+            _jm.enable_edit();
+            btn.innerHTML = 'disable editable';
+        }
     }
 
     // this method change size of container, perpare for adjusting jsmind
@@ -246,6 +290,80 @@
 
     function resize_jsmind(){
         _jm.resize();
+    }
+
+    function get_nodearray_data(){
+        var mind_data = _jm.get_data('node_array');
+        var mind_string = jsMind.util.json.json2string(mind_data);
+        prompt_info(mind_string);
+    }
+
+    function save_nodearray_file(){
+        var mind_data = _jm.get_data('node_array');
+        var mind_name = mind_data.meta.name;
+        var mind_str = jsMind.util.json.json2string(mind_data);
+        jsMind.util.file.save(mind_str,'text/jsmind',mind_name+'.jm');
+    }
+    
+    function open_nodearray(){
+        var file_input = document.getElementById('file_input_nodearray');
+        var files = file_input.files;
+        if(files.length > 0){
+            var file_data = files[0];
+            jsMind.util.file.read(file_data,function(jsmind_data, jsmind_name){
+                var mind = jsMind.util.json.string2json(jsmind_data);
+                if(!!mind){
+                    _jm.show(mind);
+                }else{
+                    prompt_info('can not open this file as mindmap');
+                }
+            });
+        }else{
+            prompt_info('please choose a file first')
+        }
+    }
+
+    function get_freemind_data(){
+        var mind_data = _jm.get_data('freemind');
+        var mind_string = jsMind.util.json.json2string(mind_data);
+        alert(mind_string);
+    }
+
+    function save_freemind_file(){
+        var mind_data = _jm.get_data('freemind');
+        var mind_name = mind_data.meta.name || 'freemind';
+        var mind_str = mind_data.data;
+        jsMind.util.file.save(mind_str,'text/xml',mind_name+'.mm');
+    }
+    
+    function open_freemind(){
+        var file_input = document.getElementById('file_input_freemind');
+        var files = file_input.files;
+        if(files.length > 0){
+            var file_data = files[0];
+            jsMind.util.file.read(file_data, function(freemind_data, freemind_name){
+                if(freemind_data){
+                    var mind = {
+                        "meta":{
+                            "name":freemind_name,
+                            "author":"hizzgdev@163.com",
+                            "version":"1.0.1"
+                        },
+                        "format":"freemind",
+                        "data":freemind_data
+                    };
+                    _jm.show(mind);
+                }else{
+                    prompt_info('can not open this file as mindmap');
+                }
+            });
+        }else{
+            prompt_info('please choose a file first')
+        }
+    }
+
+    function prompt_info(msg){
+        alert(msg);
     }
 
     open_empty();
