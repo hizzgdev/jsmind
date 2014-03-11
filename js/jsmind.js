@@ -143,11 +143,6 @@
                     if(isNaN(direction) || direction != jm.direction.left){
                         d = jm.direction.right;
                     }
-                    if(d == jm.direction.left){
-                        this._view.left_count++;
-                    }else{
-                        this._view.right_count++;
-                    }
                     node = new jm.node(nodeid,nodeindex,topic,data,false,parent_node,d);
                 }else{
                     node = new jm.node(nodeid,nodeindex,topic,data,false,parent_node);
@@ -274,12 +269,106 @@
                 }
             }
         },
-
     };
 
-
-
     jm.format = {
+        node_tree:{
+            example:{
+                "meta":{
+                    "name":__name__,
+                    "author":__author__,
+                    "version":__version__
+                },
+                "format":"node_tree",
+                "data":{"id":"root","topic":"jsMind Example"}
+            },
+            get_mind:function(source){
+                var df = jm.format.node_tree;
+                var mind = new jm.mind();
+                mind.name = source.meta.name;
+                mind.author = source.meta.author;
+                mind.version = source.meta.version;
+                df._parse(mind,source.data);
+                return mind;
+            },
+            get_data:function(mind){
+                var df = jm.format.node_tree;
+                var json = {};
+                json.meta = {
+                    name : mind.name,
+                    author : mind.author,
+                    version : mind.version
+                };
+                json.format = "node_tree";
+                json.data = df._buildnode(mind.root);
+                return json;
+            },
+
+            _parse:function(mind, node_root){
+                var df = jm.format.node_tree;
+                var data = df._extract_data(node_root);
+                mind.set_root(node_root.id, node_root.topic, data);
+                if('children' in node_root){
+                    var children = node_root.children;
+                    for(var i=0;i<children.length;i++){
+                        df._extract_subnode(mind, mind.root, children[i]);
+                    }
+                }
+            },
+
+            _extract_data:function(node_json){
+                var data = {};
+                for(var k in node_json){
+                    if(k == 'id' || k=='topic' || k=='children' || k=='direction'){
+                        continue;
+                    }
+                    data[k] = node_json[k];
+                }
+                return data;
+            },
+
+            _extract_subnode:function(mind, node_parent, node_json){
+                var df = jm.format.node_tree;
+                var data = df._extract_data(node_json);
+                var d = null;
+                if(node_parent.isroot){
+                    d = node_json.direction == 'left'?jm.direction.left:jm.direction.right;
+                }
+                var node = mind.add_node(node_parent, node_json.id, node_json.topic, data, null, d);
+                if('children' in node_json){
+                    var children = node_json.children;
+                    for(var i=0;i<children.length;i++){
+                        df._extract_subnode(mind, node, children[i]);
+                    }
+                }
+            },
+
+            _buildnode:function(node){
+                var df = jm.format.node_tree;
+                if(!(node instanceof jm.node)){return;}
+                var o = {
+                    id : node.id,
+                    topic : node.topic
+                };
+                if(!!node.parent && node.parent.isroot){
+                    o.direction = node.direction == jm.direction.left?'left':'right';
+                }
+                if(node.data != null){
+                    for(var k in node.data){
+                        o[k] = node.data.k;
+                    }
+                }
+                var children = node.children;
+                if(children.length > 0){
+                    o.children = [];
+                    for(var i=0;i<children.length;i++){
+                        o.children.push(df._buildnode(children[i]));
+                    }
+                }
+                return o;
+            }
+        },
+
         node_array:{
             example:{
                 "meta":{
@@ -288,19 +377,18 @@
                     "version":__version__
                 },
                 "format":"node_array",
-                "nodes":[
+                "data":[
                     {"id":"root","topic":"jsMind Example", "isroot":true}
                 ]
             },
 
             get_mind:function(source){
-                _console.log(source);
                 var df = jm.format.node_array;
                 var mind = new jm.mind();
                 mind.name = source.meta.name;
                 mind.author = source.meta.author;
                 mind.version = source.meta.version;
-                df._parse(mind,source.nodes);
+                df._parse(mind,source.data);
                 return mind;
             },
 
@@ -313,8 +401,8 @@
                     version : mind.version
                 };
                 json.format = "node_array";
-                json.nodes = [];
-                df._array(mind,json.nodes);
+                json.data = [];
+                df._array(mind,json.data);
                 return json;
             },
 
@@ -394,17 +482,19 @@
             _array_node:function(node, node_array){
                 var df = jm.format.node_array;
                 if(!(node instanceof jm.node)){return;}
-                var d = undefined;
-                if(!!node.parent && node.parent.isroot){
-                    d = node.direction == jm.direction.left?'left':'right';
-                }
                 var o = {
                     id : node.id,
-                    topic : node.topic,
-                    parentid : (!!node.parent)?node.parent.id:undefined,
-                    isroot : node.isroot?true:undefined,
-                    direction:d
+                    topic : node.topic
                 };
+                if(!!node.parent){
+                    o.parentid = node.parent.id;
+                }
+                if(node.isroot){
+                    o.isroot = true;
+                }
+                if(!!node.parent && node.parent.isroot){
+                    o.direction = node.direction == jm.direction.left?'left':'right';
+                }
                 if(node.data != null){
                     for(var k in node.data){
                         o[k] = node.data.k;
@@ -418,27 +508,44 @@
             },
         },
 
-        node_tree:{
-            get_mind:function(json_object){
-            },
-            get_data:function(mind){
-            }
-        },
         freemind:{
-            get_mind:function(xml){
+            example:{
+                "meta":{
+                    "name":__name__,
+                    "author":__author__,
+                    "version":__version__
+                },
+                "format":"freemind",
+                "data":"<map version=\"1.0.1\"><node ID=\"root\" TEXT=\"freemind Example\"/></map>"
+            },
+            get_mind:function(source){
                 var df = jm.format.freemind;
+                var mind = new jm.mind();
+                mind.name = source.meta.name;
+                mind.author = source.meta.author;
+                mind.version = source.meta.version;
+                var xml = source.data;
                 var xml_doc = df._parse_xml(xml);
                 var xml_root = df._find_root(xml_doc);
-                var mind = new jm.mind();
                 df._load_node(mind, null, xml_root);
-                //mind.name = source.meta.name;
-                //mind.author = source.meta.author;
-                //mind.version = source.meta.version;
                 return mind;
             },
 
             get_data:function(mind){
-
+                var df = jm.format.freemind;
+                var json = {};
+                json.meta = {
+                    name : mind.name,
+                    author : mind.author,
+                    version : mind.version
+                };
+                json.format = "freemind";
+                var xmllines = [];
+                xmllines.push('<map version=\"1.0.1\">');
+                df._buildmap(mind.root, xmllines);
+                xmllines.push('</map>');
+                json.data = xmllines.join(' ');
+                return json;
             },
 
             _parse_xml:function(xml){
@@ -503,7 +610,31 @@
                         df._load_node(mind, node_id, child);
                     }
                 }
-            }
+            },
+
+            _buildmap:function(node, xmllines){
+                var df = jm.format.freemind;
+                var pos = null;
+                if(!!node.parent && node.parent.isroot){
+                    pos = node.direction === jm.direction.left?'left':'right';
+                }
+                xmllines.push('<node');
+                xmllines.push('ID=\"'+node.id+'\"');
+                if(!!pos){
+                    xmllines.push('POSITION=\"'+pos+'\"');
+                }
+                xmllines.push('TEXT=\"'+node.topic+'\"');
+                var children = node.children;
+                if(children.length>0){
+                    xmllines.push('>');
+                    for(var i=0;i<children.length;i++){
+                        df._buildmap(children[i], xmllines);
+                    }
+                    xmllines.push('</node>');
+                }else{
+                    xmllines.push('/>');
+                }
+            },
         },
     };
 
@@ -847,7 +978,7 @@
         },
 
         get_data: function(data_format){
-            var df = data_format || 'node_array';
+            var df = data_format || 'node_tree';
             return this.data.get_data(df);
         },
 
@@ -1007,7 +1138,7 @@
                 if(!!mind_data.format){
                     df = mind_data.format;
                 }else{
-                    df = 'node_array';
+                    df = 'node_tree';
                 }
             }else{
                 df = 'freemind';
