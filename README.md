@@ -82,7 +82,7 @@ It is very easy, is not it?
 ### 1.4. Data format
 3 data formats are supported:
 
-**node tree**
+**node tree**(default)
 
         {
             "meta":{
@@ -114,7 +114,7 @@ It is very easy, is not it?
             ]}
         }
 
-**node array**
+**node array**(easy for deal with data from database)
 
         {
             "meta":{
@@ -126,24 +126,24 @@ It is very easy, is not it?
             "data":[
                 {"id":"root", "isroot":true, "topic":"jsMind"},
 
-                {"id":"easy", "parentid":"root", "topic":"Easy"},
+                {"id":"easy", "parentid":"root", "topic":"Easy", "direction":"left"},
                 {"id":"easy1", "parentid":"easy", "topic":"Easy to show"},
                 {"id":"easy2", "parentid":"easy", "topic":"Easy to edit"},
                 {"id":"easy3", "parentid":"easy", "topic":"Easy to store"},
                 {"id":"easy4", "parentid":"easy", "topic":"Easy to embed"},
 
-                {"id":"open", "parentid":"root", "topic":"Open Source"},
+                {"id":"open", "parentid":"root", "topic":"Open Source", "direction":"right"},
                 {"id":"open1", "parentid":"open", "topic":"on GitHub"},
                 {"id":"open2", "parentid":"open", "topic":"BSD License"},
 
-                {"id":"powerful", "parentid":"root", "topic":"Powerful"},
+                {"id":"powerful", "parentid":"root", "topic":"Powerful", "direction":"right"},
                 {"id":"powerful1", "parentid":"powerful", "topic":"Base on Javascript"},
                 {"id":"powerful2", "parentid":"powerful", "topic":"Base on HTML5"},
                 {"id":"powerful3", "parentid":"powerful", "topic":"Depends on you"},
             ]
         }
 
-**freemind**
+**freemind** (for freemind)
 
         {
             "meta":{
@@ -152,7 +152,7 @@ It is very easy, is not it?
                 "version":"0.2"
             },
             "format":"freemind",
-            "data":\"<map version=\"1.0.1\"> <node ID=\"root\" TEXT=\"jsMind\" > <node ID=\"easy\" POSITION=\"left\" TEXT=\"Easy\" > <node ID=\"easy1\" TEXT=\"Easy to show\" /> <node ID=\"easy2\" TEXT=\"Easy to edit\" /> <node ID=\"easy3\" TEXT=\"Easy to store\" /> <node ID=\"easy4\" TEXT=\"Easy to embed\" /> </node> <node ID=\"open\" POSITION=\"right\" TEXT=\"Open Source\" > <node ID=\"open1\" TEXT=\"on GitHub\" /> <node ID=\"open2\" TEXT=\"BSD License\" /> </node> <node ID=\"powerful\" POSITION=\"right\" TEXT=\"Powerful\" > <node ID=\"powerful1\" TEXT=\"Base on Javascript\" /> <node ID=\"powerful2\" TEXT=\"Base on HTML5\" /> <node ID=\"powerful3\" TEXT=\"Depends on you\" /> </node> <node ID=\"other\" POSITION=\"left\" TEXT=\"test node\" > <node ID=\"other1\" TEXT=\"I'm from local variable\" /> <node ID=\"other2\" TEXT=\"I can do everything\" /> </node> </node> </map>"
+            "data":"<map version=\"1.0.1\"> <node ID=\"root\" TEXT=\"jsMind\" > <node ID=\"easy\" POSITION=\"left\" TEXT=\"Easy\" > <node ID=\"easy1\" TEXT=\"Easy to show\" /> <node ID=\"easy2\" TEXT=\"Easy to edit\" /> <node ID=\"easy3\" TEXT=\"Easy to store\" /> <node ID=\"easy4\" TEXT=\"Easy to embed\" /> </node> <node ID=\"open\" POSITION=\"right\" TEXT=\"Open Source\" > <node ID=\"open1\" TEXT=\"on GitHub\" /> <node ID=\"open2\" TEXT=\"BSD License\" /> </node> <node ID=\"powerful\" POSITION=\"right\" TEXT=\"Powerful\" > <node ID=\"powerful1\" TEXT=\"Base on Javascript\" /> <node ID=\"powerful2\" TEXT=\"Base on HTML5\" /> <node ID=\"powerful3\" TEXT=\"Depends on you\" /> </node> <node ID=\"other\" POSITION=\"left\" TEXT=\"test node\" > <node ID=\"other1\" TEXT=\"I'm from local variable\" /> <node ID=\"other2\" TEXT=\"I can do everything\" /> </node> </node> </map>"
         }
 
 ### 1.5. Options
