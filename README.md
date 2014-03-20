@@ -25,7 +25,7 @@ It is very easy to show a mindmap:
     <script type="text/javascript">
         var options = {
             container:'jsmind_container',
-            readonly:false,
+            editable:true,
             theme:'orange'
         };
         var jm = jsMind.show(options);
@@ -33,7 +33,7 @@ It is very easy to show a mindmap:
 
 The example above show how to display an empty mindmap. actually, it is not empty, it includes a root node as default.
 
-jsMind show a map in read-only mode, you can enable editable mode with setting the value of readonly property to false.
+jsMind show a map in read-only mode as default, you can enable editable mode with setting the value of editable property to true.
 
 The container option is the only required, the value should be the id of the container.
 
