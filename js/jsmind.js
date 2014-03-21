@@ -1951,9 +1951,9 @@
     };
 
 
-    jm.show = function(options,mind,data_format){
+    jm.show = function(options,mind){
         var _jm = new jm(options);
-        _jm.show(mind,data_format);
+        _jm.show(mind);
         return _jm;
     };
 
