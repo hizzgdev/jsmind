@@ -27,7 +27,7 @@
     }
 
     function load_mind(){
-        var mind_url = '/example/data_example.js';
+        var mind_url = 'example/data_example.json';
         jsMind.util.ajax.get(mind_url,function(mind){
             _jm.show(mind);
         });
