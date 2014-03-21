@@ -10,15 +10,27 @@
     var _jm = null;
 
     function page_load(){
+        init_jsMind();
 		set_container_size();
-
-        var options = {
-            data:{readonly:false},
-            view:{container:'jsmind_container'}
-        };
-        _jm = jsMind.show(options);
-
 		jsMind.util.dom.add_event($w,'resize',reset_container_size);
+        load_mind();
+    }
+
+    function init_jsMind(){
+        var options = {
+            editable:true,
+            container:'jsmind_container',
+            theme:'greensea'
+        };
+        _jm = new jsMind(options);
+        _jm.init();
+    }
+
+    function load_mind(){
+        var mind_url = '/example/data_example.json';
+        jsMind.util.ajax.get(mind_url,function(mind){
+            _jm.show(mind);
+        });
     }
 
 	var _resize_timeout_id = -1;

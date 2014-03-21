@@ -3,13 +3,14 @@ html,body,header{margin:0;padding:0;}
 br.clear{font-size:1px;clear:both;}
 
 /* z-index:100 */
-header{height:60px;background-color:#eee;border-bottom:solid 1px #aaa;position:relative;z-index:100;}
-header h1{margin:0 15px;color:#444;text-shadow:1px 1px 1px #fff;font:bold 32px/60px "Microsoft YaHei",simhei,STHeiTi,sans-serif,Verdana;}
-header h1:first-letter{font-family:Webdings;line-height:54px;color:#090;} /* Wingdings v */
-header nav{width:100%;position:absolute;top:0px;}
-header nav a{color:#333;text-decoration:none;float:left;text-shadow:1px 1px 1px #fff;margin:25px 30px 0px 270px;font:normal 14px/1 Verdana,Arial,Helvetica,sans-serif;}
+header{height:60px;background-color:#eee;border-bottom:solid 1px #aaa;z-index:100;}
+header h1{float:left;margin:0 15px;color:#444;text-shadow:1px 1px 1px #fff;font:bold 32px/60px "Microsoft YaHei",simhei,STHeiTi,sans-serif,Verdana;}
+header h1:first-letter{font-family:Webdings;line-height:54px;} /* Wingdings v */
+header nav{margin-left:256px;}
+header nav a{float:left;color:#333;text-decoration:none;border:solid 1px gray;border-radius:3px;padding:5px 10px;text-shadow:1px 1px 1px #fff;margin:25px 20px 0 0;font:normal 14px/1 Verdana,Arial,Helvetica,sans-serif;}
+header nav a.latest{float:right;border:none;}
 header nav a:visited{color:#333;}
-header nav a:hover{color:#0a0;}
+header nav a:hover{color:#0a0;background-color:#f8f8f8;}
 
 .jsmind-container{clear:both}
 /*
