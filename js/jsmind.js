@@ -4,7 +4,9 @@
     // __name__ should be a const value, Never try to change it easily.
     var __name__ = 'jsMind';
     // library version
-    var __version__    = '0.2a';
+    var __version__    = '0.2b';
+    // author
+    var __author__ = 'hizzgdev@163.com';
 
     // check global variables
     if(typeof($w[__name__])!='undefined'){
@@ -23,6 +25,7 @@
     var $g = function(id){return $d.getElementById(id);};
     var $c = function(tag){return $d.createElement(tag);};
     var $t = function(n,t){if(n.hasChildNodes()){n.firstChild.nodeValue = t;}else{n.appendChild($d.createTextNode(t));}};
+    var $h = function(n,t){n.innerHTML = t;};
 
     /*
      * !! ATTENTION !!
@@ -30,28 +33,20 @@
      * LOWER OPTIONS WILL NOT BE MERGE BUT REWRITE
      */
     var DEFAULT_OPTIONS = {
-        data:{
-            readonly:true                   // you can change it in your options, or use 'set_readonly'
-        },
+        container : 'jsmind_container',   // id of the container
+        editable : false,                 // you can change it in your options
+        theme : null,
+        mode :'full', // full or side
+        support_html : true,
+
         view:{
-            container:'jsmind_container',   // id of the container
             hmargin:100,
             vmargin:50
         },
         layout:{
-            mode :'full', // full or side
             hspace:30,
             vspace:20,
             pspace:13
-        },
-        theme:{
-            name:null       // default/primary/action/highlight/caution/royal
-        },
-        provider:{
-            data : null,
-            view : null,
-            layout : null,
-            theme : null
         }
     };
 
@@ -64,26 +59,27 @@
          */
         var opts = {};
         for (var o in DEFAULT_OPTIONS) {opts[o] = DEFAULT_OPTIONS[o];}
-        for (var o in options) {if(o in opts){for (var k in options[o]){opts[o][k] = options[o][k];}}else{opts[o]=options[o];}}
+        for (var o in options) { if((o in opts) && (typeof options[o]) == 'object'){ for (var k in options[o]){opts[o][k] = options[o][k];} }else{ opts[o]=options[o]; } }
 
         this.options = opts;
+        this.mind = null;
         this._init_ = false;
     };
 
     // ============= static object =============================================
     jm.direction = {left:-1,center:0,right:1};
 
-    jm.node = function(sId,iIndex,sTopic,sSummary,bIsRoot,oParent){
+    jm.node = function(sId,iIndex,sTopic,oData,bIsRoot,oParent,eDirection){
         if(!sId){_console.error('invalid nodeid');return;}
         if(typeof(iIndex) != 'number'){_console.error('invalid node index');return;}
         this.id = sId;
         this.index = iIndex;
         this.topic = sTopic;
-        this.summary = sSummary;
+        this.data = oData;
         this.isroot = bIsRoot;
         this.parent = oParent;
+        this.direction = eDirection;
         this.children = [];
-        this.data = {};
         this._data = {};
     };
 
@@ -105,6 +101,556 @@
         }
         //_console.debug(i1+' <> '+i2+'  =  '+r);
         return r;
+    };
+
+
+    jm.mind = function(){
+        this.name = null;
+        this.author = null;
+        this.version = null;
+        this.root = null;
+        this.selected = null;
+        this.nodes = {};
+    };
+
+    jm.mind.prototype = {
+        get_node:function(nodeid){
+            if(nodeid in this.nodes){
+                return this.nodes[nodeid];
+            }else{
+                _console.warn('the node[id='+nodeid+'] can not be found');
+                return null;
+            }
+        },
+
+        set_root:function(nodeid, topic, data){
+            if(this.root == null){
+                this.root = new jm.node(nodeid, 0, topic, data, true);
+                this._put_node(this.root);
+            }else{
+                _console.error('root node is already exist');
+            }
+        },
+
+        add_node:function(parent_node, nodeid, topic, data, idx, direction){
+            if(typeof parent_node == 'string'){
+                return this.add_node(this.get_node(parent_node), nodeid, topic, data, idx, direction);
+            }
+            var nodeindex = idx || -1;
+            if(!!parent_node){
+                //_console.debug(parent_node);
+                var node = null;
+                if(parent_node.isroot){
+                    var d = jm.direction.left;
+                    if(isNaN(direction) || direction != jm.direction.left){
+                        d = jm.direction.right;
+                    }
+                    node = new jm.node(nodeid,nodeindex,topic,data,false,parent_node,d);
+                }else{
+                    node = new jm.node(nodeid,nodeindex,topic,data,false,parent_node);
+                }
+                if(this._put_node(node)){
+                    parent_node.children.push(node);
+                    this._reindex(parent_node);
+                }else{
+                    _console.error('fail, the nodeid \''+node.id+'\' has been already exist.');
+                    node = null;
+                }
+                return node;
+            }else{
+                _console.error('fail, the [node_parent] can not be found.');
+                return null;
+            }
+        },
+
+        insert_node_before:function(node_before, nodeid, topic, data){
+            if(typeof node_before == 'string'){
+                return this.insert_node_before(this.get_node(node_before), nodeid, topic, data);
+            }
+            if(!!node_before){
+                var node_index = node_before.index-0.5;
+                return this.add_node(node_before.parent, nodeid, topic, data, node_index);
+            }else{
+                _console.error('fail, the [node_before] can not be found.');
+                return null;
+            }
+        },
+
+        insert_node_after:function(node_after, nodeid, topic, data){
+            if(typeof node_after == 'string'){
+                return this.insert_node_after(this.get_node(node_after), nodeid, topic, data);
+            }
+            if(!!node_after){
+                var node_index = node_after.index + 0.5;
+                return this.add_node(node_after.parent, nodeid, topic, data, node_index);
+            }else{
+                _console.error('fail, the [node_after] can not be found.');
+                return null;
+            }
+        },
+
+        move_node:function(nodeid, beforeid){
+            var node = this.get_node(nodeid);
+            if(!!node && !!beforeid){
+                if(beforeid == '_last_'){
+                    node.index = -1;
+                    this._reindex(node.parent);
+                }else if(beforeid == '_first_'){
+                    node.index = 0;
+                    this._reindex(node.parent);
+                }else{
+                    var node_before = (!!beforeid)?this.get_node(beforeid):null;
+                    if(node_before!=null && node_before.parent!=null && node_before.parent.id==node.parent.id){
+                        node.index = node_before.index - 0.5;
+                        this._reindex(node.parent);
+                    }
+                }
+            }
+            return node;
+        },
+
+        remove_node:function(node){
+            if(typeof node == 'string'){
+                return this.remove_node(this.get_node(node));
+            }
+            if(!node){
+                _console.error('fail, the node can not be found');
+                return false;
+            }
+            if(node.isroot){
+                _console.error('fail, can not remove the root node');
+                return false;
+            }
+            if(this.selected!=null && this.selected.id == node.id){
+                this.selected = null;
+            }
+            // clean all subordinate nodes
+            var children = node.children;
+            var ci = children.length;
+            while(ci--){
+                this.remove_node(children[ci]);
+            }
+            // clean all children
+            children.length = 0;
+            // remove from parent's children
+            var sibling = node.parent.children;
+            var si = sibling.length;
+            while(si--){
+                if(sibling[si].id == node.id){
+                    sibling.splice(si,1);
+                    break;
+                }
+            }
+            // remove from global nodes
+            delete this.nodes[node.id];
+            // clean all properties
+            for(var k in node){
+                delete node[k];
+            }
+            // remove it's self
+            node = null;
+            //delete node;
+            return true;
+        },
+
+        _put_node:function(node){
+            if(node.id in this.nodes){
+                _console.warn('the nodeid \''+node.id+'\' has been already exist.');
+                return false;
+            }else{
+                this.nodes[node.id] = node;
+                return true;
+            }
+        },
+
+        _reindex:function(node){
+            if(node instanceof jm.node){
+                node.children.sort(jm.node.compare);
+                for(var i=0;i<node.children.length;i++){
+                    node.children[i].index = i+1;
+                }
+            }
+        },
+    };
+
+    jm.format = {
+        node_tree:{
+            example:{
+                "meta":{
+                    "name":__name__,
+                    "author":__author__,
+                    "version":__version__
+                },
+                "format":"node_tree",
+                "data":{"id":"root","topic":"jsMind Example"}
+            },
+            get_mind:function(source){
+                var df = jm.format.node_tree;
+                var mind = new jm.mind();
+                mind.name = source.meta.name;
+                mind.author = source.meta.author;
+                mind.version = source.meta.version;
+                df._parse(mind,source.data);
+                return mind;
+            },
+            get_data:function(mind){
+                var df = jm.format.node_tree;
+                var json = {};
+                json.meta = {
+                    name : mind.name,
+                    author : mind.author,
+                    version : mind.version
+                };
+                json.format = "node_tree";
+                json.data = df._buildnode(mind.root);
+                return json;
+            },
+
+            _parse:function(mind, node_root){
+                var df = jm.format.node_tree;
+                var data = df._extract_data(node_root);
+                mind.set_root(node_root.id, node_root.topic, data);
+                if('children' in node_root){
+                    var children = node_root.children;
+                    for(var i=0;i<children.length;i++){
+                        df._extract_subnode(mind, mind.root, children[i]);
+                    }
+                }
+            },
+
+            _extract_data:function(node_json){
+                var data = {};
+                for(var k in node_json){
+                    if(k == 'id' || k=='topic' || k=='children' || k=='direction'){
+                        continue;
+                    }
+                    data[k] = node_json[k];
+                }
+                return data;
+            },
+
+            _extract_subnode:function(mind, node_parent, node_json){
+                var df = jm.format.node_tree;
+                var data = df._extract_data(node_json);
+                var d = null;
+                if(node_parent.isroot){
+                    d = node_json.direction == 'left'?jm.direction.left:jm.direction.right;
+                }
+                var node = mind.add_node(node_parent, node_json.id, node_json.topic, data, null, d);
+                if('children' in node_json){
+                    var children = node_json.children;
+                    for(var i=0;i<children.length;i++){
+                        df._extract_subnode(mind, node, children[i]);
+                    }
+                }
+            },
+
+            _buildnode:function(node){
+                var df = jm.format.node_tree;
+                if(!(node instanceof jm.node)){return;}
+                var o = {
+                    id : node.id,
+                    topic : node.topic
+                };
+                if(!!node.parent && node.parent.isroot){
+                    o.direction = node.direction == jm.direction.left?'left':'right';
+                }
+                if(node.data != null){
+                    for(var k in node.data){
+                        o[k] = node.data.k;
+                    }
+                }
+                var children = node.children;
+                if(children.length > 0){
+                    o.children = [];
+                    for(var i=0;i<children.length;i++){
+                        o.children.push(df._buildnode(children[i]));
+                    }
+                }
+                return o;
+            }
+        },
+
+        node_array:{
+            example:{
+                "meta":{
+                    "name":__name__,
+                    "author":__author__,
+                    "version":__version__
+                },
+                "format":"node_array",
+                "data":[
+                    {"id":"root","topic":"jsMind Example", "isroot":true}
+                ]
+            },
+
+            get_mind:function(source){
+                var df = jm.format.node_array;
+                var mind = new jm.mind();
+                mind.name = source.meta.name;
+                mind.author = source.meta.author;
+                mind.version = source.meta.version;
+                df._parse(mind,source.data);
+                return mind;
+            },
+
+            get_data:function(mind){
+                var df = jm.format.node_array;
+                var json = {};
+                json.meta = {
+                    name : mind.name,
+                    author : mind.author,
+                    version : mind.version
+                };
+                json.format = "node_array";
+                json.data = [];
+                df._array(mind,json.data);
+                return json;
+            },
+
+            _parse:function(mind, node_array){
+                var df = jm.format.node_array;
+                var narray = node_array.slice(0);
+                // reverse array for improving looping performance
+                narray.reverse();
+                var root_id = df._extract_root(mind, narray);
+                if(!!root_id){
+                    df._extract_subnode(mind, root_id, narray);
+                }else{
+                    _console.error('the root node can not be found');
+                }
+            },
+
+            _extract_root:function(mind, node_array){
+                var df = jm.format.node_array;
+                var i = node_array.length;
+                while(i--){
+                    if('isroot' in node_array[i] && node_array[i].isroot){
+                        var root_json = node_array[i];
+                        var data = df._extract_data(root_json);
+                        mind.set_root(root_json.id,root_json.topic,data);
+                        node_array.splice(i,1);
+                        return root_json.id;
+                    }
+                }
+                return null;
+            },
+
+            _extract_subnode:function(mind, parentid, node_array){
+                var df = jm.format.node_array;
+                var i = node_array.length;
+                var node_json = null;
+                var data = null;
+                var extract_count = 0;
+                while(i--){
+                    node_json = node_array[i];
+                    if(node_json.parentid == parentid){
+                        data = df._extract_data(node_json);
+                        var d = null;
+                        var node_direction = node_json.direction;
+                        if(!!node_direction){
+                            d = node_direction == 'left'?jm.direction.left:jm.direction.right;
+                        }
+                        mind.add_node(parentid, node_json.id, node_json.topic, data, null, d);
+                        node_array.splice(i,1);
+                        extract_count ++;
+                        var sub_extract_count = df._extract_subnode(mind, node_json.id, node_array);
+                        if(sub_extract_count > 0){
+                            // reset loop index after extract subordinate node
+                            i = node_array.length;
+                            extract_count += sub_extract_count;
+                        }
+                    }
+                }
+                return extract_count;
+            },
+
+            _extract_data:function(node_json){
+                var data = {};
+                for(var k in node_json){
+                    if(k == 'id' || k=='topic' || k=='parentid' || k=='isroot' || k=='direction'){
+                        continue;
+                    }
+                    data[k] = node_json[k];
+                }
+                return data;
+            },
+
+            _array:function(mind, node_array){
+                var df = jm.format.node_array;
+                df._array_node(mind.root, node_array);
+            },
+
+            _array_node:function(node, node_array){
+                var df = jm.format.node_array;
+                if(!(node instanceof jm.node)){return;}
+                var o = {
+                    id : node.id,
+                    topic : node.topic
+                };
+                if(!!node.parent){
+                    o.parentid = node.parent.id;
+                }
+                if(node.isroot){
+                    o.isroot = true;
+                }
+                if(!!node.parent && node.parent.isroot){
+                    o.direction = node.direction == jm.direction.left?'left':'right';
+                }
+                if(node.data != null){
+                    for(var k in node.data){
+                        o[k] = node.data.k;
+                    }
+                }
+                node_array.push(o);
+                var ci = node.children.length;
+                for(var i=0;i<ci;i++){
+                    df._array_node(node.children[i], node_array);
+                }
+            },
+        },
+
+        freemind:{
+            example:{
+                "meta":{
+                    "name":__name__,
+                    "author":__author__,
+                    "version":__version__
+                },
+                "format":"freemind",
+                "data":"<map version=\"1.0.1\"><node ID=\"root\" TEXT=\"freemind Example\"/></map>"
+            },
+            get_mind:function(source){
+                var df = jm.format.freemind;
+                var mind = new jm.mind();
+                mind.name = source.meta.name;
+                mind.author = source.meta.author;
+                mind.version = source.meta.version;
+                var xml = source.data;
+                var xml_doc = df._parse_xml(xml);
+                var xml_root = df._find_root(xml_doc);
+                df._load_node(mind, null, xml_root);
+                return mind;
+            },
+
+            get_data:function(mind){
+                var df = jm.format.freemind;
+                var json = {};
+                json.meta = {
+                    name : mind.name,
+                    author : mind.author,
+                    version : mind.version
+                };
+                json.format = "freemind";
+                var xmllines = [];
+                xmllines.push('<map version=\"1.0.1\">');
+                df._buildmap(mind.root, xmllines);
+                xmllines.push('</map>');
+                json.data = xmllines.join(' ');
+                return json;
+            },
+
+            _parse_xml:function(xml){
+                var xml_doc = null;
+                if (window.DOMParser){
+                    var parser = new DOMParser();
+                    xml_doc = parser.parseFromString(xml,"text/xml");
+                }else{ // Internet Explorer
+                    xml_doc = new ActiveXObject("Microsoft.XMLDOM");
+                    xml_doc.async = false;
+                    xml_doc.loadXML(xml); 
+                }
+                return xml_doc;
+            },
+
+            _find_root:function(xml_doc){
+                var nodes = xml_doc.childNodes;
+                var node = null;
+                var root = null;
+                var n = null;
+                for(var i=0;i<nodes.length;i++){
+                    n = nodes[i];
+                    if(n.nodeType == 1 && n.tagName == 'map'){
+                        node = n;
+                        break;
+                    }
+                }
+                if(!!node){
+                    var ns = node.childNodes;
+                    node = null;
+                    for(var i=0;i<ns.length;i++){
+                        n = ns[i];
+                        if(n.nodeType == 1 && n.tagName == 'node'){
+                            node = n;
+                            break;
+                        }
+                    }
+                }
+                return node;
+            },
+
+            _load_node:function(mind, parent_id, xml_node){
+                var df = jm.format.freemind;
+                var node_id = xml_node.getAttribute('ID');
+                var node_topic = xml_node.getAttribute('TEXT');
+                // look for richcontent
+                if(node_topic == null){
+                    var topic_children = xml_node.childNodes;
+                    var topic_child = null;
+                    for(var i=0;i<topic_children.length;i++){
+                        topic_child = topic_children[i];
+                        //_console.debug(topic_child.tagName);
+                        if(topic_child.nodeType == 1 && topic_child.tagName === 'richcontent'){
+                            node_topic = topic_child.textContent;
+                            break;
+                        }
+                    }
+                }
+                var node_position = xml_node.getAttribute('POSITION');
+                var node_direction = null;
+                if(!!node_position){
+                    node_direction = node_position=='left'?jm.direction.left:jm.direction.right;
+                }
+                //_console.debug(node_position +':'+ node_direction);
+                if(!!parent_id){
+                    mind.add_node(parent_id, node_id, node_topic, null, null, node_direction);
+                }else{
+                    mind.set_root(node_id, node_topic);
+                }
+                var children = xml_node.childNodes;
+                var child = null;
+                for(var i=0;i<children.length;i++){
+                    child = children[i];
+                    if(child.nodeType == 1 && child.tagName == 'node'){
+                        df._load_node(mind, node_id, child);
+                    }
+                }
+            },
+
+            _buildmap:function(node, xmllines){
+                var df = jm.format.freemind;
+                var pos = null;
+                if(!!node.parent && node.parent.isroot){
+                    pos = node.direction === jm.direction.left?'left':'right';
+                }
+                xmllines.push('<node');
+                xmllines.push('ID=\"'+node.id+'\"');
+                if(!!pos){
+                    xmllines.push('POSITION=\"'+pos+'\"');
+                }
+                xmllines.push('TEXT=\"'+node.topic+'\"');
+                var children = node.children;
+                if(children.length>0){
+                    xmllines.push('>');
+                    for(var i=0;i<children.length;i++){
+                        df._buildmap(children[i], xmllines);
+                    }
+                    xmllines.push('</node>');
+                }else{
+                    xmllines.push('/>');
+                }
+            },
+        },
     };
 
     // ============= utility object =============================================
@@ -206,7 +752,7 @@
                 var reader = new FileReader();
                 reader.onload = function(){
                     if(typeof(fn_callback) == 'function'){
-                        fn_callback(this.result);
+                        fn_callback(this.result, file_data.name);
                     }
                 };
                 reader.readAsText(file_data);
@@ -287,43 +833,52 @@
             if(this._init_){return;}
             this._init_ = true;
             var opts = this.options;
-            var provider = opts.provider;
-            var _data_provider = (!!provider.data)? provider.data : jm.data_provider;
-            var _layout_provider = (!!provider.layout)? provider.layout : jm.layout_provider;
-            var _theme_provider = (!!provider.theme)? provider.theme : jm.theme_provider;
-            var _view_provider = (!!provider.view)? provider.view : jm.view_provider;
 
+            var opts_layout = {
+                mode:opts.mode,
+                hspace:opts.layout.hspace,
+                vspace:opts.layout.vspace,
+                pspace:opts.layout.pspace
+            }
+            var opts_view = {
+                container:opts.container,
+                support_html:opts.support_html,
+                hmargin:opts.view.hmargin,
+                vmargin:opts.view.vmargin
+            };
             // create instance of function provider 
-            this.data = new _data_provider(this, opts.data);
-            this.layout = new _layout_provider(this, opts.layout);
-            this.theme = new _theme_provider(this, opts.theme);
-            this.view = new _view_provider(this, opts.view);
+            this.data = new jm.data_provider(this);
+            this.layout = new jm.layout_provider(this, opts_layout);
+            this.view = new jm.view_provider(this, opts_view);
 
             this.data.init();
             this.layout.init();
-            this.theme.init();
             this.view.init();
 
-            this.event_bind();
+            this._event_bind();
         },
 
-        set_readonly:function(readonly){
-            this.options.data.readonly = readonly;
+        enable_edit:function(){
+            this.options.editable = true;
         },
 
-        is_readonly:function(){
-            return this.options.data.readonly;
+        disable_edit:function(){
+            this.options.editable = false;
         },
 
-        set_theme:function(theme_name){
-            if(!theme_name){
-                theme_name=null;
+        get_editable:function(){
+            return this.options.editable;
+        },
+
+        set_theme:function(theme){
+            var theme_old = this.options.theme;
+            this.options.theme = (!!theme) ? theme : null;
+            if(theme_old != this.options.theme){
+                this.view.reset_theme();
             }
-            this.options.theme.name = theme_name;
-            this.view.reset_theme();
         },
 
-        event_bind:function(){
+        _event_bind:function(){
             this.view.event_bind(this,null,null,this.click_handle,this.dblclick_handle);
         },
 
@@ -343,25 +898,27 @@
         },
 
         dblclick_handle:function(e){
-            if(this.is_readonly()){return;}
-            var element = e.target || e.srcElement;
-            var isnode = this.view.is_node(element);
-            if(isnode){
-                var nodeid = this.view.get_nodeid(element);
-                this.begin_edit(nodeid);
+            if(this.get_editable()){
+                var element = e.target || e.srcElement;
+                var isnode = this.view.is_node(element);
+                if(isnode){
+                    var nodeid = this.view.get_nodeid(element);
+                    this.begin_edit(nodeid);
+                }
             }
         },
 
         begin_edit:function(nodeid){
-            if(this.is_readonly()){
-                _console.error('fail, this mind map is readonly');
-                return;
-            }
-            var node = this.get_node(nodeid);
-            if(!!node){
-                this.view.edit_node_begin(node);
+            if(this.get_editable()){
+                var node = this.get_node(nodeid);
+                if(!!node){
+                    this.view.edit_node_begin(node);
+                }else{
+                    _console.error('the node[id='+nodeid+'] can not be found');
+                }
             }else{
-                _console.error('the node[id='+nodeid+'] can not be found');
+                _console.error('fail, this mind map is not editable.');
+                return;
             }
         },
 
@@ -370,42 +927,45 @@
         },
 
         toggle_node:function(nodeid){
-            var node = this.data.get_node(nodeid);
+            var node = this.mind.get_node(nodeid);
             if(!!node && !node.isroot){
                 this.layout.toggle_node(node);
-                this.view.show();
+                this.view.relayout();
             }
         },
 
         expand_node:function(nodeid){
-            var node = this.data.get_node(nodeid);
+            var node = this.mind.get_node(nodeid);
             if(!!node && !node.isroot){
                 this.layout.expand_node(node);
-                this.view.show();
+                this.view.relayout();
             }
         },
 
         collapse_node:function(nodeid){
-            var node = this.data.get_node(nodeid);
+            var node = this.mind.get_node(nodeid);
             if(!!node && !node.isroot){
                 this.layout.collapse_node(node);
-                this.view.show();
+                this.view.relayout();
             }
         },
 
         _reset:function(){
-            this.theme.reset();
             this.view.reset();
             this.layout.reset();
             this.data.reset();
         },
 
-        _show:function(mind,data_format){
-            var m = mind || [{nodeid:'root',topic:'Empty Mindmap',isroot:true}];
-            var df = data_format || 'json_array';
+        _show:function(mind){
+            var m = mind || jm.format.node_array.example;
 
-            this.data.load(m,df);
-            _console.debug('data.load ok');
+            this.mind = this.data.load(m);
+            if(!this.mind){
+                _console.error('data.load error');
+                return;
+            }else{
+                _console.debug('data.load ok');
+            }
 
             this.view.load();
             _console.debug('view.load ok');
@@ -415,108 +975,156 @@
 
             this.view.show();
             _console.debug('view.show ok');
-
         },
 
-        show : function(mind,data_format){
+        show : function(mind){
             if(!this._init_){
                 this.init();
             }
             this._reset();
-            this._show(mind,data_format);
+            this._show(mind);
+        },
+
+        get_meta: function(){
+            return {
+                name : this.mind.name,
+                author : this.mind.author,
+                version : this.mind.version
+            };
         },
 
         get_data: function(data_format){
-            var df = data_format || 'json_array';
+            var df = data_format || 'node_tree';
             return this.data.get_data(df);
         },
 
         get_root:function(){
-            return this.data.get_root();
+            return this.mind.root;
         },
 
         get_node:function(nodeid){
-            return this.data.get_node(nodeid);
+            return this.mind.get_node(nodeid);
         },
 
-        add_node:function(nodeid, parentid, topic, summary, beforeid){
-            if(this.is_readonly()){
-                _console.error('fail, this mind map is readonly');
-                return;
-            }
-            var node = null;
-            if(!!beforeid){
-                node = this.data.add_node_before(nodeid, parentid, topic, summary, beforeid);
+        add_node:function(parent_node, nodeid, topic, data){
+            if(this.get_editable()){
+                var node = this.mind.add_node(parent_node, nodeid, topic, data);
+                if(!!node){
+                    this.view.add_node(node);
+                    this.layout.layout();
+                    this.view.show();
+                }
+                return node;
             }else{
-                node = this.data.add_node(nodeid, parentid, topic, summary);
-            };
-            if(!!node){
-                this.view.add_node(node);
-                this.layout.layout();
-                this.view.show();
+                _console.error('fail, this mind map is not editable');
+                return null;
             }
-            return node;
         },
 
-        remove_node:function(nodeid){
-            if(this.is_readonly()){
-                _console.error('fail, this mind map is readonly');
-                return;
+        insert_node_before:function(node_before, nodeid, topic, data){
+            if(this.get_editable()){
+                var node = this.mind.insert_node_before(node_before, nodeid, topic, data);
+                if(!!node){
+                    this.view.add_node(node);
+                    this.layout.layout();
+                    this.view.show();
+                }
+                return node;
+            }else{
+                _console.error('fail, this mind map is not editable');
+                return null;
             }
-            var node = this.get_node(nodeid);
-            if(!!node){
-                if(node.isroot){
-                    _console.error('fail, can not remove the root node');
+        },
+
+        insert_node_after:function(node_after, nodeid, topic, data){
+            if(this.get_editable()){
+                var node = this.mind.insert_node_after(node_after, nodeid, topic, data);
+                if(!!node){
+                    this.view.add_node(node);
+                    this.layout.layout();
+                    this.view.show();
+                }
+                return node;
+            }else{
+                _console.error('fail, this mind map is not editable');
+                return null;
+            }
+        },
+
+        remove_node:function(node){
+            if(typeof node == 'string'){
+                return this.remove_node(this.get_node(node));
+            }
+            if(this.get_editable()){
+                if(!!node){
+                    if(node.isroot){
+                        _console.error('fail, can not remove the root node');
+                        return false;
+                    }
+                    this.view.remove_node(node);
+                    this.mind.remove_node(node);
+                    this.layout.layout();
+                    this.view.show();
+                }else{
+                    _console.error('fail, node can not be found');
                     return false;
                 }
-                this.view.remove_node(node);
-                this.data.remove_node(node);
-                this.layout.layout();
-                this.view.show();
+            }else{
+                _console.error('fail, this mind map is not editable');
+                return;
             }
         },
 
-        update_node:function(nodeid, topic, summary){
-            if(this.is_readonly()){
-                _console.error('fail, this mind map is readonly');
+        update_node:function(nodeid, topic){
+            if(this.get_editable()){
+                var node = this.get_node(nodeid);
+                if(!!node){
+                    node.topic = topic;
+                    this.view.update_node(node);
+                    this.layout.layout();
+                    this.view.show();
+                }
+            }else{
+                _console.error('fail, this mind map is not editable');
                 return;
-            }
-            var node = this.data.update_node(nodeid,topic,summary);
-            if(!!node){
-                this.view.update_node(node);
-                this.layout.layout();
-                this.view.show();
             }
         },
 
         move_node:function(nodeid, beforeid){
-            if(this.is_readonly()){
-                _console.error('fail, this mind map is readonly');
+            if(this.get_editable()){
+                var node = this.mind.move_node(nodeid,beforeid);
+                if(!!node){
+                    this.view.update_node(node);
+                    this.layout.layout();
+                    this.view.show();
+                }
+            }else{
+                _console.error('fail, this mind map is not editable');
                 return;
-            }
-            var node = this.data.update_node(nodeid,null,null,beforeid);
-            if(!!node){
-                this.view.update_node(node);
-                this.layout.layout();
-                this.view.show();
             }
         },
 
         select_node:function(nodeid){
-            var node = this.data.select_node(nodeid);
+            var node = this.get_node(nodeid);
+            this.mind.selected = node;
             if(!!node){
                 this.view.select_node(node);
             }
         },
 
         get_selected_node:function(){
-            var node = this.data.get_selected_node();
-            return node;
+            if(!!this.mind){
+                return this.mind.selected;
+            }else{
+                return null;
+            }
         },
 
         select_clear:function(){
-            this.data.select_clear();
-            this.view.select_clear();
+            if(!!this.mind){
+                this.mind.selected = null;
+                this.view.select_clear();
+            }
         },
 
         resize:function(){
@@ -526,12 +1134,8 @@
 
 // ============= data provider =============================================
 
-    jm.data_provider = function(jm, options){
+    jm.data_provider = function(jm){
         this.jm = jm;
-        this.opts = options;
-        this.root = null;
-        this.selected_node = null;
-        this.nodes = {};
     };
 
     jm.data_provider.prototype={
@@ -541,310 +1145,41 @@
 
         reset:function(){
             _console.debug('data.reset');
-            this.root = null;
-            this.selected_node = null;
-            this.nodes = {};
         },
 
-        // now, 'json_array' is the only supported data format, never change it
-        load:function(mind,data_format){
-            if(data_format == 'json_array'){
-                this.load_json_array(mind);
-            }else{
-                _console.error('unsupported '+data_format+' format');
-            }
-        },
-
-        load_json_array:function(json_array){
-            _console.debug('data.load');
-            // copy array for preventing to effect the origin data
-            var node_array = json_array.slice(0);
-            // reverse array for improving looping performance
-            node_array.reverse();
-            var root_node = this._parse_extract_root(node_array);
-            if(!!root_node){
-                this.root = root_node;
-                this._parse_extract_subnode(node_array, root_node);
-                this.reindex(root_node);
-            }else{
-                _console.error('the root node can not be found');
-            }
-        },
-
-        _parse_node:function(node_json, parent_node, isroot){
-            var o = node_json;
-            var p = parent_node;
-            var r = !!isroot;
-            if(!r && !p){
-                _console.error('node has not parent');
-                return null;
-            }
-            var idx = ('nodeindex' in o)?o.nodeindex:-1;
-            var node = new jm.node(o.nodeid,idx,o.topic,o.summary,r,p);
-            return node;
-        },
-
-        _parse_extract_root:function(node_array){
-            var i = node_array.length;
-            while(i--){
-                if('isroot' in node_array[i] && node_array[i].isroot){
-                    var root_json = node_array[i];
-                    node_array.splice(i,1);
-                    var root_node = this._parse_node(root_json,null,true);
-                    if(this.put_node(root_node)){
-                        return root_node;
-                    }else{
-                        //delete root_node;
-                        root_node = null;
-                        _console.warn('root node has an not unique id, and this node has been skipped');
-                    }
-                }
-            }
-            return null;
-        },
-
-        _parse_extract_subnode:function(node_array,parent_node){
-            var pid = parent_node.id;
-            var i = node_array.length;
-            var node_json = null;
-            var node = null;
-            var extract_count = 0;
-            while(i--){
-                node_json = node_array[i];
-                if(!('nodeindex' in node_json)){
-                    node_json.nodeindex = extract_count;
-                }
-                if(node_json.parentid == pid){
-                    node = this._parse_node(node_json,parent_node);
-                    if(this.put_node(node)){
-                        parent_node.children.push(node);
-                    }else{
-                        //delete node;
-                        _console.warn('some node has skipped');
-                        break;
-                    }
-                    node_array.splice(i,1);
-                    extract_count ++;
-                    var sub_extract_count = this._parse_extract_subnode(node_array,node);
-                    if(sub_extract_count > 0){
-                        // reset loop index after extract subordinate node
-                        i = node_array.length;
-                        extract_count += sub_extract_count;
-                    }
-                    this.reindex(node);
-                }
-            }
-            return extract_count;
-        },
-
-        put_node:function(node){
-            if(node.id in this.nodes){
-                _console.warn('the nodeid \''+node.id+'\' has been already exist.');
-                return false;
-            }else{
-                this.nodes[node.id] = node;
-                return true;
-            }
-        },
-
-        get_node:function(nodeid){
-            if(nodeid in this.nodes){
-                return this.nodes[nodeid];
-            }else{
-                _console.warn('the node[id='+nodeid+'] can not be found');
-                return null;
-            }
-        },
-
-        get_root:function(){
-            return this.root;
-        },
-
-        get_subnodes:function(nodeid){
-            var node = this.get_node(nodeid);
-            return node.children;
-        },
-
-        add_node:function(nodeid, parentid, topic, summary, idx){
-            if(this.is_readonly()){
-                _console.error('fail, this mind map is readonly');
-                return null;
-            }
-            var nodeindex = idx || -1;
-            var parent_node = this.get_node(parentid);
-            if(!!parent_node){
-                var node = new jm.node(nodeid,nodeindex,topic,summary,false,parent_node);
-                if(this.put_node(node)){
-                    parent_node.children.push(node);
-                    this.reindex(parent_node);
+        load:function(mind_data){
+            var df = null;
+            var mind = null;
+            if(typeof mind_data == 'object'){
+                if(!!mind_data.format){
+                    df = mind_data.format;
                 }else{
-                    _console.error('fail, the nodeid \''+node.id+'\' has been already exist.');
-                    //delete node;
-                    node = null;
+                    df = 'node_tree';
                 }
+            }else{
+                df = 'freemind';
             }
-            return node;
-        },
 
-        add_node_before:function(nodeid, parentid, topic, summary, before_id){
-            var node_before = (!!before_id)?this.get_node(before_id):null;
-            var node_index = -1;
-            if(!!node_before){
-                if(node_before.parent!=null && node_before.parent.id == parentid){
-                    node_index = node_before.index-0.5;
-                }
+            if(df == 'node_array'){
+                mind = jm.format.node_array.get_mind(mind_data);
+            }else if(df == 'node_tree'){
+                mind = jm.format.node_tree.get_mind(mind_data);
+            }else if(df == 'freemind'){
+                mind = jm.format.freemind.get_mind(mind_data);
+            }else{
+                _console.warn('unsupported format');
             }
-            return this.add_node(nodeid, parentid, topic, summary, node_index);
-        },
-
-        add_node_after:function(nodeid, parentid, topic, summary, after_id){
-            var node_after = (!!after_id)?this.get_node(after_id):null;
-            var node_index = -1;
-            if(!!node_after){
-                if(node_after.parent!=null && node_after.parent.id==parentid){
-                    node_index = node_after.index + 0.5;
-                }
-            }
-            return this.add_node(nodeid, parentid, topic, summary, node_index);
-        },
-
-        update_node:function(nodeid, topic, summary, before_id){
-            if(this.is_readonly()){
-                _console.error('fail, the mindmap is readonly');
-                return null;
-            }
-            var node = this.get_node(nodeid);
-            if(!!topic){
-                node.topic = topic;
-            }
-            if(!!summary){
-                node.summary = summary;
-            }
-            if(!!before_id){
-                if(before_id == '_last_'){
-                    node.index = -1;
-                    this.reindex(node.parent);
-                }else if(before_id == '_first_'){
-                    node.index = 0;
-                    this.reindex(node.parent);
-                }else{
-                    var node_before = (!!before_id)?this.get_node(before_id):null;
-                    if(node_before!=null && node_before.parent!=null && node_before.parent.id==node.parent.id){
-                        node.index = node_before.index - 0.5;
-                        this.reindex(node.parent);
-                    }
-                }
-            }
-            return node;
-        },
-
-        remove_node:function(node){
-            if(this.is_readonly()){
-                _console.error('fail, the mindmap is readonly');
-                return false;
-            }
-            if(!node){
-                _console.error('fail, can not found the node');
-                return false;
-            }
-            if(node.isroot){
-                _console.error('fail, can not remove the root node');
-                return false;
-            }
-            if(this.selected_node != null && this.selected_node.id == node.id){
-                this.selected_node = null;
-            }
-            if(this.editing_node!= null && this.editing_node.id == node.id){
-                this.editing_node = null;
-            }
-            // clean all subordinate nodes
-            var children = node.children;
-            var ci = children.length;
-            while(ci--){
-                this.remove_node(children[ci]);
-            }
-            // clean all children
-            children.length = 0;
-            // remove from parent's children
-            var sibling = node.parent.children;
-            var si = sibling.length;
-            while(si--){
-                if(sibling[si].id == node.id){
-                    sibling.splice(si,1);
-                    break;
-                }
-            }
-            // remove from global nodes
-            delete this.nodes[node.id];
-            // clean all properties
-            for(var k in node){
-                delete node[k];
-            }
-            // remove it's self
-            node = null;
-            //delete node;
-            return true;
-        },
-
-        select_node:function(nodeid){
-            var node = this.get_node(nodeid);
-            if(!!node){
-                this.selected_node = node;
-            }
-            return node;
-        },
-
-        get_selected_node:function(){
-            return this.selected_node;
-        },
-
-        select_clear:function(){
-            this.selected_node = null;
-        },
-
-        is_readonly:function(){
-            return !!this.opts.readonly;
-        },
-
-        reindex:function(node){
-            if(node instanceof jm.node){
-                node.children.sort(jm.node.compare);
-                for(var i=0;i<node.children.length;i++){
-                    node.children[i].index = i+1;
-                }
-            }
-        },
-
-        _get_json_array:function(node,json_array){
-            if(!(node instanceof jm.node)){return;}
-            if(!json_array){
-                json_array = [];
-            }
-            var o = {
-                //_nodeindex_ : node.index,
-                nodeid : node.id,
-                isroot : node.isroot,
-                parentid : (!!node.parent)?node.parent.id:undefined,
-                topic : node.topic,
-                summary : node.summary
-            };
-            json_array.push(o);
-            var ci = node.children.length;
-            for(var i=0;i<ci;i++){
-                this._get_json_array(node.children[i],json_array);
-            }
-            return json_array;
-        },
-
-        get_json:function(){
-            var json = this._get_json_array(this.root,[]);
-            return json;
+            return mind;
         },
 
         get_data:function(data_format){
             var data = null;
-            if(data_format == 'json_array'){
-                data = this.get_json();
+            if(data_format == 'node_array'){
+                data = jm.format.node_array.get_data(this.jm.mind);
+            }else if(data_format == 'node_tree'){
+                data = jm.format.node_tree.get_data(this.jm.mind);
+            }else if(data_format == 'freemind'){
+                data = jm.format.freemind.get_data(this.jm.mind);
             }else{
                 _console.error('unsupported '+data_format+' format');
             }
@@ -857,7 +1192,6 @@
     jm.layout_provider = function(jm, options){
         this.opts = options;
         this.jm = jm;
-        this.data= this.jm.data;
         this.isside = (this.opts.mode == 'side');
         this.bounds = null;
 
@@ -867,17 +1201,15 @@
     jm.layout_provider.prototype={
         init:function(){
             _console.debug('layout.init');
-            this.bounds = {n:0,s:0,w:0,e:0};
         },
         reset:function(){
             _console.debug('layout.reset');
-            this.init();
+            this.bounds = {n:0,s:0,w:0,e:0};
         },
         layout:function(){
             _console.debug('layout.layout');
             this.layout_direction();
             this.layout_offset();
-            //_console.debug(this.data.root);
         },
 
         layout_direction:function(){
@@ -885,7 +1217,8 @@
         },
 
         _layout_direction_root:function(){
-            var node = this.data.root;
+            var node = this.jm.mind.root;
+            _console.debug(node);
             var layout_data = null;
             if('layout' in node._data){
                 layout_data = node._data.layout;
@@ -898,16 +1231,23 @@
             layout_data.direction = jm.direction.center;
             layout_data.side_index = 0;
             if(this.isside){
-                layout_data.left_count = 0;
-                layout_data.right_count = children_count;
                 var i = children_count;
                 while(i--){
                     this._layout_direction_side(children[i], jm.direction.right, i);
                 }
             }else{
+                var i = children_count;
+                var subnode = null;
+                while(i--){
+                    subnode = children[i];
+                    if(subnode.direction == jm.direction.left){
+                        this._layout_direction_side(subnode,jm.direction.left, i);
+                    }else{
+                        this._layout_direction_side(subnode,jm.direction.right, i);
+                    }
+                }
+                /*
                 var boundary = Math.ceil(children_count/2);
-                layout_data.left_count = children_count - boundary;
-                layout_data.right_count = boundary;
                 var i = children_count;
                 while(i--){
                     if(i>=boundary){
@@ -915,7 +1255,8 @@
                     }else{
                         this._layout_direction_side(children[i],jm.direction.right, i);
                     }
-                }
+                }*/
+
             }
         },
 
@@ -932,13 +1273,6 @@
 
             layout_data.direction = direction;
             layout_data.side_index = side_index;
-            if(direction == jm.direction.right){
-                layout_data.right_count = children_count;
-                layout_data.left_count = 0;
-            }else{
-                layout_data.left_count = children_count;
-                layout_data.right_count = 0;
-            }
             var i = children_count;
             while(i--){
                 this._layout_direction_side(children[i], direction, i);
@@ -946,7 +1280,7 @@
         },
 
         layout_offset:function(){
-            var node = this.data.root;
+            var node = this.jm.mind.root;
             var layout_data = node._data.layout;
             layout_data.offset_x = 0;
             layout_data.offset_y = 0;
@@ -961,7 +1295,7 @@
                 if(subnode._data.layout.direction == jm.direction.right){
                     right_nodes.unshift(subnode);
                 }else{
-                    left_nodes.push(subnode);
+                    left_nodes.unshift(subnode);
                 }
             }
             layout_data.left_nodes = left_nodes;
@@ -1141,7 +1475,7 @@
         },
 
         get_min_size:function(){
-            var nodes = this.data.nodes;
+            var nodes = this.jm.mind.nodes;
             var node = null;
             var pout = null;
             for(var nodeid in nodes){
@@ -1171,7 +1505,6 @@
             }else{
                 this.expand_node(node);
             }
-            //_console.debug(this.data.root);
         },
 
         expand_node:function(node){
@@ -1190,14 +1523,19 @@
 
         part_layout:function(node){
             //_console.debug('part_layout');
-            var root_layout_data = this.data.root._data.layout;
-            if(node._data.layout.direction == jm.direction.right){
-                root_layout_data.outer_height_right=this._layout_offset_subnodes_height(root_layout_data.right_nodes);
+            var root = this.jm.mind.root;
+            if(!!root){
+                var root_layout_data = root._data.layout;
+                if(node._data.layout.direction == jm.direction.right){
+                    root_layout_data.outer_height_right=this._layout_offset_subnodes_height(root_layout_data.right_nodes);
+                }else{
+                    root_layout_data.outer_height_left=this._layout_offset_subnodes_height(root_layout_data.left_nodes);
+                }
+                this.bounds.s = Math.max(root_layout_data.outer_height_left,root_layout_data.outer_height_right);
+                this.cache_valid = false;
             }else{
-                root_layout_data.outer_height_left=this._layout_offset_subnodes_height(root_layout_data.left_nodes);
+                _console.warn('can not found root node');
             }
-            this.bounds.s = Math.max(root_layout_data.outer_height_left,root_layout_data.outer_height_right);
-            this.cache_valid = false;
         },
 
         set_visible:function(nodes,visible){
@@ -1235,30 +1573,11 @@
         },
     };
 
-    // theme provider
-    jm.theme_provider= function(jm, options){this.jm = jm; this.opts = options;};
-    jm.theme_provider.prototype={
-        init:function(){
-            _console.debug('theme.init');
-        },
-        reset:function(){
-            _console.debug('theme.reset');
-        },
-        get_theme:function(){
-            return this.opts.name;
-        },
-        set_theme:function(theme_name){
-            this.opts.name = theme_name;
-        },
-    };
-
     // view provider
     jm.view_provider= function(jm, options){
         this.opts = options;
         this.jm = jm;
-        this.data= jm.data;
         this.layout = jm.layout;
-        this.theme = jm.theme;
 
         this.container = null;
         this.e_panel = null;
@@ -1342,7 +1661,7 @@
         },
 
         reset_theme:function(){
-            var theme_name = this.theme.get_theme();
+            var theme_name = this.jm.options.theme;
             if(!!theme_name){
                 this.e_nodes.className = theme_name;
             }else{
@@ -1376,7 +1695,7 @@
         },
 
         init_nodes:function(){
-            var nodes = this.data.nodes;
+            var nodes = this.jm.mind.nodes;
             for(var nodeid in nodes){
                 this.create_node_element(nodes[nodeid]);
             }
@@ -1406,7 +1725,11 @@
                 this.e_nodes.appendChild(d_e);
                 view_data.expander = d_e;
             }
-            $t(d,node.topic);
+            if(this.opts.support_html){
+                $h(d,node.topic);
+            }else{
+                $t(d,node.topic);
+            }
             d.setAttribute('nodeid',node.id);
             d.style.visibility='hidden';
             this.e_nodes.appendChild(d);
@@ -1418,6 +1741,10 @@
         remove_node:function(node){
             if(this.selected_node != null && this.selected_node.id == node.id){
                 this.selected_node = null;
+            }
+            if(this.editing_node != null && this.editing_node.id == node.id){
+                node._data.view.element.removeChild(this.e_editor);
+                this.editing_node = null;
             }
             var children = node.children;
             var i = children.length;
@@ -1437,7 +1764,11 @@
         update_node:function(node){
             var view_data = node._data.view;
             var element = view_data.element;
-            $t(element,node.topic);
+            if(this.opts.support_html){
+                $h(element,node.topic);
+            }else{
+                $t(element,node.topic);
+            }
             view_data.width = element.clientWidth;
             view_data.height = element.clientHeight;
         },
@@ -1510,7 +1841,10 @@
             this.e_nodes.style.height = this.size.h+'px';
             this.show_nodes();
             this.show_lines();
+            //this.layout.cache_valid = true;
+        },
 
+        _center_root:function(){
             // center root node
             var outer_w = this.e_panel.clientWidth;
             var outer_h = this.e_panel.clientHeight;
@@ -1521,17 +1855,26 @@
             if(this.size.h > outer_h){
                 this.e_panel.scrollTop = (this.size.h - outer_h)/2;
             }
-            //this.layout.cache_valid = true;
         },
 
         show:function(){
             _console.debug('view.show');
             this.expand_size();
             this._show();
+            this._center_root();
+        },
+
+        relayout:function(){
+            this.expand_size();
+            this._show();
         },
 
         clear_nodes:function(){
-            var nodes = this.data.nodes;
+            var mind = this.jm.mind;
+            if(mind == null){
+                return;
+            }
+            var nodes = mind.nodes;
             var node = null;
             for(var nodeid in nodes){
                 node = nodes[nodeid];
@@ -1542,7 +1885,7 @@
         },
 
         show_nodes:function(){
-            var nodes = this.data.nodes;
+            var nodes = this.jm.mind.nodes;
             var node = null;
             var node_element = null;
             var expander = null;
@@ -1582,7 +1925,7 @@
 
         show_lines:function(){
             this.clear_lines();
-            var nodes = this.data.nodes;
+            var nodes = this.jm.mind.nodes;
             var node = null;
             var pin = null;
             var pout = null;
