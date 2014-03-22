@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>jsMind</title>
+	<title>jsMind - Online Mindmap</title>
 	<link type="text/css" rel="stylesheet" href="style/jsmind.css" />
 	<link type="text/css" rel="stylesheet" href="style/index.html.css" />
 </head>
@@ -13,18 +13,23 @@
 <header>
 	<h1>~jsMind</h1>
 	<nav>
-		<a href="#">New</a>
-		<a href="#">Open...</a>
-		<a href="#">Save...</a>
-		<a href="#">Screenshot</a>
-		<a href="#">Share...</a>
 		<a href="developer.html" target="_blank" class="latest">Developer &amp; Open Source</a>
 	</nav>
 	<a name="top"></a>
 </header>
 
 <div id="jsmind_container" class="jsmind-container"></div>
-
+<div id="jsmind_tools" class="jsmind-tools">
+    <span id="jsmind_tools_setting">Setting</span>
+    <ul>
+        <li class="new">New</li>
+        <li class="open">Open</li>
+        <li class="save-local">Save to local computer</li>
+        <li class="save-cloud">Save to Server</li>
+        <li class="screenshot">Screenshot</li>
+        <li class="share">Share</li>
+    </ul>
+</div>
 <footer>
 	<nav>
 		<a href="http://jsmind.sinaapp.com">&copy;jsMind 2014</a>
