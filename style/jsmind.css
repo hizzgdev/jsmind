@@ -13,10 +13,14 @@ jmexpander{position:absolute;width:11px;height:11px;display:block;overflow:hidde
 jmnode{padding:10px;background-color:#fff;color:#333;border-radius:5px;box-shadow:1px 1px 1px #666;font:16px/1.125 Verdana,Arial,Helvetica,sans-serif;}
 jmnode:hover{box-shadow:2px 2px 8px #000;background-color:#ebebeb;color:#333;}
 jmnode.selected{background-color:#11f;color:#fff;box-shadow:2px 2px 8px #000;}
-jmnode.root{padding:10px;font-size:24px;}
+jmnode.root{font-size:24px;}
 jmexpander{border-color:gray;}
 jmexpander:hover{border-color:#000;}
 
+@media screen and (max-device-width: 480px) {
+    jmnode{padding:5px;border-radius:3px;font-size:13px;}
+    jmnode.root{font-size:18px;}
+}
 /* primary theme */
 jmnodes.primary jmnode{background-color:#428bca;color:#fff;border-color:#357ebd;}
 jmnodes.primary jmnode:hover{background-color:#3276b1;border-color:#285e8e;}
