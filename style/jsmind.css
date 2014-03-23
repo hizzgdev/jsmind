@@ -17,7 +17,7 @@ jmnode.root{font-size:24px;}
 jmexpander{border-color:gray;}
 jmexpander:hover{border-color:#000;}
 
-@media screen and (max-device-width: 480px) {
+@media screen and (max-device-width: 1024px) {
     jmnode{padding:5px;border-radius:3px;font-size:13px;}
     jmnode.root{font-size:18px;}
 }
