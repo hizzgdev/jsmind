@@ -35,14 +35,17 @@ footer nav a{color:#666;text-decoration:none;}
     .jsmind-tools li{opacity:1;}
 }
 
-@media screen and (max-width: 480px) {
-    header h1{float:none;margin:0 4px;font-size:18px;line-height:36px;}
+@media screen and (max-width: 1024px) {
+    header{height:36px;}
+    header h1{margin:0 4px;font-size:18px;line-height:36px;}
     header h1:first-letter{line-height:16px;} /* Wingdings v */
-    header nav{display:block;margin:2px 5px;}
-    header nav a{float:none;margin:0;padding:0;}
-    header nav a.latest{float:none;}
+    header nav{margin-left:150px;}
+    header nav a{margin-top:10px;}
 
-    .jsmind-tools {width:36px;top:68px;left:8px;}
+    .jsmind-tools {width:36px;top:44px;left:8px;}
     .jsmind-tools ul{margin:5px 0;}
+
+    footer{height:20px;}
+    footer nav{line-height:20px;}
 }
 
