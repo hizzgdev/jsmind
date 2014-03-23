@@ -50,7 +50,7 @@ table {
 body {
   font-size: 15px;
   line-height: 1.5; 
-  background: #fafafa url(../images/body-bg.jpg) 0 0 repeat;
+  background: #fafafa url(../images/developer/body-bg.jpg) 0 0 repeat;
   font-family: 'Helvetica Neue', Helvetica, Arial, serif;
   font-weight: 400;
   color: #666;
@@ -67,7 +67,7 @@ header {
   padding-top: 40px;
   padding-bottom: 40px;
   font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif; 
-  background: #2e7bcf url(../images/header-bg.jpg) 0 0 repeat-x;
+  background: #2e7bcf url(../images/developer/header-bg.jpg) 0 0 repeat-x;
   border-bottom: solid 1px #275da1;
 }
 
@@ -114,7 +114,7 @@ aside#sidebar {
   padding-left: 20px;
   min-height: 504px;
   float: right;
-  background: transparent url(../images/sidebar-bg.jpg) 0 0 no-repeat;
+  background: transparent url(../images/developer/sidebar-bg.jpg) 0 0 no-repeat;
   font-size: 12px;
   line-height: 1.3;
 }
@@ -146,13 +146,13 @@ header a.button {
   position: absolute;
   right: 0;
   top: 0;
-  background: transparent url(../images/github-button.png) 0 0 no-repeat;
+  background: transparent url(../images/developer/github-button.png) 0 0 no-repeat;
 }
 aside a.button {
   width: 138px;
   padding-left: 64px;
   display: block;
-  background: transparent url(../images/download-button.png) 0 0 no-repeat;
+  background: transparent url(../images/developer/download-button.png) 0 0 no-repeat;
   margin-bottom: 20px;
   font-size: 21px;
 }
@@ -197,7 +197,7 @@ hr {
   margin-top: 1em;
   padding-bottom: 1em;
   border: none;
-  background: transparent url('../images/hr.png') 0 0 no-repeat;
+  background: transparent 0 0 no-repeat;
 }
 
 table {
@@ -341,7 +341,7 @@ dl dd {
 }
 
 footer {
-  background: transparent url('../images/hr.png') 0 0 no-repeat;
+  background: transparent  0 0 no-repeat;
   margin-top: 40px;
   padding-top: 20px;
   padding-bottom: 30px;

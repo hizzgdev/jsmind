@@ -15,17 +15,16 @@ header nav a:hover{color:#0a0;background-color:#f8f8f8;}
 .jsmind-container{clear:both}
 .jsmind-tools{position:absolute;z-index:200;top:70px;left:10px;padding:8px 6px;border:solid 1px #fff;}
 .jsmind-tools-active{border:solid 1px gray; border-radius:5px; background-color:#fefefe;}
-.jsmind-tools span{float:left;display:block;width:32px;height:32px;overflow:hidden;text-indent:32px;background:url('../images/setting.png');opacity:0.3;}
+.jsmind-tools span{float:left;display:block;width:32px;height:32px;overflow:hidden;text-indent:32px;background:url('../images/index/jsmind-setting.png');opacity:0.3;}
 .jsmind-tools span:hover{opacity:1;}
 .jsmind-tools ul{float:left;margin:0 0 0 5px;padding:0;list-style:none;display:none;}
 .jsmind-tools li{float:left;margin-left:8px;width:32px;height:32px;white-space:nowrap;overflow:hidden;text-indent:32px;opacity:0.3;background-color:#fff;}
 .jsmind-tools li:hover{opacity:1;}
-.jsmind-tools li.new{background:url('../images/document.png');}
-.jsmind-tools li.open{background:url('../images/open_computer.png');}
-.jsmind-tools li.save-local{background:url('../images/save_computer.png');}
-.jsmind-tools li.save-cloud{background:url('../images/cloud_upload.png');}
-.jsmind-tools li.screenshot{background:url('../images/camera.png');}
-.jsmind-tools li.share{background:url('../images/share.png');}
+.jsmind-tools li.new{background:url('../images/index/jsmind-new.png');}
+.jsmind-tools li.open{background:url('../images/index/jsmind-open.png');}
+.jsmind-tools li.save{background:url('../images/index/jsmind-save.png');}
+.jsmind-tools li.screenshot{background:url('../images/index/jsmind-screenshot.png');}
+.jsmind-tools li.share{background:url('../images/index/jsmind-share.png');}
 .jsmind-tools-active span{opacity:1;}
 .jsmind-tools-active ul{display:block;}
 
