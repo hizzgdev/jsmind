@@ -1,4 +1,5 @@
 (function($w){
+    "use strict"
     var $d = $w.document;
     var $g = function(id){return $d.getElementById(id)};
 	var $header = $d.getElementsByTagName('header')[0];
@@ -29,8 +30,7 @@
 
     function register_event(){
 		jsMind.util.dom.add_event($w,'resize',reset_container_size);
-        var jsmind_tools_setting = $g('jsmind_tools_setting');
-        jsMind.util.dom.add_event(jsmind_tools_setting,'click',toggle_setting_visible);
+        jsMind.util.dom.add_event($g('jsmind_tools'),'click',tools_handler);
         jsMind.util.dom.add_event($d,'click',hide_setting_visible);
     }
 
@@ -66,14 +66,41 @@
     }
     function hide_setting_visible(e){
         if(!_setting_visible){ return; }
-        var e_src = e.Target||e.srcElement;
-        if(e_src != null && e_src.id === 'jsmind_tools_setting'){ return; }
+        var e_src = e.target || event.srcElement;
+        if(e_src != null && e_src.getAttribute('action') === 'toggle'){ return; }
 
         var tools = $g('jsmind_tools');
         _setting_visible = false;
         tools.className = tools.className.replace(/\s*jsmind-tools-active/ig,'');
     }
-	
+
+    function open_open_dialog(e){}
+    function open_save_dialog(e){}
+    function open_share_dialog(e){}
+    function open_help_dialog(e){}
+    function take_screenshot(e){}
+    function jsmind_rebuild(e){
+        _jm.show();
+    }
+
+    var tools_handlers={
+        toggle  : toggle_setting_visible,
+        open    : open_open_dialog,
+        save    : open_save_dialog,
+        screenshot : take_screenshot,
+        share   : open_share_dialog,
+        rebuild : jsmind_rebuild,
+        help    : open_help_dialog
+    };
+
+    function tools_handler(e){
+        var ele = e.target || event.srcElement;
+        var action = ele.getAttribute('action');
+        if(action in tools_handlers){
+            tools_handlers[action](e);
+        }
+    }
+
 	function set_container_size(){
 		var ch = $w.innerHeight-_h_header-_h_footer-2;
 		var cw = $w.innerWidth;
