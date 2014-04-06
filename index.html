@@ -3,16 +3,20 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=8">
 	<link type="text/css" rel="stylesheet" href="style/jsmind.css" />
 	<link type="text/css" rel="stylesheet" href="style/index.html.css" />
+	<link type="text/css" rel="stylesheet" href="style/entypo/style.css" />
+    <!--[if lt IE 7]>
+    <script type="text/javascript" src="style/entypo/lte-ie7.js"></script>
+    <![endif]-->
 	<title>jsMind - Online Mindmap</title>
 </head>
 
 <body>
 
 <header>
-	<h1>~jsMind</h1>
+	<h1 class="icon-bolt">jsMind</h1>
 	<nav>
 		<a href="developer.html" target="_blank" class="latest">Developer &amp; Open Source</a>
 	</nav>
@@ -21,13 +25,14 @@
 
 <div id="jsmind_container" class="jsmind-container"></div>
 <div id="jsmind_tools" class="jsmind-tools">
-    <span id="jsmind_tools_setting">Setting</span>
     <ul>
-        <li class="new">New</li>
-        <li class="open">Open</li>
-        <li class="save">Save</li>
-        <li class="screenshot">Screenshot</li>
-        <li class="share">Share</li>
+        <li action="toggle" class="icon-cog visible" title="click for more function">Toggle</li>
+        <li action="open" class="icon-popup" title="open a mindmap from ...">Open</li>
+        <li action="save" class="icon-export" title="export current mindmap to ...">Save</li>
+        <li action="screenshot" class="icon-camera" title="take a screenshot on current mindmap">Screenshot</li>
+        <li action="share" class="icon-share" title="share current mindmap to ...">Share</li>
+        <li action="rebuild" class="icon-trash" title="clean current mindmap and create new one">Rebuild</li>
+        <li action="help" class="icon-help" title="how to use jsMind ...">Usage</li>
     </ul>
 </div>
 <footer>
