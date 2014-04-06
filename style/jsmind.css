@@ -18,8 +18,8 @@ jmexpander{border-color:gray;}
 jmexpander:hover{border-color:#000;}
 
 @media screen and (max-device-width: 1024px) {
-    jmnode{padding:5px;border-radius:3px;font-size:13px;}
-    jmnode.root{font-size:18px;}
+    jmnode{padding:5px;border-radius:3px;font-size:14px;}
+    jmnode.root{font-size:21px;}
 }
 /* primary theme */
 jmnodes.primary jmnode{background-color:#428bca;color:#fff;border-color:#357ebd;}
