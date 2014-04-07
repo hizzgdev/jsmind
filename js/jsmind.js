@@ -141,9 +141,15 @@
                 //_console.debug(parent_node);
                 var node = null;
                 if(parent_node.isroot){
-                    var d = jm.direction.left;
-                    if(isNaN(direction) || direction != jm.direction.left){
-                        d = jm.direction.right;
+                    var d = jm.direction.right;
+                    if(isNaN(direction)){
+                        var children = parent_node.children;
+                        var children_len = children.length;
+                        var r = 0;
+                        for(var i=0;i<children_len;i++){if(children[i].direction === jm.direction.left){r--;}else{r++;}}
+                        d = (children_len > 1 && r > 0) ? jm.direction.left : jm.direction.right
+                    }else{
+                        d = (direction != jm.direction.left) ? jm.direction.right : jm.direction.left;
                     }
                     node = new jm.node(nodeid,nodeindex,topic,data,false,parent_node,d);
                 }else{
@@ -202,6 +208,7 @@
                     var node_before = (!!beforeid)?this.get_node(beforeid):null;
                     if(node_before!=null && node_before.parent!=null && node_before.parent.id==node.parent.id){
                         node.index = node_before.index - 0.5;
+                        node.direction = node_before.direction;
                         this._reindex(node.parent);
                     }
                 }
