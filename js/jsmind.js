@@ -160,7 +160,7 @@
                     }
                     node = new jm.node(nodeid,nodeindex,topic,data,false,parent_node,d);
                 }else{
-                    node = new jm.node(nodeid,nodeindex,topic,data,false,parent_node);
+                    node = new jm.node(nodeid,nodeindex,topic,data,false,parent_node,parent_node.direction);
                 }
                 if(this._put_node(node)){
                     parent_node.children.push(node);
@@ -189,6 +189,19 @@
             }
         },
 
+        get_node_before:function(node){
+            if(typeof node === 'string'){
+                return this.get_node_before(this.get_node(node));
+            }
+            if(node.isroot){return null;}
+            var idx = node.index - 2;
+            if(idx >= 0){
+                return node.parent.children[idx];
+            }else{
+                return null;
+            }
+        },
+
         insert_node_after:function(node_after, nodeid, topic, data){
             if(typeof node_after == 'string'){
                 return this.insert_node_after(this.get_node(node_after), nodeid, topic, data);
@@ -198,6 +211,20 @@
                 return this.add_node(node_after.parent, nodeid, topic, data, node_index);
             }else{
                 _console.error('fail, the [node_after] can not be found.');
+                return null;
+            }
+        },
+
+        get_node_after:function(node){
+            if(typeof node === 'string'){
+                return this.get_node_after(this.get_node(node));
+            }
+            if(node.isroot){return null;}
+            var idx = node.index;
+            var brothers = node.parent.children;
+            if(brothers.length >= idx){
+                return node.parent.children[idx];
+            }else{
                 return null;
             }
         },
@@ -1948,17 +1975,21 @@
             var p = null;
             var p_expander= null;
             var expander_text = '-';
+            var view_data = null;
             var _offset = this.get_view_offset();
             for(var nodeid in nodes){
                 node = nodes[nodeid];
-                node_element = node._data.view.element;
-                expander = node._data.view.expander;
+                view_data = node._data.view;
+                node_element = view_data.element;
+                expander = view_data.expander;
                 if(!this.layout.is_visible(node)){
                     node_element.style.display = 'none';
                     expander.style.display = 'none';
                     continue;
                 }
                 p = this.layout.get_node_point(node);
+                view_data.abs_x = _offset.x + p.x;
+                view_data.abs_y = _offset.y + p.y;
                 node_element.style.left = (_offset.x+p.x) + 'px';
                 node_element.style.top = (_offset.y+p.y) + 'px';
                 node_element.style.display = '';
@@ -2003,7 +2034,7 @@
                 pin.y + offset.y,
                 pout.x + offset.x,
                 pout.y + offset.y);
-        }
+        },
     };
 
     // view provider
@@ -2083,8 +2114,32 @@
             }
         },
         handle_up:function(_jm,e){
+            var evt = e || event;
+            var selected_node = _jm.get_selected_node();
+            if(!!selected_node){
+                var n = _jm.mind.get_node_before(selected_node);
+                if(!!n){
+                    _jm.select_node(n);
+                }else{
+                    //TODO:for node parent's brother's children
+                }
+                evt.stopPropagation();
+                evt.preventDefault();
+            }
         },
         handle_down:function(_jm,e){
+            var evt = e || event;
+            var selected_node = _jm.get_selected_node();
+            if(!!selected_node){
+                var n = _jm.mind.get_node_after(selected_node);
+                if(!!n){
+                    _jm.select_node(n);
+                }else{
+                    //TODO:for node parent's brother's children
+                }
+                evt.stopPropagation();
+                evt.preventDefault();
+            }
         },
         handle_left:function(_jm,e){
         },
