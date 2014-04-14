@@ -47,8 +47,18 @@
         };
         var options = {
             container:'jsmind_container',
-            readonly:false,
-            theme:'primary'
+            editable:true,
+            theme:'primary',
+            shortcut:{
+                handles:{
+                    test:function(j,e){
+                        console.log(j);
+                    }
+                },
+                mapping:{
+                    test:89
+                }
+            }
         }
         _jm = jsMind.show(options,mind);
         // jm.set_readonly(true);

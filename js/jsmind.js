@@ -27,11 +27,6 @@
     var $t = function(n,t){if(n.hasChildNodes()){n.firstChild.nodeValue = t;}else{n.appendChild($d.createTextNode(t));}};
     var $h = function(n,t){n.innerHTML = t;};
 
-    /*
-     * !! ATTENTION !!
-     * DO NOT EXPAND OPTIONS TO 3 LEVEL OR MORE.
-     * LOWER OPTIONS WILL NOT BE MERGE BUT REWRITE
-     */
     var DEFAULT_OPTIONS = {
         container : 'jsmind_container',   // id of the container
         editable : false,                 // you can change it in your options
@@ -47,19 +42,33 @@
             hspace:30,
             vspace:20,
             pspace:13
-        }
+        },
+        shortcut:{
+            enable:true,
+            handles:{
+            },
+            mapping:{
+                addchild   : 45, // Insert
+                addbrother : 13, // Enter
+                editnode   : 113,// F2
+                delnode    : 46, // Delete
+                toggle     : 32, // Space
+                left       : 37, // Left
+                up         : 38, // Up
+                right      : 39, // Right
+                down       : 40, // Down
+            }
+        },
     };
 
     // core object
     var jm = function(options){
+        jm.current = this;
+
         this.version = __version__;
-        /*
-         * merge DEFAULT_OPTIONS and options
-         * only merge in 2 level, lower will be rewrite
-         */
         var opts = {};
-        for (var o in DEFAULT_OPTIONS) {opts[o] = DEFAULT_OPTIONS[o];}
-        for (var o in options) { if((o in opts) && (typeof options[o]) == 'object'){ for (var k in options[o]){opts[o][k] = options[o][k];} }else{ opts[o]=options[o]; } }
+        jm.util.json.merge(opts, DEFAULT_OPTIONS);
+        jm.util.json.merge(opts, options);
 
         this.options = opts;
         this.mind = null;
@@ -141,13 +150,19 @@
                 //_console.debug(parent_node);
                 var node = null;
                 if(parent_node.isroot){
-                    var d = jm.direction.left;
-                    if(isNaN(direction) || direction != jm.direction.left){
-                        d = jm.direction.right;
+                    var d = jm.direction.right;
+                    if(isNaN(direction)){
+                        var children = parent_node.children;
+                        var children_len = children.length;
+                        var r = 0;
+                        for(var i=0;i<children_len;i++){if(children[i].direction === jm.direction.left){r--;}else{r++;}}
+                        d = (children_len > 1 && r > 0) ? jm.direction.left : jm.direction.right
+                    }else{
+                        d = (direction != jm.direction.left) ? jm.direction.right : jm.direction.left;
                     }
                     node = new jm.node(nodeid,nodeindex,topic,data,false,parent_node,d);
                 }else{
-                    node = new jm.node(nodeid,nodeindex,topic,data,false,parent_node);
+                    node = new jm.node(nodeid,nodeindex,topic,data,false,parent_node,parent_node.direction);
                 }
                 if(this._put_node(node)){
                     parent_node.children.push(node);
@@ -176,6 +191,20 @@
             }
         },
 
+        get_node_before:function(node){
+            if(!node){return null;}
+            if(typeof node === 'string'){
+                return this.get_node_before(this.get_node(node));
+            }
+            if(node.isroot){return null;}
+            var idx = node.index - 2;
+            if(idx >= 0){
+                return node.parent.children[idx];
+            }else{
+                return null;
+            }
+        },
+
         insert_node_after:function(node_after, nodeid, topic, data){
             if(typeof node_after == 'string'){
                 return this.insert_node_after(this.get_node(node_after), nodeid, topic, data);
@@ -189,8 +218,25 @@
             }
         },
 
-        move_node:function(nodeid, beforeid){
-            var node = this.get_node(nodeid);
+        get_node_after:function(node){
+            if(!node){return null;}
+            if(typeof node === 'string'){
+                return this.get_node_after(this.get_node(node));
+            }
+            if(node.isroot){return null;}
+            var idx = node.index;
+            var brothers = node.parent.children;
+            if(brothers.length >= idx){
+                return node.parent.children[idx];
+            }else{
+                return null;
+            }
+        },
+
+        move_node:function(node, beforeid){
+            if(typeof node === 'string'){
+                return this.move_node(this.get_node(node), beforeid);
+            }
             if(!!node && !!beforeid){
                 if(beforeid == '_last_'){
                     node.index = -1;
@@ -202,6 +248,7 @@
                     var node_before = (!!beforeid)?this.get_node(beforeid):null;
                     if(node_before!=null && node_before.parent!=null && node_before.parent.id==node.parent.id){
                         node.index = node_before.index - 0.5;
+                        node.direction = node_before.direction;
                         this._reindex(node.parent);
                     }
                 }
@@ -218,7 +265,7 @@
                 return false;
             }
             if(node.isroot){
-                _console.error('fail, can not remove the root node');
+                _console.error('fail, can not remove root node');
                 return false;
             }
             if(this.selected!=null && this.selected.id == node.id){
@@ -417,7 +464,7 @@
                 if(!!root_id){
                     df._extract_subnode(mind, root_id, narray);
                 }else{
-                    _console.error('the root node can not be found');
+                    _console.error('root node can not be found');
                 }
             },
 
@@ -812,6 +859,22 @@
                         return null;
                     }
                 }
+            },
+            merge:function(b,a){
+                for(var o in a){
+                    if(o in b){
+                        if(typeof b[o] === 'object' &&
+                            Object.prototype.toString.call(b[o]).toLowerCase() == "[object object]" &&
+                            !b[o].length){
+                            jm.util.json.merge(b[o], a[o]);
+                        }else{
+                            b[o] = a[o];
+                        }
+                    }else{
+                        b[o] = a[o];
+                    }
+                }
+                return b;
             }
         },
 
@@ -850,10 +913,12 @@
             this.data = new jm.data_provider(this);
             this.layout = new jm.layout_provider(this, opts_layout);
             this.view = new jm.view_provider(this, opts_view);
+            this.shortcut = new jm.shortcut_provider(this, opts.shortcut);
 
             this.data.init();
             this.layout.init();
             this.view.init();
+            this.shortcut.init();
 
             this._event_bind();
         },
@@ -883,7 +948,7 @@
         },
 
         click_handle:function(e){
-            var element = e.target || e.srcElement;
+            var element = e.target || event.srcElement;
             var isnode = this.view.is_node(element);
             var isexpander = this.view.is_expander(element);
 
@@ -899,7 +964,7 @@
 
         dblclick_handle:function(e){
             if(this.get_editable()){
-                var element = e.target || e.srcElement;
+                var element = e.target || event.srcElement;
                 var isnode = this.view.is_node(element);
                 if(isnode){
                     var nodeid = this.view.get_nodeid(element);
@@ -908,13 +973,15 @@
             }
         },
 
-        begin_edit:function(nodeid){
+        begin_edit:function(node){
+            if(typeof node === 'string'){
+                return this.begin_edit(this.get_node(node));
+            }
             if(this.get_editable()){
-                var node = this.get_node(nodeid);
                 if(!!node){
                     this.view.edit_node_begin(node);
                 }else{
-                    _console.error('the node[id='+nodeid+'] can not be found');
+                    _console.error('the node can not be found');
                 }
             }else{
                 _console.error('fail, this mind map is not editable.');
@@ -926,27 +993,42 @@
             this.view.edit_node_end();
         },
 
-        toggle_node:function(nodeid){
-            var node = this.mind.get_node(nodeid);
-            if(!!node && !node.isroot){
+        toggle_node:function(node){
+            if(typeof node === 'string'){
+                return this.toggle_node(this.get_node(node));
+            }
+            if(!!node){
+                if(node.isroot){return;}
                 this.layout.toggle_node(node);
                 this.view.relayout();
+            }else{
+                _console.error('the node can not be found.');
             }
         },
 
-        expand_node:function(nodeid){
-            var node = this.mind.get_node(nodeid);
-            if(!!node && !node.isroot){
+        expand_node:function(node){
+            if(typeof node === 'string'){
+                return this.expand_node(this.get_node(node));
+            }
+            if(!!node){
+                if(node.isroot){return;}
                 this.layout.expand_node(node);
                 this.view.relayout();
+            }else{
+                _console.error('the node can not be found.');
             }
         },
 
-        collapse_node:function(nodeid){
-            var node = this.mind.get_node(nodeid);
-            if(!!node && !node.isroot){
+        collapse_node:function(node){
+            if(typeof node === 'string'){
+                return this.collapse_node(this.get_node(node));
+            }
+            if(!!node){
+                if(node.isroot){return;}
                 this.layout.collapse_node(node);
                 this.view.relayout();
+            }else{
+                _console.error('the node can not be found.');
             }
         },
 
@@ -1013,6 +1095,7 @@
                     this.view.add_node(node);
                     this.layout.layout();
                     this.view.show();
+                    this.expand_node(parent_node);
                 }
                 return node;
             }else{
@@ -1052,13 +1135,13 @@
         },
 
         remove_node:function(node){
-            if(typeof node == 'string'){
+            if(typeof node === 'string'){
                 return this.remove_node(this.get_node(node));
             }
             if(this.get_editable()){
                 if(!!node){
                     if(node.isroot){
-                        _console.error('fail, can not remove the root node');
+                        _console.error('fail, can not remove root node');
                         return false;
                     }
                     this.view.remove_node(node);
@@ -1079,6 +1162,11 @@
             if(this.get_editable()){
                 var node = this.get_node(nodeid);
                 if(!!node){
+                    if(node.topic === topic){
+                        _console.info('nothing changed');
+                        this.view.update_node(node);
+                        return;
+                    }
                     node.topic = topic;
                     this.view.update_node(node);
                     this.layout.layout();
@@ -1104,8 +1192,13 @@
             }
         },
 
-        select_node:function(nodeid){
-            var node = this.get_node(nodeid);
+        select_node:function(node){
+            if(typeof node === 'string'){
+                return this.select_node(this.get_node(node));
+            }
+            if(!this.layout.is_visible(node)){
+                return;
+            }
             this.mind.selected = node;
             if(!!node){
                 this.view.select_node(node);
@@ -1125,6 +1218,63 @@
                 this.mind.selected = null;
                 this.view.select_clear();
             }
+        },
+
+        is_node_visible:function(node){
+            return this.layout.is_visible(node);
+        },
+
+        find_node_before:function(node){
+            if(typeof node === 'string'){
+                return this.find_node_before(this.get_node(node));
+            }
+            if(!node || node.isroot){return null;}
+            var n = null;
+            if(node.parent.isroot){
+                var c = node.parent.children;
+                var prev = null;
+                var ni = null;
+                for(var i=0;i<c.length;i++){
+                    ni = c[i];
+                    if(node.direction === ni.direction){
+                        if(node.id === ni.id){
+                            n = prev;
+                        }
+                        prev = ni;
+                    }
+                }
+            }else{
+                n = this.mind.get_node_before(node);
+            }
+            return n;
+        },
+
+        find_node_after:function(node){
+            if(typeof node === 'string'){
+                return this.find_node_after(this.get_node(node));
+            }
+            if(!node || node.isroot){return null;}
+            var n = null;
+            if(node.parent.isroot){
+                var c = node.parent.children;
+                var getthis = false;
+                var ni = null;
+                for(var i=0;i<c.length;i++){
+                    ni = c[i];
+                    if(node.direction === ni.direction){
+                        if(getthis){
+                            n = ni;
+                            break;
+                        }
+                        if(node.id === ni.id){
+                            getthis = true;
+                        }
+                    }
+                }
+            }else{
+                n = this.mind.get_node_after(node);
+            }
+            return n;
         },
 
         resize:function(){
@@ -1614,7 +1764,8 @@
 
             var v = this;
             jm.util.dom.add_event(this.e_editor,'keydown',function(e){
-                if(e.keyCode == 13){v.edit_node_end();}
+                var evt = e || event;
+                if(evt.keyCode == 13){v.edit_node_end();evt.stopPropagation();}
             });
             jm.util.dom.add_event(this.e_editor,'blur',function(e){
                 v.edit_node_end();
@@ -1788,6 +1939,10 @@
             this.select_node(null);
         },
 
+        get_editing_node:function(){
+            return this.editing_node;
+        },
+
         edit_node_begin:function(node){
             if(this.editing_node != null){
                 this.edit_node_end();
@@ -1813,7 +1968,7 @@
                 var topic = this.e_editor.value;
                 element.style.zIndex = 'auto';
                 element.removeChild(this.e_editor);
-                this.jm.update_node(node.id,topic,node.summary);
+                this.jm.update_node(node.id,topic);
             }
         },
 
@@ -1892,17 +2047,21 @@
             var p = null;
             var p_expander= null;
             var expander_text = '-';
+            var view_data = null;
             var _offset = this.get_view_offset();
             for(var nodeid in nodes){
                 node = nodes[nodeid];
-                node_element = node._data.view.element;
-                expander = node._data.view.expander;
+                view_data = node._data.view;
+                node_element = view_data.element;
+                expander = view_data.expander;
                 if(!this.layout.is_visible(node)){
                     node_element.style.display = 'none';
                     expander.style.display = 'none';
                     continue;
                 }
                 p = this.layout.get_node_point(node);
+                view_data.abs_x = _offset.x + p.x;
+                view_data.abs_y = _offset.y + p.y;
                 node_element.style.left = (_offset.x+p.x) + 'px';
                 node_element.style.top = (_offset.y+p.y) + 'px';
                 node_element.style.display = '';
@@ -1947,12 +2106,180 @@
                 pin.y + offset.y,
                 pout.x + offset.x,
                 pout.y + offset.y);
-        }
+        },
     };
 
+    // view provider
+    jm.shortcut_provider= function(jm, options){
+        this.jm = jm;
+        this.opts = options;
+        this.mapping = options.mapping;
+        this.handles = options.handles;
+        this._mapping = {};
+    };
+
+    jm.shortcut_provider.prototype = {
+        init : function(){
+            jm.util.dom.add_event($d,'keydown',this.handler.bind(this));
+
+            this.handles['addchild'] = this.handle_addchild;
+            this.handles['addbrother'] = this.handle_addbrother;
+            this.handles['editnode'] = this.handle_editnode;
+            this.handles['delnode'] = this.handle_delnode;
+            this.handles['toggle'] = this.handle_toggle;
+            this.handles['up'] = this.handle_up;
+            this.handles['down'] = this.handle_down;
+            this.handles['left'] = this.handle_left;
+            this.handles['right'] = this.handle_right;
+
+            for(var handle in this.mapping){
+                if(!!this.mapping[handle] && (handle in this.handles)){
+                    this._mapping[this.mapping[handle]] = this.handles[handle];
+                }
+            }
+        },
+
+        enable_shortcut : function(){
+            this.opts.enable = true;
+        },
+
+        disable_shortcut : function(){
+            this.opts.enable = false;
+        },
+
+        handler : function(e){
+            var evt = e || event;
+            if(!this.opts.enable){return true;}
+            var kc = evt.keyCode;
+            if(kc in this._mapping){
+                this._mapping[kc].call(this,this.jm,e);
+            }
+        },
+
+        handle_addchild: function(_jm,e){
+            var selected_node = _jm.get_selected_node();
+            if(!!selected_node){
+                var nodeid = jm.util.uuid.newid();
+                var node = _jm.add_node(selected_node, nodeid, 'New Node');
+                if(!!node){
+                    _jm.select_node(nodeid);
+                    _jm.begin_edit(nodeid);
+                }
+            }
+        },
+        handle_addbrother:function(_jm,e){
+            var selected_node = _jm.get_selected_node();
+            if(!!selected_node && !selected_node.isroot){
+                var nodeid = jm.util.uuid.newid();
+                var node = _jm.insert_node_after(selected_node, nodeid, 'New Node');
+                if(!!node){
+                    _jm.select_node(nodeid);
+                    _jm.begin_edit(nodeid);
+                }
+            }
+        },
+        handle_editnode:function(_jm,e){
+            var selected_node = _jm.get_selected_node();
+            if(!!selected_node){
+                _jm.begin_edit(selected_node);
+            }
+        },
+        handle_delnode:function(_jm,e){
+            var selected_node = _jm.get_selected_node();
+            if(!!selected_node && !selected_node.isroot){
+                _jm.select_node(selected_node.parent);
+                _jm.remove_node(selected_node);
+            }
+        },
+        handle_toggle:function(_jm,e){
+            var evt = e || event;
+            var selected_node = _jm.get_selected_node();
+            if(!!selected_node){
+                _jm.toggle_node(selected_node.id);
+                evt.stopPropagation();
+                evt.preventDefault();
+            }
+        },
+        handle_up:function(_jm,e){
+            var evt = e || event;
+            var selected_node = _jm.get_selected_node();
+            var up_node = _jm.find_node_before(selected_node);
+            if(!up_node){
+                var np = _jm.find_node_before(selected_node.parent);
+                if(!!np && np.children.length > 0){
+                    up_node = np.children[np.children.length-1];
+                }
+            }
+            if(!!up_node){
+                _jm.select_node(up_node);
+            }
+            evt.stopPropagation();
+            evt.preventDefault();
+        },
+
+        handle_down:function(_jm,e){
+            var evt = e || event;
+            var selected_node = _jm.get_selected_node();
+            var down_node = _jm.find_node_after(selected_node);
+            if(!down_node){
+                var np = _jm.find_node_after(selected_node.parent);
+                if(!!np && np.children.length > 0){
+                    down_node = np.children[0];
+                }
+            }
+            if(!!down_node){
+                _jm.select_node(down_node);
+            }
+            evt.stopPropagation();
+            evt.preventDefault();
+        },
+
+        handle_left:function(_jm,e){
+            this._handle_direction(_jm,e,jm.direction.left);
+        },
+        handle_right:function(_jm,e){
+            this._handle_direction(_jm,e,jm.direction.right);
+        },
+        _handle_direction:function(_jm,e,d){
+            var evt = e || event;
+            var selected_node = _jm.get_selected_node();
+            var node = null;
+            if(!!selected_node){
+                if(selected_node.isroot){
+                    var c = selected_node.children;
+                    var children = [];
+                    for(var i=0;i<c.length;i++){
+                        if(c[i].direction === d){
+                            children.push(i)
+                        }
+                    }
+                    node = c[children[Math.floor((children.length-1)/2)]];
+                }
+                else if(selected_node.direction === d){
+                    var children = selected_node.children;
+                    var childrencount = children.length;
+                    if(childrencount > 0){
+                        node = children[Math.floor((childrencount-1)/2)]
+                    }
+                }else{
+                    node = selected_node.parent;
+                }
+                if(!!node){
+                    _jm.select_node(node);
+                }
+                evt.stopPropagation();
+                evt.preventDefault();
+            }
+        },
+    };
+
+    jm.current = null;
 
     jm.show = function(options,mind){
-        var _jm = new jm(options);
+        var _jm = jm.current;
+        if(!_jm){
+            _jm = new jm(options);
+        }
         _jm.show(mind);
         return _jm;
     };
