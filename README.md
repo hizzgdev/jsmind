@@ -114,6 +114,7 @@ It is very easy, is not it?
             ]}
         }
 
+
 **node array**(easy for deal with data from database)
 
         {
@@ -142,6 +143,7 @@ It is very easy, is not it?
                 {"id":"powerful3", "parentid":"powerful", "topic":"Depends on you"},
             ]
         }
+
 
 **freemind** (for freemind)
 
