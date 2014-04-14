@@ -50,6 +50,8 @@
             mapping:{
                 addchild   : 45, // Insert
                 addbrother : 13, // Enter
+                editnode   : 113,// F2
+                delnode    : 46, // Delete
                 toggle     : 32, // Space
                 left       : 37, // Left
                 up         : 38, // Up
@@ -190,6 +192,7 @@
         },
 
         get_node_before:function(node){
+            if(!node){return null;}
             if(typeof node === 'string'){
                 return this.get_node_before(this.get_node(node));
             }
@@ -216,6 +219,7 @@
         },
 
         get_node_after:function(node){
+            if(!node){return null;}
             if(typeof node === 'string'){
                 return this.get_node_after(this.get_node(node));
             }
@@ -261,7 +265,7 @@
                 return false;
             }
             if(node.isroot){
-                _console.error('fail, can not remove the root node');
+                _console.error('fail, can not remove root node');
                 return false;
             }
             if(this.selected!=null && this.selected.id == node.id){
@@ -460,7 +464,7 @@
                 if(!!root_id){
                     df._extract_subnode(mind, root_id, narray);
                 }else{
-                    _console.error('the root node can not be found');
+                    _console.error('root node can not be found');
                 }
             },
 
@@ -993,11 +997,12 @@
             if(typeof node === 'string'){
                 return this.toggle_node(this.get_node(node));
             }
-            if(!!node && !node.isroot){
+            if(!!node){
+                if(node.isroot){return;}
                 this.layout.toggle_node(node);
                 this.view.relayout();
             }else{
-                _console.error('the node can not be found, or it is root.');
+                _console.error('the node can not be found.');
             }
         },
 
@@ -1005,11 +1010,12 @@
             if(typeof node === 'string'){
                 return this.expand_node(this.get_node(node));
             }
-            if(!!node && !node.isroot){
+            if(!!node){
+                if(node.isroot){return;}
                 this.layout.expand_node(node);
                 this.view.relayout();
             }else{
-                _console.error('the node can not be found, or it is root node.');
+                _console.error('the node can not be found.');
             }
         },
 
@@ -1017,11 +1023,12 @@
             if(typeof node === 'string'){
                 return this.collapse_node(this.get_node(node));
             }
-            if(!!node && !node.isroot){
+            if(!!node){
+                if(node.isroot){return;}
                 this.layout.collapse_node(node);
                 this.view.relayout();
             }else{
-                _console.error('the node can not be found, or it is root node.');
+                _console.error('the node can not be found.');
             }
         },
 
@@ -1134,7 +1141,7 @@
             if(this.get_editable()){
                 if(!!node){
                     if(node.isroot){
-                        _console.error('fail, can not remove the root node');
+                        _console.error('fail, can not remove root node');
                         return false;
                     }
                     this.view.remove_node(node);
@@ -1155,6 +1162,11 @@
             if(this.get_editable()){
                 var node = this.get_node(nodeid);
                 if(!!node){
+                    if(node.topic === topic){
+                        _console.info('nothing changed');
+                        this.view.update_node(node);
+                        return;
+                    }
                     node.topic = topic;
                     this.view.update_node(node);
                     this.layout.layout();
@@ -1184,6 +1196,9 @@
             if(typeof node === 'string'){
                 return this.select_node(this.get_node(node));
             }
+            if(!this.layout.is_visible(node)){
+                return;
+            }
             this.mind.selected = node;
             if(!!node){
                 this.view.select_node(node);
@@ -1203,6 +1218,63 @@
                 this.mind.selected = null;
                 this.view.select_clear();
             }
+        },
+
+        is_node_visible:function(node){
+            return this.layout.is_visible(node);
+        },
+
+        find_node_before:function(node){
+            if(typeof node === 'string'){
+                return this.find_node_before(this.get_node(node));
+            }
+            if(!node || node.isroot){return null;}
+            var n = null;
+            if(node.parent.isroot){
+                var c = node.parent.children;
+                var prev = null;
+                var ni = null;
+                for(var i=0;i<c.length;i++){
+                    ni = c[i];
+                    if(node.direction === ni.direction){
+                        if(node.id === ni.id){
+                            n = prev;
+                        }
+                        prev = ni;
+                    }
+                }
+            }else{
+                n = this.mind.get_node_before(node);
+            }
+            return n;
+        },
+
+        find_node_after:function(node){
+            if(typeof node === 'string'){
+                return this.find_node_after(this.get_node(node));
+            }
+            if(!node || node.isroot){return null;}
+            var n = null;
+            if(node.parent.isroot){
+                var c = node.parent.children;
+                var getthis = false;
+                var ni = null;
+                for(var i=0;i<c.length;i++){
+                    ni = c[i];
+                    if(node.direction === ni.direction){
+                        if(getthis){
+                            n = ni;
+                            break;
+                        }
+                        if(node.id === ni.id){
+                            getthis = true;
+                        }
+                    }
+                }
+            }else{
+                n = this.mind.get_node_after(node);
+            }
+            return n;
         },
 
         resize:function(){
@@ -1896,7 +1968,7 @@
                 var topic = this.e_editor.value;
                 element.style.zIndex = 'auto';
                 element.removeChild(this.e_editor);
-                this.jm.update_node(node.id,topic,node.summary);
+                this.jm.update_node(node.id,topic);
             }
         },
 
@@ -2052,6 +2124,8 @@
 
             this.handles['addchild'] = this.handle_addchild;
             this.handles['addbrother'] = this.handle_addbrother;
+            this.handles['editnode'] = this.handle_editnode;
+            this.handles['delnode'] = this.handle_delnode;
             this.handles['toggle'] = this.handle_toggle;
             this.handles['up'] = this.handle_up;
             this.handles['down'] = this.handle_down;
@@ -2095,13 +2169,26 @@
         },
         handle_addbrother:function(_jm,e){
             var selected_node = _jm.get_selected_node();
-            if(!!selected_node){
+            if(!!selected_node && !selected_node.isroot){
                 var nodeid = jm.util.uuid.newid();
                 var node = _jm.insert_node_after(selected_node, nodeid, 'New Node');
                 if(!!node){
                     _jm.select_node(nodeid);
                     _jm.begin_edit(nodeid);
                 }
+            }
+        },
+        handle_editnode:function(_jm,e){
+            var selected_node = _jm.get_selected_node();
+            if(!!selected_node){
+                _jm.begin_edit(selected_node);
+            }
+        },
+        handle_delnode:function(_jm,e){
+            var selected_node = _jm.get_selected_node();
+            if(!!selected_node && !selected_node.isroot){
+                _jm.select_node(selected_node.parent);
+                _jm.remove_node(selected_node);
             }
         },
         handle_toggle:function(_jm,e){
@@ -2116,34 +2203,73 @@
         handle_up:function(_jm,e){
             var evt = e || event;
             var selected_node = _jm.get_selected_node();
-            if(!!selected_node){
-                var n = _jm.mind.get_node_before(selected_node);
-                if(!!n){
-                    _jm.select_node(n);
-                }else{
-                    //TODO:for node parent's brother's children
+            var up_node = _jm.find_node_before(selected_node);
+            if(!up_node){
+                var np = _jm.find_node_before(selected_node.parent);
+                if(!!np && np.children.length > 0){
+                    up_node = np.children[np.children.length-1];
                 }
-                evt.stopPropagation();
-                evt.preventDefault();
             }
+            if(!!up_node){
+                _jm.select_node(up_node);
+            }
+            evt.stopPropagation();
+            evt.preventDefault();
         },
+
         handle_down:function(_jm,e){
             var evt = e || event;
             var selected_node = _jm.get_selected_node();
+            var down_node = _jm.find_node_after(selected_node);
+            if(!down_node){
+                var np = _jm.find_node_after(selected_node.parent);
+                if(!!np && np.children.length > 0){
+                    down_node = np.children[0];
+                }
+            }
+            if(!!down_node){
+                _jm.select_node(down_node);
+            }
+            evt.stopPropagation();
+            evt.preventDefault();
+        },
+
+        handle_left:function(_jm,e){
+            this._handle_direction(_jm,e,jm.direction.left);
+        },
+        handle_right:function(_jm,e){
+            this._handle_direction(_jm,e,jm.direction.right);
+        },
+        _handle_direction:function(_jm,e,d){
+            var evt = e || event;
+            var selected_node = _jm.get_selected_node();
+            var node = null;
             if(!!selected_node){
-                var n = _jm.mind.get_node_after(selected_node);
-                if(!!n){
-                    _jm.select_node(n);
+                if(selected_node.isroot){
+                    var c = selected_node.children;
+                    var children = [];
+                    for(var i=0;i<c.length;i++){
+                        if(c[i].direction === d){
+                            children.push(i)
+                        }
+                    }
+                    node = c[children[Math.floor((children.length-1)/2)]];
+                }
+                else if(selected_node.direction === d){
+                    var children = selected_node.children;
+                    var childrencount = children.length;
+                    if(childrencount > 0){
+                        node = children[Math.floor((childrencount-1)/2)]
+                    }
                 }else{
-                    //TODO:for node parent's brother's children
+                    node = selected_node.parent;
+                }
+                if(!!node){
+                    _jm.select_node(node);
                 }
                 evt.stopPropagation();
                 evt.preventDefault();
             }
-        },
-        handle_left:function(_jm,e){
-        },
-        handle_right:function(_jm,e){
         },
     };
 
