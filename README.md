@@ -8,7 +8,9 @@ jsMind is very powerful. It base on javascript and HTML5(Canvas).
 jsMind is under BSD license. You can embed it in any project, if only you observe the license.
 
 Demo : <http://hizzgdev.github.io/jsmind/>
+
 Demo-basic : <http://hizzgdev.github.io/jsmind/example/1_basic.html>
+
 Demo-features : <http://hizzgdev.github.io/jsmind/example/2_features.html>
 
 1. Usage
@@ -23,7 +25,7 @@ a div element should be in your HTML as container
 
     <div id="jsmind_container"></div>
 
-### 1.2. An empty mindmap
+### 1.2. Empty mindmap
 It is very easy to show a mindmap:
 
     <script type="text/javascript">
@@ -41,7 +43,7 @@ jsMind show a map in read-only mode as default, you can enable editable mode wit
 
 The container option is the only required, the value should be the id of the container.
 
-### 1.3. A simple mindmap
+### 1.3. Simple mindmap
 You can display an existing mindmap:
 
     <script type="text/javascript">
@@ -86,7 +88,8 @@ It is very easy, is not it?
 ### 1.4. Data format
 3 data formats are supported:
 
-**node tree**(default)
+#### A. node tree
+This is the default data format:
 
     {
         "meta":{
@@ -119,7 +122,8 @@ It is very easy, is not it?
     }
 
 
-**node array**(easy for deal with data from database)
+#### B. node array
+This data format help you to operate the data from database)
 
     {
         "meta":{
@@ -149,7 +153,8 @@ It is very easy, is not it?
     }
 
 
-**freemind** (for freemind)
+#### C. freemind
+This is example of freemind
 
     {
         "meta":{
@@ -225,6 +230,8 @@ Actually, some other options are also supported, these are all options below, yo
 + pomegranate
 + clouds
 + asbestos
+
+visit [Demo-features](http://hizzgdev.github.io/jsmind/example/2_features.html) for preview.
 
 And, you can add your theme in jsmind.css.
 
