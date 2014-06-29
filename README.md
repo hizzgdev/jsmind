@@ -84,88 +84,88 @@ It is very easy, is not it?
 
 **node tree**(default)
 
-        {
-            "meta":{
-                "name":"jsMind remote",
-                "author":"hizzgdev@163.com",
-                "version":"0.2"
-            },
-            "format":"node_tree",
-            "data":{"id":"root","topic":"jsMind","children":[
-                {"id":"easy","topic":"Easy","direction":"left","children":[
-                    {"id":"easy1","topic":"Easy to show"},
-                    {"id":"easy2","topic":"Easy to edit"},
-                    {"id":"easy3","topic":"Easy to store"},
-                    {"id":"easy4","topic":"Easy to embed"}
-                ]},
-                {"id":"open","topic":"Open Source","direction":"right","children":[
-                    {"id":"open1","topic":"on GitHub"},
-                    {"id":"open2","topic":"BSD License"}
-                ]},
-                {"id":"powerful","topic":"Powerful","direction":"right","children":[
-                    {"id":"powerful1","topic":"Base on Javascript"},
-                    {"id":"powerful2","topic":"Base on HTML5"},
-                    {"id":"powerful3","topic":"Depends on you"}
-                ]},
-                {"id":"other","topic":"test node","direction":"left","children":[
-                    {"id":"other1","topic":"I'm from local variable"},
-                    {"id":"other2","topic":"I can do everything"}
-                ]}
+    {
+        "meta":{
+            "name":"jsMind remote",
+            "author":"hizzgdev@163.com",
+            "version":"0.2"
+        },
+        "format":"node_tree",
+        "data":{"id":"root","topic":"jsMind","children":[
+            {"id":"easy","topic":"Easy","direction":"left","children":[
+                {"id":"easy1","topic":"Easy to show"},
+                {"id":"easy2","topic":"Easy to edit"},
+                {"id":"easy3","topic":"Easy to store"},
+                {"id":"easy4","topic":"Easy to embed"}
+            ]},
+            {"id":"open","topic":"Open Source","direction":"right","children":[
+                {"id":"open1","topic":"on GitHub"},
+                {"id":"open2","topic":"BSD License"}
+            ]},
+            {"id":"powerful","topic":"Powerful","direction":"right","children":[
+                {"id":"powerful1","topic":"Base on Javascript"},
+                {"id":"powerful2","topic":"Base on HTML5"},
+                {"id":"powerful3","topic":"Depends on you"}
+            ]},
+            {"id":"other","topic":"test node","direction":"left","children":[
+                {"id":"other1","topic":"I'm from local variable"},
+                {"id":"other2","topic":"I can do everything"}
             ]}
-        }
+        ]}
+    }
 
 
 **node array**(easy for deal with data from database)
 
-        {
-            "meta":{
-                "name":"example",
-                "author":"hizzgdev@163.com",
-                "version":"0.2"
-            },
-            "format":"node_array",
-            "data":[
-                {"id":"root", "isroot":true, "topic":"jsMind"},
+    {
+        "meta":{
+            "name":"example",
+            "author":"hizzgdev@163.com",
+            "version":"0.2"
+        },
+        "format":"node_array",
+        "data":[
+            {"id":"root", "isroot":true, "topic":"jsMind"},
 
-                {"id":"easy", "parentid":"root", "topic":"Easy", "direction":"left"},
-                {"id":"easy1", "parentid":"easy", "topic":"Easy to show"},
-                {"id":"easy2", "parentid":"easy", "topic":"Easy to edit"},
-                {"id":"easy3", "parentid":"easy", "topic":"Easy to store"},
-                {"id":"easy4", "parentid":"easy", "topic":"Easy to embed"},
+            {"id":"easy", "parentid":"root", "topic":"Easy", "direction":"left"},
+            {"id":"easy1", "parentid":"easy", "topic":"Easy to show"},
+            {"id":"easy2", "parentid":"easy", "topic":"Easy to edit"},
+            {"id":"easy3", "parentid":"easy", "topic":"Easy to store"},
+            {"id":"easy4", "parentid":"easy", "topic":"Easy to embed"},
 
-                {"id":"open", "parentid":"root", "topic":"Open Source", "direction":"right"},
-                {"id":"open1", "parentid":"open", "topic":"on GitHub"},
-                {"id":"open2", "parentid":"open", "topic":"BSD License"},
+            {"id":"open", "parentid":"root", "topic":"Open Source", "direction":"right"},
+            {"id":"open1", "parentid":"open", "topic":"on GitHub"},
+            {"id":"open2", "parentid":"open", "topic":"BSD License"},
 
-                {"id":"powerful", "parentid":"root", "topic":"Powerful", "direction":"right"},
-                {"id":"powerful1", "parentid":"powerful", "topic":"Base on Javascript"},
-                {"id":"powerful2", "parentid":"powerful", "topic":"Base on HTML5"},
-                {"id":"powerful3", "parentid":"powerful", "topic":"Depends on you"},
-            ]
-        }
+            {"id":"powerful", "parentid":"root", "topic":"Powerful", "direction":"right"},
+            {"id":"powerful1", "parentid":"powerful", "topic":"Base on Javascript"},
+            {"id":"powerful2", "parentid":"powerful", "topic":"Base on HTML5"},
+            {"id":"powerful3", "parentid":"powerful", "topic":"Depends on you"},
+        ]
+    }
 
 
 **freemind** (for freemind)
 
-        {
-            "meta":{
-                "name":"example",
-                "author":"hizzgdev@163.com",
-                "version":"0.2"
-            },
-            "format":"freemind",
-            "data":"<map version=\"1.0.1\"> <node ID=\"root\" TEXT=\"jsMind\" > <node ID=\"easy\" POSITION=\"left\" TEXT=\"Easy\" > <node ID=\"easy1\" TEXT=\"Easy to show\" /> <node ID=\"easy2\" TEXT=\"Easy to edit\" /> <node ID=\"easy3\" TEXT=\"Easy to store\" /> <node ID=\"easy4\" TEXT=\"Easy to embed\" /> </node> <node ID=\"open\" POSITION=\"right\" TEXT=\"Open Source\" > <node ID=\"open1\" TEXT=\"on GitHub\" /> <node ID=\"open2\" TEXT=\"BSD License\" /> </node> <node ID=\"powerful\" POSITION=\"right\" TEXT=\"Powerful\" > <node ID=\"powerful1\" TEXT=\"Base on Javascript\" /> <node ID=\"powerful2\" TEXT=\"Base on HTML5\" /> <node ID=\"powerful3\" TEXT=\"Depends on you\" /> </node> <node ID=\"other\" POSITION=\"left\" TEXT=\"test node\" > <node ID=\"other1\" TEXT=\"I'm from local variable\" /> <node ID=\"other2\" TEXT=\"I can do everything\" /> </node> </node> </map>"
-        }
+    {
+        "meta":{
+            "name":"example",
+            "author":"hizzgdev@163.com",
+            "version":"0.2"
+        },
+        "format":"freemind",
+        "data":"<map version=\"1.0.1\"> <node ID=\"root\" TEXT=\"jsMind\" > <node ID=\"easy\" POSITION=\"left\" TEXT=\"Easy\" > <node ID=\"easy1\" TEXT=\"Easy to show\" /> <node ID=\"easy2\" TEXT=\"Easy to edit\" /> <node ID=\"easy3\" TEXT=\"Easy to store\" /> <node ID=\"easy4\" TEXT=\"Easy to embed\" /> </node> <node ID=\"open\" POSITION=\"right\" TEXT=\"Open Source\" > <node ID=\"open1\" TEXT=\"on GitHub\" /> <node ID=\"open2\" TEXT=\"BSD License\" /> </node> <node ID=\"powerful\" POSITION=\"right\" TEXT=\"Powerful\" > <node ID=\"powerful1\" TEXT=\"Base on Javascript\" /> <node ID=\"powerful2\" TEXT=\"Base on HTML5\" /> <node ID=\"powerful3\" TEXT=\"Depends on you\" /> </node> <node ID=\"other\" POSITION=\"left\" TEXT=\"test node\" > <node ID=\"other1\" TEXT=\"I'm from local variable\" /> <node ID=\"other2\" TEXT=\"I can do everything\" /> </node> </node> </map>"
+    }
 
 ### 1.5. Options
 
 As what you see above, you can customize jsMind with some options like this: 
 
-        var options = {
-            container:'jsmind_container',
-            theme:'greensea',
-            editable:true
-        };
+    var options = {
+        container:'jsmind_container',
+        theme:'greensea',
+        editable:true
+    };
 
 Actually, some other options are also supported, these are all options below, you may rewrite any of it in your code.
 
@@ -207,21 +207,21 @@ Actually, some other options are also supported, these are all options below, yo
 
 15 themes was supported in jsmind, you can use them as you like:
 
-+primary
-+warning
-+danger
-+success
-+info
-+greensea
-+nephrite
-+belizehole
-+wisteria
-+asphalt
-+orange
-+pumpkin
-+pomegranate
-+clouds
-+asbestos
++ primary
++ warning
++ danger
++ success
++ info
++ greensea
++ nephrite
++ belizehole
++ wisteria
++ asphalt
++ orange
++ pumpkin
++ pomegranate
++ clouds
++ asbestos
 
 And, you can add your theme in jsmind.css.
 
