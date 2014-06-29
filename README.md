@@ -158,10 +158,82 @@ It is very easy, is not it?
         }
 
 ### 1.5. Options
-To be continued
+
+As what you see above, you can customize jsMind with some options like this: 
+
+        var options = {
+            container:'jsmind_container',
+            theme:'greensea',
+            editable:true
+        };
+
+Actually, some other options are also supported, these are all options below, you may rewrite any of it in your code.
+
+    var DEFAULT_OPTIONS = {
+        container : '',         // id of the container where the mindmap loaded on
+        editable : false,       // allow user to edit the mindmap or not
+        theme : null,           // see [1.6. Themes] for more information
+        mode :'full',           // show topic on right side only, or both left and right
+        support_html : true,    // support html on node topic
+
+        view:{
+            hmargin:100,        // top and bottom padding of container, in pixels
+            vmargin:50          // left and right padding of container, in pixels
+        },
+        layout:{
+            hspace:30,          // horizontal space between nodes, in pixels
+            vspace:20,          // vertical space between nodes, in pixels
+            pspace:13           // width and height of collaps/expand pointer, in pixels
+        },
+        shortcut:{
+            enable:true,        // enable shortcut
+            handles:{           // add your custome handles here, some build-in handles are supported
+            },
+            mapping:{           // handle mapping.
+                addchild   : 45, // Insert
+                addbrother : 13, // Enter
+                editnode   : 113,// F2
+                delnode    : 46, // Delete
+                toggle     : 32, // Space
+                left       : 37, // Left
+                up         : 38, // Up
+                right      : 39, // Right
+                down       : 40, // Down
+            }
+        },
+    };
 
 ### 1.6. Themes
-To be continued
+
+15 themes was supported in jsmind, you can use them as you like:
+
++primary
++warning
++danger
++success
++info
++greensea
++nephrite
++belizehole
++wisteria
++asphalt
++orange
++pumpkin
++pomegranate
++clouds
++asbestos
+
+And, you can add your theme in jsmind.css.
+
+It's greensea theme defined in jsmind.css as example:
+
+    /* greensea theme */
+    jmnodes.greensea jmnode{background-color:#1abc9c;color:#fff;}
+    jmnodes.greensea jmnode:hover{background-color:#16a085;}
+    jmnodes.greensea jmnode.selected{background-color:#11f;color:#fff;}
+    jmnodes.greensea jmnode.root{}
+    jmnodes.greensea jmexpander{}
+    jmnodes.greensea jmexpander:hover{}
 
 2. Apis
 ------
