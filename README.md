@@ -15,4 +15,29 @@ Demo-features : <http://hizzgdev.github.io/jsmind/example/2_features.html>
 
 Documents : [Index of document][1]
 
+Get Started:
+
+    <html>
+        <head>
+            <link type="text/css" rel="stylesheet" href="style/jsmind.css" />
+            <script type="text/javascript" src="js/jsmind.js"></script>
+        </head>
+        <body>
+            <div id="jsmind_container"></div>
+
+            <script type="text/javascript">
+                var mind = {
+                    // 3 data format supported ...
+                    // see Documents for more information
+                };
+                var options = {
+                    container:'jsmind_container',
+                    editable:true,
+                    theme:'orange'
+                };
+                var jm = jsMind.show(options,mind);
+            </script>
+        </body>
+    </html>
+
 [1]:docs/index.md
