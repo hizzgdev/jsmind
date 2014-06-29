@@ -28,7 +28,7 @@
     var $h = function(n,t){n.innerHTML = t;};
 
     var DEFAULT_OPTIONS = {
-        container : 'jsmind_container',   // id of the container
+        container : '',   // id of the container
         editable : false,                 // you can change it in your options
         theme : null,
         mode :'full', // full or side
@@ -69,6 +69,12 @@
         var opts = {};
         jm.util.json.merge(opts, DEFAULT_OPTIONS);
         jm.util.json.merge(opts, options);
+
+        if(opts.container == null || opts.container.length == 0){
+            _console.error('the options.container should not be empty.');
+            this = null;
+            return;
+        }
 
         this.options = opts;
         this.mind = null;
