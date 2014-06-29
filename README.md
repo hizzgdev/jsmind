@@ -172,7 +172,7 @@ Actually, some other options are also supported, these are all options below, yo
     var DEFAULT_OPTIONS = {
         container : '',         // id of the container where the mindmap loaded on
         editable : false,       // allow user to edit the mindmap or not
-        theme : null,           // see [1.6. Themes] for more information
+        theme : null,           // see [1.6. Themes](#16-themes) for more information
         mode :'full',           // show topic on right side only, or both left and right
         support_html : true,    // support html on node topic
 
@@ -190,15 +190,15 @@ Actually, some other options are also supported, these are all options below, yo
             handles:{           // add your custome handles here, some build-in handles are supported
             },
             mapping:{           // handle mapping.
-                addchild   : 45, // Insert
-                addbrother : 13, // Enter
-                editnode   : 113,// F2
-                delnode    : 46, // Delete
-                toggle     : 32, // Space
-                left       : 37, // Left
-                up         : 38, // Up
-                right      : 39, // Right
-                down       : 40, // Down
+                addchild   : 45,    // <Insert>
+                addbrother : 13,    // <Enter>
+                editnode   : 113,   // <F2>
+                delnode    : 46,    // <Delete>
+                toggle     : 32,    // <Space>
+                left       : 37,    // <Left>
+                up         : 38,    // <Up>
+                right      : 39,    // <Right>
+                down       : 40,    // <Down>
             }
         },
     };
