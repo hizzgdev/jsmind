@@ -13,4 +13,6 @@ Demo-basic : <http://hizzgdev.github.io/jsmind/example/1_basic.html>
 
 Demo-features : <http://hizzgdev.github.io/jsmind/example/2_features.html>
 
-Documents : <docs/index.md>
+Documents : [Index of document][1]
+
+[1]:docs/index.md
