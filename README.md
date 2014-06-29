@@ -7,6 +7,10 @@ jsMind is very powerful. It base on javascript and HTML5(Canvas).
 
 jsMind is under BSD license. You can embed it in any project, if only you observe the license.
 
+Demo : <http://hizzgdev.github.io/jsmind/>
+Demo-basic : <http://hizzgdev.github.io/jsmind/example/1_basic.html>
+Demo-features : <http://hizzgdev.github.io/jsmind/example/2_features.html>
+
 1. Usage
 ------
 ### 1.1. Required
@@ -172,7 +176,7 @@ Actually, some other options are also supported, these are all options below, yo
     var DEFAULT_OPTIONS = {
         container : '',         // id of the container where the mindmap loaded on
         editable : false,       // allow user to edit the mindmap or not
-        theme : null,           // see [1.6. Themes](#16-themes) for more information
+        theme : null,           // see [1.6. Themes] for more information
         mode :'full',           // show topic on right side only, or both left and right
         support_html : true,    // support html on node topic
 
@@ -187,8 +191,7 @@ Actually, some other options are also supported, these are all options below, yo
         },
         shortcut:{
             enable:true,        // enable shortcut
-            handles:{           // add your custome handles here, some build-in handles are supported
-            },
+            handles:{},         // add your custome handles here, some build-in handles are supported
             mapping:{           // handle mapping.
                 addchild   : 45,    // <Insert>
                 addbrother : 13,    // <Enter>
