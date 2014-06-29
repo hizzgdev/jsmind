@@ -72,10 +72,8 @@
 
         if(opts.container == null || opts.container.length == 0){
             _console.error('the options.container should not be empty.');
-            this = null;
             return;
         }
-
         this.options = opts;
         this.mind = null;
         this._init_ = false;
