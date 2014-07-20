@@ -1,3 +1,11 @@
+/*
+ * Released under BSD License
+ * Copyright (c) 2014 hizzgdev@163.com
+ * 
+ * Project Home:
+ *   https://github.com/hizzgdev/jsmind/
+ */
+
 (function($w){
     "use strict";       
     // set 'jsMind' as the library name.
@@ -28,7 +36,7 @@
     var $h = function(n,t){n.innerHTML = t;};
 
     var DEFAULT_OPTIONS = {
-        container : 'jsmind_container',   // id of the container
+        container : '',   // id of the container
         editable : false,                 // you can change it in your options
         theme : null,
         mode :'full', // full or side
@@ -70,6 +78,10 @@
         jm.util.json.merge(opts, DEFAULT_OPTIONS);
         jm.util.json.merge(opts, options);
 
+        if(opts.container == null || opts.container.length == 0){
+            _console.error('the options.container should not be empty.');
+            return;
+        }
         this.options = opts;
         this.mind = null;
         this._init_ = false;
