@@ -1,3 +1,11 @@
+/*
+ * Released under BSD License
+ * Copyright (c) 2014 hizzgdev@163.com
+ * 
+ * Project Home:
+ *   https://github.com/hizzgdev/jsmind/
+ */
+
 (function($w){
     "use strict";       
     // set 'jsMind' as the library name.

@@ -1,7 +1,7 @@
 Documents
 ======
 
-jsMind is a pure javascript library for mindmap, it base on html5 canvas. jsMind offering the source code under the MIT open source license, you can embed it in any project, if only you observe the license.
+jsMind is a pure javascript library for mindmap, it base on html5 canvas. jsMind was released under BSD license, you can embed it in any project, if only you observe the license.
 
 1. [Usage][1]
 
