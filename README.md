@@ -23,7 +23,7 @@ Get Started:
 
             <script type="text/javascript">
                 var mind = {
-                    // 3 data format supported ...
+                    // 3 data formats were supported ...
                     // see Documents for more information
                 };
                 var options = {
