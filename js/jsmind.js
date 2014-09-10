@@ -415,8 +415,9 @@
                     o.direction = node.direction == jm.direction.left?'left':'right';
                 }
                 if(node.data != null){
-                    for(var k in node.data){
-                        o[k] = node.data.k;
+                    var node_data = node.data;
+                    for(var k in node_data){
+                        o[k] = node_data[k];
                     }
                 }
                 var children = node.children;
@@ -557,8 +558,9 @@
                     o.direction = node.direction == jm.direction.left?'left':'right';
                 }
                 if(node.data != null){
-                    for(var k in node.data){
-                        o[k] = node.data.k;
+                    var node_data = node.data;
+                    for(var k in node_data){
+                        o[k] = node_data[k];
                     }
                 }
                 node_array.push(o);
@@ -665,6 +667,7 @@
                         }
                     }
                 }
+                var node_data = df._load_attributes(xml_node);
                 var node_position = xml_node.getAttribute('POSITION');
                 var node_direction = null;
                 if(!!node_position){
@@ -672,9 +675,9 @@
                 }
                 //_console.debug(node_position +':'+ node_direction);
                 if(!!parent_id){
-                    mind.add_node(parent_id, node_id, node_topic, null, null, node_direction);
+                    mind.add_node(parent_id, node_id, node_topic, node_data, null, node_direction);
                 }else{
-                    mind.set_root(node_id, node_topic);
+                    mind.set_root(node_id, node_topic, node_data);
                 }
                 var children = xml_node.childNodes;
                 var child = null;
@@ -684,6 +687,22 @@
                         df._load_node(mind, node_id, child);
                     }
                 }
+            },
+
+            _load_attributes:function(xml_node){
+                var children = xml_node.childNodes;
+                var attr = null;
+                var attr_data = null;
+                for(var i=0;i<children.length;i++){
+                    attr = children[i];
+                    if(attr.nodeType == 1 && attr.tagName === 'attribute'){
+                        if(attr_data == null){
+                            attr_data = {};
+                        }
+                        attr_data[attr.getAttribute('NAME')] = attr.getAttribute('VALUE');
+                    }
+                }
+                return attr_data;
             },
 
             _buildmap:function(node, xmllines){
@@ -699,8 +718,16 @@
                 }
                 xmllines.push('TEXT=\"'+node.topic+'\"');
                 var children = node.children;
-                if(children.length>0){
+                var node_data = node.data;
+                if(children.length>0 || node_data!=null){
                     xmllines.push('>');
+                    // for attributes
+                    if(node_data != null){
+                        for(var k in node_data){
+                            xmllines.push('<attribute NAME=\"'+k+'\" VALUE=\"'+node_data[k]+'\"/>');
+                        }
+                    }
+                    // for children
                     for(var i=0;i<children.length;i++){
                         df._buildmap(children[i], xmllines);
                     }
@@ -1380,7 +1407,7 @@
 
         _layout_direction_root:function(){
             var node = this.jm.mind.root;
-            _console.debug(node);
+            // _console.debug(node);
             var layout_data = null;
             if('layout' in node._data){
                 layout_data = node._data.layout;

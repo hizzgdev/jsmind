@@ -343,9 +343,13 @@
             var file_data = files[0];
             jsMind.util.file.read(file_data, function(freemind_data, freemind_name){
                 if(freemind_data){
+                    var mind_name = freemind_name;
+                    if(/.*\.mm$/.test(mind_name)){
+                        mind_name = freemind_name.substring(0,freemind_name.length-3);
+                    }
                     var mind = {
                         "meta":{
-                            "name":freemind_name,
+                            "name":mind_name,
                             "author":"hizzgdev@163.com",
                             "version":"1.0.1"
                         },
