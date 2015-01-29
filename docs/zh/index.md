@@ -1,14 +1,14 @@
 目录
 ======
 
-* [基本用法](1.usage.md)
-  * [资源引用](1.usage.md#required)
-  * [Empty mindmap](1.usage.md#empty-mindmap)
-  * [Simple mindmap](1.usage.md#simple-mindmap)
-  * [Data format](1.usage.md#data-format)
-  * [Options](1.usage.md#options)
-  * [Themes](1.usage.md#themes)
-* [Apis](2.apis.md)
+* [1. 基本用法](1.usage.md)
+  * 1.1. 基本框架
+  * 1.2. 数据格式
+  * 1.3. 主题
+* [2.选项](2.options.md)
+* [3.界面操控](3.operation.md)
+* [4.数据与存储](4.storage.md)
+* [5.二次开发接口](5.apis.md)
   * [Enums](2.apis.md#enums)
     * jsMind.direction
   * Classes
@@ -27,8 +27,3 @@
     * jsMind.util.file
     * jsMind.util.json
     * jsMind.util.uuid
-* [Features](3.features.md)
-  * to be continued
-* [Storage](4.storage.md)
-  * to be continued
-
