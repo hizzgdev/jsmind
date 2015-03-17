@@ -2114,6 +2114,11 @@
                     expander.style.visibility = 'visible';
                     $t(expander,expander_text);
                 }
+                // hide expander while all children have been removed
+                if(!node.isroot && node.children.length==0){
+                    expander.style.display = 'none';
+                    expander.style.visibility = 'hidden';
+                }
             }
         },
 
