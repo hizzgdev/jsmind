@@ -1094,7 +1094,7 @@
             this.layout.layout();
             _console.debug('layout.layout ok');
 
-            this.view.show();
+            this.view.show(true);
             _console.debug('view.show ok');
         },
 
@@ -1133,7 +1133,7 @@
                 if(!!node){
                     this.view.add_node(node);
                     this.layout.layout();
-                    this.view.show();
+                    this.view.show(false);
                     this.expand_node(parent_node);
                 }
                 return node;
@@ -1149,7 +1149,7 @@
                 if(!!node){
                     this.view.add_node(node);
                     this.layout.layout();
-                    this.view.show();
+                    this.view.show(false);
                 }
                 return node;
             }else{
@@ -1164,7 +1164,7 @@
                 if(!!node){
                     this.view.add_node(node);
                     this.layout.layout();
-                    this.view.show();
+                    this.view.show(false);
                 }
                 return node;
             }else{
@@ -1186,7 +1186,7 @@
                     this.view.remove_node(node);
                     this.mind.remove_node(node);
                     this.layout.layout();
-                    this.view.show();
+                    this.view.show(false);
                 }else{
                     _console.error('fail, node can not be found');
                     return false;
@@ -1209,7 +1209,7 @@
                     node.topic = topic;
                     this.view.update_node(node);
                     this.layout.layout();
-                    this.view.show();
+                    this.view.show(false);
                 }
             }else{
                 _console.error('fail, this mind map is not editable');
@@ -1223,7 +1223,7 @@
                 if(!!node){
                     this.view.update_node(node);
                     this.layout.layout();
-                    this.view.show();
+                    this.view.show(false);
                 }
             }else{
                 _console.error('fail, this mind map is not editable');
@@ -2051,11 +2051,13 @@
             }
         },
 
-        show:function(){
+        show:function(keep_center){
             _console.debug('view.show');
             this.expand_size();
             this._show();
-            this._center_root();
+            if(!!keep_center){
+                this._center_root();
+            }
         },
 
         relayout:function(){
