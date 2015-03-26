@@ -12,21 +12,21 @@
     // __name__ should be a const value, Never try to change it easily.
     var __name__ = 'jsMind';
     // library version
-    var __version__    = '0.2b';
+    var __version__ = '0.2b';
     // author
     var __author__ = 'hizzgdev@163.com';
 
-    // check global variables
-    if(typeof($w[__name__])!='undefined'){
-        _console.log(__name__+' has been already exist.');
-        return;
-    }
-
     // an noop function define
     var _noop = function(){};
-    var _console = (typeof(console) == 'undefined')?{
+    var logger = (typeof(console) == 'undefined')?{
             log:_noop, debug:_noop, error:_noop, warn:_noop, info:_noop
         }:console;
+
+    // check global variables
+    if(typeof($w[__name__])!='undefined'){
+        logger.log(__name__+' has been already exist.');
+        return;
+    }
 
     // shortcut of methods in dom
     var $d = $w.document;
@@ -37,9 +37,9 @@
 
     var DEFAULT_OPTIONS = {
         container : '',   // id of the container
-        editable : false,                 // you can change it in your options
+        editable : false, // you can change it in your options
         theme : null,
-        mode :'full', // full or side
+        mode :'full',     // full or side
         support_html : true,
 
         view:{
@@ -79,7 +79,7 @@
         jm.util.json.merge(opts, options);
 
         if(opts.container == null || opts.container.length == 0){
-            _console.error('the options.container should not be empty.');
+            logger.error('the options.container should not be empty.');
             return;
         }
         this.options = opts;
@@ -91,8 +91,8 @@
     jm.direction = {left:-1,center:0,right:1};
 
     jm.node = function(sId,iIndex,sTopic,oData,bIsRoot,oParent,eDirection){
-        if(!sId){_console.error('invalid nodeid');return;}
-        if(typeof(iIndex) != 'number'){_console.error('invalid node index');return;}
+        if(!sId){logger.error('invalid nodeid');return;}
+        if(typeof(iIndex) != 'number'){logger.error('invalid node index');return;}
         this.id = sId;
         this.index = iIndex;
         this.topic = sTopic;
@@ -120,7 +120,7 @@
         }else{
             r = 0;
         }
-        //_console.debug(i1+' <> '+i2+'  =  '+r);
+        //logger.debug(i1+' <> '+i2+'  =  '+r);
         return r;
     };
 
@@ -139,7 +139,7 @@
             if(nodeid in this.nodes){
                 return this.nodes[nodeid];
             }else{
-                _console.warn('the node[id='+nodeid+'] can not be found');
+                logger.warn('the node[id='+nodeid+'] can not be found');
                 return null;
             }
         },
@@ -149,7 +149,7 @@
                 this.root = new jm.node(nodeid, 0, topic, data, true);
                 this._put_node(this.root);
             }else{
-                _console.error('root node is already exist');
+                logger.error('root node is already exist');
             }
         },
 
@@ -159,7 +159,7 @@
             }
             var nodeindex = idx || -1;
             if(!!parent_node){
-                //_console.debug(parent_node);
+                //logger.debug(parent_node);
                 var node = null;
                 if(parent_node.isroot){
                     var d = jm.direction.right;
@@ -180,12 +180,12 @@
                     parent_node.children.push(node);
                     this._reindex(parent_node);
                 }else{
-                    _console.error('fail, the nodeid \''+node.id+'\' has been already exist.');
+                    logger.error('fail, the nodeid \''+node.id+'\' has been already exist.');
                     node = null;
                 }
                 return node;
             }else{
-                _console.error('fail, the [node_parent] can not be found.');
+                logger.error('fail, the [node_parent] can not be found.');
                 return null;
             }
         },
@@ -198,7 +198,7 @@
                 var node_index = node_before.index-0.5;
                 return this.add_node(node_before.parent, nodeid, topic, data, node_index);
             }else{
-                _console.error('fail, the [node_before] can not be found.');
+                logger.error('fail, the [node_before] can not be found.');
                 return null;
             }
         },
@@ -225,7 +225,7 @@
                 var node_index = node_after.index + 0.5;
                 return this.add_node(node_after.parent, nodeid, topic, data, node_index);
             }else{
-                _console.error('fail, the [node_after] can not be found.');
+                logger.error('fail, the [node_after] can not be found.');
                 return null;
             }
         },
@@ -273,11 +273,11 @@
                 return this.remove_node(this.get_node(node));
             }
             if(!node){
-                _console.error('fail, the node can not be found');
+                logger.error('fail, the node can not be found');
                 return false;
             }
             if(node.isroot){
-                _console.error('fail, can not remove root node');
+                logger.error('fail, can not remove root node');
                 return false;
             }
             if(this.selected!=null && this.selected.id == node.id){
@@ -314,7 +314,7 @@
 
         _put_node:function(node){
             if(node.id in this.nodes){
-                _console.warn('the nodeid \''+node.id+'\' has been already exist.');
+                logger.warn('the nodeid \''+node.id+'\' has been already exist.');
                 return false;
             }else{
                 this.nodes[node.id] = node;
@@ -477,7 +477,7 @@
                 if(!!root_id){
                     df._extract_subnode(mind, root_id, narray);
                 }else{
-                    _console.error('root node can not be found');
+                    logger.error('root node can not be found');
                 }
             },
 
@@ -660,7 +660,7 @@
                     var topic_child = null;
                     for(var i=0;i<topic_children.length;i++){
                         topic_child = topic_children[i];
-                        //_console.debug(topic_child.tagName);
+                        //logger.debug(topic_child.tagName);
                         if(topic_child.nodeType == 1 && topic_child.tagName === 'richcontent'){
                             node_topic = topic_child.textContent;
                             break;
@@ -673,7 +673,7 @@
                 if(!!node_position){
                     node_direction = node_position=='left'?jm.direction.left:jm.direction.right;
                 }
-                //_console.debug(node_position +':'+ node_direction);
+                //logger.debug(node_position +':'+ node_direction);
                 if(!!parent_id){
                     mind.add_node(parent_id, node_id, node_topic, node_data, null, node_direction);
                 }else{
@@ -881,8 +881,8 @@
                         var json_str = JSON.stringify(json);
                         return json_str;
                     }catch(e){
-                        _console.warn(e);
-                        _console.warn('can not convert to string');
+                        logger.warn(e);
+                        logger.warn('can not convert to string');
                         return null;
                     }
                 }
@@ -893,8 +893,8 @@
                         var json = JSON.parse(json_str);
                         return json;
                     }catch(e){
-                        _console.warn(e);
-                        _console.warn('can not parse to json');
+                        logger.warn(e);
+                        logger.warn('can not parse to json');
                         return null;
                     }
                 }
@@ -1020,10 +1020,10 @@
                 if(!!node){
                     this.view.edit_node_begin(node);
                 }else{
-                    _console.error('the node can not be found');
+                    logger.error('the node can not be found');
                 }
             }else{
-                _console.error('fail, this mind map is not editable.');
+                logger.error('fail, this mind map is not editable.');
                 return;
             }
         },
@@ -1041,7 +1041,7 @@
                 this.layout.toggle_node(node);
                 this.view.relayout();
             }else{
-                _console.error('the node can not be found.');
+                logger.error('the node can not be found.');
             }
         },
 
@@ -1054,7 +1054,7 @@
                 this.layout.expand_node(node);
                 this.view.relayout();
             }else{
-                _console.error('the node can not be found.');
+                logger.error('the node can not be found.');
             }
         },
 
@@ -1067,7 +1067,7 @@
                 this.layout.collapse_node(node);
                 this.view.relayout();
             }else{
-                _console.error('the node can not be found.');
+                logger.error('the node can not be found.');
             }
         },
 
@@ -1082,20 +1082,20 @@
 
             this.mind = this.data.load(m);
             if(!this.mind){
-                _console.error('data.load error');
+                logger.error('data.load error');
                 return;
             }else{
-                _console.debug('data.load ok');
+                logger.debug('data.load ok');
             }
 
             this.view.load();
-            _console.debug('view.load ok');
+            logger.debug('view.load ok');
 
             this.layout.layout();
-            _console.debug('layout.layout ok');
+            logger.debug('layout.layout ok');
 
             this.view.show(true);
-            _console.debug('view.show ok');
+            logger.debug('view.show ok');
         },
 
         show : function(mind){
@@ -1138,7 +1138,7 @@
                 }
                 return node;
             }else{
-                _console.error('fail, this mind map is not editable');
+                logger.error('fail, this mind map is not editable');
                 return null;
             }
         },
@@ -1153,7 +1153,7 @@
                 }
                 return node;
             }else{
-                _console.error('fail, this mind map is not editable');
+                logger.error('fail, this mind map is not editable');
                 return null;
             }
         },
@@ -1168,7 +1168,7 @@
                 }
                 return node;
             }else{
-                _console.error('fail, this mind map is not editable');
+                logger.error('fail, this mind map is not editable');
                 return null;
             }
         },
@@ -1180,7 +1180,7 @@
             if(this.get_editable()){
                 if(!!node){
                     if(node.isroot){
-                        _console.error('fail, can not remove root node');
+                        logger.error('fail, can not remove root node');
                         return false;
                     }
                     this.view.remove_node(node);
@@ -1188,11 +1188,11 @@
                     this.layout.layout();
                     this.view.show(false);
                 }else{
-                    _console.error('fail, node can not be found');
+                    logger.error('fail, node can not be found');
                     return false;
                 }
             }else{
-                _console.error('fail, this mind map is not editable');
+                logger.error('fail, this mind map is not editable');
                 return;
             }
         },
@@ -1202,7 +1202,7 @@
                 var node = this.get_node(nodeid);
                 if(!!node){
                     if(node.topic === topic){
-                        _console.info('nothing changed');
+                        logger.info('nothing changed');
                         this.view.update_node(node);
                         return;
                     }
@@ -1212,7 +1212,7 @@
                     this.view.show(false);
                 }
             }else{
-                _console.error('fail, this mind map is not editable');
+                logger.error('fail, this mind map is not editable');
                 return;
             }
         },
@@ -1226,7 +1226,7 @@
                     this.view.show(false);
                 }
             }else{
-                _console.error('fail, this mind map is not editable');
+                logger.error('fail, this mind map is not editable');
                 return;
             }
         },
@@ -1329,11 +1329,11 @@
 
     jm.data_provider.prototype={
         init:function(){
-            _console.debug('data.init');
+            logger.debug('data.init');
         },
 
         reset:function(){
-            _console.debug('data.reset');
+            logger.debug('data.reset');
         },
 
         load:function(mind_data){
@@ -1356,7 +1356,7 @@
             }else if(df == 'freemind'){
                 mind = jm.format.freemind.get_mind(mind_data);
             }else{
-                _console.warn('unsupported format');
+                logger.warn('unsupported format');
             }
             return mind;
         },
@@ -1370,7 +1370,7 @@
             }else if(data_format == 'freemind'){
                 data = jm.format.freemind.get_data(this.jm.mind);
             }else{
-                _console.error('unsupported '+data_format+' format');
+                logger.error('unsupported '+data_format+' format');
             }
             return data;
         },
@@ -1389,14 +1389,14 @@
 
     jm.layout_provider.prototype={
         init:function(){
-            _console.debug('layout.init');
+            logger.debug('layout.init');
         },
         reset:function(){
-            _console.debug('layout.reset');
+            logger.debug('layout.reset');
             this.bounds = {n:0,s:0,w:0,e:0};
         },
         layout:function(){
-            _console.debug('layout.layout');
+            logger.debug('layout.layout');
             this.layout_direction();
             this.layout_offset();
         },
@@ -1407,7 +1407,7 @@
 
         _layout_direction_root:function(){
             var node = this.jm.mind.root;
-            // _console.debug(node);
+            // logger.debug(node);
             var layout_data = null;
             if('layout' in node._data){
                 layout_data = node._data.layout;
@@ -1493,7 +1493,7 @@
             layout_data.outer_height_right = this._layout_offset_subnodes(right_nodes);
             this.bounds.e=node._data.view.width/2;
             this.bounds.w=0-this.bounds.e;
-            //_console.debug(this.bounds.w);
+            //logger.debug(this.bounds.w);
             this.bounds.n=0;
             this.bounds.s = Math.max(layout_data.outer_height_left,layout_data.outer_height_right);
         },
@@ -1539,7 +1539,7 @@
             while(i--){
                 node = nodes[i];
                 node._data.layout.offset_y += middle_height;
-                //_console.debug(node._data.layout.offset_y);
+                //logger.debug(node._data.layout.offset_y);
             }
             return total_height;
         },
@@ -1581,8 +1581,8 @@
             while(i--){
                 node = nodes[i];
                 node._data.layout.offset_y += middle_height;
-                //_console.debug(node.topic);
-                //_console.debug(node._data.layout.offset_y);
+                //logger.debug(node.topic);
+                //logger.debug(node._data.layout.offset_y);
             }
             return total_height;
         },
@@ -1613,11 +1613,11 @@
         get_node_point:function(node){
             var view_data = node._data.view;
             var offset_p = this.get_node_offset(node);
-            //_console.debug(offset_p);
+            //logger.debug(offset_p);
             var p = {};
             p.x = offset_p.x + view_data.width*(node._data.layout.direction-1)/2;
             p.y = offset_p.y-view_data.height/2;
-            //_console.debug(p);
+            //logger.debug(p);
             return p;
         },
 
@@ -1644,8 +1644,8 @@
                     var offset_p = this.get_node_offset(node);
                     pout_cache.x = offset_p.x + (view_data.width+this.opts.pspace)*node._data.layout.direction;
                     pout_cache.y = offset_p.y;
-                    //_console.debug('pout');
-                    //_console.debug(pout_cache);
+                    //logger.debug('pout');
+                    //logger.debug(pout_cache);
                 }
             }
             return pout_cache;
@@ -1670,7 +1670,7 @@
             for(var nodeid in nodes){
                 node = nodes[nodeid];
                 pout = this.get_node_point_out(node);
-                //_console.debug(pout.x);
+                //logger.debug(pout.x);
                 if(pout.x > this.bounds.e){this.bounds.e = pout.x;}
                 if(pout.x < this.bounds.w){this.bounds.w = pout.x;}
             }
@@ -1697,21 +1697,21 @@
         },
 
         expand_node:function(node){
-            //_console.debug('expand');
+            //logger.debug('expand');
             node._data.layout.isexpand = true;
             this.part_layout(node);
             this.set_visible(node.children,true);
         },
 
         collapse_node:function(node){
-            //_console.debug('collapse');
+            //logger.debug('collapse');
             node._data.layout.isexpand = false;
             this.part_layout(node);
             this.set_visible(node.children,false);
         },
 
         part_layout:function(node){
-            //_console.debug('part_layout');
+            //logger.debug('part_layout');
             var root = this.jm.mind.root;
             if(!!root){
                 var root_layout_data = root._data.layout;
@@ -1723,7 +1723,7 @@
                 this.bounds.s = Math.max(root_layout_data.outer_height_left,root_layout_data.outer_height_right);
                 this.cache_valid = false;
             }else{
-                _console.warn('can not found root node');
+                logger.warn('can not found root node');
             }
         },
 
@@ -1782,11 +1782,11 @@
 
     jm.view_provider.prototype={
         init:function(){
-            _console.debug('view.init');
+            logger.debug('view.init');
 
             this.container = $g(this.opts.container);
             if(!this.container){
-                _console.error('the options.view.container was not be found in dom');
+                logger.error('the options.view.container was not be found in dom');
                 return;
             }
             this.e_panel = $c('div');
@@ -1843,7 +1843,7 @@
         },
 
         reset:function(){
-            _console.debug('view.reset');
+            logger.debug('view.reset');
             this.selected_node = null;
             this.clear_lines();
             this.clear_nodes();
@@ -1860,7 +1860,7 @@
         },
 
         load:function(){
-            _console.debug('view.load');
+            logger.debug('view.load');
             this.init_nodes();
         },
 
@@ -2052,7 +2052,7 @@
         },
 
         show:function(keep_center){
-            _console.debug('view.show');
+            logger.debug('view.show');
             this.expand_size();
             this._show();
             if(!!keep_center){
