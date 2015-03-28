@@ -1,4 +1,4 @@
-Copyright (c) 2014, hizzgdev@163.com
+Copyright (c) 2015, ZHANG ZHIGANG <hizzgdev@163.com>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -8,3 +8,17 @@ Redistribution and use in source and binary forms, with or without modification,
 * Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+
+版权所有 (c) 2015, 张志刚 <hizzgdev@163.com>
+保留一切权利。
+
+在满足下列条件的前提下，授予使用者使用及再发布本软件的源代码或二进制形式的权利，无论是否修改皆然：
+
+* 对于本软件源代码的再发布，必须保留上述的版权声明、此三条许可条件，以及下述的免责声明。
+* 对于本软件二进制形式的再发布，必须在随同提供的文档和/或其它媒介中，包含上述的版权声明、此三条许可条件，以及下述的免责声明。
+* 未获得事前书面许可，不得使用版权所有人的名称和贡献者的名字，来为本软件的衍生物做任何支持、认可或推广、促销的行为。
+
+此软件由版权所有者及贡献者以现状（"as is"）方式提供，本软件不负任何明示或暗示的担保责任，包括但不限于就适销性以及特定目的的适用性的暗示性担保。任何因使用本软件造成的，直接、间接、连带、特别、惩戒或任何结果的损害（包括但不限于替代商品及服务的采购，无法使用，数据丢失，盈利损失或业务中断等），无论任何条件、无论任何原因或任何责任推断、无论是否属于合同范畴、无论是否为严格赔偿责任或民事侵权行为（包括过失或其他原因）而起，即使在使用前已获告知可能会造成此类损害的情形下，版权所有者及贡献者均不负任何责任。
+
