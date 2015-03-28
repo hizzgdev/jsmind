@@ -11,7 +11,7 @@ Links:
 * Demo-basic : <http://hizzgdev.github.io/jsmind/example/1_basic.html>
 * Demo-features : <http://hizzgdev.github.io/jsmind/example/2_features.html>
 * Project-home : <http://hizzgdev.github.io/jsmind/developer.html>
-* Documents : [简体中文][1] [English][2]
+* Documents : [简体中文(草稿)][1] [English(draft)][2]
 
 Get Started:
 
