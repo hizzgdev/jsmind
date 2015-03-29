@@ -1,7 +1,7 @@
 Contents
 ======
 
-**Sorry, Documents in English are not completed.**
+**Sorry, documents in English have not been completed.**
 
 **Thank you for helping us complete it.**
 
