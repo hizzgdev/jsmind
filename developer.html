@@ -27,27 +27,25 @@
     <div id="content-wrapper">
       <div class="inner clearfix">
         <section id="main-content">
-          <h3><a name="about" class="anchor" href="#about"><span class="octicon octicon-link"></span></a>About</h3>
+          <h3><a name="about" class="anchor" href="#about"><span class="octicon octicon-link"></span></a>关于 | About</h3>
+          <p>jsMind 是一个显示/编辑思维导图的纯 javascript 类库，其基于 html5 的 canvas 进行设计。jsMind 以 BSD 协议开源，在此基础上你可以在你的项目上任意使用。你可以在此浏览<a href="LICENSE" target="_blank">适用于 jsMind 的 BSD 许可协议(中英文版本)</a>。</p>
+          <p>jsMind is a pure javascript library for mindmap, it base on html5 canvas. jsMind was released under BSD license, you can embed it in any project, if only you observe the license. You can read <a href="LICENSE" target="_blank">the BSD license agreement for jsMind in English and Chinese version here</a>.<p>
+          <p>Project Home: <a href="https://github.com/hizzgdev/jsmind">jsMind on GitHub</a></p> 
 
-            <p>jsMind is a pure javascript library for mindmap, it base on html5 canvas. jsMind was released under BSD license, you can embed it in any project, if only you observe the license.</p>
-            <p>Project Home: <a href="https://github.com/hizzgdev/jsmind">jsMind on GitHub</a></p> 
-
-          <h3><a name="demo" class="anchor" href="#demo"><span class="octicon octicon-link"></span></a>Demo</h3>
+          <h3><a name="demo" class="anchor" href="#demo"><span class="octicon octicon-link"></span></a>示例 | Demo</h3>
             <ul>
               <li><a href="/jsmind/">WebApp Demo</a></li>
               <li><a href="/jsmind/example/1_basic.html">Basic Demo</a></li>
               <li><a href="/jsmind/example/2_features.html">Features Demo</a></li>
             </ul>
 
-          <h3><a name="docs" class="anchor" href="#docs"><span class="octicon octicon-link"></span></a>Documents</h3>
+          <h3><a name="docs" class="anchor" href="#docs"><span class="octicon octicon-link"></span></a>文档 | Documents</h3>
             <ol>
-              <li><a href="https://github.com/hizzgdev/jsmind/blob/master/docs/1.usage.md">Usage</a></li>
-              <li><a href="https://github.com/hizzgdev/jsmind/blob/master/docs/2.apis.md">Apis</a> (not yet finished)</li>
-              <li><a href="https://github.com/hizzgdev/jsmind/blob/master/docs/3.features.md">Features</a> (not yet finished)</li>
-              <li><a href="https://github.com/hizzgdev/jsmind/blob/master/docs/4.storage.md">Storages</a> (not yet finished)</li>
+              <li><a href="https://github.com/hizzgdev/jsmind/blob/master/docs/zh/index.md">简体中文版</a></li>
+              <li><a href="https://github.com/hizzgdev/jsmind/blob/master/docs/en/index.md">English Version (not completed)</a></li>
             </ol>
 
-          <h3><a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Simple Usage</h3>
+          <h3><a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>用法 | Simple Usage</h3>
 
             <p>This is just a simple usage demo below:</p>
 <pre><code>&lt;html&gt;
@@ -68,7 +66,8 @@
                 editable:true,
                 theme:'orange'
             };
-            var jm = jsMind.show(options,mind);
+            var jm = new jsMind(options);
+            jm.show(mind);
         &lt;/script&gt;
     &lt;/body&gt;
 &lt;/html&gt;</code></pre>
