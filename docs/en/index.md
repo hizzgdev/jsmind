@@ -1,8 +1,9 @@
 Contents
 ======
 
-** Sorry, Documents in English are not completed. **
-** Please send pull-request, if you want to help us complete it. **
+**Sorry, Documents in English are not completed.**
+
+**Thank you for helping us complete it.**
 
 * [1. Usage](1.usage.md)
 * [2. Options](2.options.md)
