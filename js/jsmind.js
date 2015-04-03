@@ -960,6 +960,7 @@
             this.shortcut.init();
 
             this._event_bind();
+            jm.invoke_event_handle(this,'init',null);
         },
 
         enable_edit:function(){
@@ -2320,6 +2321,22 @@
     };
 
     jm.current = null;
+
+    jm.event_handles = [];
+
+    // callback(jsMind, type ,data)
+    jm.add_event_handle = function(callback){
+        if(typeof callback === 'function'){
+            jm.event_handles.push(callback);
+        }
+    };
+
+    jm.invoke_event_handle = function(sender,type,data){
+        var l = jm.event_handles.length;
+        for(var i=0;i<l;i++){
+            jm.event_handles[i](sender,type,data);
+        }
+    }
 
     jm.show = function(options,mind){
         var _jm = jm.current;
