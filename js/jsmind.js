@@ -814,7 +814,7 @@
 
         canvas:{
             easing_gauss: function(t,b,c,d){var x=t*4/d;return (1-Math.pow(Math.E,-(x*x)/2))*c+b;},
-            lineto : function(ctx,x1,y1,x2,y2){
+            gaussto : function(ctx,x1,y1,x2,y2){
                 var ztf = jm.util.canvas.easing_gauss;
                 ctx.moveTo(x1,y1);
                 ctx.beginPath();
@@ -828,8 +828,14 @@
                 }
                 ctx.stroke();
             },
-            clear:function(ctx,x1,y1,x2,y2){
-                ctx.clearRect(x1,y1,x2,y2);
+            lineto : function(ctx,x1,y1,x2,y2){
+                ctx.beginPath();
+                ctx.moveTo(x1,y1);
+                ctx.lineTo(x2,y2);
+                ctx.stroke();
+            },
+            clear:function(ctx,x,y,w,h){
+                ctx.clearRect(x,y,w,h);
             }
         },
 
@@ -2037,6 +2043,7 @@
             this.show_nodes();
             this.show_lines();
             //this.layout.cache_valid = true;
+            jm.invoke_event_handle(this,'show',null);
         },
 
         _center_root:function(){
@@ -2147,7 +2154,7 @@
         },
 
         draw_line:function(pin,pout,offset){
-            jm.util.canvas.lineto(
+            jm.util.canvas.gaussto(
                 this.canvas_ctx,
                 pin.x + offset.x,
                 pin.y + offset.y,

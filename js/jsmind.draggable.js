@@ -13,6 +13,7 @@
     var jsMind = $w[__name__];
 
     var jdom = jsMind.util.dom;
+    var jcanvas = jsMind.util.canvas;
 
     var clear_selection = "getSelection" in $w ? function(){
          $w.getSelection().removeAllRanges();
@@ -20,8 +21,12 @@
          $d.selection.empty();
     };
 
+    var jd = null;
+
     jsMind.draggable = function(jm_){
         this.jm = jm_;
+        this.e_canvas = null;
+        this.canvas_ctx = null;
         this.shadow = null;
         this.active_node = null;
         this.client_w = 0;
@@ -34,8 +39,24 @@
 
     jsMind.draggable.prototype = {
         init:function(){
+            this._create_canvas();
             this._create_shadow();
             this._event_bind();
+        },
+
+        resize:function(){
+            this.e_canvas.width=this.jm.view.size.w;
+            this.e_canvas.height=this.jm.view.size.h;
+        },
+
+        _create_canvas:function(){
+            var c = $d.createElement('canvas');
+            this.jm.view.e_panel.appendChild(c);
+            var ctx = c.getContext('2d');
+            ctx.lineWidth = 10;
+            ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+            this.e_canvas = c;
+            this.canvas_ctx = ctx;
         },
 
         _create_shadow:function(){
@@ -60,36 +81,48 @@
             this.shadow.style.visibility = 'hidden';
         },
 
-        //shadow_follow:function(
+        clear_lines:function(){
+            jcanvas.clear(this.canvas_ctx, 0, 0, this.jm.view.size.w, this.jm.view.size.h);
+        },
 
-        _lookup_close_node:function(){
+        magnet_shadow:function(node){
+            this.canvas_ctx.lineWidth = 6;
+            this.canvas_ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+            this.clear_lines();
+            jcanvas.lineto(this.canvas_ctx,
+                node.p_s.x,
+                node.p_s.y,
+                node.p_n.x,
+                node.p_n.y);
+        },
+
+        lookup_close_node:function(){
+            var p_shadow = {x:(this.shadow.offsetLeft + this.shadow.clientWidth/2),
+                y:(this.shadow.offsetTop + this.shadow.clientHeight/2)};
             var nodes = this.jm.mind.nodes;
+            var el = null;
+            var p = null;
             var node = null;
-            var nel = null;
             var min_distance = Number.MAX_VALUE;
             var distance = 0;
             var closest_node = null;
-            var shadow_y = this.shadow.offsetTop;
-            var node_direction = 0;
+            var closest_p = null;
             for(var nodeid in nodes){
                 node = nodes[nodeid];
-                nel = node._data.view.element;
-                console.log('math.abs('+shadow_y+','+nel.offsetTop);
-                distance = Math.abs(shadow_y - nel.offsetTop);
-                console.log(node.topic+':'+distance+'; =>'+min_distance);
+                el = node._data.view.element;
+                p = {x:(el.offsetLeft+el.clientWidth/2),y:(el.offsetTop+el.clientHeight/2)};
+                distance = Math.abs(p_shadow.x-p.x)+Math.abs(p_shadow.y-p.y);
                 if(distance < min_distance){
-                    console.log(min_distance);
-                    min_distance = distance;
                     closest_node = node;
+                    closest_p = p;
+                    min_distance = distance;
                 }
             }
-            console.log(closest_node);
-            if(node.direction == jsMind.direction.center){
-                node_direction = distance>0?jsMind.direction.left:jsMind.direction.right;
-            }else{
-                node_direction = node.direction;
-            }
-            return node;
+            return {
+                node:closest_node,
+                p_s:p_shadow,
+                p_n:closest_p
+            };
         },
 
         _event_bind:function(){
@@ -122,7 +155,9 @@
                         $w.clearInterval(this.hlookup);
                     }
                     this.hlookup = $w.setInterval(function(){
-                        jd._lookup_close_node.call(jd);},1000);
+                        var node = jd.lookup_close_node.call(jd);
+                        jd.magnet_shadow.call(jd,node);
+                    },300);
                     this.capture = true;
                 }
             }
@@ -144,13 +179,17 @@
 
         dragend:function(e){
             if(this.capture){
+                var src_node = this.active_node;
+                var target_node = null;
                 this.active_node = null;
                 this.hide_shadow();
                 this.capture = false;
                 if(this.hlookup != 0){
                     $w.clearInterval(this.hlookup);
                     this.hlookup = 0;
+                    this.clear_lines();
                 }
+                this.move_node(src_node,target_node);
             }
         },
 
@@ -158,14 +197,19 @@
             //console.log(x+','+y);
         },
 
-        move_node:function(){
+        move_node:function(src_node,target_node){
         }
     };
 
     var jm_event_handle = function(jm_, type, data){
         if(type === 'init'){
-            var jd = new jsMind.draggable(jm_);
+            jd = new jsMind.draggable(jm_);
             jd.init();
+        }
+        if(type === 'show'){//resize
+            if(!!jd){
+                jd.resize();
+            }
         }
     };
 
