@@ -28,13 +28,18 @@
         this.e_canvas = null;
         this.canvas_ctx = null;
         this.shadow = null;
+        this.shadow_w = 0;
+        this.shadow_h = 0;
         this.active_node = null;
+        this.target_node = null;
+        this.target_direct = null;
         this.client_w = 0;
         this.client_h = 0;
         this.offset_x = 0;
         this.offset_y = 0;
         this.hlookup = 0;
         this.capture = false;
+        this.moved = false;
     };
 
     jsMind.draggable.prototype = {
@@ -69,12 +74,19 @@
             this.shadow = s;
         },
 
-        show_shadow:function(el){
+        reset_shadow:function(el){
             var s = this.shadow.style;
             this.shadow.innerHTML = el.innerHTML;
             s.left = el.style.left;
             s.top = el.style.top;
-            s.visibility = 'visible';
+            this.shadow_w = this.shadow.clientWidth;
+            this.shadow_h = this.shadow.clientHeight;
+        },
+
+        show_shadow:function(){
+            if(!this.moved){
+                this.shadow.style.visibility = 'visible';
+            }
         },
 
         hide_shadow:function(){
@@ -85,44 +97,78 @@
             jcanvas.clear(this.canvas_ctx, 0, 0, this.jm.view.size.w, this.jm.view.size.h);
         },
 
-        magnet_shadow:function(node){
+        _magnet_shadow:function(node){
             this.canvas_ctx.lineWidth = 6;
             this.canvas_ctx.strokeStyle = 'rgba(0,0,0,0.3)';
             this.clear_lines();
             jcanvas.lineto(this.canvas_ctx,
-                node.p_s.x,
-                node.p_s.y,
-                node.p_n.x,
-                node.p_n.y);
+                node.sp.x,
+                node.sp.y,
+                node.np.x,
+                node.np.y);
         },
 
-        lookup_close_node:function(){
-            var p_shadow = {x:(this.shadow.offsetLeft + this.shadow.clientWidth/2),
-                y:(this.shadow.offsetTop + this.shadow.clientHeight/2)};
+        _lookup_close_node:function(){
+            var root = this.jm.get_root();
+            var root_el = root._data.view.element;
+            var root_x = root_el.offsetLeft + root_el.clientWidth/2;
+
+            var sw = this.shadow_w;
+            var sh = this.shadow_h;
+            var sx = this.shadow.offsetLeft;
+            var sy = this.shadow.offsetTop;
+
+            var nw,nh,nx,ny;
+
+            var direct = (sx + sw/2)>=root_x ?
+                            jsMind.direction.right : jsMind.direction.left;
             var nodes = this.jm.mind.nodes;
-            var el = null;
-            var p = null;
             var node = null;
+            var el = null;
             var min_distance = Number.MAX_VALUE;
             var distance = 0;
             var closest_node = null;
             var closest_p = null;
+            var shadow_p = null;
             for(var nodeid in nodes){
+                var np,sp;
                 node = nodes[nodeid];
-                el = node._data.view.element;
-                p = {x:(el.offsetLeft+el.clientWidth/2),y:(el.offsetTop+el.clientHeight/2)};
-                distance = Math.abs(p_shadow.x-p.x)+Math.abs(p_shadow.y-p.y);
-                if(distance < min_distance){
-                    closest_node = node;
-                    closest_p = p;
-                    min_distance = distance;
+                if(node.isroot || node.direction == direct){
+                    el = node._data.view.element;
+                    nw = el.clientWidth;
+                    nh = el.clientHeight;
+                    nx = el.offsetLeft;
+                    ny = el.offsetTop;
+                    if(direct == jsMind.direction.right){
+                        distance = Math.abs(sx-nx-nw) + Math.abs(sy+sh/2-ny-nh/2);
+                        np = {x:nx+nw,y:ny+nh/2};
+                        sp = {x:sx,y:sy+sh/2};
+                    }else{
+                        distance = Math.abs(sx+sw-nx) + Math.abs(sy+sh/2-ny-nh/2);
+                        np = {x:nx,y:ny+nh/2};
+                        sp = {x:sx+sw,y:sy+sh/2};
+                    }
+                    if(distance < min_distance){
+                        closest_node = node;
+                        closest_p = np;
+                        shadow_p = sp;
+                        min_distance = distance;
+                    }
                 }
             }
             return {
                 node:closest_node,
-                p_s:p_shadow,
-                p_n:closest_p
+                direction:direct,
+                sp:shadow_p,
+                np:closest_p
             };
+        },
+
+        lookup_close_node:function(){
+            var node_data = this._lookup_close_node();
+            this._magnet_shadow(node_data);
+            this.target_node = node_data.node;
+            this.target_direct = node_data.direction;
         },
 
         _event_bind:function(){
@@ -134,8 +180,8 @@
         },
 
         dragstart:function(e){
+            if(this.capture){return;}
             this.active_node = null;
-            this.capture = false;
 
             var jd = this;
             var jview = this.jm.view;
@@ -145,7 +191,7 @@
                 var nodeid = jview.get_nodeid(el);
                 var node = this.jm.get_node(nodeid);
                 if(!node.isroot){
-                    this.show_shadow(el);
+                    this.reset_shadow(el);
                     this.active_node = node;
                     this.offset_x = e.clientX - el.offsetLeft;
                     this.offset_y = e.clientY - el.offsetTop;
@@ -155,8 +201,7 @@
                         $w.clearInterval(this.hlookup);
                     }
                     this.hlookup = $w.setInterval(function(){
-                        var node = jd.lookup_close_node.call(jd);
-                        jd.magnet_shadow.call(jd,node);
+                        jd.lookup_close_node.call(jd);
                     },300);
                     this.capture = true;
                 }
@@ -165,6 +210,8 @@
 
         drag:function(e){
             if(this.capture){
+                this.show_shadow();
+                this.moved = true;
                 clear_selection();
                 var px = e.clientX - this.offset_x;
                 var py = e.clientY - this.offset_y;
@@ -172,32 +219,36 @@
                 var cy = py + this.client_hh;
                 this.shadow.style.left = px + 'px';
                 this.shadow.style.top = py + 'px';
-                this.auto_line(cx,cy);
                 clear_selection();
             }
         },
 
         dragend:function(e){
             if(this.capture){
-                var src_node = this.active_node;
-                var target_node = null;
-                this.active_node = null;
-                this.hide_shadow();
-                this.capture = false;
                 if(this.hlookup != 0){
                     $w.clearInterval(this.hlookup);
                     this.hlookup = 0;
                     this.clear_lines();
                 }
-                this.move_node(src_node,target_node);
+                if(this.moved){
+                    var src_node = this.active_node;
+                    var target_node = this.target_node;
+                    var target_direct = this.target_direct;
+                    this.move_node(src_node,target_node,target_direct);
+                }
+                this.hide_shadow();
             }
+            this.moved = false;
+            this.capture = false;
         },
 
-        auto_line:function(x,y){
-            //console.log(x+','+y);
-        },
-
-        move_node:function(src_node,target_node){
+        move_node:function(src_node,target_node,target_direct){
+            if(!!target_node && !!src_node && !jsMind.node.inherited(src_node, target_node)){
+                this.jm.move_node(src_node, '_last_', target_node.id, target_direct);
+            }
+            this.active_node = null;
+            this.target_node = null;
+            this.target_direct = null;
         }
     };
 

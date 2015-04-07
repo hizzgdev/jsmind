@@ -124,6 +124,26 @@
         return r;
     };
 
+    jm.node.inherited=function(pnode,node){
+        if(!!pnode && !!node){
+            if(pnode.id === node.id){
+                return true;
+            }
+            if(pnode.isroot){
+                return true;
+            }
+            var pid = pnode.id;
+            var p = node;
+            while(!p.isroot){
+                p = p.parent;
+                if(p.id === pid){
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+
 
     jm.mind = function(){
         this.name = null;
@@ -245,10 +265,29 @@
             }
         },
 
-        move_node:function(node, beforeid){
+        move_node:function(node, beforeid, parentid, direction){
             if(typeof node === 'string'){
-                return this.move_node(this.get_node(node), beforeid);
+                return this.move_node(this.get_node(node), beforeid, parentid, direction);
             }
+            if(!parentid){
+                parentid = node.parent.id;
+            }
+            return this._move_node(node, beforeid, parentid, direction);
+        },
+
+        _flow_node_direction:function(node,direction){
+            if(typeof direction === 'undefined'){
+                direction = node.direction;
+            }else{
+                node.direction = direction;
+            }
+            var len = node.children.length;
+            while(len--){
+                this._flow_node_direction(node.children[len],direction);
+            }
+        },
+
+        _move_node_internal:function(node, beforeid){
             if(!!node && !!beforeid){
                 if(beforeid == '_last_'){
                     node.index = -1;
@@ -260,10 +299,40 @@
                     var node_before = (!!beforeid)?this.get_node(beforeid):null;
                     if(node_before!=null && node_before.parent!=null && node_before.parent.id==node.parent.id){
                         node.index = node_before.index - 0.5;
-                        node.direction = node_before.direction;
                         this._reindex(node.parent);
                     }
                 }
+            }
+            return node;
+        },
+
+        _move_node:function(node, beforeid, parentid, direction){
+            if(!!node && !!parentid){
+                if(node.parent.id != parentid){
+                    // remove from parent's children
+                    var sibling = node.parent.children;
+                    var si = sibling.length;
+                    while(si--){
+                        if(sibling[si].id == node.id){
+                            sibling.splice(si,1);
+                            break;
+                        }
+                    }
+                    node.parent = this.get_node(parentid);
+                    node.parent.children.push(node);
+                }
+
+                if(node.parent.isroot){
+                    if(direction == jsMind.direction.left){
+                        node.direction = direction;
+                    }else{
+                        node.direction = jm.direction.right;
+                    }
+                }else{
+                    node.direction = node.parent.direction;
+                }
+                this._move_node_internal(node, beforeid);
+                this._flow_node_direction(node);
             }
             return node;
         },
@@ -1224,9 +1293,9 @@
             }
         },
 
-        move_node:function(nodeid, beforeid){
+        move_node:function(nodeid, beforeid, parentid, direction){
             if(this.get_editable()){
-                var node = this.mind.move_node(nodeid,beforeid);
+                var node = this.mind.move_node(nodeid,beforeid,parentid,direction);
                 if(!!node){
                     this.view.update_node(node);
                     this.layout.layout();
