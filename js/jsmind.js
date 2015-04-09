@@ -1172,6 +1172,8 @@
 
             this.view.show(true);
             logger.debug('view.show ok');
+
+            jm.invoke_event_handle(this,'show',null);
         },
 
         show : function(mind){
@@ -2112,7 +2114,6 @@
             this.show_nodes();
             this.show_lines();
             //this.layout.cache_valid = true;
-            jm.invoke_event_handle(this,'show',null);
         },
 
         _center_root:function(){

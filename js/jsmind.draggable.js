@@ -21,6 +21,10 @@
          $d.selection.empty();
     };
 
+    var option = {
+        line_width : 5
+    };
+
     var jd = null;
 
     jsMind.draggable = function(jm_){
@@ -49,7 +53,8 @@
             this._event_bind();
         },
 
-        resize:function(){
+        reset:function(){
+            this.jm.view.e_nodes.appendChild(this.shadow);
             this.e_canvas.width=this.jm.view.size.w;
             this.e_canvas.height=this.jm.view.size.h;
         },
@@ -58,8 +63,6 @@
             var c = $d.createElement('canvas');
             this.jm.view.e_panel.appendChild(c);
             var ctx = c.getContext('2d');
-            ctx.lineWidth = 10;
-            ctx.strokeStyle = 'rgba(0,0,0,0.5)';
             this.e_canvas = c;
             this.canvas_ctx = ctx;
         },
@@ -70,7 +73,6 @@
             s.style.zIndex = '3';
             s.style.cursor = 'move';
             s.style.opacity= '0.7';
-            this.jm.view.e_nodes.appendChild(s);
             this.shadow = s;
         },
 
@@ -98,20 +100,23 @@
         },
 
         _magnet_shadow:function(node){
-            this.canvas_ctx.lineWidth = 6;
-            this.canvas_ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-            this.clear_lines();
-            jcanvas.lineto(this.canvas_ctx,
-                node.sp.x,
-                node.sp.y,
-                node.np.x,
-                node.np.y);
+            if(!!node){
+                this.canvas_ctx.lineWidth = option.line_width;
+                this.canvas_ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+                this.canvas_ctx.lineCap = 'round';
+                this.clear_lines();
+                jcanvas.lineto(this.canvas_ctx,
+                    node.sp.x,
+                    node.sp.y,
+                    node.np.x,
+                    node.np.y);
+            }
         },
 
         _lookup_close_node:function(){
             var root = this.jm.get_root();
-            var root_el = root._data.view.element;
-            var root_x = root_el.offsetLeft + root_el.clientWidth/2;
+            var root_view_data = root._data.view;
+            var root_x = root_view_data.abs_x + root_view_data.width/2;
 
             var sw = this.shadow_w;
             var sh = this.shadow_h;
@@ -124,7 +129,7 @@
                             jsMind.direction.right : jsMind.direction.left;
             var nodes = this.jm.mind.nodes;
             var node = null;
-            var el = null;
+            var view_data = null;
             var min_distance = Number.MAX_VALUE;
             var distance = 0;
             var closest_node = null;
@@ -134,19 +139,24 @@
                 var np,sp;
                 node = nodes[nodeid];
                 if(node.isroot || node.direction == direct){
-                    el = node._data.view.element;
-                    nw = el.clientWidth;
-                    nh = el.clientHeight;
-                    nx = el.offsetLeft;
-                    ny = el.offsetTop;
+                    if(node.id == this.active_node.id){
+                        continue;
+                    }
+                    view_data = node._data.view;
+                    nw = view_data.width;
+                    nh = view_data.height;
+                    nx = view_data.abs_x;
+                    ny = view_data.abs_y;
                     if(direct == jsMind.direction.right){
+                        if(sx-nx-nw<=0){continue;}
                         distance = Math.abs(sx-nx-nw) + Math.abs(sy+sh/2-ny-nh/2);
-                        np = {x:nx+nw,y:ny+nh/2};
-                        sp = {x:sx,y:sy+sh/2};
+                        np = {x:nx+nw-option.line_width,y:ny+nh/2};
+                        sp = {x:sx+option.line_width,y:sy+sh/2};
                     }else{
+                        if(nx-sx-sw<=0){continue;}
                         distance = Math.abs(sx+sw-nx) + Math.abs(sy+sh/2-ny-nh/2);
-                        np = {x:nx,y:ny+nh/2};
-                        sp = {x:sx+sw,y:sy+sh/2};
+                        np = {x:nx+option.line_width,y:ny+nh/2};
+                        sp = {x:sx+sw-option.line_width,y:sy+sh/2};
                     }
                     if(distance < min_distance){
                         closest_node = node;
@@ -156,23 +166,28 @@
                     }
                 }
             }
-            return {
-                node:closest_node,
-                direction:direct,
-                sp:shadow_p,
-                np:closest_p
-            };
+            var result_node = null;
+            if(!!closest_node){
+                result_node = {
+                    node:closest_node,
+                    direction:direct,
+                    sp:shadow_p,
+                    np:closest_p
+                };
+            }
+            return result_node;
         },
 
         lookup_close_node:function(){
             var node_data = this._lookup_close_node();
-            this._magnet_shadow(node_data);
-            this.target_node = node_data.node;
-            this.target_direct = node_data.direction;
+            if(!!node_data){
+                this._magnet_shadow(node_data);
+                this.target_node = node_data.node;
+                this.target_direct = node_data.direction;
+            }
         },
 
         _event_bind:function(){
-            var jd = this;
             var container = this.jm.view.container;
             jdom.add_event(container,'mousedown',function(e){jd.dragstart.call(jd,e);});
             jdom.add_event(container,'mousemove',function(e){jd.drag.call(jd,e);});
@@ -183,7 +198,6 @@
             if(this.capture){return;}
             this.active_node = null;
 
-            var jd = this;
             var jview = this.jm.view;
             var el = e.target || event.srcElement;
             var isnode = jview.is_node(el);
@@ -202,7 +216,7 @@
                     }
                     this.hlookup = $w.setInterval(function(){
                         jd.lookup_close_node.call(jd);
-                    },300);
+                    },400);
                     this.capture = true;
                 }
             }
@@ -243,8 +257,30 @@
         },
 
         move_node:function(src_node,target_node,target_direct){
+            var shadow_h = this.shadow.offsetTop;
             if(!!target_node && !!src_node && !jsMind.node.inherited(src_node, target_node)){
-                this.jm.move_node(src_node, '_last_', target_node.id, target_direct);
+                // lookup before_node
+                var sibling_nodes = target_node.children;
+                var sc = sibling_nodes.length;
+                var node = null;
+                var node_h = null;
+                var delta_y = Number.MAX_VALUE;
+                var node_before = null;
+                var beforeid = '_last_';
+                while(sc--){
+                    node = sibling_nodes[sc];
+                    if(node.direction == target_direct && node.id != src_node.id){
+                        node_h = node._data.view.abs_y;
+                        var dy = node_h - shadow_h;
+                        if(dy > 0 && dy < delta_y){
+                            delta_y = dy;
+                            node_before = node;
+                            beforeid = '_first_';
+                        }
+                    }
+                }
+                if(!!node_before){beforeid = node_before.id;}
+                this.jm.move_node(src_node, beforeid, target_node.id, target_direct);
             }
             this.active_node = null;
             this.target_node = null;
@@ -257,9 +293,9 @@
             jd = new jsMind.draggable(jm_);
             jd.init();
         }
-        if(type === 'show'){//resize
+        if(type === 'show'){//reset
             if(!!jd){
-                jd.resize();
+                jd.reset();
             }
         }
     };
