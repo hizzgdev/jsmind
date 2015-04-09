@@ -20,6 +20,10 @@ Get Started:
     <head>
         <link type="text/css" rel="stylesheet" href="style/jsmind.css" />
         <script type="text/javascript" src="js/jsmind.js"></script>
+        <!--
+            enable drag-and-drop feature
+            <script type="text/javascript" src="js/jsmind.draggable.js"></script>
+        -->
     </head>
     <body>
         <div id="jsmind_container"></div>
