@@ -1213,6 +1213,7 @@
                     this.layout.layout();
                     this.view.show(false);
                     this.expand_node(parent_node);
+                    jm.invoke_event_handle(this,'edit',{evt:'add_node',nodeid:nodeid,topic:topic,data:data});
                 }
                 return node;
             }else{
@@ -1228,6 +1229,7 @@
                     this.view.add_node(node);
                     this.layout.layout();
                     this.view.show(false);
+                    jm.invoke_event_handle(this,'edit',{evt:'insert_node_before',node_before:node_before,nodeid:nodeid,topic:topic,data:data});
                 }
                 return node;
             }else{
@@ -1243,6 +1245,7 @@
                     this.view.add_node(node);
                     this.layout.layout();
                     this.view.show(false);
+                    jm.invoke_event_handle(this,'edit',{evt:'insert_node_after',node_after:node_after,nodeid:nodeid,topic:topic,data:data});
                 }
                 return node;
             }else{
@@ -1261,10 +1264,12 @@
                         logger.error('fail, can not remove root node');
                         return false;
                     }
+                    var nodeid = node.id;
                     this.view.remove_node(node);
                     this.mind.remove_node(node);
                     this.layout.layout();
                     this.view.show(false);
+                    jm.invoke_event_handle(this,'edit',{evt:'remove_node',node:nodeid});
                 }else{
                     logger.error('fail, node can not be found');
                     return false;
@@ -1279,6 +1284,7 @@
             if(this.get_editable()){
                 var node = this.get_node(nodeid);
                 if(!!node){
+                    jm.invoke_event_handle(this,'edit',{evt:'update_node',nodeid:nodeid,topic:topic});
                     if(node.topic === topic){
                         logger.info('nothing changed');
                         this.view.update_node(node);
@@ -1302,6 +1308,7 @@
                     this.view.update_node(node);
                     this.layout.layout();
                     this.view.show(false);
+                    jm.invoke_event_handle(this,'edit',{evt:'move_node',nodeid:nodeid,beforeid:beforeid,parentid:parentid,direction:direction});
                 }
             }else{
                 logger.error('fail, this mind map is not editable');
