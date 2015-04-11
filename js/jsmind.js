@@ -1,6 +1,6 @@
 /*
  * Released under BSD License
- * Copyright (c) 2014 hizzgdev@163.com
+ * Copyright (c) 2014-2015 hizzgdev@163.com
  * 
  * Project Home:
  *   https://github.com/hizzgdev/jsmind/
@@ -994,13 +994,7 @@
 
         uuid:{
             newid:function(){
-                var d = new Date().getTime();
-                var _uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                    var r = (d + Math.random()*16)%16 | 0;
-                    d = Math.floor(d/16);
-                    return (c=='x' ? r : (r&0x7|0x8)).toString(16);
-                });
-                return _uuid;
+                return (new Date().getTime().toString(16)+Math.random().toString(16).substr(2)).substr(2,16);
             }
         }
     };
@@ -1059,21 +1053,28 @@
         },
 
         _event_bind:function(){
-            this.view.event_bind(this,null,null,this.click_handle,this.dblclick_handle);
+            this.view.add_event(this,'mousedown',this.mousedown_handle);
+            this.view.add_event(this,'click',this.click_handle);
+            this.view.add_event(this,'dblclick',this.dblclick_handle);
+        },
+
+        mousedown_handle:function(e){
+            var element = e.target || event.srcElement;
+            var isnode = this.view.is_node(element);
+            if(isnode){
+                var nodeid = this.view.get_nodeid(element);
+                this.select_node(nodeid);
+            }else{
+                this.select_clear();
+            }
         },
 
         click_handle:function(e){
             var element = e.target || event.srcElement;
-            var isnode = this.view.is_node(element);
             var isexpander = this.view.is_expander(element);
-
-            var nodeid = this.view.get_nodeid(element);
-            if(isnode){
-                this.select_node(nodeid);
-            }else if(isexpander){
+            if(isexpander){
+                var nodeid = this.view.get_nodeid(element);
                 this.toggle_node(nodeid);
-            }else{
-                this.select_clear();
             }
         },
 
@@ -1173,7 +1174,7 @@
             this.view.show(true);
             logger.debug('view.show ok');
 
-            jm.invoke_event_handle(this,'show',null);
+            jm.invoke_event_handle(this,'show',m);
         },
 
         show : function(mind){
@@ -1213,6 +1214,7 @@
                     this.layout.layout();
                     this.view.show(false);
                     this.expand_node(parent_node);
+                    jm.invoke_event_handle(this,'edit',{evt:'add_node',nodeid:nodeid,topic:topic,data:data});
                 }
                 return node;
             }else{
@@ -1228,6 +1230,7 @@
                     this.view.add_node(node);
                     this.layout.layout();
                     this.view.show(false);
+                    jm.invoke_event_handle(this,'edit',{evt:'insert_node_before',node_before:node_before,nodeid:nodeid,topic:topic,data:data});
                 }
                 return node;
             }else{
@@ -1243,6 +1246,7 @@
                     this.view.add_node(node);
                     this.layout.layout();
                     this.view.show(false);
+                    jm.invoke_event_handle(this,'edit',{evt:'insert_node_after',node_after:node_after,nodeid:nodeid,topic:topic,data:data});
                 }
                 return node;
             }else{
@@ -1261,10 +1265,12 @@
                         logger.error('fail, can not remove root node');
                         return false;
                     }
+                    var nodeid = node.id;
                     this.view.remove_node(node);
                     this.mind.remove_node(node);
                     this.layout.layout();
                     this.view.show(false);
+                    jm.invoke_event_handle(this,'edit',{evt:'remove_node',node:nodeid});
                 }else{
                     logger.error('fail, node can not be found');
                     return false;
@@ -1288,6 +1294,7 @@
                     this.view.update_node(node);
                     this.layout.layout();
                     this.view.show(false);
+                    jm.invoke_event_handle(this,'edit',{evt:'update_node',nodeid:nodeid,topic:topic});
                 }
             }else{
                 logger.error('fail, this mind map is not editable');
@@ -1302,6 +1309,7 @@
                     this.view.update_node(node);
                     this.layout.layout();
                     this.view.show(false);
+                    jm.invoke_event_handle(this,'edit',{evt:'move_node',nodeid:nodeid,beforeid:beforeid,parentid:parentid,direction:direction});
                 }
             }else{
                 logger.error('fail, this mind map is not editable');
@@ -1892,20 +1900,9 @@
 
             this.init_canvas();
         },
-            
-        event_bind:function(obj,fn_mouseover,fn_mouseout,fn_click,fn_dblclick){
-            if(!!fn_mouseover){
-                jm.util.dom.add_event(this.e_nodes,'mouseover',function(e){fn_mouseover.call(obj,e);});
-            }
-            if(!!fn_mouseout){
-                jm.util.dom.add_event(this.e_nodes,'mouseout',function(e){fn_mouseout.call(obj,e);});
-            }
-            if(!!fn_click){
-                jm.util.dom.add_event(this.e_nodes,'click',function(e){fn_click.call(obj,e);});
-            }
-            if(!!fn_dblclick){
-                jm.util.dom.add_event(this.e_nodes,'dblclick',function(e){fn_dblclick.call(obj,e);});
-            }
+
+        add_event:function(obj,event_name,event_handle){
+            jm.util.dom.add_event(this.e_nodes,event_name,function(e){event_handle.call(obj,e);});
         },
 
         get_nodeid:function(element){
@@ -2060,6 +2057,10 @@
             return this.editing_node;
         },
 
+        is_editing:function(){
+            return (!!this.editing_node);
+        },
+
         edit_node_begin:function(node){
             if(this.editing_node != null){
                 this.edit_node_end();
@@ -2085,7 +2086,15 @@
                 var topic = this.e_editor.value;
                 element.style.zIndex = 'auto';
                 element.removeChild(this.e_editor);
-                this.jm.update_node(node.id,topic);
+                if(node.topic != topic){
+                    this.jm.update_node(node.id,topic);
+                }else{
+                    if(this.opts.support_html){
+                        $h(element,node.topic);
+                    }else{
+                        $t(element,node.topic);
+                    }
+                }
             }
         },
 
@@ -2114,6 +2123,7 @@
             this.show_nodes();
             this.show_lines();
             //this.layout.cache_valid = true;
+            jm.invoke_event_handle(this.jm,'resize',null);
         },
 
         _center_root:function(){
@@ -2272,6 +2282,7 @@
         },
 
         handler : function(e){
+            if(_jm.view.is_editing()){return;}
             var evt = e || event;
             if(!this.opts.enable){return true;}
             var kc = evt.keyCode;
@@ -2408,12 +2419,18 @@
         }
     };
 
-    jm.invoke_event_handle = function(sender,type,data){
+    jm.invoke_event_handle = function(sender, type, data){
+        $w.setTimeout(function(){
+            jm._invoke_event_handle(sender,type,data);
+        },0);
+    };
+
+    jm._invoke_event_handle = function(sender,type,data){
         var l = jm.event_handles.length;
         for(var i=0;i<l;i++){
             jm.event_handles[i](sender,type,data);
         }
-    }
+    };
 
     jm.show = function(options,mind){
         var _jm = jm.current;
