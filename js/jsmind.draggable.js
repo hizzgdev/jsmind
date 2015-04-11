@@ -11,7 +11,7 @@
     var $d = $w.document;
     var __name__ = 'jsMind';
     var jsMind = $w[__name__];
-    if(!!jsMind){return;}
+    if(!jsMind){return;}
 
     var jdom = jsMind.util.dom;
     var jcanvas = jsMind.util.canvas;
@@ -22,8 +22,9 @@
          $d.selection.empty();
     };
 
-    var option = {
-        line_width : 5
+    var options = {
+        line_width : 5,
+        lookup_interval : 30
     };
 
     jsMind.draggable = function(jm){
@@ -100,7 +101,7 @@
 
         _magnet_shadow:function(node){
             if(!!node){
-                this.canvas_ctx.lineWidth = option.line_width;
+                this.canvas_ctx.lineWidth = options.line_width;
                 this.canvas_ctx.strokeStyle = 'rgba(0,0,0,0.3)';
                 this.canvas_ctx.lineCap = 'round';
                 this.clear_lines();
@@ -149,13 +150,13 @@
                     if(direct == jsMind.direction.right){
                         if(sx-nx-nw<=0){continue;}
                         distance = Math.abs(sx-nx-nw) + Math.abs(sy+sh/2-ny-nh/2);
-                        np = {x:nx+nw-option.line_width,y:ny+nh/2};
-                        sp = {x:sx+option.line_width,y:sy+sh/2};
+                        np = {x:nx+nw-options.line_width,y:ny+nh/2};
+                        sp = {x:sx+options.line_width,y:sy+sh/2};
                     }else{
                         if(nx-sx-sw<=0){continue;}
                         distance = Math.abs(sx+sw-nx) + Math.abs(sy+sh/2-ny-nh/2);
-                        np = {x:nx+option.line_width,y:ny+nh/2};
-                        sp = {x:sx+sw-option.line_width,y:sy+sh/2};
+                        np = {x:nx+options.line_width,y:ny+nh/2};
+                        sp = {x:sx+sw-options.line_width,y:sy+sh/2};
                     }
                     if(distance < min_distance){
                         closest_node = node;
@@ -218,7 +219,7 @@
                     var jd = this;
                     this.hlookup = $w.setInterval(function(){
                         jd.lookup_close_node.call(jd);
-                    },400);
+                    },options.lookup_interval);
                     this.capture = true;
                 }
             }
