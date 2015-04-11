@@ -1,6 +1,6 @@
 /*
  * Released under BSD License
- * Copyright (c) 2014 hizzgdev@163.com
+ * Copyright (c) 2014-2015 hizzgdev@163.com
  * 
  * Project Home:
  *   https://github.com/hizzgdev/jsmind/
@@ -11,6 +11,7 @@
     var $d = $w.document;
     var __name__ = 'jsMind';
     var jsMind = $w[__name__];
+    if(!jsMind){return;}
 
     var jdom = jsMind.util.dom;
     var jcanvas = jsMind.util.canvas;
@@ -21,14 +22,14 @@
          $d.selection.empty();
     };
 
-    var option = {
-        line_width : 5
+    var options = {
+        line_width : 5,
+        lookup_delay : 500,
+        lookup_interval : 80
     };
 
-    var jd = null;
-
-    jsMind.draggable = function(jm_){
-        this.jm = jm_;
+    jsMind.draggable = function(jm){
+        this.jm = jm;
         this.e_canvas = null;
         this.canvas_ctx = null;
         this.shadow = null;
@@ -41,7 +42,8 @@
         this.client_h = 0;
         this.offset_x = 0;
         this.offset_y = 0;
-        this.hlookup = 0;
+        this.hlookup_delay = 0;
+        this.hlookup_timer = 0;
         this.capture = false;
         this.moved = false;
     };
@@ -53,7 +55,7 @@
             this._event_bind();
         },
 
-        reset:function(){
+        resize:function(){
             this.jm.view.e_nodes.appendChild(this.shadow);
             this.e_canvas.width=this.jm.view.size.w;
             this.e_canvas.height=this.jm.view.size.h;
@@ -101,7 +103,7 @@
 
         _magnet_shadow:function(node){
             if(!!node){
-                this.canvas_ctx.lineWidth = option.line_width;
+                this.canvas_ctx.lineWidth = options.line_width;
                 this.canvas_ctx.strokeStyle = 'rgba(0,0,0,0.3)';
                 this.canvas_ctx.lineCap = 'round';
                 this.clear_lines();
@@ -150,13 +152,13 @@
                     if(direct == jsMind.direction.right){
                         if(sx-nx-nw<=0){continue;}
                         distance = Math.abs(sx-nx-nw) + Math.abs(sy+sh/2-ny-nh/2);
-                        np = {x:nx+nw-option.line_width,y:ny+nh/2};
-                        sp = {x:sx+option.line_width,y:sy+sh/2};
+                        np = {x:nx+nw-options.line_width,y:ny+nh/2};
+                        sp = {x:sx+options.line_width,y:sy+sh/2};
                     }else{
                         if(nx-sx-sw<=0){continue;}
                         distance = Math.abs(sx+sw-nx) + Math.abs(sy+sh/2-ny-nh/2);
-                        np = {x:nx+option.line_width,y:ny+nh/2};
-                        sp = {x:sx+sw-option.line_width,y:sy+sh/2};
+                        np = {x:nx+options.line_width,y:ny+nh/2};
+                        sp = {x:sx+sw-options.line_width,y:sy+sh/2};
                     }
                     if(distance < min_distance){
                         closest_node = node;
@@ -188,6 +190,7 @@
         },
 
         _event_bind:function(){
+            var jd = this;
             var container = this.jm.view.container;
             jdom.add_event(container,'mousedown',function(e){jd.dragstart.call(jd,e);});
             jdom.add_event(container,'mousemove',function(e){jd.drag.call(jd,e);});
@@ -195,6 +198,7 @@
         },
 
         dragstart:function(e){
+            if(!this.jm.get_editable()){return;}
             if(this.capture){return;}
             this.active_node = null;
 
@@ -211,18 +215,26 @@
                     this.offset_y = e.clientY - el.offsetTop;
                     this.client_hw = Math.floor(el.clientWidth/2);
                     this.client_hh = Math.floor(el.clientHeight/2);
-                    if(this.hlookup != 0){
-                        $w.clearInterval(this.hlookup);
+                    if(this.hlookup_delay != 0){
+                        $w.clearTimeout(this.hlookup_delay);
                     }
-                    this.hlookup = $w.setInterval(function(){
-                        jd.lookup_close_node.call(jd);
-                    },400);
+                    if(this.hlookup_timer != 0){
+                        $w.clearInterval(this.hlookup_timer);
+                    }
+                    var jd = this;
+                    this.hlookup_delay = $w.setTimeout(function(){
+                        jd.hlookup_delay = 0;
+                        jd.hlookup_timer = $w.setInterval(function(){
+                            jd.lookup_close_node.call(jd);
+                        },options.lookup_interval);
+                    },options.lookup_delay);
                     this.capture = true;
                 }
             }
         },
 
         drag:function(e){
+            if(!this.jm.get_editable()){return;}
             if(this.capture){
                 this.show_shadow();
                 this.moved = true;
@@ -238,10 +250,16 @@
         },
 
         dragend:function(e){
+            if(!this.jm.get_editable()){return;}
             if(this.capture){
-                if(this.hlookup != 0){
-                    $w.clearInterval(this.hlookup);
-                    this.hlookup = 0;
+                if(this.hlookup_delay != 0){
+                    $w.clearTimeout(this.hlookup_delay);
+                    this.hlookup_delay = 0;
+                    this.clear_lines();
+                }
+                if(this.hlookup_timer != 0){
+                    $w.clearInterval(this.hlookup_timer);
+                    this.hlookup_timer = 0;
                     this.clear_lines();
                 }
                 if(this.moved){
@@ -288,14 +306,16 @@
         }
     };
 
-    var jm_event_handle = function(jm_, type, data){
+    var jm_event_handle = function(jm, type, data){
         if(type === 'init'){
-            jd = new jsMind.draggable(jm_);
+            var jd = new jsMind.draggable(jm);
             jd.init();
+            jm.draggable = jd;
         }
-        if(type === 'show'){//reset
+        if(type === 'resize'){
+            var jd = jm.draggable;
             if(!!jd){
-                jd.reset();
+                jd.resize();
             }
         }
     };
