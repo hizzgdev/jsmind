@@ -1059,21 +1059,28 @@
         },
 
         _event_bind:function(){
-            this.view.event_bind(this,null,null,this.click_handle,this.dblclick_handle);
+            this.view.add_event(this,'mousedown',this.mousedown_handle);
+            this.view.add_event(this,'click',this.click_handle);
+            this.view.add_event(this,'dblclick',this.dblclick_handle);
+        },
+
+        mousedown_handle:function(e){
+            var element = e.target || event.srcElement;
+            var isnode = this.view.is_node(element);
+            if(isnode){
+                var nodeid = this.view.get_nodeid(element);
+                this.select_node(nodeid);
+            }else{
+                this.select_clear();
+            }
         },
 
         click_handle:function(e){
             var element = e.target || event.srcElement;
-            var isnode = this.view.is_node(element);
             var isexpander = this.view.is_expander(element);
-
-            var nodeid = this.view.get_nodeid(element);
-            if(isnode){
-                this.select_node(nodeid);
-            }else if(isexpander){
+            if(isexpander){
+                var nodeid = this.view.get_nodeid(element);
                 this.toggle_node(nodeid);
-            }else{
-                this.select_clear();
             }
         },
 
@@ -1284,7 +1291,6 @@
             if(this.get_editable()){
                 var node = this.get_node(nodeid);
                 if(!!node){
-                    jm.invoke_event_handle(this,'edit',{evt:'update_node',nodeid:nodeid,topic:topic});
                     if(node.topic === topic){
                         logger.info('nothing changed');
                         this.view.update_node(node);
@@ -1294,6 +1300,7 @@
                     this.view.update_node(node);
                     this.layout.layout();
                     this.view.show(false);
+                    jm.invoke_event_handle(this,'edit',{evt:'update_node',nodeid:nodeid,topic:topic});
                 }
             }else{
                 logger.error('fail, this mind map is not editable');
@@ -1899,20 +1906,9 @@
 
             this.init_canvas();
         },
-            
-        event_bind:function(obj,fn_mouseover,fn_mouseout,fn_click,fn_dblclick){
-            if(!!fn_mouseover){
-                jm.util.dom.add_event(this.e_nodes,'mouseover',function(e){fn_mouseover.call(obj,e);});
-            }
-            if(!!fn_mouseout){
-                jm.util.dom.add_event(this.e_nodes,'mouseout',function(e){fn_mouseout.call(obj,e);});
-            }
-            if(!!fn_click){
-                jm.util.dom.add_event(this.e_nodes,'click',function(e){fn_click.call(obj,e);});
-            }
-            if(!!fn_dblclick){
-                jm.util.dom.add_event(this.e_nodes,'dblclick',function(e){fn_dblclick.call(obj,e);});
-            }
+
+        add_event:function(obj,event_name,event_handle){
+            jm.util.dom.add_event(this.e_nodes,event_name,function(e){event_handle.call(obj,e);});
         },
 
         get_nodeid:function(element){
@@ -2092,7 +2088,15 @@
                 var topic = this.e_editor.value;
                 element.style.zIndex = 'auto';
                 element.removeChild(this.e_editor);
-                this.jm.update_node(node.id,topic);
+                if(node.topic != topic){
+                    this.jm.update_node(node.id,topic);
+                }else{
+                    if(this.opts.support_html){
+                        $h(element,node.topic);
+                    }else{
+                        $t(element,node.topic);
+                    }
+                }
             }
         },
 
