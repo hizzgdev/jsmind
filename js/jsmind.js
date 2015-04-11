@@ -1,6 +1,6 @@
 /*
  * Released under BSD License
- * Copyright (c) 2014 hizzgdev@163.com
+ * Copyright (c) 2014-2015 hizzgdev@163.com
  * 
  * Project Home:
  *   https://github.com/hizzgdev/jsmind/
@@ -2415,12 +2415,18 @@
         }
     };
 
-    jm.invoke_event_handle = function(sender,type,data){
+    jm.invoke_event_handle = function(sender, type, data){
+        $w.setTimeout(function(){
+            jm._invoke_event_handle(sender,type,data);
+        },0);
+    };
+
+    jm._invoke_event_handle = function(sender,type,data){
         var l = jm.event_handles.length;
         for(var i=0;i<l;i++){
             jm.event_handles[i](sender,type,data);
         }
-    }
+    };
 
     jm.show = function(options,mind){
         var _jm = jm.current;
