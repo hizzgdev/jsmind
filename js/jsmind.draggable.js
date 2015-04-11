@@ -55,7 +55,7 @@
             this._event_bind();
         },
 
-        reset:function(){
+        resize:function(){
             this.jm.view.e_nodes.appendChild(this.shadow);
             this.e_canvas.width=this.jm.view.size.w;
             this.e_canvas.height=this.jm.view.size.h;
@@ -312,10 +312,10 @@
             jd.init();
             jm.draggable = jd;
         }
-        if(type === 'show'){//reset
+        if(type === 'resize'){
             var jd = jm.draggable;
             if(!!jd){
-                jd.reset();
+                jd.resize();
             }
         }
     };

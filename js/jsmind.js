@@ -1180,7 +1180,7 @@
             this.view.show(true);
             logger.debug('view.show ok');
 
-            jm.invoke_event_handle(this,'show',null);
+            jm.invoke_event_handle(this,'show',m);
         },
 
         show : function(mind){
@@ -2129,6 +2129,7 @@
             this.show_nodes();
             this.show_lines();
             //this.layout.cache_valid = true;
+            jm.invoke_event_handle(this.jm,'resize',null);
         },
 
         _center_root:function(){
@@ -2287,6 +2288,7 @@
         },
 
         handler : function(e){
+            if(_jm.view.is_editing()){return;}
             var evt = e || event;
             if(!this.opts.enable){return true;}
             var kc = evt.keyCode;
@@ -2340,7 +2342,6 @@
             }
         },
         handle_up:function(_jm,e){
-            if(_jm.view.is_editing()){return;}
             var evt = e || event;
             var selected_node = _jm.get_selected_node();
             var up_node = _jm.find_node_before(selected_node);
@@ -2358,7 +2359,6 @@
         },
 
         handle_down:function(_jm,e){
-            if(_jm.view.is_editing()){return;}
             var evt = e || event;
             var selected_node = _jm.get_selected_node();
             var down_node = _jm.find_node_after(selected_node);
@@ -2376,11 +2376,9 @@
         },
 
         handle_left:function(_jm,e){
-            if(_jm.view.is_editing()){return;}
             this._handle_direction(_jm,e,jm.direction.left);
         },
         handle_right:function(_jm,e){
-            if(_jm.view.is_editing()){return;}
             this._handle_direction(_jm,e,jm.direction.right);
         },
         _handle_direction:function(_jm,e,d){
