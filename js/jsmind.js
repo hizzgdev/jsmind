@@ -2063,6 +2063,10 @@
             return this.editing_node;
         },
 
+        is_editing:function(){
+            return (!!this.editing_node);
+        },
+
         edit_node_begin:function(node){
             if(this.editing_node != null){
                 this.edit_node_end();
@@ -2336,6 +2340,7 @@
             }
         },
         handle_up:function(_jm,e){
+            if(_jm.view.is_editing()){return;}
             var evt = e || event;
             var selected_node = _jm.get_selected_node();
             var up_node = _jm.find_node_before(selected_node);
@@ -2353,6 +2358,7 @@
         },
 
         handle_down:function(_jm,e){
+            if(_jm.view.is_editing()){return;}
             var evt = e || event;
             var selected_node = _jm.get_selected_node();
             var down_node = _jm.find_node_after(selected_node);
@@ -2370,9 +2376,11 @@
         },
 
         handle_left:function(_jm,e){
+            if(_jm.view.is_editing()){return;}
             this._handle_direction(_jm,e,jm.direction.left);
         },
         handle_right:function(_jm,e){
+            if(_jm.view.is_editing()){return;}
             this._handle_direction(_jm,e,jm.direction.right);
         },
         _handle_direction:function(_jm,e,d){
