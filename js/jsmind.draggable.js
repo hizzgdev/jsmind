@@ -11,6 +11,7 @@
     var $d = $w.document;
     var __name__ = 'jsMind';
     var jsMind = $w[__name__];
+    if(!!jsMind){return;}
 
     var jdom = jsMind.util.dom;
     var jcanvas = jsMind.util.canvas;
@@ -25,10 +26,8 @@
         line_width : 5
     };
 
-    var jd = null;
-
-    jsMind.draggable = function(jm_){
-        this.jm = jm_;
+    jsMind.draggable = function(jm){
+        this.jm = jm;
         this.e_canvas = null;
         this.canvas_ctx = null;
         this.shadow = null;
@@ -188,6 +187,7 @@
         },
 
         _event_bind:function(){
+            var jd = this;
             var container = this.jm.view.container;
             jdom.add_event(container,'mousedown',function(e){jd.dragstart.call(jd,e);});
             jdom.add_event(container,'mousemove',function(e){jd.drag.call(jd,e);});
@@ -215,6 +215,7 @@
                     if(this.hlookup != 0){
                         $w.clearInterval(this.hlookup);
                     }
+                    var jd = this;
                     this.hlookup = $w.setInterval(function(){
                         jd.lookup_close_node.call(jd);
                     },400);
@@ -291,12 +292,14 @@
         }
     };
 
-    var jm_event_handle = function(jm_, type, data){
+    var jm_event_handle = function(jm, type, data){
         if(type === 'init'){
-            jd = new jsMind.draggable(jm_);
+            var jd = new jsMind.draggable(jm);
             jd.init();
+            jm.draggable = jd;
         }
         if(type === 'show'){//reset
+            var jd = jm.draggable;
             if(!!jd){
                 jd.reset();
             }
