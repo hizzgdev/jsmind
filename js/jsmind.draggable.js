@@ -195,6 +195,7 @@
         },
 
         dragstart:function(e){
+            if(!this.jm.get_editable()){return;}
             if(this.capture){return;}
             this.active_node = null;
 
@@ -223,6 +224,7 @@
         },
 
         drag:function(e){
+            if(!this.jm.get_editable()){return;}
             if(this.capture){
                 this.show_shadow();
                 this.moved = true;
@@ -238,6 +240,7 @@
         },
 
         dragend:function(e){
+            if(!this.jm.get_editable()){return;}
             if(this.capture){
                 if(this.hlookup != 0){
                     $w.clearInterval(this.hlookup);
