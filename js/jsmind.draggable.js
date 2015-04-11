@@ -42,8 +42,8 @@
         this.client_h = 0;
         this.offset_x = 0;
         this.offset_y = 0;
-        this.hlookupf = 0;
-        this.hlookup = 0;
+        this.hlookup_delay = 0;
+        this.hlookup_timer = 0;
         this.capture = false;
         this.moved = false;
     };
@@ -215,15 +215,16 @@
                     this.offset_y = e.clientY - el.offsetTop;
                     this.client_hw = Math.floor(el.clientWidth/2);
                     this.client_hh = Math.floor(el.clientHeight/2);
-                    if(this.hlookupf != 0){
-                        $w.clearTimeout(this.hlookupf);
+                    if(this.hlookup_delay != 0){
+                        $w.clearTimeout(this.hlookup_delay);
                     }
-                    if(this.hlookup != 0){
-                        $w.clearInterval(this.hlookup);
+                    if(this.hlookup_timer != 0){
+                        $w.clearInterval(this.hlookup_timer);
                     }
                     var jd = this;
-                    this.hlookupf = $w.setTimeout(function(){
-                        jd.hlookup = $w.setInterval(function(){
+                    this.hlookup_delay = $w.setTimeout(function(){
+                        jd.hlookup_delay = 0;
+                        jd.hlookup_timer = $w.setInterval(function(){
                             jd.lookup_close_node.call(jd);
                         },options.lookup_interval);
                     },options.lookup_delay);
@@ -251,14 +252,14 @@
         dragend:function(e){
             if(!this.jm.get_editable()){return;}
             if(this.capture){
-                if(this.hlookupf != 0){
-                    $w.clearTimeout(this.hlookupf);
-                    this.hlookupf = 0;
+                if(this.hlookup_delay != 0){
+                    $w.clearTimeout(this.hlookup_delay);
+                    this.hlookup_delay = 0;
                     this.clear_lines();
                 }
-                if(this.hlookup != 0){
-                    $w.clearInterval(this.hlookup);
-                    this.hlookup = 0;
+                if(this.hlookup_timer != 0){
+                    $w.clearInterval(this.hlookup_timer);
+                    this.hlookup_timer = 0;
                     this.clear_lines();
                 }
                 if(this.moved){
