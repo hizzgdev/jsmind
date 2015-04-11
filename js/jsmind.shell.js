@@ -11,15 +11,16 @@
     var $d = $w.document;
     var __name__ = 'jsMind';
     var jsMind = $w[__name__];
+    if(!jsMind){return;}
 
-    var js = null;
-
-    jsMind.shell = function(jm_){
-        this.jm = jm_;
+    jsMind.shell = function(jm){
+        this.jm = jm;
         this.commands = [];
     };
 
     jsMind.shell.prototype = {
+        init:function(){
+        },
         execute:function(command){
         },
         execute_batch:function(commands,interval){
@@ -31,15 +32,30 @@
         get_next_command:function(){
         },
         reset:function(){
+        },
+        record:function(action,data){
+            console.log(action);
+            console.log(data);
         }
     };
-    var jm_event_handle = function(jm_, type, data){
+    var jm_event_handle = function(jm, type, data){
         if(type === 'init'){
-            js = new jsMind.shell(jm_);
+            var js = new jsMind.shell(jm);
+            jm.shell = js;
+        }
+        if(type === 'show'){
+            var js = jm.shell;
+            js.init();
+            if(!!js){
+                js.record('show',data);
+            }
         }
         if(type === 'edit'){
+            var js = jm.shell;
             if(!!js){
-                console.log(data);
+                var action=data.evt;
+                delete data.evt;
+                js.record(action,data);
             }
         }
     }
