@@ -2282,7 +2282,7 @@
         },
 
         handler : function(e){
-            if(_jm.view.is_editing()){return;}
+            if(this.jm.view.is_editing()){return;}
             var evt = e || event;
             if(!this.opts.enable){return true;}
             var kc = evt.keyCode;
