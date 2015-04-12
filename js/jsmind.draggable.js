@@ -12,6 +12,7 @@
     var __name__ = 'jsMind';
     var jsMind = $w[__name__];
     if(!jsMind){return;}
+    if(typeof(jsMind.draggable)!='undefined'){return;}
 
     var jdom = jsMind.util.dom;
     var jcanvas = jsMind.util.canvas;
@@ -298,7 +299,7 @@
                     }
                 }
                 if(!!node_before){beforeid = node_before.id;}
-                this.jm.move_node(src_node, beforeid, target_node.id, target_direct);
+                this.jm.move_node(src_node.id, beforeid, target_node.id, target_direct);
             }
             this.active_node = null;
             this.target_node = null;
