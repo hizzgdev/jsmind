@@ -12,6 +12,7 @@
     var __name__ = 'jsMind';
     var jsMind = $w[__name__];
     if(!jsMind){return;}
+    if(typeof(jsMind.draggable)!='undefined'){return;}
 
     var jdom = jsMind.util.dom;
     var jcanvas = jsMind.util.canvas;

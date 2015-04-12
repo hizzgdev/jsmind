@@ -12,6 +12,7 @@
     var __name__ = 'jsMind';
     var jsMind = $w[__name__];
     if(!jsMind){return;}
+    if(typeof(jsMind.shell)!='undefined'){return;}
 
     var options = {
         play_delay : 1000
@@ -22,7 +23,6 @@
         this.step = 0;
         this.commands = []; //version
         this.delay_handle = 0;
-        this.recording = false;
         this.playing = false;
         this.jm_editable = true;
     };
@@ -34,7 +34,13 @@
         record:function(action,obj){
             if(!this.playing){
                 var command = {action:action,data:obj.data,node:obj.node};
-                this.step = this.commands.push(command);
+                var prev_command = this.commands[this.step-1];
+                if(command.action === 'update_node' && prev_command.action === 'add_node' && prev_command.data[2]==='New Node'){
+                    prev_command.data[2] = command.data[1];
+                    this.commands[this.step-1] = prev_command;
+                }else{
+                    this.step = this.commands.push(command);
+                }
             }
         },
         execute:function(command){
@@ -50,9 +56,6 @@
         add_command:function(command){
             this.commands.push(command);
             play();
-        },
-        get_command_list:function(){
-            // deep clone
         },
         replay:function(){
             this.step = 0;
@@ -77,10 +80,10 @@
                     js.play.call(js); 
                 },options.play_delay);
             }else{
-                this.play_end();
+                this._play_end();
             }
         },
-        play_end:function(){
+        _play_end:function(){
             this.playing = false;
             if(this.jm_editable){
                 this.jm.enable_edit();
