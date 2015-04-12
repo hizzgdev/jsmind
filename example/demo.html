@@ -16,12 +16,13 @@
     </style>
 </head>
 <body>
-双面问题，指定位置问题
 <input type="file" onchange="load_file(this);"/>
 <button onclick="save_nodetree();">nodetree</button>
+<button onclick="replay();">replay</button>
 <div id="jsmind_container"></div>
 <script type="text/javascript" src="../js/jsmind.js"></script>
 <script type="text/javascript" src="../js/jsmind.draggable.js"></script>
+<script type="text/javascript" src="../features/jsmind.shell.js"></script>
 <script type="text/javascript">
     var _jm = null;
     function load_jsmind(){
@@ -86,6 +87,13 @@
     function save_nodetree(){
         var mind_data = _jm.get_data('node_tree');
         console.log(mind_data);
+    }
+
+    function replay(){
+        var shell = _jm.shell;
+        if(!!shell){
+            shell.replay();
+        }
     }
 
     load_jsmind();
