@@ -298,7 +298,7 @@
                     }
                 }
                 if(!!node_before){beforeid = node_before.id;}
-                this.jm.move_node(src_node, beforeid, target_node.id, target_direct);
+                this.jm.move_node(src_node.id, beforeid, target_node.id, target_direct);
             }
             this.active_node = null;
             this.target_node = null;

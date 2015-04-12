@@ -13,39 +13,90 @@
     var jsMind = $w[__name__];
     if(!jsMind){return;}
 
+    var options = {
+        play_delay : 1000
+    };
+
     jsMind.shell = function(jm){
         this.jm = jm;
-        this.commands = [];
+        this.step = 0;
+        this.commands = []; //version
+        this.delay_handle = 0;
+        this.recording = false;
+        this.playing = false;
+        this.jm_editable = true;
     };
 
     jsMind.shell.prototype = {
         init:function(){
+            this.playing = false;
+        },
+        record:function(action,obj){
+            if(!this.playing){
+                var command = {action:action,data:obj.data,node:obj.node};
+                this.step = this.commands.push(command);
+            }
         },
         execute:function(command){
-        },
-        execute_batch:function(commands,interval){
+            var func = this.jm[command.action];
+            var node = command.node;
+            this.jm.enable_edit();
+            func.apply(this.jm,command.data);
+            this.jm.disable_edit();
+            if(!!node){
+                this.jm.select_node(node);
+            }
         },
         add_command:function(command){
+            this.commands.push(command);
+            play();
         },
         get_command_list:function(){
+            // deep clone
         },
-        get_next_command:function(){
+        replay:function(){
+            this.step = 0;
+            this.play();
         },
-        reset:function(){
+        play:function(){
+            this.jm_editable = this.jm.get_editable();
+            this.jm.disable_edit();
+            this.playing = true;
+            this._play_stepbystep();
         },
-        record:function(action,data){
-            console.log(action);
-            console.log(data);
+        _play_stepbystep:function(){
+            if(this.delay_handle != 0){
+                $w.clearTimeout(this.delay_handle);
+                this.delay_handle = 0;
+            }
+            if(this.step<this.commands.length){
+                this.execute(this.commands[this.step]);
+                this.step ++;
+                var js = this;
+                this.delay_handle = $w.setTimeout(function(){
+                    js.play.call(js); 
+                },options.play_delay);
+            }else{
+                this.play_end();
+            }
+        },
+        play_end:function(){
+            this.playing = false;
+            if(this.jm_editable){
+                this.jm.enable_edit();
+            }else{
+                this.jm.disable_edit();
+            }
         }
     };
     var jm_event_handle = function(jm, type, data){
         if(type === 'init'){
             var js = new jsMind.shell(jm);
             jm.shell = js;
+            js.init();
         }
         if(type === 'show'){
             var js = jm.shell;
-            js.init();
             if(!!js){
                 js.record('show',data);
             }

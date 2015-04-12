@@ -1029,7 +1029,7 @@
             this.shortcut.init();
 
             this._event_bind();
-            jm.invoke_event_handle(this,'init',null);
+            jm.invoke_event_handle(this,'init',{data:[]});
         },
 
         enable_edit:function(){
@@ -1174,7 +1174,7 @@
             this.view.show(true);
             logger.debug('view.show ok');
 
-            jm.invoke_event_handle(this,'show',m);
+            jm.invoke_event_handle(this,'show',{data:[mind]});
         },
 
         show : function(mind){
@@ -1214,7 +1214,7 @@
                     this.layout.layout();
                     this.view.show(false);
                     this.expand_node(parent_node);
-                    jm.invoke_event_handle(this,'edit',{evt:'add_node',nodeid:nodeid,topic:topic,data:data});
+                    jm.invoke_event_handle(this,'edit',{evt:'add_node',data:[parent_node.id,nodeid,topic,data],node:nodeid});
                 }
                 return node;
             }else{
@@ -1230,7 +1230,7 @@
                     this.view.add_node(node);
                     this.layout.layout();
                     this.view.show(false);
-                    jm.invoke_event_handle(this,'edit',{evt:'insert_node_before',node_before:node_before,nodeid:nodeid,topic:topic,data:data});
+                    jm.invoke_event_handle(this,'edit',{evt:'insert_node_before',data:[node_before.id,nodeid,topic,data],node:nodeid});
                 }
                 return node;
             }else{
@@ -1246,7 +1246,7 @@
                     this.view.add_node(node);
                     this.layout.layout();
                     this.view.show(false);
-                    jm.invoke_event_handle(this,'edit',{evt:'insert_node_after',node_after:node_after,nodeid:nodeid,topic:topic,data:data});
+                    jm.invoke_event_handle(this,'edit',{evt:'insert_node_after',data:[node_after.id,nodeid,topic,data],node:nodeid});
                 }
                 return node;
             }else{
@@ -1270,7 +1270,7 @@
                     this.mind.remove_node(node);
                     this.layout.layout();
                     this.view.show(false);
-                    jm.invoke_event_handle(this,'edit',{evt:'remove_node',node:nodeid});
+                    jm.invoke_event_handle(this,'edit',{evt:'remove_node',data:[node.id],node:node.parent.id});
                 }else{
                     logger.error('fail, node can not be found');
                     return false;
@@ -1294,7 +1294,7 @@
                     this.view.update_node(node);
                     this.layout.layout();
                     this.view.show(false);
-                    jm.invoke_event_handle(this,'edit',{evt:'update_node',nodeid:nodeid,topic:topic});
+                    jm.invoke_event_handle(this,'edit',{evt:'update_node',data:[nodeid,topic],node:nodeid});
                 }
             }else{
                 logger.error('fail, this mind map is not editable');
@@ -1309,7 +1309,7 @@
                     this.view.update_node(node);
                     this.layout.layout();
                     this.view.show(false);
-                    jm.invoke_event_handle(this,'edit',{evt:'move_node',nodeid:nodeid,beforeid:beforeid,parentid:parentid,direction:direction});
+                    jm.invoke_event_handle(this,'edit',{evt:'move_node',data:[nodeid,beforeid,parentid,direction],node:nodeid});
                 }
             }else{
                 logger.error('fail, this mind map is not editable');
@@ -2123,7 +2123,7 @@
             this.show_nodes();
             this.show_lines();
             //this.layout.cache_valid = true;
-            jm.invoke_event_handle(this.jm,'resize',null);
+            jm.invoke_event_handle(this.jm,'resize',{data:[]});
         },
 
         _center_root:function(){
