@@ -7,7 +7,7 @@
  */
 
 (function($w){
-    "use strict";       
+    'use strict';       
     // set 'jsMind' as the library name.
     // __name__ should be a const value, Never try to change it easily.
     var __name__ = 'jsMind';
@@ -18,12 +18,12 @@
 
     // an noop function define
     var _noop = function(){};
-    var logger = (typeof(console) == 'undefined')?{
+    var logger = (typeof console === 'undefined')?{
             log:_noop, debug:_noop, error:_noop, warn:_noop, info:_noop
         }:console;
 
     // check global variables
-    if(typeof($w[__name__])!='undefined'){
+    if(typeof $w[__name__] != 'undefined'){
         logger.log(__name__+' has been already exist.');
         return;
     }
@@ -84,15 +84,17 @@
         }
         this.options = opts;
         this.mind = null;
-        this._init_ = false;
+        this.event_handles = [];
+        this.init();
     };
 
     // ============= static object =============================================
     jm.direction = {left:-1,center:0,right:1};
+    jm.event_type = {show:1,resize:2,edit:3,select:4};
 
     jm.node = function(sId,iIndex,sTopic,oData,bIsRoot,oParent,eDirection){
         if(!sId){logger.error('invalid nodeid');return;}
-        if(typeof(iIndex) != 'number'){logger.error('invalid node index');return;}
+        if(typeof iIndex != 'number'){logger.error('invalid node index');return;}
         this.id = sId;
         this.index = iIndex;
         this.topic = sTopic;
@@ -142,6 +144,23 @@
             }
         }
         return false;
+    };
+
+    jm.node.prototype = {
+        get_location:function(){
+            var vd = this._data.view;
+            return {
+                x:vd.abs_x,
+                y:vd.abs_y
+            };
+        },
+        get_size:function(){
+            var vd = this._data.view;
+            return {
+                w:vd.width,
+                h:vd.height
+            }
+        }
     };
 
 
@@ -338,7 +357,7 @@
         },
 
         remove_node:function(node){
-            if(typeof node == 'string'){
+            if(typeof node === 'string'){
                 return this.remove_node(this.get_node(node));
             }
             if(!node){
@@ -429,7 +448,7 @@
                     author : mind.author,
                     version : mind.version
                 };
-                json.format = "node_tree";
+                json.format = 'node_tree';
                 json.data = df._buildnode(mind.root);
                 return json;
             },
@@ -531,7 +550,7 @@
                     author : mind.author,
                     version : mind.version
                 };
-                json.format = "node_array";
+                json.format = 'node_array';
                 json.data = [];
                 df._array(mind,json.data);
                 return json;
@@ -671,7 +690,7 @@
                     author : mind.author,
                     version : mind.version
                 };
-                json.format = "freemind";
+                json.format = 'freemind';
                 var xmllines = [];
                 xmllines.push('<map version=\"1.0.1\">');
                 df._buildmap(mind.root, xmllines);
@@ -684,9 +703,9 @@
                 var xml_doc = null;
                 if (window.DOMParser){
                     var parser = new DOMParser();
-                    xml_doc = parser.parseFromString(xml,"text/xml");
+                    xml_doc = parser.parseFromString(xml,'text/xml');
                 }else{ // Internet Explorer
-                    xml_doc = new ActiveXObject("Microsoft.XMLDOM");
+                    xml_doc = new ActiveXObject('Microsoft.XMLDOM');
                     xml_doc.async = false;
                     xml_doc.loadXML(xml); 
                 }
@@ -818,7 +837,7 @@
                     xhr = new XMLHttpRequest();
                 }else{
                     try{
-                        xhr = new ActiveXObject("Microsoft.XMLHTTP");
+                        xhr = new ActiveXObject('Microsoft.XMLHTTP');
                     }catch(e){}
                 }
                 return xhr;
@@ -841,7 +860,7 @@
                 xhr.onreadystatechange = function(){
                     if(xhr.readyState == 4){
                         if(xhr.status == 200 || xhr.status == 0){
-                            if(typeof(callback) == 'function'){
+                            if(typeof callback === 'function'){
                                 var data = eval('('+xhr.responseText+')');
                                 callback(data);
                             }
@@ -912,7 +931,7 @@
             read:function(file_data,fn_callback){
                 var reader = new FileReader();
                 reader.onload = function(){
-                    if(typeof(fn_callback) == 'function'){
+                    if(typeof fn_callback === 'function'){
                         fn_callback(this.result, file_data.name);
                     }
                 };
@@ -921,7 +940,7 @@
 
             save:function(file_data, type, name) {
                 var blob;
-                if (typeof $w.Blob == "function") {
+                if (typeof $w.Blob === 'function') {
                     blob = new Blob([file_data], {type: type});
                 } else {
                     var BlobBuilder = $w.BlobBuilder || $w.MozBlobBuilder || $w.WebKitBlobBuilder || $w.MSBlobBuilder;
@@ -933,12 +952,12 @@
                 var bloburl = URL.createObjectURL(blob);
                 var anchor = $c('a');
                 if ('download' in anchor) {
-                    anchor.style.visibility = "hidden";
+                    anchor.style.visibility = 'hidden';
                     anchor.href = bloburl;
                     anchor.download = name;
                     $d.body.appendChild(anchor);
-                    var evt = $d.createEvent("MouseEvents");
-                    evt.initEvent("click", true, true);
+                    var evt = $d.createEvent('MouseEvents');
+                    evt.initEvent('click', true, true);
                     anchor.dispatchEvent(evt);
                     $d.body.removeChild(anchor);
                 } else if (navigator.msSaveBlob) {
@@ -978,7 +997,7 @@
                 for(var o in a){
                     if(o in b){
                         if(typeof b[o] === 'object' &&
-                            Object.prototype.toString.call(b[o]).toLowerCase() == "[object object]" &&
+                            Object.prototype.toString.call(b[o]).toLowerCase() == '[object object]' &&
                             !b[o].length){
                             jm.util.json.merge(b[o], a[o]);
                         }else{
@@ -1001,8 +1020,6 @@
 
     jm.prototype={
         init : function(){
-            if(this._init_){return;}
-            this._init_ = true;
             var opts = this.options;
 
             var opts_layout = {
@@ -1029,7 +1046,8 @@
             this.shortcut.init();
 
             this._event_bind();
-            jm.invoke_event_handle(this,'init',{data:[]});
+
+            jm.init_plugins(this);
         },
 
         enable_edit:function(){
@@ -1051,7 +1069,6 @@
                 this.view.reset_theme();
             }
         },
-
         _event_bind:function(){
             this.view.add_event(this,'mousedown',this.mousedown_handle);
             this.view.add_event(this,'click',this.click_handle);
@@ -1174,13 +1191,10 @@
             this.view.show(true);
             logger.debug('view.show ok');
 
-            jm.invoke_event_handle(this,'show',{data:[mind]});
+            this.invoke_event_handle(jm.event_type.show,{data:[mind]});
         },
 
         show : function(mind){
-            if(!this._init_){
-                this.init();
-            }
             this._reset();
             this._show(mind);
         },
@@ -1214,7 +1228,7 @@
                     this.layout.layout();
                     this.view.show(false);
                     this.expand_node(parent_node);
-                    jm.invoke_event_handle(this,'edit',{evt:'add_node',data:[parent_node.id,nodeid,topic,data],node:nodeid});
+                    this.invoke_event_handle(jm.event_type.edit,{evt:'add_node',data:[parent_node.id,nodeid,topic,data],node:nodeid});
                 }
                 return node;
             }else{
@@ -1230,7 +1244,7 @@
                     this.view.add_node(node);
                     this.layout.layout();
                     this.view.show(false);
-                    jm.invoke_event_handle(this,'edit',{evt:'insert_node_before',data:[node_before.id,nodeid,topic,data],node:nodeid});
+                    this.invoke_event_handle(jm.event_type.edit,{evt:'insert_node_before',data:[node_before.id,nodeid,topic,data],node:nodeid});
                 }
                 return node;
             }else{
@@ -1246,7 +1260,7 @@
                     this.view.add_node(node);
                     this.layout.layout();
                     this.view.show(false);
-                    jm.invoke_event_handle(this,'edit',{evt:'insert_node_after',data:[node_after.id,nodeid,topic,data],node:nodeid});
+                    this.invoke_event_handle(jm.event_type.edit,{evt:'insert_node_after',data:[node_after.id,nodeid,topic,data],node:nodeid});
                 }
                 return node;
             }else{
@@ -1270,7 +1284,7 @@
                     this.mind.remove_node(node);
                     this.layout.layout();
                     this.view.show(false);
-                    jm.invoke_event_handle(this,'edit',{evt:'remove_node',data:[node.id],node:node.parent.id});
+                    this.invoke_event_handle(jm.event_type.edit,{evt:'remove_node',data:[node.id],node:node.parent.id});
                 }else{
                     logger.error('fail, node can not be found');
                     return false;
@@ -1294,7 +1308,7 @@
                     this.view.update_node(node);
                     this.layout.layout();
                     this.view.show(false);
-                    jm.invoke_event_handle(this,'edit',{evt:'update_node',data:[nodeid,topic],node:nodeid});
+                    this.invoke_event_handle(jm.event_type.edit,{evt:'update_node',data:[nodeid,topic],node:nodeid});
                 }
             }else{
                 logger.error('fail, this mind map is not editable');
@@ -1309,7 +1323,7 @@
                     this.view.update_node(node);
                     this.layout.layout();
                     this.view.show(false);
-                    jm.invoke_event_handle(this,'edit',{evt:'move_node',data:[nodeid,beforeid,parentid,direction],node:nodeid});
+                    this.invoke_event_handle(jm.event_type.edit,{evt:'move_node',data:[nodeid,beforeid,parentid,direction],node:nodeid});
                 }
             }else{
                 logger.error('fail, this mind map is not editable');
@@ -1405,6 +1419,28 @@
         resize:function(){
             this.view.resize();
         },
+
+        // callback(type ,data)
+        add_event_listener:function(callback){
+            if(typeof callback === 'function'){
+                this.event_handles.push(callback);
+            }
+        },
+
+        invoke_event_handle:function(type, data){
+            var j = this;
+            $w.setTimeout(function(){
+                j._invoke_event_handle(type,data);
+            },0);
+        },
+
+        _invoke_event_handle:function(type,data){
+            var l = this.event_handles.length;
+            for(var i=0;i<l;i++){
+                this.event_handles[i](type,data);
+            }
+        }
+
     };
 
 // ============= data provider =============================================
@@ -1425,7 +1461,7 @@
         load:function(mind_data){
             var df = null;
             var mind = null;
-            if(typeof mind_data == 'object'){
+            if(typeof mind_data === 'object'){
                 if(!!mind_data.format){
                     df = mind_data.format;
                 }else{
@@ -2123,7 +2159,7 @@
             this.show_nodes();
             this.show_lines();
             //this.layout.cache_valid = true;
-            jm.invoke_event_handle(this.jm,'resize',{data:[]});
+            this.jm.invoke_event_handle(jm.event_type.resize,{data:[]});
         },
 
         _center_root:function(){
@@ -2243,7 +2279,7 @@
         },
     };
 
-    // view provider
+    // shortcut provider
     jm.shortcut_provider= function(jm, options){
         this.jm = jm;
         this.opts = options;
@@ -2408,35 +2444,41 @@
         },
     };
 
-    jm.current = null;
 
-    jm.event_handles = [];
+    // plugin
+    jm.plugin = function(name,init){
+        this.name = name;
+        this.init = init;
+    };
 
-    // callback(jsMind, type ,data)
-    jm.add_event_handle = function(callback){
-        if(typeof callback === 'function'){
-            jm.event_handles.push(callback);
+    jm.plugins = [];
+
+    jm.register_plugin = function(plugin){
+        if(plugin instanceof jm.plugin){
+            jm.plugins.push(plugin);
         }
     };
 
-    jm.invoke_event_handle = function(sender, type, data){
+    jm.init_plugins = function(sender){
         $w.setTimeout(function(){
-            jm._invoke_event_handle(sender,type,data);
+            jm._init_plugins(sender);
         },0);
     };
 
-    jm._invoke_event_handle = function(sender,type,data){
-        var l = jm.event_handles.length;
+    jm._init_plugins = function(sender){
+        var l = jm.plugins.length;
+        var fn_init = null;
         for(var i=0;i<l;i++){
-            jm.event_handles[i](sender,type,data);
+            fn_init = jm.plugins[i].init;
+            if(typeof fn_init === 'function'){
+                fn_init(sender);
+            }
         }
     };
 
+    // quick way
     jm.show = function(options,mind){
-        var _jm = jm.current;
-        if(!_jm){
-            _jm = new jm(options);
-        }
+        var _jm = new jm(options);
         _jm.show(mind);
         return _jm;
     };

@@ -7,17 +7,17 @@
  */
 
 (function($w){
-    "use strict";
+    'use strict';
     var $d = $w.document;
     var __name__ = 'jsMind';
     var jsMind = $w[__name__];
     if(!jsMind){return;}
-    if(typeof(jsMind.draggable)!='undefined'){return;}
+    if(typeof jsMind.draggable != 'undefined'){return;}
 
     var jdom = jsMind.util.dom;
     var jcanvas = jsMind.util.canvas;
 
-    var clear_selection = "getSelection" in $w ? function(){
+    var clear_selection = 'getSelection' in $w ? function(){
          $w.getSelection().removeAllRanges();
     } : function(){
          $d.selection.empty();
@@ -118,21 +118,21 @@
 
         _lookup_close_node:function(){
             var root = this.jm.get_root();
-            var root_view_data = root._data.view;
-            var root_x = root_view_data.abs_x + root_view_data.width/2;
+            var root_location = root.get_location();
+            var root_size = root.get_size();
+            var root_x = root_location.x + root_size.w/2;
 
             var sw = this.shadow_w;
             var sh = this.shadow_h;
             var sx = this.shadow.offsetLeft;
             var sy = this.shadow.offsetTop;
 
-            var nw,nh,nx,ny;
+            var ns,nl;
 
             var direct = (sx + sw/2)>=root_x ?
                             jsMind.direction.right : jsMind.direction.left;
             var nodes = this.jm.mind.nodes;
             var node = null;
-            var view_data = null;
             var min_distance = Number.MAX_VALUE;
             var distance = 0;
             var closest_node = null;
@@ -145,20 +145,17 @@
                     if(node.id == this.active_node.id){
                         continue;
                     }
-                    view_data = node._data.view;
-                    nw = view_data.width;
-                    nh = view_data.height;
-                    nx = view_data.abs_x;
-                    ny = view_data.abs_y;
+                    ns = node.get_size();
+                    nl = node.get_location();
                     if(direct == jsMind.direction.right){
-                        if(sx-nx-nw<=0){continue;}
-                        distance = Math.abs(sx-nx-nw) + Math.abs(sy+sh/2-ny-nh/2);
-                        np = {x:nx+nw-options.line_width,y:ny+nh/2};
+                        if(sx-nl.x-ns.w<=0){continue;}
+                        distance = Math.abs(sx-nl.x-ns.w) + Math.abs(sy+sh/2-nl.y-ns.h/2);
+                        np = {x:nl.x+ns.w-options.line_width,y:nl.y+ns.h/2};
                         sp = {x:sx+options.line_width,y:sy+sh/2};
                     }else{
-                        if(nx-sx-sw<=0){continue;}
-                        distance = Math.abs(sx+sw-nx) + Math.abs(sy+sh/2-ny-nh/2);
-                        np = {x:nx+options.line_width,y:ny+nh/2};
+                        if(nl.x-sx-sw<=0){continue;}
+                        distance = Math.abs(sx+sw-nl.x) + Math.abs(sy+sh/2-nl.y-ns.h/2);
+                        np = {x:nl.x+options.line_width,y:nl.y+ns.h/2};
                         sp = {x:sx+sw-options.line_width,y:sy+sh/2};
                     }
                     if(distance < min_distance){
@@ -282,15 +279,13 @@
                 var sibling_nodes = target_node.children;
                 var sc = sibling_nodes.length;
                 var node = null;
-                var node_h = null;
                 var delta_y = Number.MAX_VALUE;
                 var node_before = null;
                 var beforeid = '_last_';
                 while(sc--){
                     node = sibling_nodes[sc];
                     if(node.direction == target_direct && node.id != src_node.id){
-                        node_h = node._data.view.abs_y;
-                        var dy = node_h - shadow_h;
+                        var dy = node.get_location().y - shadow_h;
                         if(dy > 0 && dy < delta_y){
                             delta_y = dy;
                             node_before = node;
@@ -304,22 +299,23 @@
             this.active_node = null;
             this.target_node = null;
             this.target_direct = null;
-        }
-    };
+        },
 
-    var jm_event_handle = function(jm, type, data){
-        if(type === 'init'){
-            var jd = new jsMind.draggable(jm);
-            jd.init();
-            jm.draggable = jd;
-        }
-        if(type === 'resize'){
-            var jd = jm.draggable;
-            if(!!jd){
-                jd.resize();
+        jm_event_handle:function(type,data){
+            if(type === jsMind.event_type.resize){
+                this.resize();
             }
         }
     };
 
-    jsMind.add_event_handle(jm_event_handle);
+    var draggable_plugin = new jsMind.plugin('draggable',function(jm){
+        var jd = new jsMind.draggable(jm);
+        jd.init();
+        jm.add_event_listener(function(type,data){
+            jd.jm_event_handle.call(jd,type,data);
+        });
+    });
+
+    jsMind.register_plugin(draggable_plugin);
+
 })(window);
