@@ -1018,6 +1018,13 @@
             newid:function(){
                 return (new Date().getTime().toString(16)+Math.random().toString(16).substr(2)).substr(2,16);
             }
+        },
+
+        text:{
+            is_empty:function(s){
+                if(!s){return true;}
+                return s.replace(/\s*/,'').length == 0;
+            }
         }
     };
 
@@ -1303,6 +1310,10 @@
 
         update_node:function(nodeid, topic){
             if(this.get_editable()){
+                if(jm.util.text.is_empty(topic)){
+                    logger.warn('fail, topic can not be empty');
+                    return;
+                }
                 var node = this.get_node(nodeid);
                 if(!!node){
                     if(node.topic === topic){
@@ -2128,14 +2139,14 @@
                 var topic = this.e_editor.value;
                 element.style.zIndex = 'auto';
                 element.removeChild(this.e_editor);
-                if(node.topic != topic){
-                    this.jm.update_node(node.id,topic);
-                }else{
+                if(jm.util.text.is_empty(topic) || node.topic === topic){
                     if(this.opts.support_html){
                         $h(element,node.topic);
                     }else{
                         $t(element,node.topic);
                     }
+                }else{
+                    this.jm.update_node(node.id,topic);
                 }
             }
         },
