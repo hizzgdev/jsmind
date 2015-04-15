@@ -1101,7 +1101,6 @@
 
         click_handle:function(e){
             var element = e.target || event.srcElement;
-            logger.log(element);
             var isexpander = this.view.is_expander(element);
             if(isexpander){
                 var nodeid = this.view.get_nodeid(element);
@@ -1112,7 +1111,6 @@
         dblclick_handle:function(e){
             if(this.get_editable()){
                 var element = e.target || event.srcElement;
-                logger.log(element);
                 var isnode = this.view.is_node(element);
                 if(isnode){
                     var nodeid = this.view.get_nodeid(element);
