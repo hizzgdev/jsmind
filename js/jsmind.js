@@ -83,6 +83,7 @@
             return;
         }
         this.options = opts;
+        this.inited = false;
         this.mind = null;
         this.event_handles = [];
         this.init();
@@ -1022,6 +1023,9 @@
 
     jm.prototype={
         init : function(){
+            if(this.inited){return;}
+            this.inited = true;
+
             var opts = this.options;
 
             var opts_layout = {
