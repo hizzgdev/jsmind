@@ -1101,6 +1101,7 @@
 
         click_handle:function(e){
             var element = e.target || event.srcElement;
+            logger.log(element);
             var isexpander = this.view.is_expander(element);
             if(isexpander){
                 var nodeid = this.view.get_nodeid(element);
@@ -1111,6 +1112,7 @@
         dblclick_handle:function(e){
             if(this.get_editable()){
                 var element = e.target || event.srcElement;
+                logger.log(element);
                 var isnode = this.view.is_node(element);
                 if(isnode){
                     var nodeid = this.view.get_nodeid(element);
@@ -1955,7 +1957,11 @@
         },
 
         add_event:function(obj,event_name,event_handle){
-            jm.util.dom.add_event(this.e_nodes,event_name,function(e){event_handle.call(obj,e);});
+            jm.util.dom.add_event(this.e_nodes,event_name,function(e){
+                var evt = e || event;
+                event_handle.call(obj,evt);
+                evt.stopPropagation();
+            });
         },
 
         get_nodeid:function(element){
