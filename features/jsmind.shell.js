@@ -7,7 +7,7 @@
  */
 
 (function($w){
-    "use strict";
+    'use strict';
     var $d = $w.document;
     var __name__ = 'jsMind';
     var jsMind = $w[__name__];
@@ -90,28 +90,28 @@
             }else{
                 this.jm.disable_edit();
             }
-        }
-    };
-    var jm_event_handle = function(jm, type, data){
-        if(type === 'init'){
-            var js = new jsMind.shell(jm);
-            jm.shell = js;
-            js.init();
-        }
-        if(type === 'show'){
-            var js = jm.shell;
-            if(!!js){
-                js.record('show',data);
+        },
+
+        jm_event_handle:function(type, data){
+            if(type === jsMind.event_type.show){
+                this.record('show',data);
             }
-        }
-        if(type === 'edit'){
-            var js = jm.shell;
-            if(!!js){
+            if(type === jsMind.event_type.edit){
                 var action=data.evt;
                 delete data.evt;
-                js.record(action,data);
+                this.record(action,data);
             }
         }
-    }
-    jsMind.add_event_handle(jm_event_handle);
+    };
+
+    var shell_plugin = new jsMind.plugin('shell',function(jm){
+        var js = new jsMind.shell(jm);
+        jm.shell = js;
+        js.init();
+        jm.add_event_listener(function(type,data){
+            js.jm_event_handle.call(js,type,data);
+        });
+    });
+
+    jsMind.register_plugin(shell_plugin);
 })(window);
