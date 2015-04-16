@@ -190,9 +190,18 @@
         _event_bind:function(){
             var jd = this;
             var container = this.jm.view.container;
-            jdom.add_event(container,'mousedown',function(e){jd.dragstart.call(jd,e);});
-            jdom.add_event(container,'mousemove',function(e){jd.drag.call(jd,e);});
-            jdom.add_event(container,'mouseup',function(e){jd.dragend.call(jd,e);});
+            jdom.add_event(container,'mousedown',function(e){
+                var evt = e || event;
+                jd.dragstart.call(jd,evt);
+            });
+            jdom.add_event(container,'mousemove',function(e){
+                var evt = e || event;
+                jd.drag.call(jd,evt);
+            });
+            jdom.add_event(container,'mouseup',function(e){
+                var evt = e || event;
+                jd.dragend.call(jd,evt);
+            });
         },
 
         dragstart:function(e){
