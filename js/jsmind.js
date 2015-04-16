@@ -1958,7 +1958,6 @@
             jm.util.dom.add_event(this.e_nodes,event_name,function(e){
                 var evt = e || event;
                 event_handle.call(obj,evt);
-                evt.stopPropagation();
             });
         },
 
