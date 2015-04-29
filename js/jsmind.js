@@ -1252,12 +1252,13 @@
 
         insert_node_before:function(node_before, nodeid, topic, data){
             if(this.get_editable()){
+                var beforeid = (typeof node_before === 'string') ? node_before : node_before.id;
                 var node = this.mind.insert_node_before(node_before, nodeid, topic, data);
                 if(!!node){
                     this.view.add_node(node);
                     this.layout.layout();
                     this.view.show(false);
-                    this.invoke_event_handle(jm.event_type.edit,{evt:'insert_node_before',data:[node_before.id,nodeid,topic,data],node:nodeid});
+                    this.invoke_event_handle(jm.event_type.edit,{evt:'insert_node_before',data:[beforeid,nodeid,topic,data],node:nodeid});
                 }
                 return node;
             }else{
@@ -1293,11 +1294,12 @@
                         return false;
                     }
                     var nodeid = node.id;
+                    var parentid = node.parent.id;
                     this.view.remove_node(node);
                     this.mind.remove_node(node);
                     this.layout.layout();
                     this.view.show(false);
-                    this.invoke_event_handle(jm.event_type.edit,{evt:'remove_node',data:[node.id],node:node.parent.id});
+                    this.invoke_event_handle(jm.event_type.edit,{evt:'remove_node',data:[nodeid],node:parentid});
                 }else{
                     logger.error('fail, node can not be found');
                     return false;
