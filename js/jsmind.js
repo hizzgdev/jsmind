@@ -44,7 +44,9 @@
 
         view:{
             hmargin:100,
-            vmargin:50
+            vmargin:50,
+            line_width:2,
+            line_color:'#555'
         },
         layout:{
             hspace:30,
@@ -1045,7 +1047,9 @@
                 container:opts.container,
                 support_html:opts.support_html,
                 hmargin:opts.view.hmargin,
-                vmargin:opts.view.vmargin
+                vmargin:opts.view.vmargin,
+                line_width:opts.view.line_width,
+                line_color:opts.view.line_color
             };
             // create instance of function provider 
             this.data = new jm.data_provider(this);
@@ -2011,9 +2015,6 @@
 
         init_canvas:function(){
             var ctx = this.e_canvas.getContext('2d');
-            ctx.strokeStyle = '#555';
-            ctx.lineWidth = 2;
-            ctx.lineCap = 'round';
             this.canvas_ctx = ctx;
         },
 
@@ -2292,8 +2293,13 @@
         },
 
         draw_line:function(pin,pout,offset){
+            var ctx = this.canvas_ctx;
+            ctx.strokeStyle = this.opts.line_color;
+            ctx.lineWidth = this.opts.line_width;
+            ctx.lineCap = 'round';
+            
             jm.util.canvas.gaussto(
-                this.canvas_ctx,
+                ctx,
                 pin.x + offset.x,
                 pin.y + offset.y,
                 pout.x + offset.x,
