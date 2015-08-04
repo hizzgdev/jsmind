@@ -2018,18 +2018,30 @@
             this.canvas_ctx = ctx;
         },
 
+        init_nodes_size:function(node){
+            var view_data = node._data.view;
+            view_data.width = view_data.element.clientWidth;
+            view_data.height = view_data.element.clientHeight;
+        },
+
         init_nodes:function(){
             var nodes = this.jm.mind.nodes;
+            var doc_frag = $d.createDocumentFragment();
             for(var nodeid in nodes){
-                this.create_node_element(nodes[nodeid]);
+                this.create_node_element(nodes[nodeid],doc_frag);
+            }
+            this.e_nodes.appendChild(doc_frag);
+            for(var nodeid in nodes){
+                this.init_nodes_size(nodes[nodeid]);
             }
         },
 
         add_node:function(node){
-            this.create_node_element(node);
+            this.create_node_element(node,this.e_nodes);
+            this.init_nodes_size(node);
         },
 
-        create_node_element:function(node){
+        create_node_element:function(node,parent_node){
             var view_data = null;
             if('view' in node._data){
                 view_data = node._data.view;
@@ -2046,7 +2058,7 @@
                 $t(d_e,'-');
                 d_e.setAttribute('nodeid',node.id);
                 d_e.style.visibility = 'hidden';
-                this.e_nodes.appendChild(d_e);
+                parent_node.appendChild(d_e);
                 view_data.expander = d_e;
             }
             if(this.opts.support_html){
@@ -2056,10 +2068,8 @@
             }
             d.setAttribute('nodeid',node.id);
             d.style.visibility='hidden';
-            this.e_nodes.appendChild(d);
+            parent_node.appendChild(d);
             view_data.element = d;
-            view_data.width = d.clientWidth;
-            view_data.height = d.clientHeight;
         },
 
         remove_node:function(node){
