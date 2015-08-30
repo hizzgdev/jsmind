@@ -906,19 +906,10 @@
         },
 
         canvas:{
-            easing_gauss: function(t,b,c,d){var x=t*4/d;return (1-Math.pow(Math.E,-(x*x)/2))*c+b;},
-            gaussto : function(ctx,x1,y1,x2,y2){
-                var ztf = jm.util.canvas.easing_gauss;
-                ctx.moveTo(x1,y1);
+            bezierto: function(ctx,x1,y1,x2,y2){
                 ctx.beginPath();
-                var l = x2-x1;
-                var c = y1-y2;
-                var absl = Math.abs(l);
-                var t = 0;
-                for(var t=0;t<absl+1;t++){
-                    y2 = y1-ztf(t,0,c,l);
-                    ctx.lineTo(t*(Math.abs(l)/l)+x1,y2);
-                }
+                ctx.moveTo(x1,y1);
+                ctx.bezierCurveTo(x1+(x2-x1)*2/3,y1,x1,y2,x2,y2);
                 ctx.stroke();
             },
             lineto : function(ctx,x1,y1,x2,y2){
@@ -2308,7 +2299,7 @@
             ctx.lineWidth = this.opts.line_width;
             ctx.lineCap = 'round';
             
-            jm.util.canvas.gaussto(
+            jm.util.canvas.bezierto(
                 ctx,
                 pin.x + offset.x,
                 pin.y + offset.y,
