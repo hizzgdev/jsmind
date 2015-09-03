@@ -36,14 +36,31 @@
         ctx.arcTo(x,   y,   x+w, y,   r);
     };
 
-    jcanvas.fillText = function (ctx,text,x,y,w,h){
+    jcanvas.fillText = function(ctx,text,x,y,w,h){
         var center_x = x+w/2;
         var center_y = y+h/2;
+        var text = jcanvas.fittingString(ctx,text,w);
+        // TODO: multiline text
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(text,center_x,center_y);
+        ctx.fillText(text,center_x,center_y,w);
     };
 
+    jcanvas.fittingString = function(ctx,text,max_width) {
+        var width = ctx.measureText(text).width;
+        var ellipsis = '…'
+        var ellipsis_width = ctx.measureText(ellipsis).width;
+        if (width<=max_width || width<=ellipsis_width) {
+            return text;
+        } else {
+            var len = text.length;
+            while (width>=max_width-ellipsis_width && len-->0) {
+                text = text.substring(0, len);
+                width = ctx.measureText(text).width;
+            }
+            return text+ellipsis;
+        }
+    };
 
     jsMind.screenshot = function(jm){
         this.jm = jm;
@@ -55,12 +72,14 @@
     jsMind.screenshot.prototype = {
         init:function(){
             if(this._inited){return;}
+            console.log('init');
             var c = $c('canvas');
             var ctx = c.getContext('2d');
 
             this.canvas_elem = c;
             this.canvas_ctx = ctx;
             this.jm.view.e_panel.appendChild(c);
+            this._inited = true;
             this.resize();
         },
 
@@ -82,8 +101,10 @@
         },
 
         resize:function(){
-            this.canvas_elem.width=this.jm.view.size.w;
-            this.canvas_elem.height=this.jm.view.size.h;
+            if(this._inited){
+                this.canvas_elem.width=this.jm.view.size.w;
+                this.canvas_elem.height=this.jm.view.size.h;
+            }
         },
 
         clean:function(){
@@ -95,8 +116,8 @@
             var ctx = this.canvas_ctx;
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
-            this.jm.view.show_lines(ctx);
-            this._draw_nodes(ctx);
+            this._draw_lines();
+            this._draw_nodes();
         },
 
         _watermark:function(){
@@ -107,6 +128,12 @@
             ctx.fillStyle='#000';
             ctx.font='11px Verdana,Arial,Helvetica,sans-serif';
             ctx.fillText('hizzgdev.github.io/jsmind',c.width-5.5,c.height-2.5);
+            ctx.textAlign='left';
+            ctx.fillText($w.location,5.5,c.height-2.5);
+        },
+
+        _draw_lines:function(){
+            this.jm.view.show_lines(this.canvas_ctx);
         },
 
         _draw_nodes:function(){
@@ -134,6 +161,10 @@
             var round_radius = parseInt(style_round_radius);
             var color = css(ncs,'color');
             var font = css(ncs,'font');
+            var style_padding_left = css(ncs,'padding-left');
+            var style_padding_right = css(ncs,'padding-right');
+            var padding_left = parseInt(style_padding_left);
+            var padding_right = parseInt(style_padding_right);
 
             ctx.font=font;
             ctx.fillStyle = bgcolor;
@@ -143,7 +174,7 @@
             ctx.fill();
 
             ctx.fillStyle = color;
-            jcanvas.fillText(ctx, node.topic, view_data.abs_x, view_data.abs_y, view_data.width+2, view_data.height+2);
+            jcanvas.fillText(ctx, node.topic, view_data.abs_x+padding_left, view_data.abs_y, view_data.width-padding_left-padding_right+2, view_data.height+2);
         },
 
         _draw_expander:function(expander){
