@@ -58,7 +58,9 @@
 
     function take_screenshot(){
         var jm = jsMind.current;
-        jm.screenshot.shoot();
+        var d = jm.screenshot.shootAsDataURL();
+        console.log(d);
+        jm.shoot();
     }
     
     load_jsmind();
