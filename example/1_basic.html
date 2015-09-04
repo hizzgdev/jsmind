@@ -17,10 +17,8 @@
 </head>
 <body>
 <div id="jsmind_container"></div>
-<div><button onclick="take_screenshot();">Screenshot</button></div>
 <script type="text/javascript" src="../js/jsmind.js"></script>
 <script type="text/javascript" src="../js/jsmind.draggable.js"></script>
-<script type="text/javascript" src="../js/jsmind.screenshot.js"></script>
 <script type="text/javascript">
     function load_jsmind(){
         var mind = {
@@ -56,13 +54,6 @@
         // alert(mind_data);
     }
 
-    function take_screenshot(){
-        var jm = jsMind.current;
-        var d = jm.screenshot.shootAsDataURL();
-        console.log(d);
-        jm.shoot();
-    }
-    
     load_jsmind();
 </script>
 </body>
