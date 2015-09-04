@@ -26,7 +26,7 @@
         return (visibility !== 'hidden' && display !== 'none');
     };
     var jcanvas = jsMind.util.canvas;
-    jcanvas.roundRect = function (ctx,x,y,w,h,r) {
+    jcanvas.rect = function (ctx,x,y,w,h,r) {
         if (w < 2 * r) r = w / 2;
         if (h < 2 * r) r = h / 2;
         ctx.moveTo(x+r, y);
@@ -36,14 +36,32 @@
         ctx.arcTo(x,   y,   x+w, y,   r);
     };
 
-    jcanvas.fillText = function(ctx,text,x,y,w,h){
-        var center_x = x+w/2;
+    jcanvas.text_multiline = function(ctx,text,x,y,w,h,lineheight){
+        var line = '';
+        var text_len = text.length;
+        var chars = text.split('');
+        var test_line = null;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        for(var i=0;i<text_len;i++){
+            test_line = line + chars[i];
+            if(ctx.measureText(test_line).width > w && i>0){
+                ctx.fillText(line,x,y);
+                line = chars[i];
+                y += lineheight;
+            }else{
+                line = test_line;
+            }
+        }
+        ctx.fillText(line,x,y);
+    };
+
+    jcanvas.text_ellipsis = function(ctx,text,x,y,w,h){
         var center_y = y+h/2;
         var text = jcanvas.fittingString(ctx,text,w);
-        // TODO: multiline text
-        ctx.textAlign = 'center';
+        ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
-        ctx.fillText(text,center_x,center_y,w);
+        ctx.fillText(text,x,center_y,w);
     };
 
     jcanvas.fittingString = function(ctx,text,max_width) {
@@ -152,29 +170,43 @@
             var ncs = getComputedStyle(node_element);
             if(!is_visible(ncs)){ return; }
 
-            if(!!view_data.expander){
-                this._draw_expander(view_data.expander);
-            }
-
             var bgcolor = css(ncs,'background-color');
-            var style_round_radius = css(ncs,'border-radius');
-            var round_radius = parseInt(style_round_radius);
+            var round_radius = parseInt(css(ncs,'border-radius'));
             var color = css(ncs,'color');
             var font = css(ncs,'font');
-            var style_padding_left = css(ncs,'padding-left');
-            var style_padding_right = css(ncs,'padding-right');
-            var padding_left = parseInt(style_padding_left);
-            var padding_right = parseInt(style_padding_right);
+            var padding_left = parseInt(css(ncs,'padding-left'));
+            var padding_right = parseInt(css(ncs,'padding-right'));
+            var padding_top = parseInt(css(ncs,'padding-top'));
+            var padding_bottom = parseInt(css(ncs,'padding-bottom'));
+            var text_overflow = css(ncs,'text-overflow');
+
+            var rb = {x:view_data.abs_x,
+                      y:view_data.abs_y,
+                      w:view_data.width+1,
+                      h:view_data.height+1};
+            var tb = {x:rb.x+padding_left,
+                      y:rb.y+padding_top,
+                      w:rb.w-padding_left-padding_right,
+                      h:rb.h-padding_top-padding_bottom};
 
             ctx.font=font;
             ctx.fillStyle = bgcolor;
             ctx.beginPath();
-            jcanvas.roundRect(ctx, view_data.abs_x,view_data.abs_y, view_data.width+2, view_data.height+2, round_radius);
+            jcanvas.rect(ctx, rb.x, rb.y, rb.w, rb.h, round_radius);
             ctx.closePath();
             ctx.fill();
 
             ctx.fillStyle = color;
-            jcanvas.fillText(ctx, node.topic, view_data.abs_x+padding_left, view_data.abs_y, view_data.width-padding_left-padding_right+2, view_data.height+2);
+            if(text_overflow === 'ellipsis'){
+                jcanvas.text_ellipsis(ctx, node.topic, tb.x, tb.y, tb.w, tb.h);
+            }else{
+                var line_height = parseInt(css(ncs,'line-height'));
+                jcanvas.text_multiline(ctx, node.topic, tb.x, tb.y, tb.w, tb.h,line_height);
+            }
+
+            if(!!view_data.expander){
+                this._draw_expander(view_data.expander);
+            }
         },
 
         _draw_expander:function(expander){
