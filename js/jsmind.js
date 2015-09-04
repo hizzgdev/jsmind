@@ -944,22 +944,24 @@
                     bb.append(file_data);
                     blob = bb.getBlob(type);
                 }
-                var URL = $w.URL || $w.webkitURL;
-                var bloburl = URL.createObjectURL(blob);
-                var anchor = $c('a');
-                if ('download' in anchor) {
-                    anchor.style.visibility = 'hidden';
-                    anchor.href = bloburl;
-                    anchor.download = name;
-                    $d.body.appendChild(anchor);
-                    var evt = $d.createEvent('MouseEvents');
-                    evt.initEvent('click', true, true);
-                    anchor.dispatchEvent(evt);
-                    $d.body.removeChild(anchor);
-                } else if (navigator.msSaveBlob) {
+                if (navigator.msSaveBlob) {
                     navigator.msSaveBlob(blob, name);
                 } else {
-                    location.href = bloburl;
+                    var URL = $w.URL || $w.webkitURL;
+                    var bloburl = URL.createObjectURL(blob);
+                    var anchor = $c('a');
+                    if ('download' in anchor) {
+                        anchor.style.visibility = 'hidden';
+                        anchor.href = bloburl;
+                        anchor.download = name;
+                        $d.body.appendChild(anchor);
+                        var evt = $d.createEvent('MouseEvents');
+                        evt.initEvent('click', true, true);
+                        anchor.dispatchEvent(evt);
+                        $d.body.removeChild(anchor);
+                    } else {
+                        location.href = bloburl;
+                    }
                 }
             }
         },
@@ -2272,12 +2274,13 @@
             }
         },
 
-        clear_lines:function(){
-            jm.util.canvas.clear(this.canvas_ctx,0,0,this.size.w,this.size.h);
+        clear_lines:function(canvas_ctx){
+            var ctx = canvas_ctx || this.canvas_ctx;
+            jm.util.canvas.clear(ctx,0,0,this.size.w,this.size.h);
         },
 
-        show_lines:function(){
-            this.clear_lines();
+        show_lines:function(canvas_ctx){
+            this.clear_lines(canvas_ctx);
             var nodes = this.jm.mind.nodes;
             var node = null;
             var pin = null;
@@ -2289,12 +2292,12 @@
                 if(('visible' in node._data.layout) && !node._data.layout.visible){continue;}
                 pin = this.layout.get_node_point_in(node);
                 pout = this.layout.get_node_point_out(node.parent);
-                this.draw_line(pout,pin,_offset);
+                this.draw_line(pout,pin,_offset,canvas_ctx);
             }
         },
 
-        draw_line:function(pin,pout,offset){
-            var ctx = this.canvas_ctx;
+        draw_line:function(pin,pout,offset,canvas_ctx){
+            var ctx = canvas_ctx || this.canvas_ctx;
             ctx.strokeStyle = this.opts.line_color;
             ctx.lineWidth = this.opts.line_width;
             ctx.lineCap = 'round';
