@@ -78,7 +78,9 @@
     function open_save_dialog(e){}
     function open_share_dialog(e){}
     function open_help_dialog(e){}
-    function take_screenshot(e){}
+    function take_screenshot(e){
+        _jm.shoot();
+    }
     function jsmind_rebuild(e){
         _jm.show();
     }

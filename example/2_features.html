@@ -32,6 +32,7 @@
             <li><button onclick="open_ajax();">open remote</button></li>
             <li><button onclick="prompt_info('see 6.Multi Format');">open local file</button></li>
             <li><button onclick="prompt_info('see 6.Multi Format');">save local file</button></li>
+            <li><button onclick="screen_shot();">screenshot</button></li>
         </ol>
         </ol>
         <div>2. Select &amp; Toggle</div>
@@ -109,6 +110,7 @@
 </div>
 <script type="text/javascript" src="../js/jsmind.js"></script>
 <script type="text/javascript" src="../js/jsmind.draggable.js"></script>
+<script type="text/javascript" src="../js/jsmind.screenshot.js"></script>
 <script type="text/javascript">
     var _jm = null;
     function open_empty(){
@@ -159,6 +161,10 @@
         jsMind.util.ajax.get(mind_url,function(mind){
             _jm.show(mind);
         });
+    }
+
+    function screen_shot(){
+        _jm.shoot();
     }
 
     function show_data(){
