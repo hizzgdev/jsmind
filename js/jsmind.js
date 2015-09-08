@@ -906,19 +906,10 @@
         },
 
         canvas:{
-            easing_gauss: function(t,b,c,d){var x=t*4/d;return (1-Math.pow(Math.E,-(x*x)/2))*c+b;},
-            gaussto : function(ctx,x1,y1,x2,y2){
-                var ztf = jm.util.canvas.easing_gauss;
-                ctx.moveTo(x1,y1);
+            bezierto: function(ctx,x1,y1,x2,y2){
                 ctx.beginPath();
-                var l = x2-x1;
-                var c = y1-y2;
-                var absl = Math.abs(l);
-                var t = 0;
-                for(var t=0;t<absl+1;t++){
-                    y2 = y1-ztf(t,0,c,l);
-                    ctx.lineTo(t*(Math.abs(l)/l)+x1,y2);
-                }
+                ctx.moveTo(x1,y1);
+                ctx.bezierCurveTo(x1+(x2-x1)*2/3,y1,x1,y2,x2,y2);
                 ctx.stroke();
             },
             lineto : function(ctx,x1,y1,x2,y2){
@@ -953,22 +944,24 @@
                     bb.append(file_data);
                     blob = bb.getBlob(type);
                 }
-                var URL = $w.URL || $w.webkitURL;
-                var bloburl = URL.createObjectURL(blob);
-                var anchor = $c('a');
-                if ('download' in anchor) {
-                    anchor.style.visibility = 'hidden';
-                    anchor.href = bloburl;
-                    anchor.download = name;
-                    $d.body.appendChild(anchor);
-                    var evt = $d.createEvent('MouseEvents');
-                    evt.initEvent('click', true, true);
-                    anchor.dispatchEvent(evt);
-                    $d.body.removeChild(anchor);
-                } else if (navigator.msSaveBlob) {
+                if (navigator.msSaveBlob) {
                     navigator.msSaveBlob(blob, name);
                 } else {
-                    location.href = bloburl;
+                    var URL = $w.URL || $w.webkitURL;
+                    var bloburl = URL.createObjectURL(blob);
+                    var anchor = $c('a');
+                    if ('download' in anchor) {
+                        anchor.style.visibility = 'hidden';
+                        anchor.href = bloburl;
+                        anchor.download = name;
+                        $d.body.appendChild(anchor);
+                        var evt = $d.createEvent('MouseEvents');
+                        evt.initEvent('click', true, true);
+                        anchor.dispatchEvent(evt);
+                        $d.body.removeChild(anchor);
+                    } else {
+                        location.href = bloburl;
+                    }
                 }
             }
         },
@@ -2018,18 +2011,30 @@
             this.canvas_ctx = ctx;
         },
 
+        init_nodes_size:function(node){
+            var view_data = node._data.view;
+            view_data.width = view_data.element.clientWidth;
+            view_data.height = view_data.element.clientHeight;
+        },
+
         init_nodes:function(){
             var nodes = this.jm.mind.nodes;
+            var doc_frag = $d.createDocumentFragment();
             for(var nodeid in nodes){
-                this.create_node_element(nodes[nodeid]);
+                this.create_node_element(nodes[nodeid],doc_frag);
+            }
+            this.e_nodes.appendChild(doc_frag);
+            for(var nodeid in nodes){
+                this.init_nodes_size(nodes[nodeid]);
             }
         },
 
         add_node:function(node){
-            this.create_node_element(node);
+            this.create_node_element(node,this.e_nodes);
+            this.init_nodes_size(node);
         },
 
-        create_node_element:function(node){
+        create_node_element:function(node,parent_node){
             var view_data = null;
             if('view' in node._data){
                 view_data = node._data.view;
@@ -2046,7 +2051,7 @@
                 $t(d_e,'-');
                 d_e.setAttribute('nodeid',node.id);
                 d_e.style.visibility = 'hidden';
-                this.e_nodes.appendChild(d_e);
+                parent_node.appendChild(d_e);
                 view_data.expander = d_e;
             }
             if(this.opts.support_html){
@@ -2056,10 +2061,8 @@
             }
             d.setAttribute('nodeid',node.id);
             d.style.visibility='hidden';
-            this.e_nodes.appendChild(d);
+            parent_node.appendChild(d);
             view_data.element = d;
-            view_data.width = d.clientWidth;
-            view_data.height = d.clientHeight;
         },
 
         remove_node:function(node){
@@ -2271,12 +2274,13 @@
             }
         },
 
-        clear_lines:function(){
-            jm.util.canvas.clear(this.canvas_ctx,0,0,this.size.w,this.size.h);
+        clear_lines:function(canvas_ctx){
+            var ctx = canvas_ctx || this.canvas_ctx;
+            jm.util.canvas.clear(ctx,0,0,this.size.w,this.size.h);
         },
 
-        show_lines:function(){
-            this.clear_lines();
+        show_lines:function(canvas_ctx){
+            this.clear_lines(canvas_ctx);
             var nodes = this.jm.mind.nodes;
             var node = null;
             var pin = null;
@@ -2288,17 +2292,17 @@
                 if(('visible' in node._data.layout) && !node._data.layout.visible){continue;}
                 pin = this.layout.get_node_point_in(node);
                 pout = this.layout.get_node_point_out(node.parent);
-                this.draw_line(pout,pin,_offset);
+                this.draw_line(pout,pin,_offset,canvas_ctx);
             }
         },
 
-        draw_line:function(pin,pout,offset){
-            var ctx = this.canvas_ctx;
+        draw_line:function(pin,pout,offset,canvas_ctx){
+            var ctx = canvas_ctx || this.canvas_ctx;
             ctx.strokeStyle = this.opts.line_color;
             ctx.lineWidth = this.opts.line_width;
             ctx.lineCap = 'round';
             
-            jm.util.canvas.gaussto(
+            jm.util.canvas.bezierto(
                 ctx,
                 pin.x + offset.x,
                 pin.y + offset.y,
