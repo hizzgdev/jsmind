@@ -8,10 +8,9 @@ jsMind is a pure javascript library for mindmap, it base on html5 canvas. jsMind
 
 Links:
 
-* App  : <http://jsmind.sinaapp.com>
+* App : <http://jsmind.sinaapp.com>
 * Home : <http://hizzgdev.github.io/jsmind/developer.html>
 * Demo :
-  * <http://hizzgdev.github.io/jsmind/>
   * <http://hizzgdev.github.io/jsmind/example/1_basic.html>
   * <http://hizzgdev.github.io/jsmind/example/2_features.html>
 * Documents :
