@@ -80,6 +80,12 @@
         <ol type='A'>
             <li><button onclick="change_container();">resize container</button>
             <button onclick="resize_jsmind();">adusting</button></li>
+            <li>expand</li>
+            <ol>
+                <li><button class="sub" onclick="expand_all();">expand all</button></li>
+                <li><button class="sub" onclick="expand_to_level2();">to level 2</button></li>
+                <li><button class="sub" onclick="expand_to_level3();">to level 3</button></li>
+            </ol>
         </ol>
         <div>6. Multi Format</div>
         <ol type='A'>
@@ -297,6 +303,18 @@
 
     function resize_jsmind(){
         _jm.resize();
+    }
+
+    function expand_all(){
+        _jm.expand_all();
+    }
+
+    function expand_to_level2(){
+        _jm.expand_to_depth(2);
+    }
+
+    function expand_to_level3(){
+        _jm.expand_to_depth(3);
     }
 
     function get_nodearray_data(){
