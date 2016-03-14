@@ -6,20 +6,39 @@
     },
     "format":"node_tree",
     "data":{"id":"root","topic":"jsMind","children":[
-        {"id":"easy","topic":"Easy","direction":"left","children":[
+        {"id":"easy","topic":"Easy","direction":"left","expanded":false,"children":[
             {"id":"easy1","topic":"Easy to show"},
             {"id":"easy2","topic":"Easy to edit"},
             {"id":"easy3","topic":"Easy to store"},
-            {"id":"easy4","topic":"Easy to embed"}
+            {"id":"easy4","topic":"Easy to embed","children":[
+                {"id":"easy41","topic":"Easy to show"},
+                {"id":"easy42","topic":"Easy to edit"},
+                {"id":"easy43","topic":"Easy to store"},
+                {"id":"open44","topic":"BSD License","children":[
+                    {"id":"open441","topic":"on GitHub"},
+                    {"id":"open442","topic":"BSD License"}
+                ]},
+                {"id":"easy45","topic":"Easy to embed"}
+            ]}
         ]},
         {"id":"open","topic":"Open Source","direction":"right","children":[
             {"id":"open1","topic":"on GitHub"},
-            {"id":"open2","topic":"BSD License"}
+            {"id":"open2","topic":"BSD License","children":[
+                {"id":"open21","topic":"on GitHub"},
+                {"id":"open22","topic":"BSD License","children":[
+                    {"id":"open221","topic":"on GitHub"},
+                    {"id":"open222","topic":"BSD License"}
+                ]}
+            ]}
         ]},
-        {"id":"powerful","topic":"Powerful","direction":"right","children":[
+        {"id":"powerful","topic":"Powerful","direction":"right","expanded":false,"children":[
             {"id":"powerful1","topic":"Base on Javascript"},
             {"id":"powerful2","topic":"Base on HTML5"},
-            {"id":"powerful3","topic":"Depends on you"}
+            {"id":"powerful3","topic":"Depends on you","expanded":false,"children":[
+                {"id":"powerful31","topic":"Base on Javascript"},
+                {"id":"powerful32","topic":"Base on HTML5"},
+                {"id":"powerful33","topic":"Depends on you"}
+            ]}
         ]},
         {"id":"other","topic":"test node","direction":"left","children":[
             {"id":"other1","topic":"I'm from ajax"},
