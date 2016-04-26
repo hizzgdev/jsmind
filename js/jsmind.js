@@ -2444,35 +2444,39 @@
         handle_up:function(_jm,e){
             var evt = e || event;
             var selected_node = _jm.get_selected_node();
-            var up_node = _jm.find_node_before(selected_node);
-            if(!up_node){
-                var np = _jm.find_node_before(selected_node.parent);
-                if(!!np && np.children.length > 0){
-                    up_node = np.children[np.children.length-1];
+            if(!!selected_node){
+                var up_node = _jm.find_node_before(selected_node);
+                if(!up_node){
+                    var np = _jm.find_node_before(selected_node.parent);
+                    if(!!np && np.children.length > 0){
+                        up_node = np.children[np.children.length-1];
+                    }
                 }
+                if(!!up_node){
+                    _jm.select_node(up_node);
+                }
+                evt.stopPropagation();
+                evt.preventDefault();
             }
-            if(!!up_node){
-                _jm.select_node(up_node);
-            }
-            evt.stopPropagation();
-            evt.preventDefault();
         },
 
         handle_down:function(_jm,e){
             var evt = e || event;
             var selected_node = _jm.get_selected_node();
-            var down_node = _jm.find_node_after(selected_node);
-            if(!down_node){
-                var np = _jm.find_node_after(selected_node.parent);
-                if(!!np && np.children.length > 0){
-                    down_node = np.children[0];
+            if(!!selected_node){
+                var down_node = _jm.find_node_after(selected_node);
+                if(!down_node){
+                    var np = _jm.find_node_after(selected_node.parent);
+                    if(!!np && np.children.length > 0){
+                        down_node = np.children[0];
+                    }
                 }
+                if(!!down_node){
+                    _jm.select_node(down_node);
+                }
+                evt.stopPropagation();
+                evt.preventDefault();
             }
-            if(!!down_node){
-                _jm.select_node(down_node);
-            }
-            evt.stopPropagation();
-            evt.preventDefault();
         },
 
         handle_left:function(_jm,e){
