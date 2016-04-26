@@ -2021,7 +2021,7 @@
         reset_theme:function(){
             var theme_name = this.jm.options.theme;
             if(!!theme_name){
-                this.e_nodes.className = theme_name;
+                this.e_nodes.className = 'theme-' + theme_name;
             }else{
                 this.e_nodes.className = '';
             }
