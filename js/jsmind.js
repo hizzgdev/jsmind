@@ -766,7 +766,7 @@
                 var node_expanded = null;
                 try{
                     if(node_data.expanded){
-                        node_expanded = node_data.expanded;
+                        node_expanded = (node_data.expanded == 'true');
                         delete node_data.expanded;
                     }
                 }
@@ -822,7 +822,10 @@
                 }
                 xmllines.push('TEXT=\"'+node.topic+'\"');
                 var children = node.children;
-                var node_data = node.data;
+                var node_data = { 
+                    expanded : node.expanded
+                };
+                jm.util.json.merge(node_data, node.data);
                 if(children.length>0 || node_data!=null){
                     xmllines.push('>');
                     // for attributes
