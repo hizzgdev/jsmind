@@ -473,7 +473,7 @@
             _extract_data:function(node_json){
                 var data = {};
                 for(var k in node_json){
-                    if(k == 'id' || k=='topic' || k=='children' || k=='direction'){
+                    if(k == 'id' || k=='topic' || k=='children' || k=='direction' || k=='expanded'){
                         continue;
                     }
                     data[k] = node_json[k];
@@ -622,7 +622,7 @@
             _extract_data:function(node_json){
                 var data = {};
                 for(var k in node_json){
-                    if(k == 'id' || k=='topic' || k=='parentid' || k=='isroot' || k=='direction'){
+                    if(k == 'id' || k=='topic' || k=='parentid' || k=='isroot' || k=='direction' || k=='expanded'){
                         continue;
                     }
                     data[k] = node_json[k];
@@ -763,6 +763,15 @@
                     }
                 }
                 var node_data = df._load_attributes(xml_node);
+                var node_expanded = null;
+                try{
+                    if(node_data.expanded){
+                        node_expanded = node_data.expanded;
+                        delete node_data.expanded;
+                    }
+                }
+                catch(err){
+                }
                 var node_position = xml_node.getAttribute('POSITION');
                 var node_direction = null;
                 if(!!node_position){
