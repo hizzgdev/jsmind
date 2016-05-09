@@ -817,9 +817,7 @@
                 xmllines.push('TEXT=\"'+node.topic+'\">');
 
                 // store expanded status as an attribute
-                if('expanded' in node){
-                    xmllines.push('<attribute NAME=\"expanded\" VALUE=\"'+node.expanded+'\"/>');
-                }
+                xmllines.push('<attribute NAME=\"expanded\" VALUE=\"'+node.expanded+'\"/>');
 
                 // for attributes
                 var node_data = node.data;
