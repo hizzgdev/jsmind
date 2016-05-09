@@ -779,7 +779,7 @@
                 }
                 //logger.debug(node_position +':'+ node_direction);
                 if(!!parent_id){
-                    mind.add_node(parent_id, node_id, node_topic, node_data, null, node_direction);
+                    mind.add_node(parent_id, node_id, node_topic, node_data, null, node_direction, node_expanded);
                 }else{
                     mind.set_root(node_id, node_topic, node_data);
                 }
