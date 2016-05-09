@@ -473,7 +473,7 @@
             _extract_data:function(node_json){
                 var data = {};
                 for(var k in node_json){
-                    if(k == 'id' || k=='topic' || k=='children' || k=='direction'){
+                    if(k == 'id' || k=='topic' || k=='children' || k=='direction' || k=='expanded'){
                         continue;
                     }
                     data[k] = node_json[k];
@@ -622,7 +622,7 @@
             _extract_data:function(node_json){
                 var data = {};
                 for(var k in node_json){
-                    if(k == 'id' || k=='topic' || k=='parentid' || k=='isroot' || k=='direction'){
+                    if(k == 'id' || k=='topic' || k=='parentid' || k=='isroot' || k=='direction' || k=='expanded'){
                         continue;
                     }
                     data[k] = node_json[k];
@@ -763,6 +763,9 @@
                     }
                 }
                 var node_data = df._load_attributes(xml_node);
+                var node_expanded = ('expanded' in node_data)?(node_data.expanded == 'true') : true;
+                delete node_data.expanded;
+
                 var node_position = xml_node.getAttribute('POSITION');
                 var node_direction = null;
                 if(!!node_position){
@@ -770,7 +773,7 @@
                 }
                 //logger.debug(node_position +':'+ node_direction);
                 if(!!parent_id){
-                    mind.add_node(parent_id, node_id, node_topic, node_data, null, node_direction);
+                    mind.add_node(parent_id, node_id, node_topic, node_data, null, node_direction, node_expanded);
                 }else{
                     mind.set_root(node_id, node_topic, node_data);
                 }
@@ -811,25 +814,26 @@
                 if(!!pos){
                     xmllines.push('POSITION=\"'+pos+'\"');
                 }
-                xmllines.push('TEXT=\"'+node.topic+'\"');
-                var children = node.children;
+                xmllines.push('TEXT=\"'+node.topic+'\">');
+
+                // store expanded status as an attribute
+                xmllines.push('<attribute NAME=\"expanded\" VALUE=\"'+node.expanded+'\"/>');
+
+                // for attributes
                 var node_data = node.data;
-                if(children.length>0 || node_data!=null){
-                    xmllines.push('>');
-                    // for attributes
-                    if(node_data != null){
-                        for(var k in node_data){
-                            xmllines.push('<attribute NAME=\"'+k+'\" VALUE=\"'+node_data[k]+'\"/>');
-                        }
+                if(node_data != null){
+                    for(var k in node_data){
+                        xmllines.push('<attribute NAME=\"'+k+'\" VALUE=\"'+node_data[k]+'\"/>');
                     }
-                    // for children
-                    for(var i=0;i<children.length;i++){
-                        df._buildmap(children[i], xmllines);
-                    }
-                    xmllines.push('</node>');
-                }else{
-                    xmllines.push('/>');
                 }
+
+                // for children
+                var children = node.children;
+                for(var i=0;i<children.length;i++){
+                    df._buildmap(children[i], xmllines);
+                }
+
+                xmllines.push('</node>');
             },
         },
     };
