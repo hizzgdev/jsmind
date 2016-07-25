@@ -1,6 +1,6 @@
 /*
  * Released under BSD License
- * Copyright (c) 2014-2015 hizzgdev@163.com
+ * Copyright (c) 2014-2016 hizzgdev@163.com
  * 
  * Project Home:
  *   https://github.com/hizzgdev/jsmind/
@@ -12,7 +12,7 @@
     // __name__ should be a const value, Never try to change it easily.
     var __name__ = 'jsMind';
     // library version
-    var __version__ = '0.3';
+    var __version__ = '0.4a';
     // author
     var __author__ = 'hizzgdev@163.com';
 
@@ -102,7 +102,7 @@
         this.id = sId;
         this.index = iIndex;
         this.topic = sTopic;
-        this.data = oData;
+        this.data = oData || {};
         this.isroot = bIsRoot;
         this.parent = oParent;
         this.direction = eDirection;
@@ -1085,6 +1085,7 @@
             this.options.theme = (!!theme) ? theme : null;
             if(theme_old != this.options.theme){
                 this.view.reset_theme();
+                this.view.reset_custom_style();
             }
         },
         _event_bind:function(){
@@ -1255,6 +1256,7 @@
                     this.view.add_node(node);
                     this.layout.layout();
                     this.view.show(false);
+                    this.view.reset_node_custom_style(node);
                     this.expand_node(parent_node);
                     this.invoke_event_handle(jm.event_type.edit,{evt:'add_node',data:[parent_node.id,nodeid,topic,data],node:nodeid});
                 }
@@ -1448,6 +1450,24 @@
                 n = this.mind.get_node_after(node);
             }
             return n;
+        },
+
+        set_node_color:function(nodeid, bgcolor, fgcolor){
+            if(this.get_editable()){
+                var node = this.mind.get_node(nodeid);
+                if(!!node){
+                    if(!!bgcolor){
+                        node.data['background-color'] = bgcolor;
+                    }
+                    if(!!fgcolor){
+                        node.data['foreground-color'] = fgcolor;
+                    }
+                    this.view.reset_node_custom_style(node);
+                }
+            }else{
+                logger.error('fail, this mind map is not editable');
+                return null;
+            }
         },
 
         resize:function(){
@@ -2031,6 +2051,14 @@
             }
         },
 
+        reset_custom_style:function(){
+            logger.debug('custom style');
+            var nodes = this.jm.mind.nodes;
+            for(nodeid in nodes){
+                this.reset_node_custom_style(nodes[nodeid]);
+            }
+        },
+
         load:function(){
             logger.debug('view.load');
             this.init_nodes();
@@ -2146,10 +2174,12 @@
             if(!!this.selected_node){
                 this.selected_node._data.view.element.className =
                 this.selected_node._data.view.element.className.replace(/\s*selected\s*/i,'');
+                this.reset_node_custom_style(this.selected_node);
             }
             if(!!node){
                 this.selected_node = node;
                 node._data.view.element.className += ' selected';
+                this.clear_node_custom_style(node);
             }
         },
 
@@ -2292,6 +2322,7 @@
                     expander.style.display = 'none';
                     continue;
                 }
+                this.reset_node_custom_style(node);
                 p = this.layout.get_node_point(node);
                 view_data.abs_x = _offset.x + p.x;
                 view_data.abs_y = _offset.y + p.y;
@@ -2314,6 +2345,22 @@
                     expander.style.visibility = 'hidden';
                 }
             }
+        },
+
+        reset_node_custom_style:function(node){
+            var node_element = node._data.view.element;
+            if('background-color' in node.data){
+                node_element.style.backgroundColor = node.data['background-color'];
+            }
+            if('foreground-color' in node.data){
+                node_element.style.color = node.data['foreground-color'];
+            }
+        },
+
+        clear_node_custom_style:function(node){
+            var node_element = node._data.view.element;
+            node_element.style.backgroundColor = "";
+            node_element.style.color = "";
         },
 
         clear_lines:function(canvas_ctx){
