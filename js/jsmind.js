@@ -2052,7 +2052,6 @@
         },
 
         reset_custom_style:function(){
-            logger.debug('custom style');
             var nodes = this.jm.mind.nodes;
             for(nodeid in nodes){
                 this.reset_node_custom_style(nodes[nodeid]);
