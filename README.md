@@ -19,6 +19,8 @@ Links:
 * Wiki :
   * [邮件列表 Mailing List](../../wiki/MailingList)
   * [热点问题 Hot Topics](../../wiki/HotTopics)
+* Donate :
+  * [资助本项目的开发][4]
 
 Get Started:
 
@@ -55,3 +57,4 @@ Get Started:
 [1]:docs/zh/index.md
 [2]:docs/en/index.md
 [3]:LICENSE
+[4]:http://hizzgdev.github.io/jsmind/donate.html
