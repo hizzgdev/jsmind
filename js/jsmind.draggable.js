@@ -84,8 +84,13 @@
             this.shadow.innerHTML = el.innerHTML;
             s.left = el.style.left;
             s.top = el.style.top;
+            s.width = el.style.width;
+            s.height = el.style.height;
+            s.backgroundImage = el.style.backgroundImage;
+            s.backgroundSize = el.style.backgroundSize;
             this.shadow_w = this.shadow.clientWidth;
             this.shadow_h = this.shadow.clientHeight;
+
         },
 
         show_shadow:function(){
