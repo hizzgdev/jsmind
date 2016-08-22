@@ -201,7 +201,7 @@
 
         add_node:function(parent_node, nodeid, topic, data, idx, direction, expanded, image){
             if(typeof parent_node === 'string'){
-                return this.add_node(this.get_node(parent_node), nodeid, topic, data, idx, direction, expanded);
+                return this.add_node(this.get_node(parent_node), nodeid, topic, data, idx, direction, expanded, image);
             }
             var nodeindex = idx || -1;
             if(!!parent_node){
@@ -507,6 +507,7 @@
                 var o = {
                     id : node.id,
                     topic : node.topic,
+                    image: node.image,
                     expanded : node.expanded
                 };
                 if(!!node.parent && node.parent.isroot){
@@ -609,7 +610,7 @@
                         if(!!node_direction){
                             d = node_direction == 'left'?jm.direction.left:jm.direction.right;
                         }
-                        mind.add_node(parentid, node_json.id, node_json.topic, data, null, d, node_json.expanded);
+                        mind.add_node(parentid, node_json.id, node_json.topic, data, null, d, node_json.expanded, node_json.image);
                         node_array.splice(i,1);
                         extract_count ++;
                         var sub_extract_count = df._extract_subnode(mind, node_json.id, node_array);
@@ -626,7 +627,7 @@
             _extract_data:function(node_json){
                 var data = {};
                 for(var k in node_json){
-                    if(k == 'id' || k=='topic' || k=='parentid' || k=='isroot' || k=='direction' || k=='expanded'){
+                    if(k == 'id' || k=='topic' || k=='parentid' || k=='isroot' || k=='direction' || k=='expanded' || k=='image'){
                         continue;
                     }
                     data[k] = node_json[k];
@@ -645,6 +646,7 @@
                 var o = {
                     id : node.id,
                     topic : node.topic,
+                    image: node.image,
                     expanded : node.expanded
                 };
                 if(!!node.parent){
