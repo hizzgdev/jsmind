@@ -227,6 +227,14 @@
             ctx.fill();
 
             ctx.fillStyle = color;
+            if (!!node.image) {
+                var backgroundUrl = css(ncs,'background-image').slice(5, -2);
+                jcanvas.image(ctx, backgroundUrl, tb.x, tb.y, tb.w, tb.h,
+                    function() {
+                        node.ready = true;
+                    });
+                node.ready = false;
+            }
             if (!!node.topic) {
                 if(text_overflow === 'ellipsis'){
                     jcanvas.text_ellipsis(ctx, node.topic, tb.x, tb.y, tb.w, tb.h);
@@ -235,14 +243,6 @@
                     jcanvas.text_multiline(ctx, node.topic, tb.x, tb.y, tb.w, tb.h,line_height);
                 }
                 node.ready = true;
-            }
-            if (!!node.image) {
-                var backgroundUrl = css(ncs,'background-image').slice(5, -2);
-                jcanvas.image(ctx, backgroundUrl, tb.x, tb.y, tb.w, tb.h,
-                    function() {
-                        node.ready = true;
-                    });
-                node.ready = false;
             }
             if(!!view_data.expander){
                 this._draw_expander(view_data.expander);
