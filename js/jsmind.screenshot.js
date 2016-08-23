@@ -120,14 +120,14 @@
             });
         },
 
-        shootAsDataURL:function(){
+        shootAsDataURL:function(callback){
             this.init();
+            this._watermark();
             var jsm = this;
             this._draw(function() {
-                this._watermark();
                 var url = jsm.canvas_elem.toDataURL();
                 jsm.clean();
-                return url;
+                callback(url);
             });
         },
 
