@@ -1064,6 +1064,7 @@
             this.shortcut.init();
 
             this._event_bind();
+            this._dblclick_editable = true;
 
             jm.init_plugins(this);
         },
@@ -1078,6 +1079,14 @@
 
         get_editable:function(){
             return this.options.editable;
+        },
+
+        enable_dblclick:function(){
+            this._dblclick_editable = true;
+        },
+
+        disable_dblclick:function(){
+            this._dblclick_editable = false;
         },
 
         set_theme:function(theme){
@@ -1115,6 +1124,9 @@
         },
 
         dblclick_handle:function(e){
+            if (!this._dblclick_editable) {
+                return;
+            }
             if(this.get_editable()){
                 var element = e.target || event.srcElement;
                 var isnode = this.view.is_node(element);
