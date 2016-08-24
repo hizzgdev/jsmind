@@ -2123,13 +2123,45 @@
                 parent_node.appendChild(d_e);
                 view_data.expander = d_e;
             }
-            if(this.opts.support_html){
-                $h(d,node.topic);
-            }else{
-                $t(d,node.topic);
+            if (!!node.topic) {
+                if(this.opts.support_html){
+                    $h(d,node.topic);
+                }else{
+                    $t(d,node.topic);
+                }
             }
             d.setAttribute('nodeid',node.id);
             d.style.visibility='hidden';
+            if(!!node.data.width){
+                d.style.width = node.data.width+'px';
+            }
+            if(!!node.data.height){
+                d.style.height = node.data.height+'px';
+            }
+            if (!!node.data.backgroundImage) {
+                var backgroundImage = node.data.backgroundImage;
+                if (backgroundImage.startsWith('data') && node.data.width && node.data.height) {
+                    var img = new Image();
+
+                    img.onload = function() {
+                        var c = document.createElement('canvas');
+                        c.width = node.data.width;
+                        c.height = node.data.height;
+                        var img = this;
+                        if(c.getContext) {
+                            var ctx = c.getContext('2d');
+                            ctx.drawImage(img, 2, 2, node.data.width, node.data.height);
+                            var scaledImageData = c.toDataURL();
+                            d.style.backgroundImage='url('+scaledImageData+')';
+                        }
+                    };
+                    img.src = node.data.backgroundImage;
+
+                } else {
+                    d.style.backgroundImage='url('+node.data.backgroundImage+')';
+                }
+                d.style.backgroundSize='99%';
+            }
             parent_node.appendChild(d);
             view_data.element = d;
         },
@@ -2160,10 +2192,12 @@
         update_node:function(node){
             var view_data = node._data.view;
             var element = view_data.element;
-            if(this.opts.support_html){
-                $h(element,node.topic);
-            }else{
-                $t(element,node.topic);
+            if (!!node.topic) {
+                if(this.opts.support_html){
+                    $h(element,node.topic);
+                }else{
+                    $t(element,node.topic);
+                }
             }
             view_data.width = element.clientWidth;
             view_data.height = element.clientHeight;
@@ -2195,6 +2229,10 @@
         },
 
         edit_node_begin:function(node){
+            if(!node.topic) {
+                // don't edit image nodes
+                return;
+            }
             if(this.editing_node != null){
                 this.edit_node_end();
             }
@@ -2354,6 +2392,10 @@
             if('foreground-color' in node.data){
                 node_element.style.color = node.data['foreground-color'];
             }
+            if('background-image' in node.data){
+                node_element.style.backgroundImage = node.data['background-image'];
+            }
+
         },
 
         clear_node_custom_style:function(node){
