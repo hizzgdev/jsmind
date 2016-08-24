@@ -46,6 +46,7 @@
         <ol type='A'>
             <li><button onclick="toggle_editable(this);">disable editable</button></li>
             <li><button onclick="add_node();">add a node</button></li>
+            <li><button onclick="add_image_node();">add a image node</button></li>
             <li><button onclick="modify_node();">modify node</button></li>
             <li><button onclick="prompt_info('please try double click a node');">try double click</button></li>
             <li><button onclick="move_node();">move a node</button></li>
@@ -113,6 +114,10 @@
         </ol>
     </div>
     <div id="jsmind_container"></div>
+    <div style="display:none">
+      <input class="file" type="file" id="image-chooser" accept="image/*"/>
+    </div>
+
 </div>
 <script type="text/javascript" src="../js/jsmind.js"></script>
 <script type="text/javascript" src="../js/jsmind.draggable.js"></script>
@@ -142,7 +147,8 @@
                     {"id":"easy1","topic":"Easy to show"},
                     {"id":"easy2","topic":"Easy to edit"},
                     {"id":"easy3","topic":"Easy to store"},
-                    {"id":"easy4","topic":"Easy to embed"}
+                    {"id":"easy4","topic":"Easy to embed"},
+                    {"id":"other3","backgroundImage":"ant.png", "width": "100", "height": "100"}
                 ]},
                 {"id":"open","topic":"Open Source","direction":"right","children":[
                     {"id":"open1","topic":"on GitHub", "background-color":"#eee", "foreground-color":"blue"},
@@ -170,7 +176,7 @@
     }
 
     function screen_shot(){
-        _jm.shoot();
+        _jm.screenshot.shootDownload();
     }
 
     function show_data(){
@@ -241,6 +247,42 @@
         var nodeid = jsMind.util.uuid.newid();
         var topic = '* Node_'+nodeid.substr(0,5)+' *';
         var node = _jm.add_node(selected_node, nodeid, topic);
+    }
+
+    var imageChooser = document.getElementById('image-chooser');
+
+    imageChooser.addEventListener('change', function (event) {
+        // Read file here.
+        var reader = new FileReader();
+        reader.onloadend = (function () {
+            var selected_node = _jm.get_selected_node();
+            var nodeid = jsMind.util.uuid.newid();
+            var topic = undefined;
+            var data = {
+                "backgroundImage": reader.result,
+                "width": "100",
+                "height": "100"};
+            var node = _jm.add_node(selected_node, nodeid, topic, data);
+            //var node = _jm.add_image_node(selected_node, nodeid, reader.result, 100, 100);
+        //add_image_node:function(parent_node, nodeid, image, width, height, data, idx, direction, expanded){
+        });
+
+        var file = imageChooser.files[0];
+        if (file) {
+            reader.readAsDataURL(file);
+        };
+
+    }, false);
+
+    function add_image_node(){
+        var selected_node = _jm.get_selected_node(); // as parent of new node
+        if(!selected_node){
+            prompt_info('please select a node first.');
+            return;
+        }
+
+        imageChooser.focus();
+        imageChooser.click();
     }
 
     function modify_node(){
