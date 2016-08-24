@@ -80,6 +80,15 @@
         }
     };
 
+    jcanvas.image = function(ctx, backgroundUrl, x, y, w, h, callback){
+        var img = new Image();
+        img.onload = function () {
+            ctx.drawImage(img,x, y);
+            callback();
+        }
+        img.src = backgroundUrl;
+    };
+
     jsMind.screenshot = function(jm){
         this.jm = jm;
         this.canvas_elem = null;
@@ -101,21 +110,28 @@
             this.resize();
         },
 
-        shoot:function(){
+        shoot:function(callback){
             this.init();
-            this._draw();
             this._watermark();
-            this._download();
-            this.clean();
+            var jms = this;
+            this._draw(function(){
+                if(!!callback){
+                    callback(jms);
+                }
+                jms.clean();
+            });
         },
 
-        shootAsDataURL:function(){
-            this.init();
-            this._draw();
-            this._watermark();
-            var url = this.canvas_elem.toDataURL();
-            this.clean();
-            return url;
+        shootDownload: function(){
+            this.shoot(function(jms){
+                jms._download();
+            });
+        },
+
+        shootAsDataURL: function(callback){
+            this.shoot(function(jms){
+                callback(jms.canvas_elem.toDataURL());
+            });
         },
 
         resize:function(){
@@ -130,12 +146,12 @@
             this.canvas_ctx.clearRect(0,0,c.width,c.height);
         },
 
-        _draw:function(){
+        _draw:function(callback){
             var ctx = this.canvas_ctx;
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
             this._draw_lines();
-            this._draw_nodes();
+            this._draw_nodes(callback);
         },
 
         _watermark:function(){
@@ -154,13 +170,30 @@
             this.jm.view.show_lines(this.canvas_ctx);
         },
 
-        _draw_nodes:function(){
+        _draw_nodes:function(callback){
             var nodes = this.jm.mind.nodes;
             var node;
             for(var nodeid in nodes){
                 node = nodes[nodeid];
                 this._draw_node(node);
             }
+
+            function check_nodes_ready() {
+                var allOk = true;
+                for(var nodeid in nodes){
+                    node = nodes[nodeid];
+                    allOk = allOk & node.ready;
+                }
+
+                if(!allOk) {
+                   window.setTimeout(check_nodes_ready, 200);
+                } else {
+                    callback();
+                }
+            }
+            check_nodes_ready();
+
+
         },
 
         _draw_node:function(node){
@@ -197,13 +230,23 @@
             ctx.fill();
 
             ctx.fillStyle = color;
-            if(text_overflow === 'ellipsis'){
-                jcanvas.text_ellipsis(ctx, node.topic, tb.x, tb.y, tb.w, tb.h);
-            }else{
-                var line_height = parseInt(css(ncs,'line-height'));
-                jcanvas.text_multiline(ctx, node.topic, tb.x, tb.y, tb.w, tb.h,line_height);
+            if (!!node.data['backgroundImage']) {
+                var backgroundUrl = css(ncs,'background-image').slice(5, -2);
+                jcanvas.image(ctx, backgroundUrl, tb.x, tb.y, tb.w, tb.h,
+                    function() {
+                        node.ready = true;
+                    });
+                node.ready = false;
             }
-
+            if (!!node.topic) {
+                if(text_overflow === 'ellipsis'){
+                    jcanvas.text_ellipsis(ctx, node.topic, tb.x, tb.y, tb.w, tb.h);
+                }else{
+                    var line_height = parseInt(css(ncs,'line-height'));
+                    jcanvas.text_multiline(ctx, node.topic, tb.x, tb.y, tb.w, tb.h,line_height);
+                }
+                node.ready = true;
+            }
             if(!!view_data.expander){
                 this._draw_expander(view_data.expander);
             }
