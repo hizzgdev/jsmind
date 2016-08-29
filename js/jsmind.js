@@ -1116,9 +1116,8 @@
                 return;
             }
             var element = e.target || event.srcElement;
-            var isnode = this.view.is_node(element);
-            if(isnode){
-                var nodeid = this.view.get_nodeid(element);
+            var nodeid = this.view.get_binded_nodeid(element);
+            if(!!nodeid){
                 this.select_node(nodeid);
             }else{
                 this.select_clear();
@@ -1132,8 +1131,10 @@
             var element = e.target || event.srcElement;
             var isexpander = this.view.is_expander(element);
             if(isexpander){
-                var nodeid = this.view.get_nodeid(element);
-                this.toggle_node(nodeid);
+                var nodeid = this.view.get_binded_nodeid(element);
+                if(!!nodeid){
+                    this.toggle_node(nodeid);
+                } 
             }
         },
 
@@ -1143,9 +1144,8 @@
             }
             if(this.get_editable()){
                 var element = e.target || event.srcElement;
-                var isnode = this.view.is_node(element);
-                if(isnode){
-                    var nodeid = this.view.get_nodeid(element);
+                var nodeid = this.view.get_binded_nodeid(element);
+                if(!!nodeid){
                     this.begin_edit(nodeid);
                 }
             }
@@ -2048,12 +2048,19 @@
             });
         },
 
-        get_nodeid:function(element){
-            return element.getAttribute('nodeid');
-        },
-
-        is_node:function(element){
-            return (element.tagName.toLowerCase() == 'jmnode');
+        get_binded_nodeid:function(element){
+            if(element == null){
+                return null;
+            }
+            var tagName = element.tagName.toLowerCase();
+            if(tagName == 'jmnodes' || tagName == 'body' || tagName == 'html'){
+                return null;
+            }
+            if(tagName == 'jmnode' || tagName == 'jmexpander'){
+                return element.getAttribute('nodeid');
+            }else{
+                return this.get_binded_nodeid(element.parentElement);
+            }
         },
 
         is_expander:function(element){

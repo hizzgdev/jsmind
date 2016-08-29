@@ -216,9 +216,8 @@
 
             var jview = this.jm.view;
             var el = e.target || event.srcElement;
-            var isnode = jview.is_node(el);
-            if(isnode){
-                var nodeid = jview.get_nodeid(el);
+            var nodeid = jview.get_binded_nodeid(el);
+            if(!!nodeid){
                 var node = this.jm.get_node(nodeid);
                 if(!node.isroot){
                     this.reset_shadow(el);
