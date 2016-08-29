@@ -53,6 +53,11 @@
             vspace:20,
             pspace:13
         },
+        default_event_handle:{
+            enable_mousedown_handle:true,
+            enable_click_handle:true,
+            enable_dblclick_handle:true
+        },
         shortcut:{
             enable:true,
             handles:{
@@ -1076,6 +1081,18 @@
             this.options.editable = false;
         },
 
+        // call enable_event_handle('dblclick')
+        // options are 'mousedown', 'click', 'dblclick'
+        enable_event_handle: function(event_handle){
+            this.options.default_event_handle['enable_'+event_handle+'_handle'] = true;
+        },
+
+        // call disable_event_handle('dblclick')
+        // options are 'mousedown', 'click', 'dblclick'
+        disable_event_handle: function(event_handle){
+            this.options.default_event_handle['enable_'+event_handle+'_handle'] = false;
+        },
+
         get_editable:function(){
             return this.options.editable;
         },
@@ -1095,6 +1112,9 @@
         },
 
         mousedown_handle:function(e){
+            if (!this.options.default_event_handle['enable_mousedown_handle']) {
+                return;
+            }
             var element = e.target || event.srcElement;
             var isnode = this.view.is_node(element);
             if(isnode){
@@ -1106,6 +1126,9 @@
         },
 
         click_handle:function(e){
+            if (!this.options.default_event_handle['enable_click_handle']) {
+                return;
+            }
             var element = e.target || event.srcElement;
             var isexpander = this.view.is_expander(element);
             if(isexpander){
@@ -1115,6 +1138,9 @@
         },
 
         dblclick_handle:function(e){
+            if (!this.options.default_event_handle['enable_dblclick_handle']) {
+                return;
+            }
             if(this.get_editable()){
                 var element = e.target || event.srcElement;
                 var isnode = this.view.is_node(element);
