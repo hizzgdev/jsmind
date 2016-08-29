@@ -1116,9 +1116,8 @@
                 return;
             }
             var element = e.target || event.srcElement;
-            var isnode = this.view.is_node(element);
-            if(isnode){
-                var nodeid = this.view.get_nodeid(element);
+            var nodeid = this.view.get_binded_nodeid(element);
+            if(!!nodeid){
                 this.select_node(nodeid);
             }else{
                 this.select_clear();
@@ -1132,8 +1131,10 @@
             var element = e.target || event.srcElement;
             var isexpander = this.view.is_expander(element);
             if(isexpander){
-                var nodeid = this.view.get_nodeid(element);
-                this.toggle_node(nodeid);
+                var nodeid = this.view.get_binded_nodeid(element);
+                if(!!nodeid){
+                    this.toggle_node(nodeid);
+                } 
             }
         },
 
@@ -1143,9 +1144,8 @@
             }
             if(this.get_editable()){
                 var element = e.target || event.srcElement;
-                var isnode = this.view.is_node(element);
-                if(isnode){
-                    var nodeid = this.view.get_nodeid(element);
+                var nodeid = this.view.get_binded_nodeid(element);
+                if(!!nodeid){
                     this.begin_edit(nodeid);
                 }
             }
@@ -2048,12 +2048,19 @@
             });
         },
 
-        get_nodeid:function(element){
-            return element.getAttribute('nodeid');
-        },
-
-        is_node:function(element){
-            return (element.tagName.toLowerCase() == 'jmnode');
+        get_binded_nodeid:function(element){
+            if(element == null){
+                return null;
+            }
+            var tagName = element.tagName.toLowerCase();
+            if(tagName == 'jmnodes' || tagName == 'body' || tagName == 'html'){
+                return null;
+            }
+            if(tagName == 'jmnode' || tagName == 'jmexpander'){
+                return element.getAttribute('nodeid');
+            }else{
+                return this.get_binded_nodeid(element.parentElement);
+            }
         },
 
         is_expander:function(element){
@@ -2149,13 +2156,45 @@
                 parent_node.appendChild(d_e);
                 view_data.expander = d_e;
             }
-            if(this.opts.support_html){
-                $h(d,node.topic);
-            }else{
-                $t(d,node.topic);
+            if (!!node.topic) {
+                if(this.opts.support_html){
+                    $h(d,node.topic);
+                }else{
+                    $t(d,node.topic);
+                }
             }
             d.setAttribute('nodeid',node.id);
             d.style.visibility='hidden';
+            if('width' in node.data){
+                d.style.width = node.data.width+'px';
+            }
+            if('height' in node.data){
+                d.style.height = node.data.height+'px';
+            }
+            if ('background-image' in node.data) {
+                var backgroundImage = node.data['background-image'];
+                if (backgroundImage.startsWith('data') && node.data.width && node.data.height) {
+                    var img = new Image();
+
+                    img.onload = function() {
+                        var c = document.createElement('canvas');
+                        c.width = d.clientWidth;
+                        c.height = d.clientHeight;
+                        var img = this;
+                        if(c.getContext) {
+                            var ctx = c.getContext('2d');
+                            ctx.drawImage(img, 2, 2, d.clientWidth, d.clientHeight);
+                            var scaledImageData = c.toDataURL();
+                            d.style.backgroundImage='url('+scaledImageData+')';
+                        }
+                    };
+                    img.src = backgroundImage;
+
+                } else {
+                    d.style.backgroundImage='url('+backgroundImage+')';
+                }
+                d.style.backgroundSize='99%';
+            }
             parent_node.appendChild(d);
             view_data.element = d;
         },
@@ -2186,10 +2225,12 @@
         update_node:function(node){
             var view_data = node._data.view;
             var element = view_data.element;
-            if(this.opts.support_html){
-                $h(element,node.topic);
-            }else{
-                $t(element,node.topic);
+            if (!!node.topic) {
+                if(this.opts.support_html){
+                    $h(element,node.topic);
+                }else{
+                    $t(element,node.topic);
+                }
             }
             view_data.width = element.clientWidth;
             view_data.height = element.clientHeight;
@@ -2221,6 +2262,10 @@
         },
 
         edit_node_begin:function(node){
+            if(!node.topic) {
+                logger.warn("don't edit image nodes");
+                return;
+            }
             if(this.editing_node != null){
                 this.edit_node_end();
             }
@@ -2380,6 +2425,10 @@
             if('foreground-color' in node.data){
                 node_element.style.color = node.data['foreground-color'];
             }
+            if('background-image' in node.data){
+                node_element.style.backgroundImage = node.data['background-image'];
+            }
+
         },
 
         clear_node_custom_style:function(node){

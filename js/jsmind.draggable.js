@@ -84,8 +84,13 @@
             this.shadow.innerHTML = el.innerHTML;
             s.left = el.style.left;
             s.top = el.style.top;
+            s.width = el.style.width;
+            s.height = el.style.height;
+            s.backgroundImage = el.style.backgroundImage;
+            s.backgroundSize = el.style.backgroundSize;
             this.shadow_w = this.shadow.clientWidth;
             this.shadow_h = this.shadow.clientHeight;
+
         },
 
         show_shadow:function(){
@@ -202,6 +207,18 @@
                 var evt = e || event;
                 jd.dragend.call(jd,evt);
             });
+            jdom.add_event(container,'touchstart',function(e){
+                var evt = e || event;
+                jd.dragstart.call(jd,evt);
+            });
+            jdom.add_event(container,'touchmove',function(e){
+                var evt = e || event;
+                jd.drag.call(jd,evt);
+            });
+            jdom.add_event(container,'touchend',function(e){
+                var evt = e || event;
+                jd.dragend.call(jd,evt);
+            });
         },
 
         dragstart:function(e){
@@ -211,15 +228,14 @@
 
             var jview = this.jm.view;
             var el = e.target || event.srcElement;
-            var isnode = jview.is_node(el);
-            if(isnode){
-                var nodeid = jview.get_nodeid(el);
+            var nodeid = jview.get_binded_nodeid(el);
+            if(!!nodeid){
                 var node = this.jm.get_node(nodeid);
                 if(!node.isroot){
                     this.reset_shadow(el);
                     this.active_node = node;
-                    this.offset_x = e.clientX - el.offsetLeft;
-                    this.offset_y = e.clientY - el.offsetTop;
+                    this.offset_x = (e.clientX || e.touches[0].clientX) - el.offsetLeft;
+                    this.offset_y = (e.clientY || e.touches[0].clientY) - el.offsetTop;
                     this.client_hw = Math.floor(el.clientWidth/2);
                     this.client_hh = Math.floor(el.clientHeight/2);
                     if(this.hlookup_delay != 0){
@@ -246,8 +262,8 @@
                 this.show_shadow();
                 this.moved = true;
                 clear_selection();
-                var px = e.clientX - this.offset_x;
-                var py = e.clientY - this.offset_y;
+                var px = (e.clientX || e.touches[0].clientX) - this.offset_x;
+                var py = (e.clientY || e.touches[0].clientY) - this.offset_y;
                 var cx = px + this.client_hw;
                 var cy = py + this.client_hh;
                 this.shadow.style.left = px + 'px';
