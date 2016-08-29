@@ -2324,6 +2324,8 @@
             this.e_canvas.height = this.size.h;
             this.e_nodes.style.width = this.size.w+'px';
             this.e_nodes.style.height = this.size.h+'px';
+            this.e_panel.style.width = this.size.w+'px';
+            this.e_panel.style.height = this.size.h+'px';
             this.show_nodes();
             this.show_lines();
             //this.layout.cache_valid = true;
