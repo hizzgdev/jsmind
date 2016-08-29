@@ -1397,7 +1397,7 @@
             if(typeof node === 'string'){
                 return this.select_node(this.get_node(node));
             }
-            if(!this.layout.is_visible(node)){
+            if(!node || !this.layout.is_visible(node)){
                 return;
             }
             this.mind.selected = node;
