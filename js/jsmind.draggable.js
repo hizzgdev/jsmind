@@ -259,6 +259,7 @@
         drag:function(e){
             if(!this.jm.get_editable()){return;}
             if(this.capture){
+                e.preventDefault();
                 this.show_shadow();
                 this.moved = true;
                 clear_selection();
