@@ -2348,7 +2348,9 @@
                 return false;
             }
             this.actualZoom = zoom;
-            this.e_panel.style.zoom = zoom;
+            for (var i=0; i < this.e_panel.children.length; i++) {
+                this.e_panel.children[i].style.transform = 'scale(' + zoom + ')';
+            };
             this.show(true);
             return true;
 
