@@ -1496,6 +1496,30 @@
             }
         },
 
+        set_node_font_style:function(nodeid, size, weight, style){
+            if(this.get_editable()){
+                var node = this.mind.get_node(nodeid);
+                if(!!node){
+                    if(!!size){
+                        node.data['font-size'] = size;
+                    }
+                    if(!!weight){
+                        node.data['font-weight'] = weight;
+                    }
+                    if(!!style){
+                        node.data['font-style'] = style;
+                    }
+                    this.view.reset_node_custom_style(node);
+                    this.view.update_node(node);
+                    this.layout.layout();
+                    this.view.show(false);
+                }
+            }else{
+                logger.error('fail, this mind map is not editable');
+                return null;
+            }
+        },
+
         resize:function(){
             this.view.resize();
         },
@@ -2171,6 +2195,17 @@
             if('height' in node.data){
                 d.style.height = node.data.height+'px';
             }
+
+            if('font-size' in node.data){
+                d.style.fontSize = node.data['font-size'];
+            }
+            if('font-weight' in node.data){
+                d.style.fontWeight = node.data['font-weight'];
+            }
+            if('font-style' in node.data){
+                d.style.fontStyle = node.data['font-style'];
+            }
+
             if ('background-image' in node.data) {
                 var backgroundImage = node.data['background-image'];
                 if (backgroundImage.startsWith('data') && node.data.width && node.data.height) {
@@ -2428,7 +2463,15 @@
             if('background-image' in node.data){
                 node_element.style.backgroundImage = node.data['background-image'];
             }
-
+            if('font-size' in node.data){
+                node_element.style.fontSize = node.data['font-size'];
+            }
+            if('font-weight' in node.data){
+                node_element.style.fontWeight = node.data['font-weight'];
+            }
+            if('font-style' in node.data){
+                node_element.style.fontStyle = node.data['font-style'];
+            }
         },
 
         clear_node_custom_style:function(node){
