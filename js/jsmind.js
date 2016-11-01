@@ -2027,6 +2027,11 @@
             this.e_editor.className = 'jsmind-editor';
             this.e_editor.type = 'text';
 
+            this.actualZoom = 1;
+            this.zoomStep = 0.1;
+            this.minZoom = 0.5;
+            this.maxZoom = 2;
+
             var v = this;
             jm.util.dom.add_event(this.e_editor,'keydown',function(e){
                 var evt = e || event;
@@ -2328,6 +2333,27 @@
             this.show_lines();
             //this.layout.cache_valid = true;
             this.jm.invoke_event_handle(jm.event_type.resize,{data:[]});
+        },
+
+        zoomIn: function() {
+            return this.setZoom(this.actualZoom + this.zoomStep);
+        },
+
+        zoomOut: function() {
+            return this.setZoom(this.actualZoom - this.zoomStep);
+        },
+
+        setZoom: function(zoom) {
+            if ((zoom < this.minZoom) || (zoom > this.maxZoom)) {
+                return false;
+            }
+            this.actualZoom = zoom;
+            for (var i=0; i < this.e_panel.children.length; i++) {
+                this.e_panel.children[i].style.transform = 'scale(' + zoom + ')';
+            };
+            this.show(true);
+            return true;
+
         },
 
         _center_root:function(){
