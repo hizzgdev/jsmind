@@ -87,7 +87,16 @@
                 <li><button class="sub" onclick="expand_to_level2();">to level 2</button></li>
                 <li><button class="sub" onclick="expand_to_level3();">to level 3</button></li>
             </ol>
+            <li>zoom</li>
+
+            <button id="zoom-in-button" style="width:50px" onclick="zoomIn();">
+                In
+            </button>
+            <button id="zoom-out-button" style="width:50px" onclick="zoomOut();">
+                Out
+            </button>
         </ol>
+
         <div>6. Multi Format</div>
         <ol type='A'>
             <li>node_tree(default)</li>
@@ -324,6 +333,25 @@
     function set_theme(theme_name){
         _jm.set_theme(theme_name);
     }
+
+    var zoomInButton = document.getElementById("zoom-in-button");
+    var zoomOutButton = document.getElementById("zoom-out-button");
+
+    function zoomIn() {
+        if (_jm.view.zoomIn()) {
+            zoomOutButton.disabled = false;
+        } else {
+            zoomInButton.disabled = true;
+        };
+    };
+
+    function zoomOut() {
+        if (_jm.view.zoomOut()) {
+            zoomInButton.disabled = false;
+        } else {
+            zoomOutButton.disabled = true;
+        };
+    };
 
     function toggle_editable(btn){
         var editable = _jm.get_editable();

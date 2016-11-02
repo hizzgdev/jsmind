@@ -201,7 +201,10 @@
             var view_data = node._data.view;
             var node_element = view_data.element;
             var ncs = getComputedStyle(node_element);
-            if(!is_visible(ncs)){ return; }
+            if(!is_visible(ncs)){
+                node.ready = true;
+                return;
+            }
 
             var bgcolor = css(ncs,'background-color');
             var round_radius = parseInt(css(ncs,'border-radius'));
