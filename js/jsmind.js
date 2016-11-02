@@ -795,13 +795,10 @@
             _load_attributes:function(xml_node){
                 var children = xml_node.childNodes;
                 var attr = null;
-                var attr_data = null;
+                var attr_data = {};
                 for(var i=0;i<children.length;i++){
                     attr = children[i];
                     if(attr.nodeType == 1 && attr.tagName === 'attribute'){
-                        if(attr_data == null){
-                            attr_data = {};
-                        }
                         attr_data[attr.getAttribute('NAME')] = attr.getAttribute('VALUE');
                     }
                 }
