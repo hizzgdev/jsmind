@@ -874,8 +874,12 @@
                     if(xhr.readyState == 4){
                         if(xhr.status == 200 || xhr.status == 0){
                             if(typeof callback === 'function'){
-                                var data = eval('('+xhr.responseText+')');
-                                callback(data);
+                                var data = jm.util.json.string2json(xhr.responseText);
+                                if(data != null){
+                                    callback(data);
+                                }else{
+                                    callback(xhr.responseText);
+                                }
                             }
                         }else{
                             if(typeof fail_callback === 'function'){
