@@ -1767,14 +1767,12 @@
             while(i--){
                 node = nodes[i];
                 node._data.layout.offset_y += middle_height;
-                //logger.debug(node._data.layout.offset_y);
             }
             return total_height;
         },
 
         // layout the y axis only, for collapse/expand a node
         _layout_offset_subnodes_height:function(nodes){
-            return this._layout_offset_subnodes(nodes);
             var total_height = 0;
             var nodes_count = nodes.length;
             var i = nodes_count;
@@ -1967,7 +1965,6 @@
         },
 
         part_layout:function(node){
-            //logger.debug('part_layout');
             var root = this.jm.mind.root;
             if(!!root){
                 var root_layout_data = root._data.layout;
