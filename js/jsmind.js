@@ -1767,14 +1767,12 @@
             while(i--){
                 node = nodes[i];
                 node._data.layout.offset_y += middle_height;
-                //logger.debug(node._data.layout.offset_y);
             }
             return total_height;
         },
 
         // layout the y axis only, for collapse/expand a node
         _layout_offset_subnodes_height:function(nodes){
-            return this._layout_offset_subnodes(nodes);
             var total_height = 0;
             var nodes_count = nodes.length;
             var i = nodes_count;
@@ -1920,14 +1918,12 @@
         },
 
         expand_node:function(node){
-            //logger.debug('expand');
             node.expanded = true;
             this.part_layout(node);
             this.set_visible(node.children,true);
         },
 
         collapse_node:function(node){
-            //logger.debug('collapse');
             node.expanded = false;
             this.part_layout(node);
             this.set_visible(node.children,false);
@@ -1967,7 +1963,6 @@
         },
 
         part_layout:function(node){
-            //logger.debug('part_layout');
             var root = this.jm.mind.root;
             if(!!root){
                 var root_layout_data = root._data.layout;
@@ -1976,7 +1971,7 @@
                 }else{
                     root_layout_data.outer_height_left=this._layout_offset_subnodes_height(root_layout_data.left_nodes);
                 }
-                this.bounds.s = Math.max(root_layout_data.outer_height_left,root_layout_data.outer_height_right);
+                //this.bounds.s = Math.max(root_layout_data.outer_height_left,root_layout_data.outer_height_right);
                 this.cache_valid = false;
             }else{
                 logger.warn('can not found root node');
