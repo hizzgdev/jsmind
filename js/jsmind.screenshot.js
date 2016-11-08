@@ -80,10 +80,16 @@
         }
     };
 
-    jcanvas.image = function(ctx, backgroundUrl, x, y, w, h, callback){
+    jcanvas.image = function(ctx,backgroundUrl,x,y,w,h,r,callback){
         var img = new Image();
         img.onload = function () {
-            ctx.drawImage(img,x, y);
+            ctx.save();
+            ctx.beginPath();
+            jcanvas.rect(ctx,x,y,w,h,r);
+            ctx.closePath();
+            ctx.clip();
+            ctx.drawImage(img,x,y,w,h);
+            ctx.restore();
             callback();
         }
         img.src = backgroundUrl;
@@ -179,6 +185,7 @@
             }
 
             function check_nodes_ready() {
+                console.log('check_node_ready'+new Date());
                 var allOk = true;
                 for(var nodeid in nodes){
                     node = nodes[nodeid];
@@ -186,14 +193,12 @@
                 }
 
                 if(!allOk) {
-                   window.setTimeout(check_nodes_ready, 200);
+                    $w.setTimeout(check_nodes_ready, 200);
                 } else {
-                    callback();
+                    $w.setTimeout(callback, 200);
                 }
             }
             check_nodes_ready();
-
-
         },
 
         _draw_node:function(node){
@@ -207,14 +212,18 @@
             }
 
             var bgcolor = css(ncs,'background-color');
-            var round_radius = parseInt(css(ncs,'border-radius'));
+            var round_radius = parseInt(css(ncs,'border-top-left-radius'));
             var color = css(ncs,'color');
-            var font = css(ncs,'font');
             var padding_left = parseInt(css(ncs,'padding-left'));
             var padding_right = parseInt(css(ncs,'padding-right'));
             var padding_top = parseInt(css(ncs,'padding-top'));
             var padding_bottom = parseInt(css(ncs,'padding-bottom'));
             var text_overflow = css(ncs,'text-overflow');
+            var font = css(ncs,'font-style')+' '+
+                        css(ncs,'font-variant')+' '+
+                        css(ncs,'font-weight')+' '+
+                        css(ncs,'font-size')+'/'+css(ncs,'line-height')+' '+
+                        css(ncs,'font-family');
 
             var rb = {x:view_data.abs_x,
                       y:view_data.abs_y,
@@ -236,7 +245,7 @@
             if ('background-image' in node.data) {
                 var backgroundUrl = css(ncs,'background-image').slice(5, -2);
                 node.ready = false;
-                jcanvas.image(ctx, backgroundUrl, rb.x, rb.y, rb.w, rb.h,
+                jcanvas.image(ctx, backgroundUrl, rb.x, rb.y, rb.w, rb.h, round_radius,
                     function() {
                         node.ready = true;
                     });
@@ -248,10 +257,12 @@
                     var line_height = parseInt(css(ncs,'line-height'));
                     jcanvas.text_multiline(ctx, node.topic, tb.x, tb.y, tb.w, tb.h,line_height);
                 }
-                node.ready = true;
             }
             if(!!view_data.expander){
                 this._draw_expander(view_data.expander);
+            }
+            if (!('background-image' in node.data)) {
+                node.ready = true;
             }
         },
 
@@ -283,7 +294,7 @@
 
         _download:function(){
             var c = this.canvas_elem;
-            var name = this.jm.mind.name;
+            var name = this.jm.mind.name+'.png';
 
             if (navigator.msSaveBlob && (!!c.msToBlob)) {
                 var blob = c.msToBlob();
@@ -294,7 +305,7 @@
                 if ('download' in anchor) {
                     anchor.style.visibility = 'hidden';
                     anchor.href = bloburl;
-                    anchor.download = this.jm.mind.name;
+                    anchor.download = name;
                     $d.body.appendChild(anchor);
                     var evt = $d.createEvent('MouseEvents');
                     evt.initEvent('click', true, true);
