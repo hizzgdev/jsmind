@@ -1918,14 +1918,12 @@
         },
 
         expand_node:function(node){
-            //logger.debug('expand');
             node.expanded = true;
             this.part_layout(node);
             this.set_visible(node.children,true);
         },
 
         collapse_node:function(node){
-            //logger.debug('collapse');
             node.expanded = false;
             this.part_layout(node);
             this.set_visible(node.children,false);
@@ -1973,7 +1971,7 @@
                 }else{
                     root_layout_data.outer_height_left=this._layout_offset_subnodes_height(root_layout_data.left_nodes);
                 }
-                this.bounds.s = Math.max(root_layout_data.outer_height_left,root_layout_data.outer_height_right);
+                //this.bounds.s = Math.max(root_layout_data.outer_height_left,root_layout_data.outer_height_right);
                 this.cache_valid = false;
             }else{
                 logger.warn('can not found root node');
