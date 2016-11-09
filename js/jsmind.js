@@ -1179,8 +1179,10 @@
             }
             if(!!node){
                 if(node.isroot){return;}
+                this.view.save_location(node);
                 this.layout.toggle_node(node);
                 this.view.relayout();
+                this.view.restore_location(node);
             }else{
                 logger.error('the node can not be found.');
             }
@@ -1192,8 +1194,10 @@
             }
             if(!!node){
                 if(node.isroot){return;}
+                this.view.save_location(node);
                 this.layout.expand_node(node);
                 this.view.relayout();
+                this.view.restore_location(node);
             }else{
                 logger.error('the node can not be found.');
             }
@@ -1205,8 +1209,10 @@
             }
             if(!!node){
                 if(node.isroot){return;}
+                this.view.save_location(node);
                 this.layout.collapse_node(node);
                 this.view.relayout();
+                this.view.restore_location(node);
             }else{
                 logger.error('the node can not be found.');
             }
@@ -1340,10 +1346,13 @@
                     }
                     var nodeid = node.id;
                     var parentid = node.parent.id;
+                    var parent_node = this.get_node(parentid);
+                    this.view.save_location(parent_node);
                     this.view.remove_node(node);
                     this.mind.remove_node(node);
                     this.layout.layout();
                     this.view.show(false);
+                    this.view.restore_location(parent_node);
                     this.invoke_event_handle(jm.event_type.edit,{evt:'remove_node',data:[nodeid],node:parentid});
                 }else{
                     logger.error('fail, node can not be found');
@@ -1972,7 +1981,7 @@
                 }else{
                     root_layout_data.outer_height_left=this._layout_offset_subnodes_height(root_layout_data.left_nodes);
                 }
-                //this.bounds.s = Math.max(root_layout_data.outer_height_left,root_layout_data.outer_height_right);
+                this.bounds.s = Math.max(root_layout_data.outer_height_left,root_layout_data.outer_height_right);
                 this.cache_valid = false;
             }else{
                 logger.warn('can not found root node');
@@ -2310,7 +2319,9 @@
             var view_data = node._data.view;
             var element = view_data.element;
             var topic = node.topic;
+            var ncs = getComputedStyle(element);
             this.e_editor.value = topic;
+            this.e_editor.style.width = (element.clientWidth-parseInt(ncs.getPropertyValue('padding-left'))-parseInt(ncs.getPropertyValue('padding-right')))+'px';
             element.innerHTML = '';
             element.appendChild(this.e_editor);
             element.style.zIndex = 5;
@@ -2413,6 +2424,20 @@
         relayout:function(){
             this.expand_size();
             this._show();
+        },
+
+        save_location:function(node){
+            var vd = node._data.view;
+            vd._saved_location={
+                x:parseInt(vd.element.style.left)-this.e_panel.scrollLeft,
+                y:parseInt(vd.element.style.top)-this.e_panel.scrollTop,
+            };
+        },
+        
+        restore_location:function(node){
+            var vd = node._data.view;
+            this.e_panel.scrollLeft = parseInt(vd.element.style.left)-vd._saved_location.x;
+            this.e_panel.scrollTop = parseInt(vd.element.style.top)-vd._saved_location.y;
         },
 
         clear_nodes:function(){
