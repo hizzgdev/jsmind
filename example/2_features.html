@@ -54,7 +54,14 @@
             <li><button onclick="move_to_last();">move to last</button></li>
             <li><button onclick="remove_node();">remove node</button></li>
         </ol>
-        <div>4. Theme</div>
+        <div>4. Style</div>
+        <ol type='A'>
+            <li><button onclick="change_text_font();">change font</button></li>
+            <li><button onclick="change_text_color();">change color</button></li>
+            <li><button onclick="change_background_color();">change bg-color</button></li>
+            <li><button onclick="change_background_image();">change background</button></li>
+        </ol>
+        <div>5. Theme</div>
         <ol type='A'>
         <li>
         <select onchange="set_theme(this.value);">
@@ -77,7 +84,7 @@
         </select>
         </li>
         </ol>
-        <div>5. Adjusting</div>
+        <div>6. Adjusting</div>
         <ol type='A'>
             <li><button onclick="change_container();">resize container</button>
             <button onclick="resize_jsmind();">adusting</button></li>
@@ -97,7 +104,7 @@
             </button>
         </ol>
 
-        <div>6. Multi Format</div>
+        <div>7. Multi Format</div>
         <ol type='A'>
             <li>node_tree(default)</li>
             <ol>
@@ -300,8 +307,6 @@
 
         // modify the topic
         _jm.update_node(selected_id, '--- modified ---');
-        // or modify the topic and summary
-        //_jm.update_node(selected_id, '--- modified ---', 'modify summary at the same time');
     }
 
     function move_to_first(){
@@ -328,6 +333,34 @@
         if(!selected_id){prompt_info('please select a node first.');}
 
         _jm.remove_node(selected_id);
+    }
+
+    function change_text_font(){
+        var selected_id = get_selected_nodeid();
+        if(!selected_id){prompt_info('please select a node first.');}
+
+        _jm.set_node_font_style(selected_id, 28);
+    }
+
+    function change_text_color(){
+        var selected_id = get_selected_nodeid();
+        if(!selected_id){prompt_info('please select a node first.');}
+
+        _jm.set_node_color(selected_id, null, '#000');
+    }
+
+    function change_background_color(){
+        var selected_id = get_selected_nodeid();
+        if(!selected_id){prompt_info('please select a node first.');}
+
+        _jm.set_node_color(selected_id, '#eee', null);
+    }
+
+    function change_background_image(){
+        var selected_id = get_selected_nodeid();
+        if(!selected_id){prompt_info('please select a node first.');}
+
+        _jm.set_node_background_image(selected_id, 'ant.png', 100, 100);
     }
 
     function set_theme(theme_name){
