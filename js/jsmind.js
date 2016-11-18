@@ -1531,6 +1531,31 @@
             }
         },
 
+        set_node_background_image:function(nodeid, image, width, height){
+            if(this.get_editable()){
+                var node = this.mind.get_node(nodeid);
+                if(!!node){
+                    if(!!image){
+                        node.data['background-image'] = image;
+                    }
+                    if(!!width){
+                        node.data['width'] = width;
+                    }
+                    if(!!height){
+                        node.data['height'] = height;
+                    }
+                    this.view.reset_node_custom_style(node);
+                    this.view.update_node(node);
+                    this.layout.layout();
+                    this.view.show(false);
+                }
+            }else{
+                logger.error('fail, this mind map is not editable');
+                return null;
+            }
+        },
+
+
         resize:function(){
             this.view.resize();
         },
@@ -2200,47 +2225,8 @@
             }
             d.setAttribute('nodeid',node.id);
             d.style.visibility='hidden';
-            if('width' in node.data){
-                d.style.width = node.data.width+'px';
-            }
-            if('height' in node.data){
-                d.style.height = node.data.height+'px';
-            }
+            this._reset_node_custom_style(d, node.data);
 
-            if('font-size' in node.data){
-                d.style.fontSize = node.data['font-size'];
-            }
-            if('font-weight' in node.data){
-                d.style.fontWeight = node.data['font-weight'];
-            }
-            if('font-style' in node.data){
-                d.style.fontStyle = node.data['font-style'];
-            }
-
-            if ('background-image' in node.data) {
-                var backgroundImage = node.data['background-image'];
-                if (backgroundImage.startsWith('data') && node.data.width && node.data.height) {
-                    var img = new Image();
-
-                    img.onload = function() {
-                        var c = document.createElement('canvas');
-                        c.width = d.clientWidth;
-                        c.height = d.clientHeight;
-                        var img = this;
-                        if(c.getContext) {
-                            var ctx = c.getContext('2d');
-                            ctx.drawImage(img, 2, 2, d.clientWidth, d.clientHeight);
-                            var scaledImageData = c.toDataURL();
-                            d.style.backgroundImage='url('+scaledImageData+')';
-                        }
-                    };
-                    img.src = backgroundImage;
-
-                } else {
-                    d.style.backgroundImage='url('+backgroundImage+')';
-                }
-                d.style.backgroundSize='99%';
-            }
             parent_node.appendChild(d);
             view_data.element = d;
         },
@@ -2501,24 +2487,54 @@
         },
 
         reset_node_custom_style:function(node){
-            var node_element = node._data.view.element;
-            if('background-color' in node.data){
-                node_element.style.backgroundColor = node.data['background-color'];
+            this._reset_node_custom_style(node._data.view.element, node.data);
+        },
+
+        _reset_node_custom_style:function(node_element, node_data){
+            if('background-color' in node_data){
+                node_element.style.backgroundColor = node_data['background-color'];
             }
-            if('foreground-color' in node.data){
-                node_element.style.color = node.data['foreground-color'];
+            if('foreground-color' in node_data){
+                node_element.style.color = node_data['foreground-color'];
             }
-            if('background-image' in node.data){
-                node_element.style.backgroundImage = node.data['background-image'];
+            if('width' in node_data){
+                node_element.style.width = node_data['width']+'px';
             }
-            if('font-size' in node.data){
-                node_element.style.fontSize = node.data['font-size'];
+            if('height' in node_data){
+                node_element.style.height = node_data['height']+'px';
             }
-            if('font-weight' in node.data){
-                node_element.style.fontWeight = node.data['font-weight'];
+            if('font-size' in node_data){
+                node_element.style.fontSize = node_data['font-size']+'px';
             }
-            if('font-style' in node.data){
-                node_element.style.fontStyle = node.data['font-style'];
+            if('font-weight' in node_data){
+                node_element.style.fontWeight = node_data['font-weight'];
+            }
+            if('font-style' in node_data){
+                node_element.style.fontStyle = node_data['font-style'];
+            }
+            if('background-image' in node_data) {
+                var backgroundImage = node_data['background-image'];
+                if (backgroundImage.startsWith('data') && node_data['width'] && node_data['height']) {
+                    var img = new Image();
+
+                    img.onload = function() {
+                        var c = $c('canvas');
+                        c.width = node_element.clientWidth;
+                        c.height = node_element.clientHeight;
+                        var img = this;
+                        if(c.getContext) {
+                            var ctx = c.getContext('2d');
+                            ctx.drawImage(img, 2, 2, node_element.clientWidth, node_element.clientHeight);
+                            var scaledImageData = c.toDataURL();
+                            node_element.style.backgroundImage='url('+scaledImageData+')';
+                        }
+                    };
+                    img.src = backgroundImage;
+
+                } else {
+                    node_element.style.backgroundImage='url('+backgroundImage+')';
+                }
+                node_element.style.backgroundSize='99%';
             }
         },
 
