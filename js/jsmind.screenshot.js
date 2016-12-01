@@ -80,15 +80,20 @@
         }
     };
 
-    jcanvas.image = function(ctx,backgroundUrl,x,y,w,h,r,callback){
+    jcanvas.image = function(ctx,backgroundUrl,x,y,w,h,r, angle, callback){
         var img = new Image();
         img.onload = function () {
             ctx.save();
+            ctx.translate(x,y);
+            ctx.save();
             ctx.beginPath();
-            jcanvas.rect(ctx,x,y,w,h,r);
+            jcanvas.rect(ctx,0,0,w,h,r);
             ctx.closePath();
             ctx.clip();
-            ctx.drawImage(img,x,y,w,h);
+            ctx.translate(w/2,h/2);
+            ctx.rotate(angle*Math.PI/180);
+            ctx.drawImage(img,-w/2,-h/2);
+            ctx.restore();
             ctx.restore();
             callback();
         }
@@ -245,7 +250,11 @@
             if ('background-image' in node.data) {
                 var backgroundUrl = css(ncs,'background-image').slice(5, -2);
                 node.ready = false;
-                jcanvas.image(ctx, backgroundUrl, rb.x, rb.y, rb.w, rb.h, round_radius,
+                var angle = 0;
+                if ('angle' in node.data) {
+                    angle = node.data['angle'];
+                }
+                jcanvas.image(ctx, backgroundUrl, rb.x, rb.y, rb.w, rb.h, round_radius, angle,
                     function() {
                         node.ready = true;
                     });
