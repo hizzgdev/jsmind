@@ -1531,7 +1531,7 @@
             }
         },
 
-        set_node_background_image:function(nodeid, image, width, height, angle){
+        set_node_background_image:function(nodeid, image, width, height, rotation){
             if(this.get_editable()){
                 var node = this.mind.get_node(nodeid);
                 if(!!node){
@@ -1544,8 +1544,8 @@
                     if(!!height){
                         node.data['height'] = height;
                     }
-                    if(!!angle){
-                        node.data['angle'] = angle;
+                    if(!!rotation){
+                        node.data['background-rotation'] = rotation;
                     }
                     this.view.reset_node_custom_style(node);
                     this.view.update_node(node);
@@ -1558,15 +1558,15 @@
             }
         },
 
-        set_node_background_angle:function(nodeid, angle){
+        set_node_background_rotation:function(nodeid, rotation){
             if(this.get_editable()){
                 var node = this.mind.get_node(nodeid);
                 if(!!node){
                     if(!node.data['background-image']) {
-                        logger.error('fail, only can change aangle of node with background image');
+                        logger.error('fail, only can change rotation angle of node with background image');
                         return null;
                     }
-                    node.data['angle'] = angle;
+                    node.data['background-rotation'] = rotation;
                     this.view.reset_node_custom_style(node);
                     this.view.update_node(node);
                     this.layout.layout();
@@ -2558,8 +2558,8 @@
                 }
                 node_element.style.backgroundSize='99%';
 
-                if('angle' in node_data){
-                    node_element.style.transform = 'rotate(' + node_data['angle'] + 'deg)';
+                if('background-rotation' in node_data){
+                    node_element.style.transform = 'rotate(' + node_data['background-rotation'] + 'deg)';
                 }
 
             }
