@@ -1223,6 +1223,11 @@
             this.view.relayout();
         },
 
+        collapse_all:function(){
+            this.layout.collapse_all();
+            this.view.relayout();
+        },
+
         expand_to_depth:function(depth){
             this.layout.expand_to_depth(depth);
             this.view.relayout();
@@ -1993,6 +1998,20 @@
                 node = nodes[nodeid];
                 if(!node.expanded){
                     this.expand_node(node);
+                }
+            }
+        },
+
+        collapse_all:function(){
+            var nodes = this.jm.mind.nodes;
+            var node;
+            for(var nodeid in nodes){
+                node = nodes[nodeid];
+                if(node.expanded){
+                    this.collapse_node(node);
+                }
+                if(node.isroot){
+                	this.expand_node(node);
                 }
             }
         },
