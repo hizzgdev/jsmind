@@ -1993,26 +1993,37 @@
 
         expand_all:function(){
             var nodes = this.jm.mind.nodes;
+            var c = 0;
             var node;
             for(var nodeid in nodes){
                 node = nodes[nodeid];
                 if(!node.expanded){
-                    this.expand_node(node);
+                    node.expanded = true;
+                    c++;
                 }
+            }
+            if(c>0){
+                var root = this.jm.mind.root;
+                this.part_layout(root);
+                this.set_visible(root.children,true);
             }
         },
 
         collapse_all:function(){
             var nodes = this.jm.mind.nodes;
+            var c = 0;
             var node;
             for(var nodeid in nodes){
                 node = nodes[nodeid];
-                if(node.expanded){
-                    this.collapse_node(node);
+                if(node.expanded && !node.isroot){
+                    node.expanded = false
+                    c++;
                 }
-                if(node.isroot){
-                	this.expand_node(node);
-                }
+            }
+            if(c>0){
+                var root = this.jm.mind.root;
+                this.part_layout(root);
+                this.set_visible(root.children,true);
             }
         },
 
@@ -2042,10 +2053,15 @@
             var root = this.jm.mind.root;
             if(!!root){
                 var root_layout_data = root._data.layout;
-                if(node._data.layout.direction == jm.direction.right){
+                if(node.isroot){
                     root_layout_data.outer_height_right=this._layout_offset_subnodes_height(root_layout_data.right_nodes);
-                }else{
                     root_layout_data.outer_height_left=this._layout_offset_subnodes_height(root_layout_data.left_nodes);
+                }else{
+                    if(node._data.layout.direction == jm.direction.right){
+                        root_layout_data.outer_height_right=this._layout_offset_subnodes_height(root_layout_data.right_nodes);
+                    }else{
+                        root_layout_data.outer_height_left=this._layout_offset_subnodes_height(root_layout_data.left_nodes);
+                    }
                 }
                 this.bounds.s = Math.max(root_layout_data.outer_height_left,root_layout_data.outer_height_right);
                 this.cache_valid = false;
@@ -2066,7 +2082,9 @@
                 }else{
                     this.set_visible(node.children,false);
                 }
-                node._data.layout.visible = visible;
+                if(!node.isroot){
+                    node._data.layout.visible = visible;
+                }
             }
         },
 
