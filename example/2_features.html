@@ -40,7 +40,6 @@
             <li><button onclick="select_node();">select a node</button></li>
             <li><button onclick="prompt_info('please try click a node');">try click a node</button></li>
             <li><button onclick="show_selected();">get the selected</button></li>
-            <li><button onclick="toggle_node();">toggle node</button></li>
         </ol>
         <div>3. Edit</div>
         <ol type='A'>
@@ -88,11 +87,15 @@
         <ol type='A'>
             <li><button onclick="change_container();">resize container</button>
             <button onclick="resize_jsmind();">adusting</button></li>
-            <li>expand</li>
+            <li>expand/collapse</li>
             <ol>
+                <li><button class="sub" onclick="expand();">expand node</button></li>
+                <li><button class="sub" onclick="collapse();">collapse node</button></li>
+                <li><button class="sub" onclick="toggle();">toggle node</button></li>
+                <li><button class="sub" onclick="expand_to_level2();">expand to level 2</button></li>
+                <li><button class="sub" onclick="expand_to_level3();">expand to level 3</button></li>
                 <li><button class="sub" onclick="expand_all();">expand all</button></li>
-                <li><button class="sub" onclick="expand_to_level2();">to level 2</button></li>
-                <li><button class="sub" onclick="expand_to_level3();">to level 3</button></li>
+                <li><button class="sub" onclick="collapse_all();">collapse all</button></li>
             </ol>
             <li>zoom</li>
 
@@ -240,13 +243,6 @@
         }
     }
 
-    function toggle_node(){
-        var selected_id = get_selected_nodeid();
-        if(!selected_id){prompt_info('please select a node first.');}
-
-        _jm.toggle_node(selected_id);
-    }
-
     function get_selected_nodeid(){
         var selected_node = _jm.get_selected_node();
         if(!!selected_node){
@@ -258,7 +254,7 @@
 
     function add_node(){
         var selected_node = _jm.get_selected_node(); // as parent of new node
-        if(!selected_node){prompt_info('please select a node first.');}
+        if(!selected_node){prompt_info('please select a node first.');return;}
 
         var nodeid = jsMind.util.uuid.newid();
         var topic = '* Node_'+nodeid.substr(0,5)+' *';
@@ -303,7 +299,7 @@
 
     function modify_node(){
         var selected_id = get_selected_nodeid();
-        if(!selected_id){prompt_info('please select a node first.');}
+        if(!selected_id){prompt_info('please select a node first.');return;}
 
         // modify the topic
         _jm.update_node(selected_id, '--- modified ---');
@@ -311,14 +307,14 @@
 
     function move_to_first(){
         var selected_id = get_selected_nodeid();
-        if(!selected_id){prompt_info('please select a node first.');}
+        if(!selected_id){prompt_info('please select a node first.');return;}
 
         _jm.move_node(selected_id,'_first_');
     }
 
     function move_to_last(){
         var selected_id = get_selected_nodeid();
-        if(!selected_id){prompt_info('please select a node first.');}
+        if(!selected_id){prompt_info('please select a node first.');return;}
 
         _jm.move_node(selected_id,'_last_');
     }
@@ -330,35 +326,35 @@
 
     function remove_node(){
         var selected_id = get_selected_nodeid();
-        if(!selected_id){prompt_info('please select a node first.');}
+        if(!selected_id){prompt_info('please select a node first.');return;}
 
         _jm.remove_node(selected_id);
     }
 
     function change_text_font(){
         var selected_id = get_selected_nodeid();
-        if(!selected_id){prompt_info('please select a node first.');}
+        if(!selected_id){prompt_info('please select a node first.');return;}
 
         _jm.set_node_font_style(selected_id, 28);
     }
 
     function change_text_color(){
         var selected_id = get_selected_nodeid();
-        if(!selected_id){prompt_info('please select a node first.');}
+        if(!selected_id){prompt_info('please select a node first.');return;}
 
         _jm.set_node_color(selected_id, null, '#000');
     }
 
     function change_background_color(){
         var selected_id = get_selected_nodeid();
-        if(!selected_id){prompt_info('please select a node first.');}
+        if(!selected_id){prompt_info('please select a node first.');return;}
 
         _jm.set_node_color(selected_id, '#eee', null);
     }
 
     function change_background_image(){
         var selected_id = get_selected_nodeid();
-        if(!selected_id){prompt_info('please select a node first.');}
+        if(!selected_id){prompt_info('please select a node first.');return;}
 
         _jm.set_node_background_image(selected_id, 'ant.png', 100, 100);
     }
@@ -408,6 +404,27 @@
         _jm.resize();
     }
 
+    function expand(){
+        var selected_id = get_selected_nodeid();
+        if(!selected_id){prompt_info('please select a node first.');return;}
+
+        _jm.expand_node(selected_id);
+    }
+
+    function collapse(){
+        var selected_id = get_selected_nodeid();
+        if(!selected_id){prompt_info('please select a node first.');return;}
+
+        _jm.collapse_node(selected_id);
+    }
+
+    function toggle(){
+        var selected_id = get_selected_nodeid();
+        if(!selected_id){prompt_info('please select a node first.');return;}
+
+        _jm.toggle_node(selected_id);
+    }
+
     function expand_all(){
         _jm.expand_all();
     }
@@ -419,6 +436,11 @@
     function expand_to_level3(){
         _jm.expand_to_depth(3);
     }
+
+    function collapse_all(){
+        _jm.collapse_all();
+    }
+
 
     function get_nodearray_data(){
         var mind_data = _jm.get_data('node_array');
