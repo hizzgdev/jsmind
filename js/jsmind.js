@@ -204,7 +204,7 @@
         },
 
         add_node:function(parent_node, nodeid, topic, data, idx, direction, expanded){
-            if(typeof parent_node === 'string'){
+            if(!jm.util.is_node(parent_node)){
                 return this.add_node(this.get_node(parent_node), nodeid, topic, data, idx, direction, expanded);
             }
             var nodeindex = idx || -1;
@@ -241,7 +241,7 @@
         },
 
         insert_node_before:function(node_before, nodeid, topic, data){
-            if(typeof node_before === 'string'){
+            if(!jm.util.is_node(node_before)){
                 return this.insert_node_before(this.get_node(node_before), nodeid, topic, data);
             }
             if(!!node_before){
@@ -255,7 +255,7 @@
 
         get_node_before:function(node){
             if(!node){return null;}
-            if(typeof node === 'string'){
+            if(!jm.util.is_node(node)){
                 return this.get_node_before(this.get_node(node));
             }
             if(node.isroot){return null;}
@@ -268,7 +268,7 @@
         },
 
         insert_node_after:function(node_after, nodeid, topic, data){
-            if(typeof node_after === 'string'){
+            if(!jm.util.is_node(node_after)){
                 return this.insert_node_after(this.get_node(node_after), nodeid, topic, data);
             }
             if(!!node_after){
@@ -282,7 +282,7 @@
 
         get_node_after:function(node){
             if(!node){return null;}
-            if(typeof node === 'string'){
+            if(!jm.util.is_node(node)){
                 return this.get_node_after(this.get_node(node));
             }
             if(node.isroot){return null;}
@@ -296,7 +296,7 @@
         },
 
         move_node:function(node, beforeid, parentid, direction){
-            if(typeof node === 'string'){
+            if(!jm.util.is_node(node)){
                 return this.move_node(this.get_node(node), beforeid, parentid, direction);
             }
             if(!parentid){
@@ -368,7 +368,7 @@
         },
 
         remove_node:function(node){
-            if(typeof node === 'string'){
+            if(!jm.util.is_node(node)){
                 return this.remove_node(this.get_node(node));
             }
             if(!node){
@@ -844,6 +844,9 @@
     // ============= utility object =============================================
 
     jm.util = {
+        is_node: function(node){
+            return node instanceof jm.node;
+        },
         ajax:{
             _xhr:function(){
                 var xhr = null;
@@ -1154,7 +1157,7 @@
         },
 
         begin_edit:function(node){
-            if(typeof node === 'string'){
+            if(!jm.util.is_node(node)){
                 return this.begin_edit(this.get_node(node));
             }
             if(this.get_editable()){
@@ -1174,7 +1177,7 @@
         },
 
         toggle_node:function(node){
-            if(typeof node === 'string'){
+            if(!jm.util.is_node(node)){
                 return this.toggle_node(this.get_node(node));
             }
             if(!!node){
@@ -1189,7 +1192,7 @@
         },
 
         expand_node:function(node){
-            if(typeof node === 'string'){
+            if(!jm.util.is_node(node)){
                 return this.expand_node(this.get_node(node));
             }
             if(!!node){
@@ -1204,7 +1207,7 @@
         },
 
         collapse_node:function(node){
-            if(typeof node === 'string'){
+            if(!jm.util.is_node(node)){
                 return this.collapse_node(this.get_node(node));
             }
             if(!!node){
@@ -1308,7 +1311,7 @@
 
         insert_node_before:function(node_before, nodeid, topic, data){
             if(this.get_editable()){
-                var beforeid = (typeof node_before === 'string') ? node_before : node_before.id;
+                var beforeid = jm.util.is_node(node_before) ? node_before.id : node_before;
                 var node = this.mind.insert_node_before(node_before, nodeid, topic, data);
                 if(!!node){
                     this.view.add_node(node);
@@ -1340,7 +1343,7 @@
         },
 
         remove_node:function(node){
-            if(typeof node === 'string'){
+            if(!jm.util.is_node(node)){
                 return this.remove_node(this.get_node(node));
             }
             if(this.get_editable()){
@@ -1410,7 +1413,7 @@
         },
 
         select_node:function(node){
-            if(typeof node === 'string'){
+            if(!jm.util.is_node(node)){
                 return this.select_node(this.get_node(node));
             }
             if(!node || !this.layout.is_visible(node)){
@@ -1442,7 +1445,7 @@
         },
 
         find_node_before:function(node){
-            if(typeof node === 'string'){
+            if(!jm.util.is_node(node)){
                 return this.find_node_before(this.get_node(node));
             }
             if(!node || node.isroot){return null;}
@@ -1467,7 +1470,7 @@
         },
 
         find_node_after:function(node){
-            if(typeof node === 'string'){
+            if(!jm.util.is_node(node)){
                 return this.find_node_after(this.get_node(node));
             }
             if(!node || node.isroot){return null;}
