@@ -2208,7 +2208,7 @@
 
         reset_custom_style:function(){
             var nodes = this.jm.mind.nodes;
-            for(nodeid in nodes){
+            for(var nodeid in nodes){
                 this.reset_node_custom_style(nodes[nodeid]);
             }
         },
