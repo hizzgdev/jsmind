@@ -866,7 +866,7 @@
                 var a = jm.util.ajax;
                 var p = null;
                 var tmp_param = [];
-                for(k in param){
+                for(var k in param){
                     tmp_param.push(a._eurl(k)+'='+a._eurl(param[k]));
                 }
                 if(tmp_param.length>0){
