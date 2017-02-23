@@ -24,7 +24,7 @@
         this.commands = []; //version
         this.delay_handle = 0;
         this.playing = false;
-        this.jm_editable = true;
+        this.jm_editable = this.jm.get_editable();
     };
 
     jsMind.shell.prototype = {
@@ -62,7 +62,6 @@
             this.play();
         },
         play:function(){
-            this.jm_editable = this.jm.get_editable();
             this.jm.disable_edit();
             this.playing = true;
             this._play_stepbystep();
