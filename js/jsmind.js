@@ -866,7 +866,7 @@
                 var a = jm.util.ajax;
                 var p = null;
                 var tmp_param = [];
-                for(k in param){
+                for(var k in param){
                     tmp_param.push(a._eurl(k)+'='+a._eurl(param[k]));
                 }
                 if(tmp_param.length>0){
@@ -2208,7 +2208,7 @@
 
         reset_custom_style:function(){
             var nodes = this.jm.mind.nodes;
-            for(nodeid in nodes){
+            for(var nodeid in nodes){
                 this.reset_node_custom_style(nodes[nodeid]);
             }
         },
