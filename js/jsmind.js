@@ -34,6 +34,14 @@
     var $c = function(tag){return $d.createElement(tag);};
     var $t = function(n,t){if(n.hasChildNodes()){n.firstChild.nodeValue = t;}else{n.appendChild($d.createTextNode(t));}};
     var $h = function(n,t){n.innerHTML = t;};
+    // detect isElement
+    var $i = function(input){
+        return !!input
+            && (typeof input === 'object')
+            && (input.nodeType === 1)
+            && (typeof input.style === 'object')
+            && (typeof input.ownerDocument === 'object');
+    }
     if(typeof String.prototype.startsWith != 'function'){String.prototype.startsWith=function(p){return this.slice(0,p.length)===p;};}
 
     var DEFAULT_OPTIONS = {
@@ -2127,7 +2135,7 @@
         init:function(){
             logger.debug('view.init');
 
-            this.container = $g(this.opts.container);
+            this.container = $i(this.opts.container) ? this.opts.container : $g(this.opts.container);
             if(!this.container){
                 logger.error('the options.view.container was not be found in dom');
                 return;
