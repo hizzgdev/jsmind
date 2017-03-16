@@ -5,6 +5,7 @@ jsMind 是一个显示/编辑思维导图的纯 javascript 类库，其基于 ht
 
 jsMind is a pure javascript library for mindmap, it base on html5 canvas. jsMind was released under BSD license, you can embed it in any project, if only you observe the license. You can read [the BSD license agreement for jsMind in English and Chinese version][3] here.
 
+**jsmind 现已发布到 npm https://www.npmjs.com/package/jsmind**
 
 Links:
 
