@@ -12,7 +12,7 @@
     // __name__ should be a const value, Never try to change it easily.
     var __name__ = 'jsMind';
     // library version
-    var __version__ = '0.4a';
+    var __version__ = '0.4.1';
     // author
     var __author__ = 'hizzgdev@163.com';
 
@@ -205,58 +205,64 @@
 
         add_node:function(parent_node, nodeid, topic, data, idx, direction, expanded){
             if(!jm.util.is_node(parent_node)){
-                return this.add_node(this.get_node(parent_node), nodeid, topic, data, idx, direction, expanded);
+                var the_parent_node = this.get_node(parent_node);
+                if(!the_parent_node){
+                    logger.error('the parent_node[id='+parent_node+'] can not be found.');
+                    return null;
+                }else{
+                    return this.add_node(the_parent_node, nodeid, topic, data, idx, direction, expanded);
+                }
             }
             var nodeindex = idx || -1;
-            if(!!parent_node){
-                //logger.debug(parent_node);
-                var node = null;
-                if(parent_node.isroot){
-                    var d = jm.direction.right;
-                    if(isNaN(direction)){
-                        var children = parent_node.children;
-                        var children_len = children.length;
-                        var r = 0;
-                        for(var i=0;i<children_len;i++){if(children[i].direction === jm.direction.left){r--;}else{r++;}}
-                        d = (children_len > 1 && r > 0) ? jm.direction.left : jm.direction.right
-                    }else{
-                        d = (direction != jm.direction.left) ? jm.direction.right : jm.direction.left;
-                    }
-                    node = new jm.node(nodeid,nodeindex,topic,data,false,parent_node,d,expanded);
+            var node = null;
+            if(parent_node.isroot){
+                var d = jm.direction.right;
+                if(isNaN(direction)){
+                    var children = parent_node.children;
+                    var children_len = children.length;
+                    var r = 0;
+                    for(var i=0;i<children_len;i++){if(children[i].direction === jm.direction.left){r--;}else{r++;}}
+                    d = (children_len > 1 && r > 0) ? jm.direction.left : jm.direction.right
                 }else{
-                    node = new jm.node(nodeid,nodeindex,topic,data,false,parent_node,parent_node.direction,expanded);
+                    d = (direction != jm.direction.left) ? jm.direction.right : jm.direction.left;
                 }
-                if(this._put_node(node)){
-                    parent_node.children.push(node);
-                    this._reindex(parent_node);
-                }else{
-                    logger.error('fail, the nodeid \''+node.id+'\' has been already exist.');
-                    node = null;
-                }
-                return node;
+                node = new jm.node(nodeid,nodeindex,topic,data,false,parent_node,d,expanded);
             }else{
-                logger.error('fail, the [node_parent] can not be found.');
-                return null;
+                node = new jm.node(nodeid,nodeindex,topic,data,false,parent_node,parent_node.direction,expanded);
             }
+            if(this._put_node(node)){
+                parent_node.children.push(node);
+                this._reindex(parent_node);
+            }else{
+                logger.error('fail, the nodeid \''+node.id+'\' has been already exist.');
+                node = null;
+            }
+            return node;
         },
 
         insert_node_before:function(node_before, nodeid, topic, data){
             if(!jm.util.is_node(node_before)){
-                return this.insert_node_before(this.get_node(node_before), nodeid, topic, data);
+                var the_node_before = this.get_node(node_before);
+                if(!the_node_before){
+                    logger.error('the node_before[id='+node_before+'] can not be found.');
+                    return null;
+                }else{
+                    return this.insert_node_before(the_node_before, nodeid, topic, data);
+                }
             }
-            if(!!node_before){
-                var node_index = node_before.index-0.5;
-                return this.add_node(node_before.parent, nodeid, topic, data, node_index);
-            }else{
-                logger.error('fail, the [node_before] can not be found.');
-                return null;
-            }
+            var node_index = node_before.index-0.5;
+            return this.add_node(node_before.parent, nodeid, topic, data, node_index);
         },
 
         get_node_before:function(node){
-            if(!node){return null;}
             if(!jm.util.is_node(node)){
-                return this.get_node_before(this.get_node(node));
+                var the_node = this.get_node(node);
+                if(!the_node){
+                    logger.error('the node[id='+node+'] can not be found.');
+                    return null;
+                }else{
+                    return this.get_node_before(the_node);
+                }
             }
             if(node.isroot){return null;}
             var idx = node.index - 2;
@@ -269,21 +275,27 @@
 
         insert_node_after:function(node_after, nodeid, topic, data){
             if(!jm.util.is_node(node_after)){
-                return this.insert_node_after(this.get_node(node_after), nodeid, topic, data);
+                var the_node_after = this.get_node(node_before);
+                if(!the_node_after){
+                    logger.error('the node_after[id='+node_after+'] can not be found.');
+                    return null;
+                }else{
+                    return this.insert_node_after(the_node_after, nodeid, topic, data);
+                }
             }
-            if(!!node_after){
-                var node_index = node_after.index + 0.5;
-                return this.add_node(node_after.parent, nodeid, topic, data, node_index);
-            }else{
-                logger.error('fail, the [node_after] can not be found.');
-                return null;
-            }
+            var node_index = node_after.index + 0.5;
+            return this.add_node(node_after.parent, nodeid, topic, data, node_index);
         },
 
         get_node_after:function(node){
-            if(!node){return null;}
             if(!jm.util.is_node(node)){
-                return this.get_node_after(this.get_node(node));
+                var the_node = this.get_node(node);
+                if(!the_node){
+                    logger.error('the node[id='+node+'] can not be found.');
+                    return null;
+                }else{
+                    return this.get_node_after(the_node);
+                }
             }
             if(node.isroot){return null;}
             var idx = node.index;
@@ -297,7 +309,13 @@
 
         move_node:function(node, beforeid, parentid, direction){
             if(!jm.util.is_node(node)){
-                return this.move_node(this.get_node(node), beforeid, parentid, direction);
+                var the_node = this.get_node(node);
+                if(!the_node){
+                    logger.error('the node[id='+node+'] can not be found.');
+                    return null;
+                }else{
+                    return this.move_node(the_node, beforeid, parentid, direction);
+                }
             }
             if(!parentid){
                 parentid = node.parent.id;
@@ -369,7 +387,13 @@
 
         remove_node:function(node){
             if(!jm.util.is_node(node)){
-                return this.remove_node(this.get_node(node));
+                var the_node = this.get_node(node);
+                if(!the_node){
+                    logger.error('the node[id='+node+'] can not be found.');
+                    return false;
+                }else{
+                    return this.remove_node(the_node);
+                }
             }
             if(!node){
                 logger.error('fail, the node can not be found');
@@ -845,7 +869,7 @@
 
     jm.util = {
         is_node: function(node){
-            return node instanceof jm.node;
+            return !!node && node instanceof jm.node;
         },
         ajax:{
             _xhr:function(){
@@ -1158,14 +1182,16 @@
 
         begin_edit:function(node){
             if(!jm.util.is_node(node)){
-                return this.begin_edit(this.get_node(node));
+                var the_node = this.get_node(node);
+                if(!the_node){
+                    logger.error('the node[id='+node+'] can not be found.');
+                    return false;
+                }else{
+                    return this.begin_edit(the_node);
+                }
             }
             if(this.get_editable()){
-                if(!!node){
-                    this.view.edit_node_begin(node);
-                }else{
-                    logger.error('the node can not be found');
-                }
+                this.view.edit_node_begin(node);
             }else{
                 logger.error('fail, this mind map is not editable.');
                 return;
@@ -1178,47 +1204,53 @@
 
         toggle_node:function(node){
             if(!jm.util.is_node(node)){
-                return this.toggle_node(this.get_node(node));
+                var the_node = this.get_node(node);
+                if(!the_node){
+                    logger.error('the node[id='+node+'] can not be found.');
+                    return;
+                }else{
+                    return this.toggle_node(the_node);
+                }
             }
-            if(!!node){
-                if(node.isroot){return;}
-                this.view.save_location(node);
-                this.layout.toggle_node(node);
-                this.view.relayout();
-                this.view.restore_location(node);
-            }else{
-                logger.error('the node can not be found.');
-            }
+            if(node.isroot){return;}
+            this.view.save_location(node);
+            this.layout.toggle_node(node);
+            this.view.relayout();
+            this.view.restore_location(node);
         },
 
         expand_node:function(node){
             if(!jm.util.is_node(node)){
-                return this.expand_node(this.get_node(node));
+                var the_node = this.get_node(node);
+                if(!the_node){
+                    logger.error('the node[id='+node+'] can not be found.');
+                    return;
+                }else{
+                    return this.expand_node(the_node);
+                }
             }
-            if(!!node){
-                if(node.isroot){return;}
-                this.view.save_location(node);
-                this.layout.expand_node(node);
-                this.view.relayout();
-                this.view.restore_location(node);
-            }else{
-                logger.error('the node can not be found.');
-            }
+            if(node.isroot){return;}
+            this.view.save_location(node);
+            this.layout.expand_node(node);
+            this.view.relayout();
+            this.view.restore_location(node);
         },
 
         collapse_node:function(node){
             if(!jm.util.is_node(node)){
-                return this.collapse_node(this.get_node(node));
+                var the_node = this.get_node(node);
+                if(!the_node){
+                    logger.error('the node[id='+node+'] can not be found.');
+                    return;
+                }else{
+                    return this.collapse_node(the_node);
+                }
             }
-            if(!!node){
-                if(node.isroot){return;}
-                this.view.save_location(node);
-                this.layout.collapse_node(node);
-                this.view.relayout();
-                this.view.restore_location(node);
-            }else{
-                logger.error('the node can not be found.');
-            }
+            if(node.isroot){return;}
+            this.view.save_location(node);
+            this.layout.collapse_node(node);
+            this.view.relayout();
+            this.view.restore_location(node);
         },
 
         expand_all:function(){
@@ -1328,12 +1360,13 @@
 
         insert_node_after:function(node_after, nodeid, topic, data){
             if(this.get_editable()){
+                var afterid = jm.util.is_node(node_after) ? node_after.id : node_after;
                 var node = this.mind.insert_node_after(node_after, nodeid, topic, data);
                 if(!!node){
                     this.view.add_node(node);
                     this.layout.layout();
                     this.view.show(false);
-                    this.invoke_event_handle(jm.event_type.edit,{evt:'insert_node_after',data:[node_after.id,nodeid,topic,data],node:nodeid});
+                    this.invoke_event_handle(jm.event_type.edit,{evt:'insert_node_after',data:[afterid,nodeid,topic,data],node:nodeid});
                 }
                 return node;
             }else{
@@ -1344,31 +1377,33 @@
 
         remove_node:function(node){
             if(!jm.util.is_node(node)){
-                return this.remove_node(this.get_node(node));
+                var the_node = this.get_node(node);
+                if(!the_node){
+                    logger.error('the node[id='+node+'] can not be found.');
+                    return false;
+                }else{
+                    return this.remove_node(the_node);
+                }
             }
             if(this.get_editable()){
-                if(!!node){
-                    if(node.isroot){
-                        logger.error('fail, can not remove root node');
-                        return false;
-                    }
-                    var nodeid = node.id;
-                    var parentid = node.parent.id;
-                    var parent_node = this.get_node(parentid);
-                    this.view.save_location(parent_node);
-                    this.view.remove_node(node);
-                    this.mind.remove_node(node);
-                    this.layout.layout();
-                    this.view.show(false);
-                    this.view.restore_location(parent_node);
-                    this.invoke_event_handle(jm.event_type.edit,{evt:'remove_node',data:[nodeid],node:parentid});
-                }else{
-                    logger.error('fail, node can not be found');
+                if(node.isroot){
+                    logger.error('fail, can not remove root node');
                     return false;
                 }
+                var nodeid = node.id;
+                var parentid = node.parent.id;
+                var parent_node = this.get_node(parentid);
+                this.view.save_location(parent_node);
+                this.view.remove_node(node);
+                this.mind.remove_node(node);
+                this.layout.layout();
+                this.view.show(false);
+                this.view.restore_location(parent_node);
+                this.invoke_event_handle(jm.event_type.edit,{evt:'remove_node',data:[nodeid],node:parentid});
+                return true;
             }else{
                 logger.error('fail, this mind map is not editable');
-                return;
+                return false;
             }
         },
 
@@ -1414,15 +1449,19 @@
 
         select_node:function(node){
             if(!jm.util.is_node(node)){
-                return this.select_node(this.get_node(node));
+                var the_node = this.get_node(node);
+                if(!the_node){
+                    logger.error('the node[id='+node+'] can not be found.');
+                    return;
+                }else{
+                    return this.select_node(the_node);
+                }
             }
-            if(!node || !this.layout.is_visible(node)){
+            if(!this.layout.is_visible(node)){
                 return;
             }
             this.mind.selected = node;
-            if(!!node){
-                this.view.select_node(node);
-            }
+            this.view.select_node(node);
         },
 
         get_selected_node:function(){
@@ -1446,9 +1485,15 @@
 
         find_node_before:function(node){
             if(!jm.util.is_node(node)){
-                return this.find_node_before(this.get_node(node));
+                var the_node = this.get_node(node);
+                if(!the_node){
+                    logger.error('the node[id='+node+'] can not be found.');
+                    return;
+                }else{
+                    return this.find_node_before(the_node);
+                }
             }
-            if(!node || node.isroot){return null;}
+            if(node.isroot){return null;}
             var n = null;
             if(node.parent.isroot){
                 var c = node.parent.children;
@@ -1471,9 +1516,15 @@
 
         find_node_after:function(node){
             if(!jm.util.is_node(node)){
-                return this.find_node_after(this.get_node(node));
+                var the_node = this.get_node(node);
+                if(!the_node){
+                    logger.error('the node[id='+node+'] can not be found.');
+                    return;
+                }else{
+                    return this.find_node_after(the_node);
+                }
             }
-            if(!node || node.isroot){return null;}
+            if(node.isroot){return null;}
             var n = null;
             if(node.parent.isroot){
                 var c = node.parent.children;
