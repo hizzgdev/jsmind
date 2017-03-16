@@ -12,7 +12,7 @@
     // __name__ should be a const value, Never try to change it easily.
     var __name__ = 'jsMind';
     // library version
-    var __version__ = '0.4.2';
+    var __version__ = '0.4.3';
     // author
     var __author__ = 'hizzgdev@163.com';
 
@@ -34,6 +34,8 @@
     var $c = function(tag){return $d.createElement(tag);};
     var $t = function(n,t){if(n.hasChildNodes()){n.firstChild.nodeValue = t;}else{n.appendChild($d.createTextNode(t));}};
     var $h = function(n,t){n.innerHTML = t;};
+    // detect isElement
+    var $i = function(el){return !!el&&(typeof el==='object')&&(el.nodeType===1)&&(typeof el.style==='object')&&(typeof el.ownerDocument==='object');};
     if(typeof String.prototype.startsWith != 'function'){String.prototype.startsWith=function(p){return this.slice(0,p.length)===p;};}
 
     var DEFAULT_OPTIONS = {
@@ -86,8 +88,8 @@
         jm.util.json.merge(opts, DEFAULT_OPTIONS);
         jm.util.json.merge(opts, options);
 
-        if(opts.container == null || opts.container.length == 0){
-            logger.error('the options.container should not be empty.');
+        if(!opts.container){
+            logger.error('the options.container should not be null or empty.');
             return;
         }
         this.options = opts;
@@ -2178,7 +2180,7 @@
         init:function(){
             logger.debug('view.init');
 
-            this.container = $g(this.opts.container);
+            this.container = $i(this.opts.container) ? this.opts.container : $g(this.opts.container);
             if(!this.container){
                 logger.error('the options.view.container was not be found in dom');
                 return;
