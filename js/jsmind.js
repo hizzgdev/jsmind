@@ -1189,6 +1189,7 @@
                 return this.toggle_node(this.get_node(node));
             }
             if(!!node){
+                this.options.toggleHandler && this.options.toggleHandler(node, node.expanded)
                 if(node.isroot){return;}
                 this.view.save_location(node);
                 this.layout.toggle_node(node);
