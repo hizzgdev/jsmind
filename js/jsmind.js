@@ -19,7 +19,7 @@
     // an noop function define
     var _noop = function(){};
     var logger = (typeof console === 'undefined')?{
-            log:_noop, debug:_noop, error:_noop, warn:_noop, info:_noop
+            log:_noop, error:_noop, warn:_noop, info:_noop
         }:console;
 
     // check global variables
@@ -141,7 +141,7 @@
         }else{
             r = 0;
         }
-        //logger.debug(i1+' <> '+i2+'  =  '+r);
+        //logger.log(i1+' <> '+i2+'  =  '+r);
         return r;
     };
 
@@ -217,7 +217,7 @@
             }
             var nodeindex = idx || -1;
             if(!!parent_node){
-                //logger.debug(parent_node);
+                //logger.log(parent_node);
                 var node = null;
                 if(parent_node.isroot){
                     var d = jm.direction.right;
@@ -769,7 +769,7 @@
                     var topic_child = null;
                     for(var i=0;i<topic_children.length;i++){
                         topic_child = topic_children[i];
-                        //logger.debug(topic_child.tagName);
+                        //logger.log(topic_child.tagName);
                         if(topic_child.nodeType == 1 && topic_child.tagName === 'richcontent'){
                             node_topic = topic_child.textContent;
                             break;
@@ -785,7 +785,7 @@
                 if(!!node_position){
                     node_direction = node_position=='left'?jm.direction.left:jm.direction.right;
                 }
-                //logger.debug(node_position +':'+ node_direction);
+                //logger.log(node_position +':'+ node_direction);
                 if(!!parent_id){
                     mind.add_node(parent_id, node_id, node_topic, node_data, null, node_direction, node_expanded);
                 }else{
@@ -1259,17 +1259,17 @@
                 logger.error('data.load error');
                 return;
             }else{
-                logger.debug('data.load ok');
+                logger.log('data.load ok');
             }
 
             this.view.load();
-            logger.debug('view.load ok');
+            logger.log('view.load ok');
 
             this.layout.layout();
-            logger.debug('layout.layout ok');
+            logger.log('layout.layout ok');
 
             this.view.show(true);
-            logger.debug('view.show ok');
+            logger.log('view.show ok');
 
             this.invoke_event_handle(jm.event_type.show,{data:[mind]});
         },
@@ -1630,11 +1630,11 @@
 
     jm.data_provider.prototype={
         init:function(){
-            logger.debug('data.init');
+            logger.log('data.init');
         },
 
         reset:function(){
-            logger.debug('data.reset');
+            logger.log('data.reset');
         },
 
         load:function(mind_data){
@@ -1690,14 +1690,14 @@
 
     jm.layout_provider.prototype={
         init:function(){
-            logger.debug('layout.init');
+            logger.log('layout.init');
         },
         reset:function(){
-            logger.debug('layout.reset');
+            logger.log('layout.reset');
             this.bounds = {n:0,s:0,w:0,e:0};
         },
         layout:function(){
-            logger.debug('layout.layout');
+            logger.log('layout.layout');
             this.layout_direction();
             this.layout_offset();
         },
@@ -1708,7 +1708,7 @@
 
         _layout_direction_root:function(){
             var node = this.jm.mind.root;
-            // logger.debug(node);
+            // logger.log(node);
             var layout_data = null;
             if('layout' in node._data){
                 layout_data = node._data.layout;
@@ -1794,7 +1794,7 @@
             layout_data.outer_height_right = this._layout_offset_subnodes(right_nodes);
             this.bounds.e=node._data.view.width/2;
             this.bounds.w=0-this.bounds.e;
-            //logger.debug(this.bounds.w);
+            //logger.log(this.bounds.w);
             this.bounds.n=0;
             this.bounds.s = Math.max(layout_data.outer_height_left,layout_data.outer_height_right);
         },
@@ -1881,8 +1881,8 @@
             while(i--){
                 node = nodes[i];
                 node._data.layout.offset_y += middle_height;
-                //logger.debug(node.topic);
-                //logger.debug(node._data.layout.offset_y);
+                //logger.log(node.topic);
+                //logger.log(node._data.layout.offset_y);
             }
             return total_height;
         },
@@ -1913,11 +1913,11 @@
         get_node_point:function(node){
             var view_data = node._data.view;
             var offset_p = this.get_node_offset(node);
-            //logger.debug(offset_p);
+            //logger.log(offset_p);
             var p = {};
             p.x = offset_p.x + view_data.width*(node._data.layout.direction-1)/2;
             p.y = offset_p.y-view_data.height/2;
-            //logger.debug(p);
+            //logger.log(p);
             return p;
         },
 
@@ -1944,8 +1944,8 @@
                     var offset_p = this.get_node_offset(node);
                     pout_cache.x = offset_p.x + (view_data.width+this.opts.pspace)*node._data.layout.direction;
                     pout_cache.y = offset_p.y;
-                    //logger.debug('pout');
-                    //logger.debug(pout_cache);
+                    //logger.log('pout');
+                    //logger.log(pout_cache);
                 }
             }
             return pout_cache;
@@ -1970,7 +1970,7 @@
             for(var nodeid in nodes){
                 node = nodes[nodeid];
                 pout = this.get_node_point_out(node);
-                //logger.debug(pout.x);
+                //logger.log(pout.x);
                 if(pout.x > this.bounds.e){this.bounds.e = pout.x;}
                 if(pout.x < this.bounds.w){this.bounds.w = pout.x;}
             }
@@ -2134,7 +2134,7 @@
 
     jm.view_provider.prototype={
         init:function(){
-            logger.debug('view.init');
+            logger.log('view.init');
 
             this.container = $i(this.opts.container) ? this.opts.container : $g(this.opts.container);
             if(!this.container){
@@ -2199,7 +2199,7 @@
         },
 
         reset:function(){
-            logger.debug('view.reset');
+            logger.log('view.reset');
             this.selected_node = null;
             this.clear_lines();
             this.clear_nodes();
@@ -2223,7 +2223,7 @@
         },
 
         load:function(){
-            logger.debug('view.load');
+            logger.log('view.load');
             this.init_nodes();
         },
 
@@ -2470,7 +2470,7 @@
         },
 
         show:function(keep_center){
-            logger.debug('view.show');
+            logger.log('view.show');
             this.expand_size();
             this._show();
             if(!!keep_center){
