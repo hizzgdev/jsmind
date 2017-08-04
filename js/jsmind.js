@@ -2911,4 +2911,8 @@
 
     // register global variables
     $w[__name__] = jm;
+    if(typeof module !== 'undefined' && module.exports)
+    {
+        module.exports = jm;
+    }
 })(window);

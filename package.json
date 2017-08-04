@@ -1,0 +1,23 @@
+{
+  "name": "jsmind",
+  "version": "1.0.0",
+  "description": "jsMind ======",
+  "main": "js/jsmind.js",
+  "directories": {
+    "doc": "docs",
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xiaohuoz/jsmind.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xiaohuoz/jsmind/issues"
+  },
+  "homepage": "https://github.com/xiaohuoz/jsmind#readme"
+}
