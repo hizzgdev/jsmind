@@ -6,13 +6,13 @@
  *   https://github.com/hizzgdev/jsmind/
  */
 
-(function($w){
+;(function($w){
     'use strict';       
     // set 'jsMind' as the library name.
     // __name__ should be a const value, Never try to change it easily.
     var __name__ = 'jsMind';
     // library version
-    var __version__ = '0.4.4';
+    var __version__ = '0.4.5';
     // author
     var __author__ = 'hizzgdev@163.com';
 
@@ -2912,10 +2912,12 @@
     };
 
     // export jsmind
-    if(typeof module !== 'undefined' && module.exports){
+    if (typeof module !== 'undefined' && typeof exports === 'object') {
         module.exports = jm;
-    }else{
+    } else if (typeof define === 'function' && (define.amd || define.cmd)) {
+        define(function() { return jm; });
+    } else {
         $w[__name__] = jm;
     }
+})(typeof window !== 'undefined' ? window : global);
 
-})(window);
