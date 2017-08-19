@@ -1,7 +1,7 @@
 {
   "name": "jsmind",
-  "version": "1.0.0",
-  "description": "jsMind ======",
+  "version": "0.4.4",
+  "description": "jsMind is a pure javascript library for mindmap, it base on html5 canvas. jsMind was released under BSD li    cense, you can embed it in any project, if only you observe the license.",
   "main": "js/jsmind.js",
   "directories": {
     "doc": "docs",
@@ -12,12 +12,23 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/xiaohuoz/jsmind.git"
+    "url": "git+https://github.com/hizzgdev/jsmind.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": {
+    "name": "hizzgdev@163.com"
+  },
+  "license": "BSD-3-Clause",
   "bugs": {
-    "url": "https://github.com/xiaohuoz/jsmind/issues"
+    "url": "https://github.com/hizzgdev/jsmind/issues"
   },
-  "homepage": "https://github.com/xiaohuoz/jsmind#readme"
+  "homepage": "https://github.com/hizzgdev/jsmind#readme",
+  "keywords": [
+    "mindmap"
+  ],
+  "maintainers": [
+    {
+      "name": "hizzgdev",
+      "email": "hizzgdev@163.com"
+    }
+  ]
 }

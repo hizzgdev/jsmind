@@ -12,7 +12,7 @@
     // __name__ should be a const value, Never try to change it easily.
     var __name__ = 'jsMind';
     // library version
-    var __version__ = '0.4.3';
+    var __version__ = '0.4.4';
     // author
     var __author__ = 'hizzgdev@163.com';
 
@@ -23,9 +23,11 @@
         }:console;
 
     // check global variables
-    if(typeof $w[__name__] != 'undefined'){
-        logger.log(__name__+' has been already exist.');
-        return;
+    if(typeof module === 'undefined' || !module.exports){
+        if(typeof $w[__name__] != 'undefined'){
+            logger.log(__name__+' has been already exist.');
+            return;
+        }
     }
 
     // shortcut of methods in dom
@@ -2909,10 +2911,11 @@
         return _jm;
     };
 
-    // register global variables
-    $w[__name__] = jm;
-    if(typeof module !== 'undefined' && module.exports)
-    {
+    // export jsmind
+    if(typeof module !== 'undefined' && module.exports){
         module.exports = jm;
+    }else{
+        $w[__name__] = jm;
     }
+
 })(window);
