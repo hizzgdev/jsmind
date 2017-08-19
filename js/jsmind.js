@@ -2388,7 +2388,7 @@
         select_node:function(node){
             if(!!this.selected_node){
                 this.selected_node._data.view.element.className =
-                this.selected_node._data.view.element.className.replace(/\s*selected*/i,'');
+                this.selected_node._data.view.element.className.replace(/\s*selected\b/i,'');
                 this.reset_node_custom_style(this.selected_node);
             }
             if(!!node){
