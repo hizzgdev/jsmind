@@ -46,6 +46,7 @@
         theme : null,
         mode :'full',     // full or side
         support_html : true,
+        displayDown: false,
 
         view:{
             hmargin:100,
@@ -55,7 +56,7 @@
         },
         layout:{
             hspace:30,
-            vspace:20,
+            vspace:70,
             pspace:13
         },
         default_event_handle:{
@@ -102,7 +103,7 @@
     };
 
     // ============= static object =============================================
-    jm.direction = {left:-1,center:0,right:1};
+    jm.direction = {left:-1,center:0,right:1,down:2};
     jm.event_type = {show:1,resize:2,edit:3,select:4};
 
     jm.node = function(sId,iIndex,sTopic,oData,bIsRoot,oParent,eDirection,bExpanded){
@@ -229,6 +230,9 @@
                     d = (children_len > 1 && r > 0) ? jm.direction.left : jm.direction.right
                 }else{
                     d = (direction != jm.direction.left) ? jm.direction.right : jm.direction.left;
+                }
+                if (direction && direction == jm.direction.down) {
+                    d = direction;
                 }
                 node = new jm.node(nodeid,nodeindex,topic,data,false,parent_node,d,expanded);
             }else{
@@ -966,7 +970,15 @@
             },
             clear:function(ctx,x,y,w,h){
                 ctx.clearRect(x,y,w,h);
-            }
+            },
+            brokenlineto: function (ctx, x1, y1, x2, y2) {
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x1, y1 + (y2 - y1) / 2);
+                ctx.lineTo(x2, y1 + (y2 - y1) / 2);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+            },
         },
 
         file:{
@@ -1329,7 +1341,13 @@
 
         add_node:function(parent_node, nodeid, topic, data){
             if(this.get_editable()){
-                var node = this.mind.add_node(parent_node, nodeid, topic, data);
+                var node;
+                if (this.options.displayDown) {
+                    node = this.mind.add_node(parent_node, nodeid, topic, data, "", jm.direction.down);
+                }
+                else {
+                    node = this.mind.add_node(parent_node, nodeid, topic, data);
+                }
                 if(!!node){
                     this.view.add_node(node);
                     this.layout.layout();
@@ -1825,24 +1843,140 @@
             var i = children.length;
             var left_nodes = [];
             var right_nodes = [];
+            var down_nodes = [];
             var subnode = null;
             while(i--){
                 subnode = children[i];
-                if(subnode._data.layout.direction == jm.direction.right){
-                    right_nodes.unshift(subnode);
-                }else{
-                    left_nodes.unshift(subnode);
+                if (this.jm.options.displayDown) {
+                    down_nodes.unshift(subnode);
+                }
+                else {
+                    if (subnode._data.layout.direction == jm.direction.right) {
+                        right_nodes.unshift(subnode);
+                    } else {
+                        left_nodes.unshift(subnode);
+                    }
                 }
             }
             layout_data.left_nodes = left_nodes;
             layout_data.right_nodes = right_nodes;
-            layout_data.outer_height_left = this._layout_offset_subnodes(left_nodes);
-            layout_data.outer_height_right = this._layout_offset_subnodes(right_nodes);
+            layout_data.down_nodes = down_nodes;
+            if (this.jm.options.displayDown) {
+                layout_data.outer_width_down = this.layoutDownNodes(down_nodes);
+            }
+            else {
+                layout_data.outer_height_left = this._layout_offset_subnodes(left_nodes);
+                layout_data.outer_height_right = this._layout_offset_subnodes(right_nodes);
+            }
             this.bounds.e=node._data.view.width/2;
             this.bounds.w=0-this.bounds.e;
             //logger.debug(this.bounds.w);
             this.bounds.n=0;
             this.bounds.s = Math.max(layout_data.outer_height_left,layout_data.outer_height_right);
+        },
+
+        layoutDownNodes: function (nodes) {
+            var node = null,
+                layout_data = null,
+                nextNodeX = 0,
+                pd = null;
+            var allWidth = this.getDownNodesWidth(nodes);
+
+            for (var i in nodes) {
+                node = nodes[i];
+                layout_data = node._data.layout;
+                pd = pd || node.parent._data;
+
+                var subNodesWidth = this.layoutDownNodes(node.children);
+
+                layout_data.offset_y = this.opts.vspace;
+
+                //get children nodes width
+                if (node.parent.isroot) {
+                    var nodeBrotherWidth = this.getNodeBrotherWidth(nodes);
+                    layout_data.offset_x = i != 0 ? nextNodeX : pd.layout.offset_x - nodeBrotherWidth / 2;
+                }
+                else {
+                    var nodeBrotherWidth = this.getNodeBrotherWidth(nodes);
+                    layout_data.offset_x = i != 0 ? nextNodeX : -(nodeBrotherWidth - pd.view.width) / 2;
+                }
+
+                nextNodeX = layout_data.offset_x + node._data.view.width + this.opts.hspace;
+
+                nextNodeX += this.getNodeRightWidth(node);
+
+                if (i < nodes.length - 1) {
+                    var nextNode = nodes[++i];
+                    nextNodeX += this.getNodeLeftWidth(nextNode);
+                }
+            }
+            return allWidth;
+        },
+
+        getDownNodesWidth: function (nodes) {
+            var allWidth = 0;
+            for (var i in nodes) {
+                allWidth += Math.max(nodes[i]._data.view.width, this.getDownNodesWidth(nodes[i].children)) + this.opts.hspace;
+            }
+            return !!nodes.length ? allWidth - this.opts.hspace : 0;
+        },
+
+        getNodeBrotherWidth: function (nodes) {
+            if (nodes.length == 1) {
+                return nodes[0]._data.view.width;
+            }
+
+            var nodeBrotherWidth = 0;
+            for (var i = 0; i < nodes.length; i++) {
+                nodeBrotherWidth += nodes[i]._data.view.width;
+
+                nodeBrotherWidth += this.getNodeRightWidth(nodes[i]);
+
+                nodeBrotherWidth += this.opts.hspace;
+                if (i < nodes.length - 1) {
+                    nodeBrotherWidth += this.getNodeLeftWidth(nodes[i + 1])
+                }
+            }
+            nodeBrotherWidth -= this.opts.hspace;
+            if (nodes.length >= 2) {
+                nodeBrotherWidth -= this.getNodeRightWidth(nodes[nodes.length - 1])
+            }
+
+            return nodeBrotherWidth;
+        },
+
+        getNodeRightWidth: function (node) {
+            return this.getNodeOuterWidth(node, "right") - node._data.view.width / 2;
+        },
+
+        getNodeLeftWidth: function (node) {
+            return this.getNodeOuterWidth(node, "left") - node._data.view.width / 2;
+        },
+
+        getNodeOuterWidth: function (node, orientation, referenceWidth, baseWidth) {
+            var children = node.children;
+            if (children.length == 0) {
+                if (referenceWidth && referenceWidth > node._data.view.width / 2) {
+                    return referenceWidth;
+                }
+                return node._data.view.width / 2;
+            }
+
+            var referenceWidth = referenceWidth || node._data.view.width / 2;
+            var childrenWidth = this.getNodeBrotherWidth(children) / 2;
+            var baseWidth = baseWidth || 0;
+
+            baseWidth += childrenWidth;
+
+            if (baseWidth > referenceWidth) {
+                referenceWidth = baseWidth;
+            }
+            var index = orientation == "left" ? 0 : children.length - 1;
+            baseWidth -= (children[index]._data.view.width) / 2;
+
+            referenceWidth = this.getNodeOuterWidth(children[index], orientation, referenceWidth, baseWidth);
+
+            return referenceWidth;
         },
 
         // layout both the x and y axis
@@ -1969,6 +2103,9 @@
 
         get_node_point_in:function(node){
             var p = this.get_node_offset(node);
+            if (this.jm.options.displayDown) {
+                p.x += node._data.view.width / 2;
+            }
             return p;
         },
 
@@ -1988,7 +2125,12 @@
                 }else{
                     var view_data = node._data.view;
                     var offset_p = this.get_node_offset(node);
-                    pout_cache.x = offset_p.x + (view_data.width+this.opts.pspace)*node._data.layout.direction;
+                    if (this.jm.options.displayDown) {
+                        pout_cache.x = offset_p.x + view_data.width / 2;
+                    }
+                    else {
+                        pout_cache.x = offset_p.x + (view_data.width + this.opts.pspace) * node._data.layout.direction;
+                    }
                     pout_cache.y = offset_p.y;
                     //logger.debug('pout');
                     //logger.debug(pout_cache);
@@ -2115,10 +2257,12 @@
                     root_layout_data.outer_height_right=this._layout_offset_subnodes_height(root_layout_data.right_nodes);
                     root_layout_data.outer_height_left=this._layout_offset_subnodes_height(root_layout_data.left_nodes);
                 }else{
-                    if(node._data.layout.direction == jm.direction.right){
-                        root_layout_data.outer_height_right=this._layout_offset_subnodes_height(root_layout_data.right_nodes);
-                    }else{
-                        root_layout_data.outer_height_left=this._layout_offset_subnodes_height(root_layout_data.left_nodes);
+                    if (!this.jm.options.displayDown) {
+                        if (node._data.layout.direction == jm.direction.right) {
+                            root_layout_data.outer_height_right = this._layout_offset_subnodes_height(root_layout_data.right_nodes);
+                        } else {
+                            root_layout_data.outer_height_left = this._layout_offset_subnodes_height(root_layout_data.left_nodes);
+                        }
                     }
                 }
                 this.bounds.s = Math.max(root_layout_data.outer_height_left,root_layout_data.outer_height_right);
@@ -2694,12 +2838,22 @@
             ctx.lineWidth = this.opts.line_width;
             ctx.lineCap = 'round';
 
-            jm.util.canvas.bezierto(
-                ctx,
-                pin.x + offset.x,
-                pin.y + offset.y,
-                pout.x + offset.x,
-                pout.y + offset.y);
+            if (this.jm.options.displayDown) {
+                jm.util.canvas.brokenlineto(
+                    ctx,
+                    pin.x + offset.x,
+                    pin.y + offset.y,
+                    pout.x + offset.x,
+                    pout.y + offset.y);
+            }
+            else {
+                jm.util.canvas.bezierto(
+                    ctx,
+                    pin.x + offset.x,
+                    pin.y + offset.y,
+                    pout.x + offset.x,
+                    pout.y + offset.y);
+            }
         },
     };
 
