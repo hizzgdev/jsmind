@@ -7,7 +7,7 @@
  */
 
 ;(function($w){
-    'use strict';       
+    'use strict';
     // set 'jsMind' as the library name.
     // __name__ should be a const value, Never try to change it easily.
     var __name__ = 'jsMind';
@@ -1552,7 +1552,7 @@
             return n;
         },
 
-        set_node_color:function(nodeid, bgcolor, fgcolor){
+        set_node_color:function(nodeid, bgcolor, fgcolor, bdcolor){
             if(this.get_editable()){
                 var node = this.mind.get_node(nodeid);
                 if(!!node){
@@ -1561,6 +1561,9 @@
                     }
                     if(!!fgcolor){
                         node.data['foreground-color'] = fgcolor;
+                    }
+                    if(!!bdcolor){
+                        node.data['border-color'] = bdcolor;
                     }
                     this.view.reset_node_custom_style(node);
                 }
@@ -2614,6 +2617,9 @@
             if('foreground-color' in node_data){
                 node_element.style.color = node_data['foreground-color'];
             }
+            if('border-color' in node_data){
+                node_element.style.border = node_data['border-color'];
+            }
             if('width' in node_data){
                 node_element.style.width = node_data['width']+'px';
             }
@@ -2920,4 +2926,3 @@
         $w[__name__] = jm;
     }
 })(typeof window !== 'undefined' ? window : global);
-
