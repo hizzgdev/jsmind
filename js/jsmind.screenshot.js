@@ -123,7 +123,6 @@
 
         shoot:function(callback){
             this.init();
-            this._watermark();
             var jms = this;
             this._draw(function(){
                 if(!!callback){
@@ -131,6 +130,7 @@
                 }
                 jms.clean();
             });
+            this._watermark();
         },
 
         shootDownload: function(){
