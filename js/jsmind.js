@@ -180,9 +180,6 @@
 
 
     jm.mind = function(){
-        this.name = null;
-        this.author = null;
-        this.version = null;
         this.root = null;
         this.selected = null;
         this.nodes = {};
@@ -462,31 +459,18 @@
     jm.format = {
         node_tree:{
             example:{
-                "meta":{
-                    "name":__name__,
-                    "author":__author__,
-                    "version":__version__
-                },
                 "format":"node_tree",
                 "data":{"id":"root","topic":"jsMind Example"}
             },
             get_mind:function(source){
                 var df = jm.format.node_tree;
                 var mind = new jm.mind();
-                mind.name = source.meta.name;
-                mind.author = source.meta.author;
-                mind.version = source.meta.version;
                 df._parse(mind,source.data);
                 return mind;
             },
             get_data:function(mind){
                 var df = jm.format.node_tree;
                 var json = {};
-                json.meta = {
-                    name : mind.name,
-                    author : mind.author,
-                    version : mind.version
-                };
                 json.format = 'node_tree';
                 json.data = df._buildnode(mind.root);
                 return json;
@@ -561,11 +545,6 @@
 
         node_array:{
             example:{
-                "meta":{
-                    "name":__name__,
-                    "author":__author__,
-                    "version":__version__
-                },
                 "format":"node_array",
                 "data":[
                     {"id":"root","topic":"jsMind Example", "isroot":true}
@@ -575,9 +554,6 @@
             get_mind:function(source){
                 var df = jm.format.node_array;
                 var mind = new jm.mind();
-                mind.name = source.meta.name;
-                mind.author = source.meta.author;
-                mind.version = source.meta.version;
                 df._parse(mind,source.data);
                 return mind;
             },
@@ -585,11 +561,6 @@
             get_data:function(mind){
                 var df = jm.format.node_array;
                 var json = {};
-                json.meta = {
-                    name : mind.name,
-                    author : mind.author,
-                    version : mind.version
-                };
                 json.format = 'node_array';
                 json.data = [];
                 df._array(mind,json.data);
@@ -702,20 +673,12 @@
 
         freemind:{
             example:{
-                "meta":{
-                    "name":__name__,
-                    "author":__author__,
-                    "version":__version__
-                },
                 "format":"freemind",
                 "data":"<map version=\"1.0.1\"><node ID=\"root\" TEXT=\"freemind Example\"/></map>"
             },
             get_mind:function(source){
                 var df = jm.format.freemind;
                 var mind = new jm.mind();
-                mind.name = source.meta.name;
-                mind.author = source.meta.author;
-                mind.version = source.meta.version;
                 var xml = source.data;
                 var xml_doc = df._parse_xml(xml);
                 var xml_root = df._find_root(xml_doc);
@@ -726,11 +689,6 @@
             get_data:function(mind){
                 var df = jm.format.freemind;
                 var json = {};
-                json.meta = {
-                    name : mind.name,
-                    author : mind.author,
-                    version : mind.version
-                };
                 json.format = 'freemind';
                 var xmllines = [];
                 xmllines.push('<map version=\"1.0.1\">');
@@ -1304,14 +1262,6 @@
         show : function(mind){
             this._reset();
             this._show(mind);
-        },
-
-        get_meta: function(){
-            return {
-                name : this.mind.name,
-                author : this.mind.author,
-                version : this.mind.version
-            };
         },
 
         get_data: function(data_format){
