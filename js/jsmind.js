@@ -36,7 +36,14 @@
     var $c = function(tag){return $d.createElement(tag);};
     var $t = function(n,t){if(n.hasChildNodes()){n.firstChild.nodeValue = t;}else{n.appendChild($d.createTextNode(t));}};
 
-    var $h = function(n,t){(t instanceof HTMLElement) ? n.appendChild(t) :n.innerHTML = t;};
+    var $h = function (n, t) {
+        if (t instanceof HTMLElement) {
+            n.innerHTML = '';
+            n.appendChild(t)
+        } else {
+            n.innerHTML = t;
+        }
+    };
     // detect isElement
     var $i = function(el){return !!el&&(typeof el==='object')&&(el.nodeType===1)&&(typeof el.style==='object')&&(typeof el.ownerDocument==='object');};
     if(typeof String.prototype.startsWith != 'function'){String.prototype.startsWith=function(p){return this.slice(0,p.length)===p;};}
