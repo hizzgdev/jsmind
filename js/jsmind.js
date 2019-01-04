@@ -383,7 +383,7 @@
                 }
 
                 if(node.parent.isroot){
-                    if(direction == jsMind.direction.left){
+                    if(direction == jm.direction.left){
                         node.direction = direction;
                     }else{
                         node.direction = jm.direction.right;
