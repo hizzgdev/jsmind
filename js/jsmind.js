@@ -2754,6 +2754,13 @@
             var evt = e || event;
             if (!this.opts.enable) { return true; }
             var kc = evt.keyCode;
+
+            //combine keyCode
+            var combine = ((e.ctrlKey || e.metaKey) || 0) * 1000;
+            if (combine === 0) combine = (e.altKey || 0) * 2000;
+            if (combine === 0) combine = (e.shiftKey || 0) * 3000;
+            kc += combine;
+
             if (kc in this._mapping) {
                 this._mapping[kc].call(this, this.jm, e);
             }
