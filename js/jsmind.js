@@ -69,7 +69,8 @@
         default_event_handle: {
             enable_mousedown_handle: true,
             enable_click_handle: true,
-            enable_dblclick_handle: true
+            enable_dblclick_handle: true,
+            enable_mousewheel_handle: true,
         },
         shortcut: {
             enable: true,
@@ -1150,6 +1151,7 @@
             this.view.add_event(this, 'mousedown', this.mousedown_handle);
             this.view.add_event(this, 'click', this.click_handle);
             this.view.add_event(this, 'dblclick', this.dblclick_handle);
+            this.view.add_event(this, "mousewheel", this.mousewheel_handle);
         },
 
         mousedown_handle: function (e) {
@@ -1163,6 +1165,20 @@
             } else {
                 this.select_clear();
             }
+        },
+
+        mousewheel_handle: function(e) {
+            if (!this.options.default_event_handle["enable_mousewheel_handle"]) {
+              return;
+            }
+      
+            var dir = e.deltaY > 0 ? "Up" : "Down";
+            if (dir == "Up") {
+              this.view.zoomIn();
+            } else {
+              this.view.zoomOut();
+            }
+            return false;
         },
 
         click_handle: function (e) {
