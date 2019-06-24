@@ -47,6 +47,7 @@
         this.hlookup_timer = 0;
         this.capture = false;
         this.moved = false;
+        this.capture_bg = false;
     };
 
     jsMind.draggable.prototype = {
@@ -229,6 +230,16 @@
 
             var jview = this.jm.view;
             var el = e.target || event.srcElement;
+            
+            if (el.tagName.toLowerCase() === "jmnodes") {
+                this.offset_x = (e.clientX || e.touches[0].clientX) - el.offsetLeft;
+                this.offset_y = (e.clientY || e.touches[0].clientY) - el.offsetTop;
+                this.client_hw = Math.floor(el.clientWidth / 2);
+                this.client_hh = Math.floor(el.clientHeight / 2);
+                this.capture_bg = true;
+                return;
+            }
+
             if (el.tagName.toLowerCase() != 'jmnode') { return; }
             var nodeid = jview.get_binded_nodeid(el);
             if (!!nodeid) {
@@ -259,6 +270,23 @@
         },
 
         drag: function (e) {
+            if (this.capture_bg) {
+                // debugger;
+                var px = (e.clientX || e.touches[0].clientX) - this.offset_x;
+                var py = (e.clientY || e.touches[0].clientY) - this.offset_y;
+                var cx = px + this.client_hw;
+                var cy = py + this.client_hh;
+        
+                var children = this.jm.view.e_panel.children;
+                for (let index = 0; index < children.length; index++) {
+                  const element = children[index];
+                  element.style.left = px + "px";
+                  element.style.top = py + "px";
+                }
+        
+                return;
+            }
+
             if (!this.jm.get_editable()) { return; }
             if (this.capture) {
                 e.preventDefault();
@@ -298,6 +326,7 @@
             }
             this.moved = false;
             this.capture = false;
+            this.capture_bg = false;
         },
 
         move_node: function (src_node, target_node, target_direct) {
