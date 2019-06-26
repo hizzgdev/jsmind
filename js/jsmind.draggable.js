@@ -274,8 +274,6 @@
                 // debugger;
                 var px = (e.clientX || e.touches[0].clientX) - this.offset_x;
                 var py = (e.clientY || e.touches[0].clientY) - this.offset_y;
-                var cx = px + this.client_hw;
-                var cy = py + this.client_hh;
         
                 var children = this.jm.view.e_panel.children;
                 for (let index = 0; index < children.length; index++) {

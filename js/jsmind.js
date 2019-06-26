@@ -1688,8 +1688,19 @@
             for (var i = 0; i < l; i++) {
                 this.event_handles[i](type, data);
             }
-        }
+        },
 
+        search_node: function(topic) {
+            var nodes = new Array();
+
+            for (var nodeid in this.mind.nodes) {
+                var node = this.mind.nodes[nodeid];
+                if (topic !== node.topic) {continue}
+                nodes.push(node);
+            }
+
+            return nodes[0];
+        },
     };
 
     // ============= data provider =============================================
@@ -2725,6 +2736,24 @@
                 pout.x + offset.x,
                 pout.y + offset.y);
         },
+
+        locate_node: function (topic) {
+            var node = this.jm.search_node(topic);
+            if (!node) {
+                return;
+            }
+            var offset = node._data.layout._offset_;
+            this.move(-1*offset.x, -1*offset.y);
+        },
+
+        move: function (x, y) {
+            var children = this.jm.view.e_panel.children;
+            for (let index = 0; index < children.length; index++) {
+                const element = children[index];
+                element.style.left = x + "px";
+                element.style.top = y + "px";
+            }
+        }
     };
 
     // shortcut provider

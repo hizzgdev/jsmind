@@ -41,6 +41,7 @@
             <li><button onclick="select_node();">select a node</button></li>
             <li><button onclick="prompt_info('please try click a node');">try click a node</button></li>
             <li><button onclick="show_selected();">get the selected</button></li>
+            <li><input id="topic_input" /><button onclick="locate_node();">locate node</button></li>
         </ol>
         <div>3. Edit</div>
         <ol type='A'>
@@ -242,6 +243,12 @@
         }else{
             prompt_info('nothing');
         }
+    }
+
+    function locate_node(){
+        var topic_input = document.getElementById('topic_input');
+        var topic = topic_input.value;
+        _jm.view.locate_node(topic);
     }
 
     function get_selected_nodeid(){
