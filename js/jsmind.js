@@ -1189,12 +1189,22 @@
                 return;
             }
             var element = e.target || event.srcElement;
+            var nodeid = this.view.get_binded_nodeid(element);
+            if (!nodeid) {
+                return;
+            }
             var isexpander = this.view.is_expander(element);
             if (isexpander) {
-                var nodeid = this.view.get_binded_nodeid(element);
                 if (!!nodeid) {
                     this.toggle_node(nodeid);
                 }
+            }else {
+                const node = this.get_node(nodeid)
+                this.invoke_event_handle(jm.event_type.select, {
+                    evt: 'select_node',
+                    data: [nodeid, node.topic],
+                    node: nodeid
+                });
             }
         },
 
