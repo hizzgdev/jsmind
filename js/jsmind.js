@@ -1174,7 +1174,7 @@
             if (!this.options.default_event_handle["enable_mousewheel_handle"]) {
               return;
             }
-      
+
             var dir = e.deltaY > 0 ? "Up" : "Down";
             if (dir == "Up") {
               this.view.zoomIn();
@@ -1744,6 +1744,16 @@
             }
 
             return nodes[0];
+        },
+
+        locate_node: function (topic) {
+            var node = this.search_node(topic);
+            if (!node) {
+                return;
+            }
+            this.view.relayout();
+            var offset = node._data.layout._offset_;
+            this.view.move(-1*offset.x, -1*offset.y);
         },
     };
 
@@ -2779,15 +2789,6 @@
                 pin.y + offset.y,
                 pout.x + offset.x,
                 pout.y + offset.y);
-        },
-
-        locate_node: function (topic) {
-            var node = this.jm.search_node(topic);
-            if (!node) {
-                return;
-            }
-            var offset = node._data.layout._offset_;
-            this.move(-1*offset.x, -1*offset.y);
         },
 
         move: function (x, y) {
