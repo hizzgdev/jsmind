@@ -1175,7 +1175,7 @@
               return;
             }
 
-            var dir = e.deltaY > 0 ? "Up" : "Down";
+            var dir = e.deltaY < 0 ? "Up" : "Down";
             if (dir == "Up") {
               this.view.zoomIn();
             } else {
