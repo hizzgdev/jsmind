@@ -224,7 +224,6 @@
         },
 
         dragstart: function (e) {
-            if (!this.jm.get_editable()) { return; }
             if (this.capture) { return; }
             this.active_node = null;
 
@@ -239,6 +238,8 @@
                 this.capture_bg = true;
                 return;
             }
+
+            if (!this.jm.get_editable()) { return; }
 
             if (el.tagName.toLowerCase() != 'jmnode') { return; }
             var nodeid = jview.get_binded_nodeid(el);
@@ -302,7 +303,7 @@
         },
 
         dragend: function (e) {
-            if (!this.jm.get_editable()) { return; }
+            // if (!this.jm.get_editable()) { return; }
             if (this.capture) {
                 if (this.hlookup_delay != 0) {
                     $w.clearTimeout(this.hlookup_delay);
