@@ -1747,7 +1747,6 @@
         },
 
         locate_node: function (topic) {
-            debugger;
             var node = this.search_node(topic);
             if (!node) {
                 return;
