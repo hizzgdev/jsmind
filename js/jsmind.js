@@ -1174,8 +1174,8 @@
             if (!this.options.default_event_handle["enable_mousewheel_handle"]) {
               return;
             }
-      
-            var dir = e.deltaY > 0 ? "Up" : "Down";
+
+            var dir = e.deltaY < 0 ? "Up" : "Down";
             if (dir == "Up") {
               this.view.zoomIn();
             } else {
@@ -1744,6 +1744,17 @@
             }
 
             return nodes[0];
+        },
+
+        locate_node: function (topic) {
+            debugger;
+            var node = this.search_node(topic);
+            if (!node) {
+                return;
+            }
+            this.view.relayout();
+            var offset = node._data.layout._offset_;
+            this.view.move(-1*offset.x, -1*offset.y);
         },
     };
 
@@ -2781,15 +2792,6 @@
                 pout.y + offset.y);
         },
 
-        locate_node: function (topic) {
-            var node = this.jm.search_node(topic);
-            if (!node) {
-                return;
-            }
-            var offset = node._data.layout._offset_;
-            this.move(-1*offset.x, -1*offset.y);
-        },
-
         move: function (x, y) {
             var children = this.jm.view.e_panel.children;
             for (let index = 0; index < children.length; index++) {
@@ -2854,7 +2856,7 @@
             var selected_node = _jm.get_selected_node();
             if (!!selected_node) {
                 var nodeid = jm.util.uuid.newid();
-                var node = _jm.add_node(selected_node, nodeid, 'New Node');
+                var node = _jm.add_node(selected_node, nodeid, nodeid);
                 if (!!node) {
                     _jm.select_node(nodeid);
                     _jm.begin_edit(nodeid);
@@ -2865,7 +2867,7 @@
             var selected_node = _jm.get_selected_node();
             if (!!selected_node && !selected_node.isroot) {
                 var nodeid = jm.util.uuid.newid();
-                var node = _jm.insert_node_after(selected_node, nodeid, 'New Node');
+                var node = _jm.insert_node_after(selected_node, nodeid, nodeid);
                 if (!!node) {
                     _jm.select_node(nodeid);
                     _jm.begin_edit(nodeid);
