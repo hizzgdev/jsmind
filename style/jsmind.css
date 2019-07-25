@@ -19,7 +19,7 @@
 }
 
 /* z-index:1 */
-canvas{position:absolute;z-index:1;}
+.jsmind-inner canvas{position:absolute;z-index:1;}
 
 /* z-index:2 */
 jmnodes{position:absolute;z-index:2;background-color:rgba(0,0,0,0);}/*background color is necessary*/
