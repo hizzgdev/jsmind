@@ -77,7 +77,8 @@
             handles: {
             },
             mapping: {
-                addchild: 45, // Insert
+                // addchild: 45, // Insert
+                addchild: 9, // Tab
                 addbrother: 13, // Enter
                 editnode: 113,// F2
                 delnode: 46, // Delete
@@ -86,6 +87,8 @@
                 up: 38, // Up
                 right: 39, // Right
                 down: 40, // Down
+                copychild: 67, // Down
+                pastechild: 86, // Down
             }
         },
     };
@@ -1171,8 +1174,8 @@
             if (!this.options.default_event_handle["enable_mousewheel_handle"]) {
               return;
             }
-      
-            var dir = e.deltaY > 0 ? "Up" : "Down";
+
+            var dir = e.deltaY < 0 ? "Up" : "Down";
             if (dir == "Up") {
               this.view.zoomIn();
             } else {
@@ -1186,12 +1189,22 @@
                 return;
             }
             var element = e.target || event.srcElement;
+            var nodeid = this.view.get_binded_nodeid(element);
+            if (!nodeid) {
+                return;
+            }
             var isexpander = this.view.is_expander(element);
             if (isexpander) {
-                var nodeid = this.view.get_binded_nodeid(element);
                 if (!!nodeid) {
                     this.toggle_node(nodeid);
                 }
+            }else {
+                const node = this.get_node(nodeid)
+                this.invoke_event_handle(jm.event_type.select, {
+                    evt: 'select_node',
+                    data: [nodeid, node.topic],
+                    node: nodeid
+                });
             }
         },
 
@@ -1362,6 +1375,37 @@
                     this.expand_node(parent_node);
                     this.invoke_event_handle(jm.event_type.edit, { evt: 'add_node', data: [parent_node.id, nodeid, topic, data], node: nodeid });
                 }
+                return node;
+            } else {
+                logger.error('fail, this mind map is not editable');
+                return null;
+            }
+        },
+
+        add_node_circle: function(parent_node, nodes) {
+            if (this.get_editable()) {
+                let nodeid = jm.util.uuid.newid()
+                var node = this.mind.add_node(parent_node, nodeid, nodes.topic, {});
+                if (!!node) {
+                    this.view.add_node(node);
+                    this.layout.layout();
+                    this.view.show(false);
+                    this.view.reset_node_custom_style(node);
+                    this.expand_node(parent_node);
+                    this.invoke_event_handle(jm.event_type.edit, {
+                        evt: 'add_node',
+                        data: [parent_node.id, nodeid, node.topic, {}],
+                        node: nodeid
+                    });
+                    if (!nodes.children) {
+                        return;
+                    }
+                    for (var i = 0; i < nodes.children.length; i++) {
+                        var sub_node = nodes.children[i];
+                        this.add_node_circle(node, sub_node)
+                    }
+                }
+
                 return node;
             } else {
                 logger.error('fail, this mind map is not editable');
@@ -1700,6 +1744,16 @@
             }
 
             return nodes[0];
+        },
+
+        locate_node: function (topic) {
+            var node = this.search_node(topic);
+            if (!node) {
+                return;
+            }
+            this.view.relayout();
+            var offset = node._data.layout._offset_;
+            this.view.move(-1*offset.x, -1*offset.y);
         },
     };
 
@@ -2737,15 +2791,6 @@
                 pout.y + offset.y);
         },
 
-        locate_node: function (topic) {
-            var node = this.jm.search_node(topic);
-            if (!node) {
-                return;
-            }
-            var offset = node._data.layout._offset_;
-            this.move(-1*offset.x, -1*offset.y);
-        },
-
         move: function (x, y) {
             var children = this.jm.view.e_panel.children;
             for (let index = 0; index < children.length; index++) {
@@ -2778,6 +2823,8 @@
             this.handles['down'] = this.handle_down;
             this.handles['left'] = this.handle_left;
             this.handles['right'] = this.handle_right;
+            this.handles['copychild'] = this.handle_copychild;
+            this.handles['pastechild'] = this.handle_pastechild;
 
             for (var handle in this.mapping) {
                 if (!!this.mapping[handle] && (handle in this.handles)) {
@@ -2921,6 +2968,34 @@
                 }
                 evt.stopPropagation();
                 evt.preventDefault();
+            }
+        },
+        handle_copychild: function(_jm, e) {
+            var evt = e || event;
+            if (!evt.ctrlKey) {
+                return
+            }
+            var selected_node = _jm.get_selected_node();
+            if (!!selected_node) {
+                var data = JSON.stringify(selected_node, ['topic', 'direction', 'expanded', 'children'])
+                localStorage.setItem('jsmind_clipboard', data)
+            }
+        },
+        handle_pastechild: function(_jm, e) {
+            var evt = e || event;
+            if (!evt.ctrlKey) {
+                return
+            }
+
+            var data = localStorage.getItem('jsmind_clipboard');
+            if (!data) {
+                return
+            }
+            debugger;
+            let node = JSON.parse(data)
+            var selected_node = _jm.get_selected_node();
+            if (!!selected_node) {
+                _jm.add_node_circle(selected_node, node)
             }
         },
     };
