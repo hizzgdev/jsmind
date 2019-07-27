@@ -27,7 +27,7 @@ jmnode{position:absolute;cursor:default;max-width:400px;white-space:nowrap;overf
 jmexpander{position:absolute;width:11px;height:11px;display:block;overflow:hidden;line-height:12px;font-size:12px;text-align:center;border-radius:6px;border-width:1px;border-style:solid;cursor:pointer;}
 
 jmnote{visibility:hidden;padding:10px;background-color:#f1c40f;color:#333;border-radius:2px;font:15px/1.125 Verdana,Arial,Helvetica,sans-serif;z-index:3;position:absolute;cursor:default;overflow:auto;text-overflow:ellipsis;opacity: 0.8;box-shadow: 5px 5px 4px #616161}
-jmnote-flg{position:absolute;z-index:3;top:0px;width: 10px;height: 10px;border-radius:5px;background-color:#f1c40f;overflow:auto;}
+jmnote-flg{position:absolute;z-index:3;bottom:0px;width: 10px;height: 10px;border-radius:5px;background-color:#f1c40f;overflow:auto;}
 
 /* default theme */
 jmnode{padding:10px;background-color:#fff;color:#333;border-radius:5px;box-shadow:1px 1px 1px #666;font:16px/1.125 Verdana,Arial,Helvetica,sans-serif;}
