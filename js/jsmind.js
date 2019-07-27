@@ -71,6 +71,7 @@
             enable_click_handle: true,
             enable_dblclick_handle: true,
             enable_mousewheel_handle: true,
+            enable_hover_handle: true,
         },
         shortcut: {
             enable: true,
@@ -115,7 +116,7 @@
 
     // ============= static object =============================================
     jm.direction = { left: -1, center: 0, right: 1 };
-    jm.event_type = { show: 1, resize: 2, edit: 3, select: 4 };
+    jm.event_type = { show: 1, resize: 2, edit: 3, select: 4, mouseover: 5 };
 
     jm.node = function (sId, iIndex, sTopic, oData, bIsRoot, oParent, eDirection, bExpanded) {
         if (!sId) { logger.error('invalid nodeid'); return; }
@@ -1155,6 +1156,7 @@
             this.view.add_event(this, 'click', this.click_handle);
             this.view.add_event(this, 'dblclick', this.dblclick_handle);
             this.view.add_event(this, "mousewheel", this.mousewheel_handle);
+            this.view.add_event(this, 'mouseover', this.mouseover_handle);
         },
 
         mousedown_handle: function (e) {
@@ -1754,6 +1756,24 @@
             this.view.relayout();
             var offset = node._data.layout._offset_;
             this.view.move(-1*offset.x, -1*offset.y);
+        },
+
+        mouseover_handle: function (e) {
+            if (!this.options.default_event_handle['enable_hover_handle']) {
+                return;
+            }
+            var element = e.target || event.srcElement;
+            var nodeid = this.view.get_binded_nodeid(element);
+            if (!nodeid) {
+                return;
+            }
+            const node = this.get_node(nodeid);
+            console.log(node);
+            this.invoke_event_handle(jm.event_type.mouseover, {
+                evt: 'mouseover_node',
+                data: [node],
+                node: nodeid
+            });
         },
     };
 
@@ -2432,6 +2452,15 @@
             d.setAttribute('nodeid', node.id);
             d.style.visibility = 'hidden';
             this._reset_node_custom_style(d, node.data);
+
+            if (node.data.notes) {
+                console.log(node.data.notes);
+                var d_notes = $c('div');
+                d_notes.className = 'd_notes';
+                d_notes.val = node.data.notes;
+                $h(d_notes, node.data.notes)
+                d.appendChild(d_notes);
+            }
 
             parent_node.appendChild(d);
             view_data.element = d;
