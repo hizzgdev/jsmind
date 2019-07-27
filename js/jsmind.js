@@ -1774,8 +1774,8 @@
             }
             var e_note = this.view.e_note;
             e_note.innerHTML = node.data.notes;
-            e_note.style.left = parseInt(element.style.left) + 60 + 'px';
-            e_note.style.top = parseInt(element.style.top) + 40 + 'px';
+            e_note.style.left = parseInt(element.style.left) + parseInt(element.clientWidth) + 2 + 'px';
+            e_note.style.top = parseInt(element.style.top) + parseInt(element.clientHeight) + 2 + 'px';
             e_note.style.visibility = "visible";
             this.invoke_event_handle(jm.event_type.mouseover, {
                 evt: 'mouseover_node',
