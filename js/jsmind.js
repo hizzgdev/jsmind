@@ -1774,8 +1774,14 @@
             }
             var e_note = this.view.e_note;
             e_note.innerHTML = node.data.notes;
-            e_note.style.left = parseInt(element.style.left) + parseInt(element.clientWidth) + 2 + 'px';
-            e_note.style.top = parseInt(element.style.top) + parseInt(element.clientHeight) + 2 + 'px';
+            var left = 0;
+            var top = 0;
+            if (this.view.e_nodes.style.left) {
+                left = parseInt(this.view.e_nodes.style.left);
+                top = parseInt(this.view.e_nodes.style.top);
+            }
+            e_note.style.left = parseInt(element.style.left) + parseInt(element.clientWidth) + 2 + left + 'px';
+            e_note.style.top = parseInt(element.style.top) + parseInt(element.clientHeight) + 2 + top +'px';
             e_note.style.visibility = "visible";
             this.invoke_event_handle(jm.event_type.mouseover, {
                 evt: 'mouseover_node',
@@ -2338,7 +2344,7 @@
             this.e_panel.className = 'jsmind-inner';
             this.e_panel.appendChild(this.e_canvas);
             this.e_panel.appendChild(this.e_nodes);
-            this.e_nodes.appendChild(this.e_note);
+            this.e_panel.appendChild(this.e_note);
 
             this.e_editor.className = 'jsmind-editor';
             this.e_editor.type = 'text';
