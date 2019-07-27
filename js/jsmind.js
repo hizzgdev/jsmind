@@ -2338,7 +2338,7 @@
             this.e_panel.className = 'jsmind-inner';
             this.e_panel.appendChild(this.e_canvas);
             this.e_panel.appendChild(this.e_nodes);
-            this.e_panel.appendChild(this.e_note);
+            this.e_nodes.appendChild(this.e_note);
 
             this.e_editor.className = 'jsmind-editor';
             this.e_editor.type = 'text';
