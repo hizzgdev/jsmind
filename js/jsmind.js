@@ -1157,6 +1157,7 @@
             this.view.add_event(this, 'dblclick', this.dblclick_handle);
             this.view.add_event(this, "mousewheel", this.mousewheel_handle);
             this.view.add_event(this, 'mouseover', this.mouseover_handle);
+            this.view.add_event(this, 'mouseout', this.mouseout_handle);
         },
 
         mousedown_handle: function (e) {
@@ -1768,9 +1769,41 @@
                 return;
             }
             const node = this.get_node(nodeid);
-            console.log(node);
+            if (!node.data.notes){
+                return;
+            }
+            var e_note = this.view.e_note;
+            e_note.innerHTML = node.data.notes;
+            e_note.style.left = parseInt(element.style.left) + 60 + 'px';
+            e_note.style.top = parseInt(element.style.top) - 40 + 'px';
+            e_note.style.visibility = "visible";
             this.invoke_event_handle(jm.event_type.mouseover, {
                 evt: 'mouseover_node',
+                data: [node],
+                node: nodeid
+            });
+        },
+        mouseout_handle: function (e) {
+            if (!this.options.default_event_handle['enable_hover_handle']) {
+                return;
+            }
+            var element = e.target || event.srcElement;
+            var nodeid = this.view.get_binded_nodeid(element);
+            if (!nodeid) {
+                return;
+            }
+            const node = this.get_node(nodeid);
+            if (!node.data.notes){
+                return;
+            }
+            var e_note = this.view.e_note;
+            e_note.innerHTML = '';
+            e_note.style.cssText = element.style.cssText;
+            e_note.style.top = 0+'px';
+            e_note.style.left = 0+'px';
+            e_note.style.visibility = 'hidden';
+            this.invoke_event_handle(jm.event_type.mouseover, {
+                evt: 'mouseout_node',
                 data: [node],
                 node: nodeid
             });
@@ -2300,10 +2333,12 @@
             this.e_canvas = $c('canvas');
             this.e_nodes = $c('jmnodes');
             this.e_editor = $c('input');
+            this.e_note = $c('jmnote');
 
             this.e_panel.className = 'jsmind-inner';
             this.e_panel.appendChild(this.e_canvas);
             this.e_panel.appendChild(this.e_nodes);
+            this.e_panel.appendChild(this.e_note);
 
             this.e_editor.className = 'jsmind-editor';
             this.e_editor.type = 'text';
@@ -2454,14 +2489,9 @@
             this._reset_node_custom_style(d, node.data);
 
             if (node.data.notes) {
-                console.log(node.data.notes);
-                var d_notes = $c('div');
-                d_notes.className = 'd_notes';
-                d_notes.val = node.data.notes;
-                $h(d_notes, node.data.notes)
-                d.appendChild(d_notes);
-            }
-
+                var d_flg = $c('jmnote-flg');
+                d.appendChild(d_flg);
+            };
             parent_node.appendChild(d);
             view_data.element = d;
         },
