@@ -2979,9 +2979,9 @@
                 }
                 evt.stopPropagation();
                 evt.preventDefault();
-                return;
+            }else {
+                this.handle_move(_jm, 0, 10);
             }
-            this.handle_move(_jm, 0, 10);
         },
 
         handle_down: function (_jm, e) {
@@ -3004,10 +3004,9 @@
                 }
                 evt.stopPropagation();
                 evt.preventDefault();
-                return;
+            }else {
+                this.handle_move(_jm, 0, -10);
             }
-
-            this.handle_move(_jm, 0, -10);
         },
 
         handle_left: function (_jm, e) {
@@ -3048,10 +3047,9 @@
                 }
                 evt.stopPropagation();
                 evt.preventDefault();
-                return;
+            }else {
+                this.handle_move(_jm, d === jm.direction.right?-10:10, 0);
             }
-
-            this.handle_move(_jm, d === jm.direction.right?-10:10, 0);
         },
         handle_copychild: function(_jm, e) {
             var evt = e || event;
