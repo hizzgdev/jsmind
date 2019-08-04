@@ -1180,9 +1180,9 @@
 
             var dir = e.deltaY < 0 ? "Up" : "Down";
             if (dir == "Up") {
-              this.shortcut.handle_move(this, 0, 10);
+              this.shortcut.handle_move(this, 0, 20);
             } else {
-              this.shortcut.handle_move(this, 0, -10);
+              this.shortcut.handle_move(this, 0, -20);
             }
             return false;
         },

@@ -1,7 +1,7 @@
 /*
  * Released under BSD License
  * Copyright (c) 2014-2015 hizzgdev@163.com
- * 
+ *
  * Project Home:
  *   https://github.com/hizzgdev/jsmind/
  */
@@ -229,7 +229,7 @@
 
             var jview = this.jm.view;
             var el = e.target || event.srcElement;
-            
+
             if (el.tagName.toLowerCase() === "jmnodes") {
                 this.offset_x = (e.clientX || e.touches[0].clientX) - el.offsetLeft;
                 this.offset_y = (e.clientY || e.touches[0].clientY) - el.offsetTop;
@@ -275,14 +275,16 @@
                 // debugger;
                 var px = (e.clientX || e.touches[0].clientX) - this.offset_x;
                 var py = (e.clientY || e.touches[0].clientY) - this.offset_y;
-        
+
                 var children = this.jm.view.e_panel.children;
                 for (let index = 0; index < children.length; index++) {
                   const element = children[index];
                   element.style.left = px + "px";
                   element.style.top = py + "px";
                 }
-        
+                e.stopPropagation();
+                e.preventDefault();
+
                 return;
             }
 
