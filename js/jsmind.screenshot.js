@@ -145,6 +145,12 @@
             });
         },
 
+        shootAsDataURL_center: function (callback) {
+            this.shoot(function (jms) {
+                callback(jms.canvas_elem.toDataURL());
+            });
+        },
+
         resize: function () {
             if (this._inited) {
                 this.canvas_elem.width = this.jm.view.size.w;
@@ -172,7 +178,7 @@
             ctx.textBaseline = 'bottom';
             ctx.fillStyle = '#000';
             ctx.font = '11px Verdana,Arial,Helvetica,sans-serif';
-            ctx.fillText('hizzgdev.github.io/jsmind', c.width - 5.5, c.height - 2.5);
+            // ctx.fillText('hizzgdev.github.io/jsmind', c.width - 5.5, c.height - 2.5);
             ctx.textAlign = 'left';
             ctx.fillText($w.location, 5.5, c.height - 2.5);
         },
