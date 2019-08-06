@@ -1,7 +1,7 @@
 /*
  * Released under BSD License
  * Copyright (c) 2014-2015 hizzgdev@163.com
- * 
+ *
  * Project Home:
  *   https://github.com/hizzgdev/jsmind/
  */
@@ -147,7 +147,18 @@
 
         shootAsDataURL_center: function (callback) {
             this.shoot(function (jms) {
-                callback(jms.canvas_elem.toDataURL());
+                var w = 960;
+                var h = 800;
+                var l = (jms.canvas_elem.width - w) / 2;
+                var t = (jms.canvas_elem.height - h) / 2;
+
+                var c = document.createElement("canvas")
+                var ctx = c.getContext("2d");
+                var ImageData = jms.canvas_ctx.getImageData(l, t, w, h);
+                c.width = w
+                c.height = h
+                ctx.putImageData(ImageData, 0, 0);
+                callback(c.toDataURL(0.1));
             });
         },
 

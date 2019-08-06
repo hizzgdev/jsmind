@@ -1180,9 +1180,9 @@
 
             var dir = e.deltaY < 0 ? "Up" : "Down";
             if (dir == "Up") {
-              this.view.zoomIn();
+              this.shortcut.handle_move(this, 0, 10);
             } else {
-              this.view.zoomOut();
+              this.shortcut.handle_move(this, 0, -10);
             }
             return false;
         },
@@ -1780,8 +1780,8 @@
                 left = parseInt(this.view.e_nodes.style.left);
                 top = parseInt(this.view.e_nodes.style.top);
             }
-            e_note.style.left = parseInt(element.style.left) + parseInt(element.clientWidth) + 2 + left + 'px';
-            e_note.style.top = parseInt(element.style.top) + parseInt(element.clientHeight) + 2 + top +'px';
+            e_note.style.left = parseInt(element.style.left) + parseInt(element.clientWidth) + 5 + left + 'px';
+            e_note.style.top = parseInt(element.style.top) + parseInt(element.clientHeight) + 5 + top +'px';
             e_note.style.visibility = "visible";
             this.invoke_event_handle(jm.event_type.mouseover, {
                 evt: 'mouseover_node',
@@ -2920,7 +2920,7 @@
             var selected_node = _jm.get_selected_node();
             if (!!selected_node) {
                 var nodeid = jm.util.uuid.newid();
-                var node = _jm.add_node(selected_node, nodeid, 'New Node');
+                var node = _jm.add_node(selected_node, nodeid, nodeid);
                 if (!!node) {
                     _jm.select_node(nodeid);
                     _jm.begin_edit(nodeid);
@@ -2931,7 +2931,7 @@
             var selected_node = _jm.get_selected_node();
             if (!!selected_node && !selected_node.isroot) {
                 var nodeid = jm.util.uuid.newid();
-                var node = _jm.insert_node_after(selected_node, nodeid, 'New Node');
+                var node = _jm.insert_node_after(selected_node, nodeid, nodeid);
                 if (!!node) {
                     _jm.select_node(nodeid);
                     _jm.begin_edit(nodeid);
@@ -2962,6 +2962,9 @@
         },
         handle_up: function (_jm, e) {
             var evt = e || event;
+            if (evt.target.nodeName !== 'BODY') {
+                return;
+            };
             var selected_node = _jm.get_selected_node();
             if (!!selected_node) {
                 var up_node = _jm.find_node_before(selected_node);
@@ -2976,11 +2979,16 @@
                 }
                 evt.stopPropagation();
                 evt.preventDefault();
+            }else {
+                this.handle_move(_jm, 0, 10);
             }
         },
 
         handle_down: function (_jm, e) {
             var evt = e || event;
+            if (evt.target.nodeName !== 'BODY') {
+                return;
+            };
             var selected_node = _jm.get_selected_node();
             if (!!selected_node) {
                 var down_node = _jm.find_node_after(selected_node);
@@ -2990,11 +2998,14 @@
                         down_node = np.children[0];
                     }
                 }
+
                 if (!!down_node) {
                     _jm.select_node(down_node);
                 }
                 evt.stopPropagation();
                 evt.preventDefault();
+            }else {
+                this.handle_move(_jm, 0, -10);
             }
         },
 
@@ -3006,6 +3017,9 @@
         },
         _handle_direction: function (_jm, e, d) {
             var evt = e || event;
+            if (evt.target.nodeName !== 'BODY') {
+                return;
+            };
             var selected_node = _jm.get_selected_node();
             var node = null;
             if (!!selected_node) {
@@ -3033,6 +3047,8 @@
                 }
                 evt.stopPropagation();
                 evt.preventDefault();
+            }else {
+                this.handle_move(_jm, d === jm.direction.right?-10:10, 0);
             }
         },
         handle_copychild: function(_jm, e) {
@@ -3056,12 +3072,37 @@
             if (!data) {
                 return
             }
-            debugger;
             let node = JSON.parse(data)
             var selected_node = _jm.get_selected_node();
             if (!!selected_node) {
                 _jm.add_node_circle(selected_node, node)
             }
+        },
+        _handle_move: function(_jm, x, y) {
+            var children = _jm.view.e_panel.children;
+            for (let index = 0; index < children.length; index++) {
+                const element = children[index];
+                if (x!==0) {
+                    let px = parseInt(element.style.left);
+                    if(!px) {
+                        px = 0;
+                    }
+                    element.style.left = px + x + "px";
+                };
+
+                if (y!==0) {
+                    let py = parseInt(element.style.top);
+                    if (!py) {
+                        py = 0;
+                    }
+                    element.style.top = py + y + "px";
+                }
+            }
+        },
+        handle_move: function(_jm, x, y) {
+            setTimeout(() => {
+                this._handle_move(_jm, x, y);
+            }, 10)
         },
     };
 
