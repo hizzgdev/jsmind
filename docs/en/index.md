@@ -11,6 +11,7 @@ Contents
   * 1.3. Themes
 * [2. Options](2.options.md)
 * [3. Operation](3.operation.md)
+* [4. Contribution](4.contribution.md)
 
 COPYRIGHT
 ===
