@@ -1157,11 +1157,13 @@
                 return;
             }
             var element = e.target || event.srcElement;
-            var nodeid = this.view.get_binded_nodeid(element);
-            if (!!nodeid) {
-                this.select_node(nodeid);
-            } else {
-                this.select_clear();
+            if(element.tagName.toLowerCase()=='jmnode'){
+                var nodeid = this.view.get_binded_nodeid(element);
+                if (!!nodeid) {
+                    this.select_node(nodeid);
+                } else {
+                    this.select_clear();
+                }
             }
         },
 
