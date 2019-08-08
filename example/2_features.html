@@ -147,7 +147,10 @@
         var options = {
             container:'jsmind_container',
             theme:'greensea',
-            editable:true
+            editable:true,
+            view:{
+                engine:'svg'
+            }
         }
         _jm = jsMind.show(options);
         // _jm = jsMind.show(options,mind);
@@ -257,7 +260,7 @@
         if(!selected_node){prompt_info('please select a node first.');return;}
 
         var nodeid = jsMind.util.uuid.newid();
-        var topic = '* Node_'+nodeid.substr(0,5)+' *';
+        var topic = '* Node_'+nodeid.substr(nodeid.length-6)+' *';
         var node = _jm.add_node(selected_node, nodeid, topic);
     }
 

@@ -15,8 +15,6 @@
     if (typeof jsMind.draggable != 'undefined') { return; }
 
     var jdom = jsMind.util.dom;
-    var jcanvas = jsMind.util.canvas;
-
     var clear_selection = 'getSelection' in $w ? function () {
         $w.getSelection().removeAllRanges();
     } : function () {
@@ -104,22 +102,25 @@
             this.shadow.style.visibility = 'hidden';
         },
 
-        clear_lines: function () {
-            jcanvas.clear(this.canvas_ctx, 0, 0, this.jm.view.size.w, this.jm.view.size.h);
-        },
-
         _magnet_shadow: function (node) {
             if (!!node) {
                 this.canvas_ctx.lineWidth = options.line_width;
                 this.canvas_ctx.strokeStyle = 'rgba(0,0,0,0.3)';
                 this.canvas_ctx.lineCap = 'round';
-                this.clear_lines();
-                jcanvas.lineto(this.canvas_ctx,
-                    node.sp.x,
-                    node.sp.y,
-                    node.np.x,
-                    node.np.y);
+                this._clear_lines();
+                this._canvas_lineto(node.sp.x, node.sp.y, node.np.x, node.np.y);
             }
+        },
+
+        _clear_lines: function () {
+            this.canvas_ctx.clearRect(0, 0, this.jm.view.size.w, this.jm.view.size.h);
+        },
+
+        _canvas_lineto: function (x1, y1, x2, y2) {
+            this.canvas_ctx.beginPath();
+            this.canvas_ctx.moveTo(x1, y1);
+            this.canvas_ctx.lineTo(x2, y2);
+            this.canvas_ctx.stroke();
         },
 
         _lookup_close_node: function () {
@@ -281,12 +282,12 @@
                 if (this.hlookup_delay != 0) {
                     $w.clearTimeout(this.hlookup_delay);
                     this.hlookup_delay = 0;
-                    this.clear_lines();
+                    this._clear_lines();
                 }
                 if (this.hlookup_timer != 0) {
                     $w.clearInterval(this.hlookup_timer);
                     this.hlookup_timer = 0;
-                    this.clear_lines();
+                    this._clear_lines();
                 }
                 if (this.moved) {
                     var src_node = this.active_node;
