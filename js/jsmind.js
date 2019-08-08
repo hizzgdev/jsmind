@@ -52,10 +52,11 @@
         container: '',   // id of the container
         editable: false, // you can change it in your options
         theme: null,
-        mode: 'full',     // full or side
+        mode: 'full',    // full or side
         support_html: true,
 
         view: {
+            engine: 'canvas',
             hmargin: 100,
             vmargin: 50,
             line_width: 2,
@@ -959,24 +960,6 @@
             }
         },
 
-        canvas: {
-            bezierto: function (ctx, x1, y1, x2, y2) {
-                ctx.beginPath();
-                ctx.moveTo(x1, y1);
-                ctx.bezierCurveTo(x1 + (x2 - x1) * 2 / 3, y1, x1, y2, x2, y2);
-                ctx.stroke();
-            },
-            lineto: function (ctx, x1, y1, x2, y2) {
-                ctx.beginPath();
-                ctx.moveTo(x1, y1);
-                ctx.lineTo(x2, y2);
-                ctx.stroke();
-            },
-            clear: function (ctx, x, y, w, h) {
-                ctx.clearRect(x, y, w, h);
-            }
-        },
-
         file: {
             read: function (file_data, fn_callback) {
                 var reader = new FileReader();
@@ -1093,6 +1076,7 @@
             var opts_view = {
                 container: opts.container,
                 support_html: opts.support_html,
+                engine: opts.view.engine,
                 hmargin: opts.view.hmargin,
                 vmargin: opts.view.vmargin,
                 line_width: opts.view.line_width,
@@ -2026,7 +2010,6 @@
             for (var nodeid in nodes) {
                 node = nodes[nodeid];
                 pout = this.get_node_point_out(node);
-                //logger.debug(pout.x);
                 if (pout.x > this.bounds.e) { this.bounds.e = pout.x; }
                 if (pout.x < this.bounds.w) { this.bounds.w = pout.x; }
             }
@@ -2167,7 +2150,126 @@
             } else {
                 return true;
             }
+        }
+    };
+
+    jm.graph_canvas = function (view) {
+        this.opts = view.opts;
+        this.e_canvas = $c('canvas');
+        this.canvas_ctx = this.e_canvas.getContext('2d');
+        this.size = { w: 0, h: 0 };
+    };
+
+    jm.graph_canvas.prototype = {
+        element: function () {
+            return this.e_canvas;
         },
+
+        set_size: function (w, h) {
+            this.size.w = w;
+            this.size.h = h;
+            this.e_canvas.width = w;
+            this.e_canvas.height = h;
+        },
+
+        clear: function () {
+            this.canvas_ctx.clearRect(0, 0, this.size.w, this.size.h);
+        },
+
+        draw_line: function (line_name, pout, pin, offset) {
+            var ctx = this.canvas_ctx;
+            ctx.strokeStyle = this.opts.line_color;
+            ctx.lineWidth = this.opts.line_width;
+            ctx.lineCap = 'round';
+
+            this._bezier_to(ctx,
+                pin.x + offset.x,
+                pin.y + offset.y,
+                pout.x + offset.x,
+                pout.y + offset.y);
+        },
+
+        copy_to: function (dest_canvas_ctx, callback) {
+            dest_canvas_ctx.drawImage(this.e_canvas, 0, 0);
+            !!callback && callback();
+        },
+
+        _bezier_to: function (ctx, x1, y1, x2, y2) {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.bezierCurveTo(x1 + (x2 - x1) * 2 / 3, y1, x1, y2, x2, y2);
+            ctx.stroke();
+        },
+
+        _line_to: function (ctx, x1, y1, x2, y2) {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+        }
+    };
+
+    jm.graph_svg = function (view) {
+        this.view = view;
+        this.opts = view.opts;
+        this.e_svg = jm.graph_svg.c('svg');
+        this.size = { w: 0, h: 0 };
+        this.lines = {};
+    };
+
+    jm.graph_svg.c = function (tag) {
+        return $d.createElementNS('http://www.w3.org/2000/svg', tag);
+    };
+
+    jm.graph_svg.prototype = {
+        element: function () {
+            return this.e_svg;
+        },
+
+        set_size: function (w, h) {
+            this.size.w = w;
+            this.size.h = h;
+            this.e_svg.setAttribute('width', w);
+            this.e_svg.setAttribute('height', h);
+        },
+
+        clear: function () {
+            for (var ln in this.lines) {
+                this.e_svg.removeChild(this.lines[ln]);
+            }
+            this.lines = {};
+        },
+
+        draw_line: function (line_name, pout, pin, offset) {
+            var line = this.lines[line_name];
+            if (!line) {
+                line = jm.graph_svg.c('path');
+                line.setAttribute('stroke', this.opts.line_color);
+                line.setAttribute('stroke-width', this.opts.line_width);
+                line.setAttribute('fill', 'transparent');
+                this.lines[line_name] = line;
+                this.e_svg.appendChild(line);
+            }
+            line.style.display = '';
+            this._bezier_to(line, pin.x + offset.x, pin.y + offset.y, pout.x + offset.x, pout.y + offset.y);
+        },
+
+        copy_to: function (dest_canvas_ctx, callback) {
+            var img = new Image();
+            img.onload = function () {
+                dest_canvas_ctx.drawImage(img, 0, 0);
+                !!callback && callback();
+            }
+            img.src = 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString(this.e_svg));
+        },
+
+        _bezier_to: function (path, x1, y1, x2, y2) {
+            path.setAttribute('d', 'M' + x1 + ' ' + y1 + ' C ' + (x1 + (x2 - x1) * 2 / 3) + ' ' + y1 + ', ' + x1 + ' ' + y2 + ', ' + x2 + ' ' + y2);
+        },
+
+        _line_to: function (path, x1, y1, x2, y2) {
+            path.setAttribute('d', 'M ' + x1 + ' ' + y1 + ' L ' + x2 + ' ' + y2);
+        }
     };
 
     // view provider
@@ -2179,13 +2281,13 @@
         this.container = null;
         this.e_panel = null;
         this.e_nodes = null;
-        this.e_canvas = null;
 
-        this.canvas_ctx = null;
         this.size = { w: 0, h: 0 };
 
         this.selected_node = null;
         this.editing_node = null;
+
+        this.graph = null;
     };
 
     jm.view_provider.prototype = {
@@ -2198,12 +2300,13 @@
                 return;
             }
             this.e_panel = $c('div');
-            this.e_canvas = $c('canvas');
             this.e_nodes = $c('jmnodes');
             this.e_editor = $c('input');
 
+            this.graph = this.opts.engine.toLowerCase() === 'svg' ? new jm.graph_svg(this) : new jm.graph_canvas(this);
+
             this.e_panel.className = 'jsmind-inner';
-            this.e_panel.appendChild(this.e_canvas);
+            this.e_panel.appendChild(this.graph.element());
             this.e_panel.appendChild(this.e_nodes);
 
             this.e_editor.className = 'jsmind-editor';
@@ -2224,8 +2327,6 @@
             });
 
             this.container.appendChild(this.e_panel);
-
-            this.init_canvas();
         },
 
         add_event: function (obj, event_name, event_handle) {
@@ -2293,11 +2394,6 @@
             if (client_h < min_height) { client_h = min_height; }
             this.size.w = client_w;
             this.size.h = client_h;
-        },
-
-        init_canvas: function () {
-            var ctx = this.e_canvas.getContext('2d');
-            this.canvas_ctx = ctx;
         },
 
         init_nodes_size: function (node) {
@@ -2471,8 +2567,7 @@
         },
 
         resize: function () {
-            this.e_canvas.width = 1;
-            this.e_canvas.height = 1;
+            this.graph.set_size(1, 1);
             this.e_nodes.style.width = '1px';
             this.e_nodes.style.height = '1px';
 
@@ -2481,8 +2576,7 @@
         },
 
         _show: function () {
-            this.e_canvas.width = this.size.w;
-            this.e_canvas.height = this.size.h;
+            this.graph.set_size(this.size.w, this.size.h);
             this.e_nodes.style.width = this.size.w + 'px';
             this.e_nodes.style.height = this.size.h + 'px';
             this.show_nodes();
@@ -2666,7 +2760,6 @@
                 if ('background-rotation' in node_data) {
                     node_element.style.transform = 'rotate(' + node_data['background-rotation'] + 'deg)';
                 }
-
             }
         },
 
@@ -2676,40 +2769,30 @@
             node_element.style.color = "";
         },
 
-        clear_lines: function (canvas_ctx) {
-            var ctx = canvas_ctx || this.canvas_ctx;
-            jm.util.canvas.clear(ctx, 0, 0, this.size.w, this.size.h);
+        clear_lines: function () {
+            this.graph.clear();
         },
 
-        show_lines: function (canvas_ctx) {
-            this.clear_lines(canvas_ctx);
+        show_lines: function () {
+            this.clear_lines();
             var nodes = this.jm.mind.nodes;
             var node = null;
             var pin = null;
             var pout = null;
             var _offset = this.get_view_offset();
+            var line_name = null;
             for (var nodeid in nodes) {
                 node = nodes[nodeid];
                 if (!!node.isroot) { continue; }
-                if (('visible' in node._data.layout) && !node._data.layout.visible) { continue; }
-                pin = this.layout.get_node_point_in(node);
-                pout = this.layout.get_node_point_out(node.parent);
-                this.draw_line(pout, pin, _offset, canvas_ctx);
+                line_name = 'line(' + node.id + ',' + node.parent.id + ')';
+                if (('visible' in node._data.layout) && !node._data.layout.visible) {
+                    continue;
+                } else {
+                    pin = this.layout.get_node_point_in(node);
+                    pout = this.layout.get_node_point_out(node.parent);
+                    this.graph.draw_line(line_name, pout, pin, _offset);
+                }
             }
-        },
-
-        draw_line: function (pin, pout, offset, canvas_ctx) {
-            var ctx = canvas_ctx || this.canvas_ctx;
-            ctx.strokeStyle = this.opts.line_color;
-            ctx.lineWidth = this.opts.line_width;
-            ctx.lineCap = 'round';
-
-            jm.util.canvas.bezierto(
-                ctx,
-                pin.x + offset.x,
-                pin.y + offset.y,
-                pout.x + offset.x,
-                pout.y + offset.y);
         },
     };
 
