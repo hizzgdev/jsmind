@@ -1177,12 +1177,11 @@
             if (!this.options.default_event_handle["enable_mousewheel_handle"]) {
               return;
             }
-
             var dir = e.deltaY < 0 ? "Up" : "Down";
             if (dir == "Up") {
-              this.shortcut.handle_move(this, 0, 20);
+              this.shortcut.handle_move(this, 0, 100);
             } else {
-              this.shortcut.handle_move(this, 0, -20);
+              this.shortcut.handle_move(this, 0, -100);
             }
             return false;
         },
@@ -2980,7 +2979,7 @@
                 evt.stopPropagation();
                 evt.preventDefault();
             }else {
-                this.handle_move(_jm, 0, 10);
+                this.handle_move(_jm, 0, 20);
             }
         },
 
@@ -3005,7 +3004,7 @@
                 evt.stopPropagation();
                 evt.preventDefault();
             }else {
-                this.handle_move(_jm, 0, -10);
+                this.handle_move(_jm, 0, -20);
             }
         },
 
@@ -3048,7 +3047,7 @@
                 evt.stopPropagation();
                 evt.preventDefault();
             }else {
-                this.handle_move(_jm, d === jm.direction.right?-10:10, 0);
+                this.handle_move(_jm, d === jm.direction.right?-20:20, 0);
             }
         },
         handle_copychild: function(_jm, e) {
