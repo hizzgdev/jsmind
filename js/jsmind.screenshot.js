@@ -25,7 +25,7 @@
         var display = css(cstyle, 'display');
         return (visibility !== 'hidden' && display !== 'none');
     };
-    var jcanvas = jsMind.util.canvas;
+    var jcanvas = {};
     jcanvas.rect = function (ctx, x, y, w, h, r) {
         if (w < 2 * r) r = w / 2;
         if (h < 2 * r) r = h / 2;
@@ -80,7 +80,7 @@
         }
     };
 
-    jcanvas.image = function (ctx, backgroundUrl, x, y, w, h, r, rotation, callback) {
+    jcanvas.image = function (ctx, url, x, y, w, h, r, rotation, callback) {
         var img = new Image();
         img.onload = function () {
             ctx.save();
@@ -95,9 +95,9 @@
             ctx.drawImage(img, -w / 2, -h / 2);
             ctx.restore();
             ctx.restore();
-            callback();
+            !!callback && callback();
         }
-        img.src = backgroundUrl;
+        img.src = url;
     };
 
     jsMind.screenshot = function (jm) {
@@ -123,26 +123,23 @@
 
         shoot: function (callback) {
             this.init();
-            var jms = this;
             this._draw(function () {
-                if (!!callback) {
-                    callback(jms);
-                }
-                jms.clean();
-            });
+                !!callback && callback();
+                this.clean();
+            }.bind(this));
             this._watermark();
         },
 
         shootDownload: function () {
-            this.shoot(function (jms) {
-                jms._download();
-            });
+            this.shoot(function () {
+                this._download();
+            }.bind(this));
         },
 
         shootAsDataURL: function (callback) {
-            this.shoot(function (jms) {
-                callback(jms.canvas_elem.toDataURL());
-            });
+            this.shoot(function () {
+                !!callback && callback(this.canvas_elem.toDataURL());
+            }.bind(this));
         },
 
         resize: function () {
@@ -161,8 +158,9 @@
             var ctx = this.canvas_ctx;
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
-            this._draw_lines();
-            this._draw_nodes(callback);
+            this._draw_lines(function () {
+                this._draw_nodes(callback);
+            }.bind(this));
         },
 
         _watermark: function () {
@@ -177,8 +175,8 @@
             ctx.fillText($w.location, 5.5, c.height - 2.5);
         },
 
-        _draw_lines: function () {
-            this.jm.view.show_lines(this.canvas_ctx);
+        _draw_lines: function (callback) {
+            this.jm.view.graph.copy_to(this.canvas_ctx, callback);
         },
 
         _draw_nodes: function (callback) {

@@ -15,5 +15,5 @@ Contents
 
 COPYRIGHT
 ===
-No reproduction, No derivatives.
 
+No reproduction, No derivatives.
