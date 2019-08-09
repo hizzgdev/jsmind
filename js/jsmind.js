@@ -113,6 +113,7 @@
     // ============= static object =============================================
     jm.direction = { left: -1, center: 0, right: 1 };
     jm.event_type = { show: 1, resize: 2, edit: 3, select: 4 };
+    jm.key = { meta: 1 << 13, ctrl: 1 << 12, alt: 1 << 11, shift: 1 << 10 };
 
     jm.node = function (sId, iIndex, sTopic, oData, bIsRoot, oParent, eDirection, bExpanded) {
         if (!sId) { logger.error('invalid nodeid'); return; }
@@ -2830,14 +2831,7 @@
             if (this.jm.view.is_editing()) { return; }
             var evt = e || event;
             if (!this.opts.enable) { return true; }
-            var kc = evt.keyCode;
-
-            //combine keyCode
-            var combine = ((e.ctrlKey || e.metaKey) || 0) * 1000;
-            if (combine === 0) combine = (e.altKey || 0) * 2000;
-            if (combine === 0) combine = (e.shiftKey || 0) * 3000;
-            kc += combine;
-
+            var kc = evt.keyCode + (evt.metaKey << 13) + (evt.ctrlKey << 12) + (evt.altKey << 11) + (evt.shiftKey << 10);
             if (kc in this._mapping) {
                 this._mapping[kc].call(this, this.jm, e);
             }
