@@ -1,7 +1,7 @@
 /*
  * Released under BSD License
  * Copyright (c) 2014-2015 hizzgdev@163.com
- * 
+ *
  * Project Home:
  *   https://github.com/hizzgdev/jsmind/
  */
@@ -47,6 +47,7 @@
         this.hlookup_timer = 0;
         this.capture = false;
         this.moved = false;
+        this.capture_bg = false;
     };
 
     jsMind.draggable.prototype = {
@@ -223,12 +224,23 @@
         },
 
         dragstart: function (e) {
-            if (!this.jm.get_editable()) { return; }
             if (this.capture) { return; }
             this.active_node = null;
 
             var jview = this.jm.view;
             var el = e.target || event.srcElement;
+
+            if (el.tagName.toLowerCase() === "jmnodes") {
+                this.offset_x = (e.clientX || e.touches[0].clientX) - el.offsetLeft;
+                this.offset_y = (e.clientY || e.touches[0].clientY) - el.offsetTop;
+                this.client_hw = Math.floor(el.clientWidth / 2);
+                this.client_hh = Math.floor(el.clientHeight / 2);
+                this.capture_bg = true;
+                return;
+            }
+
+            if (!this.jm.get_editable()) { return; }
+
             if (el.tagName.toLowerCase() != 'jmnode') { return; }
             var nodeid = jview.get_binded_nodeid(el);
             if (!!nodeid) {
@@ -259,6 +271,23 @@
         },
 
         drag: function (e) {
+            if (this.capture_bg) {
+                // debugger;
+                var px = (e.clientX || e.touches[0].clientX) - this.offset_x;
+                var py = (e.clientY || e.touches[0].clientY) - this.offset_y;
+
+                var children = this.jm.view.e_panel.children;
+                for (let index = 0; index < children.length; index++) {
+                  const element = children[index];
+                  element.style.left = px + "px";
+                  element.style.top = py + "px";
+                }
+                e.stopPropagation();
+                e.preventDefault();
+
+                return;
+            }
+
             if (!this.jm.get_editable()) { return; }
             if (this.capture) {
                 e.preventDefault();
@@ -276,7 +305,7 @@
         },
 
         dragend: function (e) {
-            if (!this.jm.get_editable()) { return; }
+            // if (!this.jm.get_editable()) { return; }
             if (this.capture) {
                 if (this.hlookup_delay != 0) {
                     $w.clearTimeout(this.hlookup_delay);
@@ -298,6 +327,7 @@
             }
             this.moved = false;
             this.capture = false;
+            this.capture_bg = false;
         },
 
         move_node: function (src_node, target_node, target_direct) {

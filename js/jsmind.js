@@ -69,14 +69,17 @@
         default_event_handle: {
             enable_mousedown_handle: true,
             enable_click_handle: true,
-            enable_dblclick_handle: true
+            enable_dblclick_handle: true,
+            enable_mousewheel_handle: true,
+            enable_hover_handle: true,
         },
         shortcut: {
             enable: true,
             handles: {
             },
             mapping: {
-                addchild: 45, // Insert
+                // addchild: 45, // Insert
+                addchild: 9, // Tab
                 addbrother: 13, // Enter
                 editnode: 113,// F2
                 delnode: 46, // Delete
@@ -85,6 +88,8 @@
                 up: 38, // Up
                 right: 39, // Right
                 down: 40, // Down
+                copychild: 67, // Down
+                pastechild: 86, // Down
             }
         },
     };
@@ -111,7 +116,7 @@
 
     // ============= static object =============================================
     jm.direction = { left: -1, center: 0, right: 1 };
-    jm.event_type = { show: 1, resize: 2, edit: 3, select: 4 };
+    jm.event_type = { show: 1, resize: 2, edit: 3, select: 4, mouseover: 5 };
 
     jm.node = function (sId, iIndex, sTopic, oData, bIsRoot, oParent, eDirection, bExpanded) {
         if (!sId) { logger.error('invalid nodeid'); return; }
@@ -1150,6 +1155,9 @@
             this.view.add_event(this, 'mousedown', this.mousedown_handle);
             this.view.add_event(this, 'click', this.click_handle);
             this.view.add_event(this, 'dblclick', this.dblclick_handle);
+            this.view.add_event(this, "mousewheel", this.mousewheel_handle);
+            this.view.add_event(this, 'mouseover', this.mouseover_handle);
+            this.view.add_event(this, 'mouseout', this.mouseout_handle);
         },
 
         mousedown_handle: function (e) {
@@ -1167,17 +1175,40 @@
             }
         },
 
+        mousewheel_handle: function(e) {
+            if (!this.options.default_event_handle["enable_mousewheel_handle"]) {
+              return;
+            }
+            var dir = e.deltaY < 0 ? "Up" : "Down";
+            if (dir == "Up") {
+              this.shortcut.handle_move(this, 0, 100);
+            } else {
+              this.shortcut.handle_move(this, 0, -100);
+            }
+            return false;
+        },
+
         click_handle: function (e) {
             if (!this.options.default_event_handle['enable_click_handle']) {
                 return;
             }
             var element = e.target || event.srcElement;
+            var nodeid = this.view.get_binded_nodeid(element);
+            if (!nodeid) {
+                return;
+            }
             var isexpander = this.view.is_expander(element);
             if (isexpander) {
-                var nodeid = this.view.get_binded_nodeid(element);
                 if (!!nodeid) {
                     this.toggle_node(nodeid);
                 }
+            }else {
+                const node = this.get_node(nodeid)
+                this.invoke_event_handle(jm.event_type.select, {
+                    evt: 'select_node',
+                    data: [nodeid, node.topic],
+                    node: nodeid
+                });
             }
         },
 
@@ -1348,6 +1379,37 @@
                     this.expand_node(parent_node);
                     this.invoke_event_handle(jm.event_type.edit, { evt: 'add_node', data: [parent_node.id, nodeid, topic, data], node: nodeid });
                 }
+                return node;
+            } else {
+                logger.error('fail, this mind map is not editable');
+                return null;
+            }
+        },
+
+        add_node_circle: function(parent_node, nodes) {
+            if (this.get_editable()) {
+                let nodeid = jm.util.uuid.newid()
+                var node = this.mind.add_node(parent_node, nodeid, nodes.topic, {});
+                if (!!node) {
+                    this.view.add_node(node);
+                    this.layout.layout();
+                    this.view.show(false);
+                    this.view.reset_node_custom_style(node);
+                    this.expand_node(parent_node);
+                    this.invoke_event_handle(jm.event_type.edit, {
+                        evt: 'add_node',
+                        data: [parent_node.id, nodeid, node.topic, {}],
+                        node: nodeid
+                    });
+                    if (!nodes.children) {
+                        return;
+                    }
+                    for (var i = 0; i < nodes.children.length; i++) {
+                        var sub_node = nodes.children[i];
+                        this.add_node_circle(node, sub_node)
+                    }
+                }
+
                 return node;
             } else {
                 logger.error('fail, this mind map is not editable');
@@ -1674,8 +1736,85 @@
             for (var i = 0; i < l; i++) {
                 this.event_handles[i](type, data);
             }
-        }
+        },
 
+        search_node: function(topic) {
+            var nodes = new Array();
+
+            for (var nodeid in this.mind.nodes) {
+                var node = this.mind.nodes[nodeid];
+                if (topic !== node.topic) {continue}
+                nodes.push(node);
+            }
+
+            return nodes[0];
+        },
+
+        locate_node: function (topic) {
+            var node = this.search_node(topic);
+            if (!node) {
+                return;
+            }
+            this.view.relayout();
+            var offset = node._data.layout._offset_;
+            this.view.move(-1*offset.x, -1*offset.y);
+        },
+
+        mouseover_handle: function (e) {
+            if (!this.options.default_event_handle['enable_hover_handle']) {
+                return;
+            }
+            var element = e.target || event.srcElement;
+            var nodeid = this.view.get_binded_nodeid(element);
+            if (!nodeid) {
+                return;
+            }
+            const node = this.get_node(nodeid);
+            if (!node.data.notes){
+                return;
+            }
+            var e_note = this.view.e_note;
+            e_note.innerHTML = node.data.notes;
+            var left = 0;
+            var top = 0;
+            if (this.view.e_nodes.style.left) {
+                left = parseInt(this.view.e_nodes.style.left);
+                top = parseInt(this.view.e_nodes.style.top);
+            }
+            e_note.style.left = parseInt(element.style.left) + parseInt(element.clientWidth) + 5 + left + 'px';
+            e_note.style.top = parseInt(element.style.top) + parseInt(element.clientHeight) + 5 + top +'px';
+            e_note.style.visibility = "visible";
+            this.invoke_event_handle(jm.event_type.mouseover, {
+                evt: 'mouseover_node',
+                data: [node],
+                node: nodeid
+            });
+        },
+        mouseout_handle: function (e) {
+            if (!this.options.default_event_handle['enable_hover_handle']) {
+                return;
+            }
+            var element = e.target || event.srcElement;
+            var nodeid = this.view.get_binded_nodeid(element);
+            if (!nodeid) {
+                return;
+            }
+            const node = this.get_node(nodeid);
+            if (!node.data.notes){
+                return;
+            }
+            var e_note = this.view.e_note;
+            e_note.innerHTML = '';
+            e_note.style.cssText = element.style.cssText;
+            e_note.style.top = 0+'px';
+            e_note.style.left = 0+'px';
+            e_note.style.visibility = 'hidden';
+            this.invoke_event_handle(jm.event_type.mouseover, {
+                evt: 'mouseout_node',
+                data: [node],
+                node: nodeid
+            });
+        },
     };
 
     // ============= data provider =============================================
@@ -2201,10 +2340,12 @@
             this.e_canvas = $c('canvas');
             this.e_nodes = $c('jmnodes');
             this.e_editor = $c('input');
+            this.e_note = $c('jmnote');
 
             this.e_panel.className = 'jsmind-inner';
             this.e_panel.appendChild(this.e_canvas);
             this.e_panel.appendChild(this.e_nodes);
+            this.e_panel.appendChild(this.e_note);
 
             this.e_editor.className = 'jsmind-editor';
             this.e_editor.type = 'text';
@@ -2354,6 +2495,10 @@
             d.style.visibility = 'hidden';
             this._reset_node_custom_style(d, node.data);
 
+            if (node.data.notes) {
+                var d_flg = $c('jmnote-flg');
+                d.appendChild(d_flg);
+            };
             parent_node.appendChild(d);
             view_data.element = d;
         },
@@ -2711,6 +2856,15 @@
                 pout.x + offset.x,
                 pout.y + offset.y);
         },
+
+        move: function (x, y) {
+            var children = this.jm.view.e_panel.children;
+            for (let index = 0; index < children.length; index++) {
+                const element = children[index];
+                element.style.left = x + "px";
+                element.style.top = y + "px";
+            }
+        }
     };
 
     // shortcut provider
@@ -2735,6 +2889,8 @@
             this.handles['down'] = this.handle_down;
             this.handles['left'] = this.handle_left;
             this.handles['right'] = this.handle_right;
+            this.handles['copychild'] = this.handle_copychild;
+            this.handles['pastechild'] = this.handle_pastechild;
 
             for (var handle in this.mapping) {
                 if (!!this.mapping[handle] && (handle in this.handles)) {
@@ -2765,7 +2921,7 @@
             var selected_node = _jm.get_selected_node();
             if (!!selected_node) {
                 var nodeid = jm.util.uuid.newid();
-                var node = _jm.add_node(selected_node, nodeid, 'New Node');
+                var node = _jm.add_node(selected_node, nodeid, nodeid);
                 if (!!node) {
                     _jm.select_node(nodeid);
                     _jm.begin_edit(nodeid);
@@ -2776,7 +2932,7 @@
             var selected_node = _jm.get_selected_node();
             if (!!selected_node && !selected_node.isroot) {
                 var nodeid = jm.util.uuid.newid();
-                var node = _jm.insert_node_after(selected_node, nodeid, 'New Node');
+                var node = _jm.insert_node_after(selected_node, nodeid, nodeid);
                 if (!!node) {
                     _jm.select_node(nodeid);
                     _jm.begin_edit(nodeid);
@@ -2807,6 +2963,9 @@
         },
         handle_up: function (_jm, e) {
             var evt = e || event;
+            if (evt.target.nodeName !== 'BODY') {
+                return;
+            };
             var selected_node = _jm.get_selected_node();
             if (!!selected_node) {
                 var up_node = _jm.find_node_before(selected_node);
@@ -2821,11 +2980,16 @@
                 }
                 evt.stopPropagation();
                 evt.preventDefault();
+            }else {
+                this.handle_move(_jm, 0, 20);
             }
         },
 
         handle_down: function (_jm, e) {
             var evt = e || event;
+            if (evt.target.nodeName !== 'BODY') {
+                return;
+            };
             var selected_node = _jm.get_selected_node();
             if (!!selected_node) {
                 var down_node = _jm.find_node_after(selected_node);
@@ -2835,11 +2999,14 @@
                         down_node = np.children[0];
                     }
                 }
+
                 if (!!down_node) {
                     _jm.select_node(down_node);
                 }
                 evt.stopPropagation();
                 evt.preventDefault();
+            }else {
+                this.handle_move(_jm, 0, -20);
             }
         },
 
@@ -2851,6 +3018,9 @@
         },
         _handle_direction: function (_jm, e, d) {
             var evt = e || event;
+            if (evt.target.nodeName !== 'BODY') {
+                return;
+            };
             var selected_node = _jm.get_selected_node();
             var node = null;
             if (!!selected_node) {
@@ -2878,7 +3048,62 @@
                 }
                 evt.stopPropagation();
                 evt.preventDefault();
+            }else {
+                this.handle_move(_jm, d === jm.direction.right?-20:20, 0);
             }
+        },
+        handle_copychild: function(_jm, e) {
+            var evt = e || event;
+            if (!evt.ctrlKey) {
+                return
+            }
+            var selected_node = _jm.get_selected_node();
+            if (!!selected_node) {
+                var data = JSON.stringify(selected_node, ['topic', 'direction', 'expanded', 'children'])
+                localStorage.setItem('jsmind_clipboard', data)
+            }
+        },
+        handle_pastechild: function(_jm, e) {
+            var evt = e || event;
+            if (!evt.ctrlKey) {
+                return
+            }
+
+            var data = localStorage.getItem('jsmind_clipboard');
+            if (!data) {
+                return
+            }
+            let node = JSON.parse(data)
+            var selected_node = _jm.get_selected_node();
+            if (!!selected_node) {
+                _jm.add_node_circle(selected_node, node)
+            }
+        },
+        _handle_move: function(_jm, x, y) {
+            var children = _jm.view.e_panel.children;
+            for (let index = 0; index < children.length; index++) {
+                const element = children[index];
+                if (x!==0) {
+                    let px = parseInt(element.style.left);
+                    if(!px) {
+                        px = 0;
+                    }
+                    element.style.left = px + x + "px";
+                };
+
+                if (y!==0) {
+                    let py = parseInt(element.style.top);
+                    if (!py) {
+                        py = 0;
+                    }
+                    element.style.top = py + y + "px";
+                }
+            }
+        },
+        handle_move: function(_jm, x, y) {
+            setTimeout(() => {
+                this._handle_move(_jm, x, y);
+            }, 10)
         },
     };
 
