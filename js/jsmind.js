@@ -2176,7 +2176,7 @@
             this.canvas_ctx.clearRect(0, 0, this.size.w, this.size.h);
         },
 
-        draw_line: function (line_name, pout, pin, offset) {
+        draw_line: function (pout, pin, offset) {
             var ctx = this.canvas_ctx;
             ctx.strokeStyle = this.opts.line_color;
             ctx.lineWidth = this.opts.line_width;
