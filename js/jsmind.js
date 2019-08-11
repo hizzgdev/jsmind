@@ -2362,6 +2362,16 @@
                 v.edit_node_end();
             });
 
+            jm.util.dom.add_event(this.e_panel, 'mousewheel', function (e) {
+                var dir = e.deltaY < 0 ? "Up" : "Down";
+                if (dir == "Up") {
+                  v.jm.shortcut.handle_move(v.jm, 0, 100);
+                } else {
+                  v.jm.shortcut.handle_move(v.jm, 0, -100);
+                }
+                return false;
+            });
+
             this.container.appendChild(this.e_panel);
 
             this.init_canvas();
@@ -2443,6 +2453,9 @@
             var view_data = node._data.view;
             view_data.width = view_data.element.clientWidth;
             view_data.height = view_data.element.clientHeight;
+            if (view_data.element.clientWidth >= 500) {
+                view_data.element.style.fontSize='smaller';
+            }
         },
 
         init_nodes: function () {
@@ -2979,7 +2992,7 @@
                 evt.stopPropagation();
                 evt.preventDefault();
             }else {
-                this.handle_move(_jm, 0, 20);
+                this.handle_move(_jm, 0, 40);
             }
         },
 
@@ -3004,7 +3017,7 @@
                 evt.stopPropagation();
                 evt.preventDefault();
             }else {
-                this.handle_move(_jm, 0, -20);
+                this.handle_move(_jm, 0, -40);
             }
         },
 
@@ -3047,7 +3060,7 @@
                 evt.stopPropagation();
                 evt.preventDefault();
             }else {
-                this.handle_move(_jm, d === jm.direction.right?-20:20, 0);
+                this.handle_move(_jm, d === jm.direction.right?-40:40, 0);
             }
         },
         handle_copychild: function(_jm, e) {
