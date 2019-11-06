@@ -112,7 +112,7 @@
 
     // ============= static object =============================================
     jm.direction = { left: -1, center: 0, right: 1 };
-    jm.event_type = { show: 1, resize: 2, edit: 3, select: 4 };
+    jm.event_type = { show: 1, resize: 2, edit: 3, select: 4, other:0 };
     jm.key = { meta: 1 << 13, ctrl: 1 << 12, alt: 1 << 11, shift: 1 << 10 };
 
     jm.node = function (sId, iIndex, sTopic, oData, bIsRoot, oParent, eDirection, bExpanded) {
@@ -1423,7 +1423,7 @@
                     this.view.update_node(node);
                     this.layout.layout();
                     this.view.show(false);
-                    this.invoke_event_handle(jm.event_type.edit, { evt: 'update_node', data: [nodeid, topic], node: nodeid });
+                    this.invoke_event_handle(jm.event_type.edit, { evt: 'update_node', data: [nodeid, topic], sdata: { nodeid:nodeid, topic:topic}, node: nodeid });
                 }
             } else {
                 logger.error('fail, this mind map is not editable');
@@ -1461,6 +1461,7 @@
             }
             this.mind.selected = node;
             this.view.select_node(node);
+            this.invoke_event_handle(jm.event_type.select, { evt: 'select_node', data: [], node: node });
         },
 
         get_selected_node: function () {
@@ -2035,12 +2036,14 @@
             node.expanded = true;
             this.part_layout(node);
             this.set_visible(node.children, true);
+            this.jm.invoke_event_handle(jm.event_type.show, { evt: 'expand_node', data: [], node: node });
         },
 
         collapse_node: function (node) {
             node.expanded = false;
             this.part_layout(node);
             this.set_visible(node.children, false);
+            this.jm.invoke_event_handle(jm.event_type.show, { evt: 'collapse_node', data: [], node: node });
         },
 
         expand_all: function () {
