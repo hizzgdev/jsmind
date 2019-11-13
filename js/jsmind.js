@@ -1331,7 +1331,7 @@
                     this.view.show(false);
                     this.view.reset_node_custom_style(node);
                     this.expand_node(parent_node);
-                    this.invoke_event_handle(jm.event_type.edit, { evt: 'add_node', data: [parent_node.id, nodeid, topic, data], node: nodeid });
+                    this.invoke_event_handle(jm.event_type.edit, { evt: 'add_node', data: [parent_node.id, nodeid, topic, data], sdata: {afterid:afterid, newnodeid:nodeid, topic:topic, data:data}, node: nodeid });
                 }
                 return node;
             } else {
@@ -1348,7 +1348,7 @@
                     this.view.add_node(node);
                     this.layout.layout();
                     this.view.show(false);
-                    this.invoke_event_handle(jm.event_type.edit, { evt: 'insert_node_before', data: [beforeid, nodeid, topic, data], node: nodeid });
+                    this.invoke_event_handle(jm.event_type.edit, { evt: 'insert_node_before', data: [beforeid, nodeid, topic, data], sdata: {afterid:afterid, newnodeid:nodeid, topic:topic, data:data}, node: nodeid });
                 }
                 return node;
             } else {
@@ -1365,7 +1365,7 @@
                     this.view.add_node(node);
                     this.layout.layout();
                     this.view.show(false);
-                    this.invoke_event_handle(jm.event_type.edit, { evt: 'insert_node_after', data: [afterid, nodeid, topic, data], node: nodeid });
+                    this.invoke_event_handle(jm.event_type.edit, { evt: 'insert_node_after', data: [afterid, nodeid, topic, data], sdata: {afterid:afterid, newnodeid:nodeid, topic:topic, data:data}, node: nodeid });
                 }
                 return node;
             } else {
@@ -1398,7 +1398,7 @@
                 this.layout.layout();
                 this.view.show(false);
                 this.view.restore_location(parent_node);
-                this.invoke_event_handle(jm.event_type.edit, { evt: 'remove_node', data: [nodeid], node: parentid });
+                this.invoke_event_handle(jm.event_type.edit, { evt: 'remove_node', data: [nodeid], sdata: { removednodeid:nodeid }, node: parentid });
                 return true;
             } else {
                 logger.error('fail, this mind map is not editable');
@@ -1646,6 +1646,19 @@
             if (typeof callback === 'function') {
                 this.event_handles.push(callback);
             }
+        },
+
+        clean_event_listener: function() {
+            this.event_handles = [] ;
+        },
+
+        set_id_generator: function(callback) {
+            if (typeof callback === 'function') {
+                this.idGenerator = callback ;
+            }
+        },
+        get_new_id : function() {
+            return this.idGenerator ?  this.idGenerator() : jm.util.uuid.newid() ;
         },
 
         invoke_event_handle: function (type, data) {
@@ -2160,6 +2173,7 @@
     jm.graph_canvas = function (view) {
         this.opts = view.opts;
         this.e_canvas = $c('canvas');
+        this.e_canvas.classList.add('jsmind') ;
         this.canvas_ctx = this.e_canvas.getContext('2d');
         this.size = { w: 0, h: 0 };
     };
@@ -2217,6 +2231,7 @@
         this.view = view;
         this.opts = view.opts;
         this.e_svg = jm.graph_svg.c('svg');
+        this.e_canvas.classList.add('jsmind') ;
         this.size = { w: 0, h: 0 };
         this.lines = [];
     };
@@ -2520,6 +2535,10 @@
         edit_node_begin: function (node) {
             if (!node.topic) {
                 logger.warn("don't edit image nodes");
+                return;
+            }
+            if (node.data.readonly) {
+                logger.warn("don't edit readonly nodes");
                 return;
             }
             if (this.editing_node != null) {
@@ -2843,7 +2862,7 @@
         handle_addchild: function (_jm, e) {
             var selected_node = _jm.get_selected_node();
             if (!!selected_node) {
-                var nodeid = jm.util.uuid.newid();
+                var nodeid = this.jm.get_new_id() ; // jm.util.uuid.newid();
                 var node = _jm.add_node(selected_node, nodeid, 'New Node');
                 if (!!node) {
                     _jm.select_node(nodeid);
@@ -2854,7 +2873,7 @@
         handle_addbrother: function (_jm, e) {
             var selected_node = _jm.get_selected_node();
             if (!!selected_node && !selected_node.isroot) {
-                var nodeid = jm.util.uuid.newid();
+                var nodeid = this.jm.get_new_id() ; // jm.util.uuid.newid();
                 var node = _jm.insert_node_after(selected_node, nodeid, 'New Node');
                 if (!!node) {
                     _jm.select_node(nodeid);
