@@ -49,6 +49,11 @@
 
     jsMind.draggable.prototype = {
         init: function () {
+            var $this = this;
+            jsMind.prototype.reset = function(){
+                $this.jm.view.center_root();
+                return this
+            }
             this._create_canvas();
             this._create_shadow();
             this._event_bind();
@@ -195,7 +200,6 @@
         },
 
         _event_bind: function () {
-            console.log(this.jm)
             var jd = this;
             var container = this.jm.view.container;
             jdom.add_event(container, 'mousedown', function (e) {
@@ -223,6 +227,11 @@
                 jd.dragend.call(jd, evt);
             });
 
+            // 功能按钮组
+            this.$btn_group = document.createElement("div");
+            this.$btn_group.className = 'jm-group-btn';
+            this.jm.view.container.appendChild(this.$btn_group);
+
             
             //绑定拖拽功能
             this.bindDragMindMapEvent();
@@ -233,25 +242,23 @@
             // 增加全屏按钮
             var $this = this
             this.jm.view.container.style.position = 'relative'
-            var $zoomBtn = document.createElement("div");
-            $zoomBtn.textContent = '全屏';
-            $zoomBtn.setAttribute('class' , 'jm-zoom-btn')
-            this.jm.view.container.appendChild($zoomBtn)
-            $zoomBtn.addEventListener('click' , function(e){
-                console.log(e)
+
+            this.registerBtnGroup('全屏' , function(e){
                 var fullClass = 'jm-full'
                 var className = $this.jm.view.container.className;
                 if(className.indexOf(fullClass) == -1){
                     // 全屏
                     $this.jm.view.container.className = className + ' ' + fullClass;
-                    $zoomBtn.textContent = '取消全屏';
+                    this.textContent = '取消全屏';
                 }else{
                     // 取消全屏
                     className = className.replace(fullClass , '');
                     $this.jm.view.container.className = className;
-                    $zoomBtn.textContent = '全屏';
+                    this.textContent = '全屏';
+                    $this.jm.reset();
                 }
             })
+
 
             //this.jm.view.container.
 
@@ -261,15 +268,53 @@
         bindDragMindMapEvent : function(){
             var $this = this
 
-            this.jm.view.container.style.cursor = 'move'
-            var jmnodes = this.jm.view.container.getElementsByTagName('jmnodes');
-            if(jmnodes.length == 1){
-                var jmnode = jmnodes[0];
-                
-                jmnode.addEventListener('mousedown' , function(e){
-                    $this.dragMindMap(e)
-                } , false);
+            if(this.jm.options.dragMove){
+
+                this.jm.view.container.style.cursor = 'move'
+                var jmnodes = this.jm.view.container.getElementsByTagName('jmnodes');
+                if(jmnodes.length == 1){
+                    var jmnode = jmnodes[0];
+                    
+                    jmnode.addEventListener('mousedown' , function(e){
+                        $this.dragMindMap(e)
+                    } , false);
+                }
+
+                // 增加重置按钮
+                this.registerBtnGroup('重置' , function(e){
+
+                    var canvas = $this.jm.view.container.getElementsByTagName('canvas')[0]
+                    jmnodes[0].style.marginLeft = '0';
+                    jmnodes[0].style.marginTop = '0';
+                    canvas.style.marginLeft = '0';
+                    canvas.style.marginTop = '0';
+
+                    setTimeout(function(){
+                        $this.jm.reset();
+                    } , 150);
+                    
+
+                })
             }
+
+        },
+
+        /**
+         * 注册一个按钮功能
+         * @text 按钮文本
+         * @fun 点击的函数
+         * 
+         *  */ 
+        registerBtnGroup : function(text , fun){
+            var resetBtn = document.createElement("div");
+            resetBtn.className = 'jm-zoom-btn';
+            if(this.$btn_group.children.length > 0){
+                resetBtn.className += ' jm-zoom-btn-first';
+            }
+            resetBtn.textContent = text;
+            resetBtn.addEventListener('click' , fun);
+
+            this.$btn_group.appendChild(resetBtn);
         },
 
         //绑定鼠标滚轮的缩放事件

@@ -7,19 +7,25 @@
 
         <style>
         
+            .jm-group-btn{
+                z-index: 99999;
+                position: absolute;
+                right: 2rem;
+                bottom: 1.5rem;
+                border-radius: 3px;
+                border: 1px solid #bfbfbf;
+
+            }
             .jm-zoom-btn{
                 font-size: 14px;
                 background-color: #ffffff;
-                border-radius: 3px;
-                border: 1px solid #bfbfbf;
                 padding: 3px 8px 3px 8px;
                 display: inline-block;
                 color: #555;
                 cursor: pointer;
-                position: absolute;
-                bottom: 1.5rem;
-                right: 2rem;
-                z-index: 99999;
+            }
+            .jm-zoom-btn-first{
+                border-left: 1px solid #bfbfbf;
             }
         </style>
     </head>
@@ -87,7 +93,8 @@
         var options = {
             container:'mind',
             editable:true,
-            theme:'primary'
+            theme:'primary',
+            fullScreen: true 
         };
 
         var jm = new jsMind(options)

@@ -54,6 +54,8 @@
         theme: null,
         mode: 'full',    // full or side
         support_html: true,
+        fullScreen: true , // 是否显示全屏按钮
+        dragMove: true , // 是否允许拖动
 
         view: {
             engine: 'canvas',
