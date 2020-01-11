@@ -1,0 +1,99 @@
+<html>
+
+    <head>
+        <meta charset="utf-8">
+
+        <link rel="stylesheet" href="style/jsmind.css"/>
+
+        <style>
+        
+            .jm-zoom-btn{
+                font-size: 14px;
+                background-color: #ffffff;
+                border-radius: 3px;
+                border: 1px solid #bfbfbf;
+                padding: 3px 8px 3px 8px;
+                display: inline-block;
+                color: #555;
+                cursor: pointer;
+                position: absolute;
+                bottom: 1.5rem;
+                right: 2rem;
+                z-index: 99999;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <div id="mind" style="width:400px;height:400px;margin:0 auto;"></div>
+
+    </body>
+    <script src="js/jsmind.js"></script>
+    <script src="js/jsmind.draggable.js"></script>
+
+
+    <script>
+
+        var mindData = {
+            "meta":{
+                "name":"jsMind remote",
+                "author":"hizzgdev@163.com",
+                "version":"0.2"
+            },
+            "format":"node_tree",
+            "data":{"id":"root","topic":"jsMind","children":[
+                {"id":"easy","topic":"Easy","direction":"left","expanded":true,"children":[
+                    {"id":"easy1","topic":"Easy to show"},
+                    {"id":"easy2","topic":"Easy to edit"},
+                    {"id":"easy3","topic":"Easy to store"},
+                    {"id":"easy4","topic":"Easy to embed","children":[
+                        {"id":"easy41","topic":"Easy to show"},
+                        {"id":"easy42","topic":"Easy to edit"},
+                        {"id":"easy43","topic":"Easy to store"},
+                        {"id":"open44","topic":"BSD License","children":[
+                            {"id":"open441","topic":"on GitHub"},
+                            {"id":"open442","topic":"BSD License"}
+                        ]},
+                        {"id":"easy45","topic":"Easy to embed"}
+                    ]}
+                ]},
+                {"id":"open","topic":"Open Source","direction":"right","children":[
+                    {"id":"open1","topic":"on GitHub"},
+                    {"id":"open2","topic":"BSD License","children":[
+                        {"id":"open21","topic":"on GitHub"},
+                        {"id":"open22","topic":"BSD License","children":[
+                            {"id":"open221","topic":"on GitHub"},
+                            {"id":"open222","topic":"BSD License"}
+                        ]}
+                    ]}
+                ]},
+                {"id":"powerful","topic":"Powerful","direction":"right","expanded":true,"children":[
+                    {"id":"powerful1","topic":"Base on Javascript"},
+                    {"id":"powerful2","topic":"Base on HTML5"},
+                    {"id":"powerful3","topic":"Depends on you","expanded":true,"children":[
+                        {"id":"powerful31","topic":"Base on Javascript"},
+                        {"id":"powerful32","topic":"Base on HTML5"},
+                        {"id":"powerful33","topic":"Depends on you"}
+                    ]}
+                ]},
+                {"id":"other","topic":"test node","direction":"left","children":[
+                    {"id":"other1","topic":"I'm from ajax"},
+                    {"id":"other2","topic":"I can do everything"}
+                ]}
+            ]}
+        }
+
+        var options = {
+            container:'mind',
+            editable:true,
+            theme:'primary'
+        };
+
+        var jm = new jsMind(options)
+        jm.show(mindData)
+
+    
+    </script>
+
+</html>

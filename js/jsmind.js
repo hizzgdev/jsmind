@@ -2604,6 +2604,10 @@
 
         },
 
+        center_root : function(){
+            this._center_root();
+            return this;
+        },
         _center_root: function () {
             // center root node
             var outer_w = this.e_panel.clientWidth;
@@ -2615,6 +2619,7 @@
             if (this.size.h > outer_h) {
                 this.e_panel.scrollTop = (this.size.h - outer_h) / 2;
             }
+            return this
         },
 
         show: function (keep_center) {

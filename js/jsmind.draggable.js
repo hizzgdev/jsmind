@@ -195,6 +195,7 @@
         },
 
         _event_bind: function () {
+            console.log(this.jm)
             var jd = this;
             var container = this.jm.view.container;
             jdom.add_event(container, 'mousedown', function (e) {
@@ -221,6 +222,114 @@
                 var evt = e || event;
                 jd.dragend.call(jd, evt);
             });
+
+            
+            //绑定拖拽功能
+            this.bindDragMindMapEvent();
+
+            // 绑定鼠标滚缩放事件
+            this.bindMouseWheelEvent();
+
+            // 增加全屏按钮
+            var $this = this
+            this.jm.view.container.style.position = 'relative'
+            var $zoomBtn = document.createElement("div");
+            $zoomBtn.textContent = '全屏';
+            $zoomBtn.setAttribute('class' , 'jm-zoom-btn')
+            this.jm.view.container.appendChild($zoomBtn)
+            $zoomBtn.addEventListener('click' , function(e){
+                console.log(e)
+                var fullClass = 'jm-full'
+                var className = $this.jm.view.container.className;
+                if(className.indexOf(fullClass) == -1){
+                    // 全屏
+                    $this.jm.view.container.className = className + ' ' + fullClass;
+                    $zoomBtn.textContent = '取消全屏';
+                }else{
+                    // 取消全屏
+                    className = className.replace(fullClass , '');
+                    $this.jm.view.container.className = className;
+                    $zoomBtn.textContent = '全屏';
+                }
+            })
+
+            //this.jm.view.container.
+
+        },
+
+        // 绑定拖拽事件
+        bindDragMindMapEvent : function(){
+            var $this = this
+
+            this.jm.view.container.style.cursor = 'move'
+            var jmnodes = this.jm.view.container.getElementsByTagName('jmnodes');
+            if(jmnodes.length == 1){
+                var jmnode = jmnodes[0];
+                
+                jmnode.addEventListener('mousedown' , function(e){
+                    $this.dragMindMap(e)
+                } , false);
+            }
+        },
+
+        //绑定鼠标滚轮的缩放事件
+        bindMouseWheelEvent : function(){
+            var $this = this
+            this.jm.view.container.addEventListener('mousewheel' , function(e){
+                // 禁止事件冒泡导致的滚动条上下拉动
+                e.preventDefault()
+                if(e.deltaY > 0){
+                    $this.jm.view.zoomOut()
+                }else{
+                    $this.jm.view.zoomIn()
+
+                }
+            })
+        },
+
+        // 拖拽事件处理 , jmnodes
+        dragMindMap : function(e){
+            var $this = this
+            var cer = this.jm.view.container;
+            var $jmnodes = cer.getElementsByTagName('jmnodes')[0]
+            var $canvas = cer.getElementsByTagName('canvas')[0]
+            var originTop = this.convertIntPx($jmnodes.style.marginTop)
+            var originLeft = this.convertIntPx($jmnodes.style.marginLeft)
+
+            var $moveDoms = [$jmnodes , $canvas]
+
+            document.onmousemove = function(mv){
+                // 超出边界时，取消拖动事件
+                if(mv.clientX > cer.offsetLeft + cer.offsetWidth || mv.clientX < cer.offsetLeft
+                || mv.clientY > cer.offsetTop + cer.offsetHeight || mv.clientY < cer.offsetTop){
+                    document.onmousemove = null;
+                    document.onmouseup = null;
+                    return
+                }
+
+                var left = originLeft + mv.clientX - e.clientX
+                var top = originTop + mv.clientY - e.clientY
+
+                for(var i = 0 ; i < $moveDoms.length ; i ++){
+                    var $dom = $moveDoms[i]
+                    $dom.style.marginLeft = left + 'px'
+                    $dom.style.marginTop = top + 'px'
+                }
+            }
+            document.onmouseup = function(){
+                document.onmousemove = null;
+                document.onmouseup = null;
+            }
+
+        },
+
+        // 把像素转换为数字单位
+        convertIntPx : function(i){
+            if(typeof(i) == 'undefined' || i == null || i == ""){
+                return 0
+            }
+
+            return parseInt(i.substring(0 , i.length - 2))
         },
 
         dragstart: function (e) {

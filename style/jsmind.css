@@ -7,7 +7,7 @@
  */
 
 /* important section */
-.jsmind-inner{position:relative;overflow:auto;width:100%;height:100%;}/*box-shadow:0 0 2px #000;*/
+.jsmind-inner{position:relative;overflow:auto;width:100%;height:100%;overflow: hidden;border: 1px solid #c6d6dc;}/*box-shadow:0 0 2px #000;*/
 .jsmind-inner{
     moz-user-select:-moz-none;
     -moz-user-select:none;
@@ -158,3 +158,4 @@ jmnodes.theme-asbestos jmnode.selected{background-color:#11f;color:#fff;}
 jmnodes.theme-asbestos jmnode.root{}
 jmnodes.theme-asbestos jmexpander{}
 jmnodes.theme-asbestos jmexpander:hover{}
+.jm-full{position: fixed !important;width: 100% !important;height: 100% !important;}
