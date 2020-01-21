@@ -8,25 +8,100 @@
         <style>
         
             .jm-group-btn{
-                z-index: 99999;
+                z-index: 8;
                 position: absolute;
-                right: 2rem;
-                bottom: 1.5rem;
+                right: 1rem;
+                top: 1rem;
                 border-radius: 3px;
                 border: 1px solid #bfbfbf;
 
             }
             .jm-zoom-btn{
                 font-size: 14px;
-                background-color: #ffffff;
+                background-color: #ffffff82;
                 padding: 3px 8px 3px 8px;
                 display: inline-block;
                 color: #555;
                 cursor: pointer;
             }
+            .jm-zoom-btn:hover{background-color: #b4bdc38c;}
             .jm-zoom-btn-first{
                 border-left: 1px solid #bfbfbf;
             }
+            .jm-zoom-btn svg{
+                position: static !important;
+                width: 25px;
+                height: 25px;}
+
+            .jm-tips{
+                width: 400px;
+                margin: 0 auto;
+                padding: 1rem 1rem 4rem 2rem;
+                box-sizing: border-box;
+                border: 1px solid #e4e7e8;
+                box-shadow: 0px 0px 4px 2px #a6a9ab;
+                border-radius: 3px;
+                position: fixed;
+                z-index: 10;
+                background: #fff;
+                margin-left: auto;
+                top: 8rem;
+                left: 0;
+                right: 0;
+            }
+            .jm-tips-close-btn{
+                display: inline-block;
+                position: absolute;
+                bottom: 1rem;
+                right: 1rem;
+                font-size: 13px;
+                color: #666666;
+                cursor: pointer;
+                background: #fffffffc;
+                padding: 5px 10px 5px 10px;
+                border-radius: 3px;
+                border: 1px solid #909ca2;
+            }
+            .jm-tips-close-btn:hover{
+                color: #333333;
+                border:1px solid #333333;
+            }
+            .jm-tip-key{
+                color: #4d6c77;
+                display: inline-block;
+                background: #bfbfbf8c;
+                padding: 2px 4px 2px 4px;
+                font-size: 12px;
+                margin-right: 1rem;
+                position: relative;
+                vertical-align: middle;
+            }
+            .jm-tip-value{color: #666666;font-size: 14px;}
+            .jm-tip{    margin-bottom: 0.5rem;}
+            .jm-tip-y{
+                display: inline-block;
+                width: 13px;
+                height: 13px;
+                background: #285e8e;
+                border-radius: 50%;
+                margin-right: 0.5rem;
+                vertical-align: middle;
+            }
+            .jm-tips-header{
+                margin-bottom: 2rem;
+                font-weight: bold;
+                color: #333333;
+            }
+            .jm-zhezao{
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+                background: #00000052;
+                z-index: 9;
+            }
+            
         </style>
     </head>
 
@@ -94,11 +169,36 @@
             container:'mind',
             editable:true,
             theme:'primary',
-            fullScreen: true 
+            fullScreen: true,
+            showTip: true,
+            shortcut: {
+                enable: true,
+                handles: {
+                },
+                mapping: {
+                    addchild: {which: 9 , key: 'tab 制表符' , desc: '插入子节点'}, // Insert
+                    addbrother: {which: 13 , key: 'enter' , desc: '插入同级节点'}, // Enter
+                    editnode: {which: 113 , key: 'F2' , desc: '编辑'},// F2
+                    delnode: {which: 46 , key: 'delete' , desc: '删除节点'}, // Delete
+                    toggle: {which: 32 , key: '空格' , desc: '展开或隐藏节点'}, // Space
+                    left: {which: 37 , key: '←' , desc: '光标向左移动'}, // Left
+                    up: {which: 38 , key: '↑' , desc: '光标向上移动'}, // Up
+                    right: {which: 39 , key: '→' , desc: '光标向右移动'}, // Right
+                    down: {which: 40 , key: '↓' , desc: '光标向下移动'} // Down
+                }
+            }
         };
 
         var jm = new jsMind(options)
         jm.show(mindData)
+
+
+        var doEvent = function(e){
+            console.log(e);
+        }
+
+        document.body.onkeydown = doEvent;
+
 
     
     </script>

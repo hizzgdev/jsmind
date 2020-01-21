@@ -21,10 +21,29 @@
         $d.selection.empty();
     };
 
+
     var options = {
         line_width: 5,
         lookup_delay: 500,
-        lookup_interval: 80
+        lookup_interval: 80,
+        zoomIcon : '<svg t="1579579493062" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="11062" width="32" height="32"><path d="M100.58 286.879v639.329h635.462v-639.33H100.58z m557.03 560.759H179.15v-482.19h478.46v482.19z" fill="#515151" p-id="11063"></path><path d="M302.32 89.418V363.93c3.452 0 7.042 0 10.495 0.139h68.075v-196.08h478.461v482.19H661.34v12.013c1.243 9.666 1.243 19.47 1.104 28.722-0.276 12.565-1.242 25.269-2.07 37.835H937.92V89.418h-635.6z" fill="#515151" p-id="11064"></path></svg>',
+        resetIcon : '<svg t="1579579613231" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="14368" width="32" height="32"><path d="M939.739429 711.0656a37.449143 37.449143 0 0 0-51.375543 13.019429c-76.273371 128-216.151771 207.520914-364.982857 207.520914-198.597486 0-365.7728-137.0112-411.940572-321.477486l54.418286 54.418286a37.449143 37.449143 0 1 0 52.955428-52.984686L87.771429 480.548571a37.390629 37.390629 0 1 0-63.8976 26.477715c0 275.426743 224.080457 499.5072 499.5072 499.5072 175.104 0 339.616914-93.535086 429.377828-244.092343a37.536914 37.536914 0 0 0-12.990171-51.375543zM523.410286 7.548343c-192.570514 0-364.690286 107.549257-449.1264 280.693028a37.449143 37.449143 0 0 0 67.291428 32.855772c71.855543-147.163429 218.112-238.621257 381.805715-238.621257 198.626743 0 365.714286 137.0112 411.940571 321.448228l-66.501486-66.472228a37.449143 37.449143 0 0 0-52.926171 52.984685l143.096686 143.096686a37.332114 37.332114 0 0 0 40.784457 8.104229c14.043429-5.792914 23.113143-19.456 23.113143-34.581943C1022.858971 231.6288 798.778514 7.548343 523.410286 7.548343z" p-id="14369" fill="#515151"></path></svg>',
+        tipIcon: '<svg t="1579594414215" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3366" width="32" height="32"><path d="M510.1 411.1c-18.8 0-34.2 15.4-34.2 34.4v295.7c0 18.8 15.4 34.2 34.2 34.2 19 0 34.4-15.4 34.4-34.2V445.5c-0.1-19-15.5-34.4-34.4-34.4zM512 64.7C265 64.7 64.7 265 64.7 512 64.7 759.1 265 959.3 512 959.3S959.3 759.1 959.3 512C959.3 265 759 64.7 512 64.7z m0.1 825c-208.5 0-377.7-169.1-377.7-377.6S303.5 134.5 512 134.5s377.6 169.1 377.6 377.6-168.9 377.6-377.5 377.6z m-1.4-639.3c-26.8 0-48.4 21.7-48.4 48.4s21.7 48.4 48.4 48.4c26.8 0 48.5-21.7 48.5-48.4-0.2-26.7-21.8-48.4-48.5-48.4z m0 0" fill="#515151" p-id="3367"></path></svg>'
+    };
+
+    // 传入一个 boolean 值，显示或隐藏遮罩
+    jsMind.setZhezaoVisiable = function(b){
+        if(b){
+            //show
+            var $zs = document.createElement('div');
+            $zs.setAttribute('class' , 'jm-zhezao');
+            document.body.appendChild($zs);
+        }else{
+            var zs = document.getElementsByClassName('jm-zhezao');
+            for(var i = 0 ; i < zs.length ; i ++){
+                zs[i].remove();
+            }
+        }
     };
 
     jsMind.draggable = function (jm) {
@@ -50,10 +69,40 @@
     jsMind.draggable.prototype = {
         init: function () {
             var $this = this;
+            // 获取 canvas 对象
+            jsMind.prototype.getCanvas = function(){
+                var canvas = $this.jm.view.container.getElementsByTagName('canvas');
+                if(canvas.length >= 1){
+                    return canvas[0];
+                }else{
+                    return null;
+                }
+            }
+            
+            // 获取 jmnodes 对象
+            jsMind.prototype.getJmNodes = function(){
+                var jmnodes = $this.jm.view.container.getElementsByTagName('jmnodes');
+                if(jmnodes.length == 1){
+                    return jmnodes[0];
+                }else{
+                    return null;
+                }
+            }
+
             jsMind.prototype.reset = function(){
+
+                var canvas = $this.jm.getCanvas();
+                var jmnodes = $this.jm.getJmNodes();
+                jmnodes.style.marginLeft = '0';
+                jmnodes.style.marginTop = '0';
+                canvas.style.marginLeft = '0';
+                canvas.style.marginTop = '0';
+
                 $this.jm.view.center_root();
                 return this
             }
+
+
             this._create_canvas();
             this._create_shadow();
             this._event_bind();
@@ -228,10 +277,14 @@
             });
 
             // 功能按钮组
+            this.jm.view.container.style.position = 'relative'
+
             this.$btn_group = document.createElement("div");
             this.$btn_group.className = 'jm-group-btn';
             this.jm.view.container.appendChild(this.$btn_group);
 
+            // 增加提示按钮
+            this.bindTipEvent();
             
             //绑定拖拽功能
             this.bindDragMindMapEvent();
@@ -240,27 +293,86 @@
             this.bindMouseWheelEvent();
 
             // 增加全屏按钮
-            var $this = this
-            this.jm.view.container.style.position = 'relative'
+            this.bindFullScreenEvent();
 
-            this.registerBtnGroup('全屏' , function(e){
+
+
+
+        },
+
+        // 绑定提示事件
+        bindTipEvent : function(){
+            if(!this.jm.options.showTip){
+                return;
+            }
+
+            // 关闭提示的方法
+            var closeTipsFn = function(e){
+                jsMind.setZhezaoVisiable(false);
+
+                this.parentNode.remove();
+            }
+
+            var $this = this;
+            this.registerBtnGroup(options.tipIcon , function(e){
+
+                jsMind.setZhezaoVisiable(true);
+
+                console.log($this)
+                var mapping = $this.jm.options.shortcut.mapping;
+
+                var tips = document.createElement('div');
+                tips.setAttribute('class' , 'jm-tips');
+
+                tips.insertAdjacentHTML('beforeend' , '<div class="jm-tips-header">提示</div>');
+
+                var closeBtn = document.createElement('div');
+                closeBtn.setAttribute('class' , 'jm-tips-close-btn');
+                closeBtn.onclick = closeTipsFn;
+                closeBtn.textContent = '确定';
+                
+                tips.appendChild(closeBtn);
+
+                for(var itemKey in mapping){
+                    var item = mapping[itemKey];
+                    var $html = '<div class="jm-tip">'+
+                                    '<span class="jm-tip-y"></span>'+
+                                    '<span class="jm-tip-key">'+ item.key +'</span>'+
+                                    '<span class="jm-tip-value">'+ item.desc +'</span>'+
+                                '</div>';
+
+                    tips.insertAdjacentHTML('beforeend' , $html);
+                }
+
+                document.body.appendChild(tips);
+
+            })
+        },
+
+        // 绑定全屏事件
+        bindFullScreenEvent : function(){
+            if(!this.jm.options.fullScreen){
+                return;
+            }
+
+            var $this = this
+            
+
+            this.registerBtnGroup(options.zoomIcon , function(e){
                 var fullClass = 'jm-full'
                 var className = $this.jm.view.container.className;
                 if(className.indexOf(fullClass) == -1){
                     // 全屏
                     $this.jm.view.container.className = className + ' ' + fullClass;
-                    this.textContent = '取消全屏';
                 }else{
                     // 取消全屏
                     className = className.replace(fullClass , '');
                     $this.jm.view.container.className = className;
-                    this.textContent = '全屏';
-                    $this.jm.reset();
+                    setTimeout(function(){
+                        $this.jm.reset();
+                    } , 150);
                 }
             })
-
-
-            //this.jm.view.container.
 
         },
 
@@ -271,23 +383,24 @@
             if(this.jm.options.dragMove){
 
                 this.jm.view.container.style.cursor = 'move'
-                var jmnodes = this.jm.view.container.getElementsByTagName('jmnodes');
-                if(jmnodes.length == 1){
-                    var jmnode = jmnodes[0];
+                var jmnodes = this.jm.getJmNodes();
+                if(jmnodes != null){
                     
-                    jmnode.addEventListener('mousedown' , function(e){
-                        $this.dragMindMap(e)
+                    jmnodes.addEventListener('mousedown' , function(e){
+                        var clickNode = e.target;
+                        if(clickNode){
+                            // 点击的是思维导图的节点，则不触发事件
+                            if(clickNode.tagName.toUpperCase() == 'JMNODE'){
+                                return;
+                            }
+
+                            $this.dragMindMap(e)
+                        }
                     } , false);
                 }
 
                 // 增加重置按钮
-                this.registerBtnGroup('重置' , function(e){
-
-                    var canvas = $this.jm.view.container.getElementsByTagName('canvas')[0]
-                    jmnodes[0].style.marginLeft = '0';
-                    jmnodes[0].style.marginTop = '0';
-                    canvas.style.marginLeft = '0';
-                    canvas.style.marginTop = '0';
+                this.registerBtnGroup(options.resetIcon , function(e){
 
                     setTimeout(function(){
                         $this.jm.reset();
@@ -311,7 +424,8 @@
             if(this.$btn_group.children.length > 0){
                 resetBtn.className += ' jm-zoom-btn-first';
             }
-            resetBtn.textContent = text;
+            // resetBtn.textContent = text;
+            resetBtn.insertAdjacentHTML('beforeend' , text);
             resetBtn.addEventListener('click' , fun);
 
             this.$btn_group.appendChild(resetBtn);

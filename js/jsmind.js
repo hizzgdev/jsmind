@@ -56,6 +56,7 @@
         support_html: true,
         fullScreen: true , // 是否显示全屏按钮
         dragMove: true , // 是否允许拖动
+        showTip: true , // 显示提示按钮
 
         view: {
             engine: 'canvas',
@@ -79,15 +80,15 @@
             handles: {
             },
             mapping: {
-                addchild: 45, // Insert
-                addbrother: 13, // Enter
-                editnode: 113,// F2
-                delnode: 46, // Delete
-                toggle: 32, // Space
-                left: 37, // Left
-                up: 38, // Up
-                right: 39, // Right
-                down: 40, // Down
+                addchild: {which: 45 , key: 'insert' , desc: 'Insert child'}, // Insert
+                addbrother: {which: 13 , key: 'enter' , desc: 'Insert brother'}, // Enter
+                editnode: {which: 113 , key: 'F2' , desc: 'edit node'},// F2
+                delnode: {which: 46 , key: 'delete' , desc: 'delete node'}, // Delete
+                toggle: {which: 32 , key: 'Space' , desc: 'toggle'}, // Space
+                left: {which: 37 , key: 'left' , desc: 'move left'}, // Left
+                up: {which: 38 , key: 'up' , desc: 'move up'}, // Up
+                right: {which: 39 , key: 'right' , desc: 'move right'}, // Right
+                down: {which: 40 , key: 'down' , desc: 'move down'} // Down
             }
         },
     };
@@ -2821,7 +2822,7 @@
 
             for (var handle in this.mapping) {
                 if (!!this.mapping[handle] && (handle in this.handles)) {
-                    this._mapping[this.mapping[handle]] = this.handles[handle];
+                    this._mapping[this.mapping[handle]['which']] = this.handles[handle];
                 }
             }
         },
@@ -2839,6 +2840,7 @@
             var evt = e || event;
             if (!this.opts.enable) { return true; }
             var kc = evt.keyCode + (evt.metaKey << 13) + (evt.ctrlKey << 12) + (evt.altKey << 11) + (evt.shiftKey << 10);
+
             if (kc in this._mapping) {
                 this._mapping[kc].call(this, this.jm, e);
             }
