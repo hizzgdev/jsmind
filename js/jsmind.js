@@ -1461,6 +1461,7 @@
             }
             this.mind.selected = node;
             this.view.select_node(node);
+            this.invoke_event_handle(jm.event_type.select, { evt: 'select_node', data: [], node: node.id });
         },
 
         get_selected_node: function () {
@@ -1645,6 +1646,10 @@
             if (typeof callback === 'function') {
                 this.event_handles.push(callback);
             }
+        },
+
+        clear_event_listener: function () {
+            this.event_handles = [];
         },
 
         invoke_event_handle: function (type, data) {
@@ -2035,12 +2040,14 @@
             node.expanded = true;
             this.part_layout(node);
             this.set_visible(node.children, true);
+            this.jm.invoke_event_handle(jm.event_type.show, { evt: 'expand_node', data: [], node: node.id });
         },
 
         collapse_node: function (node) {
             node.expanded = false;
             this.part_layout(node);
             this.set_visible(node.children, false);
+            this.jm.invoke_event_handle(jm.event_type.show, { evt: 'collapse_node', data: [], node: node.id });
         },
 
         expand_all: function () {
@@ -2157,6 +2164,7 @@
     jm.graph_canvas = function (view) {
         this.opts = view.opts;
         this.e_canvas = $c('canvas');
+        this.e_canvas.className = 'jsmind';
         this.canvas_ctx = this.e_canvas.getContext('2d');
         this.size = { w: 0, h: 0 };
     };
@@ -2214,6 +2222,7 @@
         this.view = view;
         this.opts = view.opts;
         this.e_svg = jm.graph_svg.c('svg');
+        this.e_svg.className = 'jsmind';
         this.size = { w: 0, h: 0 };
         this.lines = [];
     };
@@ -2795,6 +2804,7 @@
         this.opts = options;
         this.mapping = options.mapping;
         this.handles = options.handles;
+        this._newid = null;
         this._mapping = {};
     };
 
@@ -2816,6 +2826,12 @@
                 if (!!this.mapping[handle] && (handle in this.handles)) {
                     this._mapping[this.mapping[handle]] = this.handles[handle];
                 }
+            }
+
+            if (typeof this.opts.id_generator === 'function') {
+                this._newid = this.opts.id_generator;
+            } else {
+                this._newid = jm.util.uuid.newid;
             }
         },
 
@@ -2840,7 +2856,7 @@
         handle_addchild: function (_jm, e) {
             var selected_node = _jm.get_selected_node();
             if (!!selected_node) {
-                var nodeid = jm.util.uuid.newid();
+                var nodeid = this._newid();
                 var node = _jm.add_node(selected_node, nodeid, 'New Node');
                 if (!!node) {
                     _jm.select_node(nodeid);
@@ -2851,7 +2867,7 @@
         handle_addbrother: function (_jm, e) {
             var selected_node = _jm.get_selected_node();
             if (!!selected_node && !selected_node.isroot) {
-                var nodeid = jm.util.uuid.newid();
+                var nodeid = this._newid();
                 var node = _jm.insert_node_after(selected_node, nodeid, 'New Node');
                 if (!!node) {
                     _jm.select_node(nodeid);
