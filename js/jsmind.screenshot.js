@@ -66,7 +66,7 @@
 
     jcanvas.fittingString = function (ctx, text, max_width) {
         var width = ctx.measureText(text).width;
-        var ellipsis = '…'
+        var ellipsis = '…';
         var ellipsis_width = ctx.measureText(ellipsis).width;
         if (width <= max_width || width <= ellipsis_width) {
             return text;
