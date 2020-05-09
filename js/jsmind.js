@@ -39,7 +39,7 @@
     var $h = function (n, t) {
         if (t instanceof HTMLElement) {
             n.innerHTML = '';
-            n.appendChild(t)
+            n.appendChild(t);
         } else {
             n.innerHTML = t;
         }
@@ -236,7 +236,7 @@
                     var children_len = children.length;
                     var r = 0;
                     for (var i = 0; i < children_len; i++) { if (children[i].direction === jm.direction.left) { r--; } else { r++; } }
-                    d = (children_len > 1 && r > 0) ? jm.direction.left : jm.direction.right
+                    d = (children_len > 1 && r > 0) ? jm.direction.left : jm.direction.right;
                 } else {
                     d = (direction != jm.direction.left) ? jm.direction.right : jm.direction.left;
                 }
@@ -2075,7 +2075,7 @@
             for (var nodeid in nodes) {
                 node = nodes[nodeid];
                 if (node.expanded && !node.isroot) {
-                    node.expanded = false
+                    node.expanded = false;
                     c++;
                 }
             }
@@ -2951,7 +2951,7 @@
                     var children = [];
                     for (var i = 0; i < c.length; i++) {
                         if (c[i].direction === d) {
-                            children.push(i)
+                            children.push(i);
                         }
                     }
                     node = c[children[Math.floor((children.length - 1) / 2)]];
@@ -2960,7 +2960,7 @@
                     var children = selected_node.children;
                     var childrencount = children.length;
                     if (childrencount > 0) {
-                        node = children[Math.floor((childrencount - 1) / 2)]
+                        node = children[Math.floor((childrencount - 1) / 2)];
                     }
                 } else {
                     node = selected_node.parent;
