@@ -2844,6 +2844,7 @@
         },
 
         handler: function (e) {
+            if (e.which == 9) { e.preventDefault(); } //prevent tab to change focus in browser
             if (this.jm.view.is_editing()) { return; }
             var evt = e || event;
             if (!this.opts.enable) { return true; }
