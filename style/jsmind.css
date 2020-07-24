@@ -27,7 +27,7 @@ jmnode{position:absolute;cursor:default;max-width:500px;white-space:nowrap;overf
 jmexpander{position:absolute;width:11px;height:11px;display:block;overflow:hidden;line-height:12px;font-size:12px;text-align:center;border-radius:6px;border-width:1px;border-style:solid;cursor:pointer;}
 
 jmnote{visibility:hidden;padding:10px;background-color:#f1c40f;color:#333;border-radius:2px;font:15px/1.125 Verdana,Arial,Helvetica,sans-serif;z-index:3;position:absolute;cursor:default;overflow:auto;text-overflow:ellipsis;opacity: 0.8;box-shadow: 5px 5px 4px #616161}
-jmnote-flg{position:absolute;z-index:3;bottom:0px;width: 10px;height: 10px;border-radius:5px;background-color:#f1c40f;overflow:auto;}
+jmnote-flg{position:absolute;z-index:3;bottom:0px;width: 8px;height: 8px;border-radius:4px;background-color:#f1c40f;overflow:auto;}
 
 /* default theme */
 jmnode{padding:10px;background-color:#fff;color:#333;border-radius:5px;box-shadow:1px 1px 1px #666;font:16px/1.125 Verdana,Arial,Helvetica,sans-serif;}
@@ -163,9 +163,9 @@ jmnodes.theme-asbestos jmexpander:hover{}
 
 
 /* primary theme */
-jmnodes.theme-primary2 jmnode{background-color:#428bca;color:#fff;border-color:#357ebd;font-size:14px }
+jmnodes.theme-primary2 jmnode{background-color:#428bca;color:#fff;border-color:#357ebd;font-size:13px;border-radius:3px;padding: 8px; }
 jmnodes.theme-primary2 jmnode:hover{background-color:#3276b1;border-color:#285e8e;}
 jmnodes.theme-primary2 jmnode.selected{background-color:#f1c40f;color:#fff;}
-jmnodes.theme-primary2 jmnode.root{font-size:18px;background-color:#5cb85c;border-color:#4cae4c;color:#fff;}
+jmnodes.theme-primary2 jmnode.root{font-size:16px;background-color:#5cb85c;border-color:#4cae4c;color:#fff;}
 jmnodes.theme-primary2 jmexpander{}
 jmnodes.theme-primary2 jmexpander:hover{}
