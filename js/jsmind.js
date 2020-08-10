@@ -2222,7 +2222,7 @@
         this.view = view;
         this.opts = view.opts;
         this.e_svg = jm.graph_svg.c('svg');
-        this.e_svg.className = 'jsmind';
+        this.e_svg.setAttribute('class', 'jsmind');
         this.size = { w: 0, h: 0 };
         this.lines = [];
     };
