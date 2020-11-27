@@ -289,7 +289,7 @@
 
         insert_node_after: function (node_after, nodeid, topic, data) {
             if (!jm.util.is_node(node_after)) {
-                var the_node_after = this.get_node(node_before);
+                var the_node_after = this.get_node(node_after);
                 if (!the_node_after) {
                     logger.error('the node_after[id=' + node_after + '] can not be found.');
                     return null;
