@@ -39,7 +39,7 @@
     var $h = function (n, t) {
         if (t instanceof HTMLElement) {
             n.innerHTML = '';
-            n.appendChild(t)
+            n.appendChild(t);
         } else {
             n.innerHTML = t;
         }
@@ -236,7 +236,7 @@
                     var children_len = children.length;
                     var r = 0;
                     for (var i = 0; i < children_len; i++) { if (children[i].direction === jm.direction.left) { r--; } else { r++; } }
-                    d = (children_len > 1 && r > 0) ? jm.direction.left : jm.direction.right
+                    d = (children_len > 1 && r > 0) ? jm.direction.left : jm.direction.right;
                 } else {
                     d = (direction != jm.direction.left) ? jm.direction.right : jm.direction.left;
                 }
@@ -289,7 +289,7 @@
 
         insert_node_after: function (node_after, nodeid, topic, data) {
             if (!jm.util.is_node(node_after)) {
-                var the_node_after = this.get_node(node_before);
+                var the_node_after = this.get_node(node_after);
                 if (!the_node_after) {
                     logger.error('the node_after[id=' + node_after + '] can not be found.');
                     return null;
@@ -1461,6 +1461,7 @@
             }
             this.mind.selected = node;
             this.view.select_node(node);
+            this.invoke_event_handle(jm.event_type.select, { evt: 'select_node', data: [], node: node.id });
         },
 
         get_selected_node: function () {
@@ -1645,6 +1646,10 @@
             if (typeof callback === 'function') {
                 this.event_handles.push(callback);
             }
+        },
+
+        clear_event_listener: function () {
+            this.event_handles = [];
         },
 
         invoke_event_handle: function (type, data) {
@@ -2035,12 +2040,14 @@
             node.expanded = true;
             this.part_layout(node);
             this.set_visible(node.children, true);
+            this.jm.invoke_event_handle(jm.event_type.show, { evt: 'expand_node', data: [], node: node.id });
         },
 
         collapse_node: function (node) {
             node.expanded = false;
             this.part_layout(node);
             this.set_visible(node.children, false);
+            this.jm.invoke_event_handle(jm.event_type.show, { evt: 'collapse_node', data: [], node: node.id });
         },
 
         expand_all: function () {
@@ -2068,7 +2075,7 @@
             for (var nodeid in nodes) {
                 node = nodes[nodeid];
                 if (node.expanded && !node.isroot) {
-                    node.expanded = false
+                    node.expanded = false;
                     c++;
                 }
             }
@@ -2157,6 +2164,7 @@
     jm.graph_canvas = function (view) {
         this.opts = view.opts;
         this.e_canvas = $c('canvas');
+        this.e_canvas.className = 'jsmind';
         this.canvas_ctx = this.e_canvas.getContext('2d');
         this.size = { w: 0, h: 0 };
     };
@@ -2214,6 +2222,7 @@
         this.view = view;
         this.opts = view.opts;
         this.e_svg = jm.graph_svg.c('svg');
+        this.e_svg.setAttribute('class', 'jsmind');
         this.size = { w: 0, h: 0 };
         this.lines = [];
     };
@@ -2795,6 +2804,7 @@
         this.opts = options;
         this.mapping = options.mapping;
         this.handles = options.handles;
+        this._newid = null;
         this._mapping = {};
     };
 
@@ -2817,6 +2827,12 @@
                     this._mapping[this.mapping[handle]] = this.handles[handle];
                 }
             }
+
+            if (typeof this.opts.id_generator === 'function') {
+                this._newid = this.opts.id_generator;
+            } else {
+                this._newid = jm.util.uuid.newid;
+            }
         },
 
         enable_shortcut: function () {
@@ -2828,6 +2844,7 @@
         },
 
         handler: function (e) {
+            if (e.which == 9) { e.preventDefault(); } //prevent tab to change focus in browser
             if (this.jm.view.is_editing()) { return; }
             var evt = e || event;
             if (!this.opts.enable) { return true; }
@@ -2840,7 +2857,7 @@
         handle_addchild: function (_jm, e) {
             var selected_node = _jm.get_selected_node();
             if (!!selected_node) {
-                var nodeid = jm.util.uuid.newid();
+                var nodeid = this._newid();
                 var node = _jm.add_node(selected_node, nodeid, 'New Node');
                 if (!!node) {
                     _jm.select_node(nodeid);
@@ -2851,7 +2868,7 @@
         handle_addbrother: function (_jm, e) {
             var selected_node = _jm.get_selected_node();
             if (!!selected_node && !selected_node.isroot) {
-                var nodeid = jm.util.uuid.newid();
+                var nodeid = this._newid();
                 var node = _jm.insert_node_after(selected_node, nodeid, 'New Node');
                 if (!!node) {
                     _jm.select_node(nodeid);
@@ -2935,7 +2952,7 @@
                     var children = [];
                     for (var i = 0; i < c.length; i++) {
                         if (c[i].direction === d) {
-                            children.push(i)
+                            children.push(i);
                         }
                     }
                     node = c[children[Math.floor((children.length - 1) / 2)]];
@@ -2944,7 +2961,7 @@
                     var children = selected_node.children;
                     var childrencount = children.length;
                     if (childrencount > 0) {
-                        node = children[Math.floor((childrencount - 1) / 2)]
+                        node = children[Math.floor((childrencount - 1) / 2)];
                     }
                 } else {
                     node = selected_node.parent;
