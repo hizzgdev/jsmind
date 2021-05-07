@@ -140,6 +140,7 @@
                 jsMind.direction.right : jsMind.direction.left;
             var nodes = this.jm.mind.nodes;
             var node = null;
+            var layout = this.jm.layout;
             var min_distance = Number.MAX_VALUE;
             var distance = 0;
             var closest_node = null;
@@ -150,6 +151,9 @@
                 node = nodes[nodeid];
                 if (node.isroot || node.direction == direct) {
                     if (node.id == this.active_node.id) {
+                        continue;
+                    }
+                    if (!layout.is_visible(node)){
                         continue;
                     }
                     ns = node.get_size();
