@@ -169,3 +169,4 @@ jmnodes.theme-primary2 jmnode.selected{background-color:#f1c40f;color:#fff;}
 jmnodes.theme-primary2 jmnode.root{font-size:16px;background-color:#5cb85c;border-color:#4cae4c;color:#fff;}
 jmnodes.theme-primary2 jmexpander{}
 jmnodes.theme-primary2 jmexpander:hover{}
+jmnodes.theme-primary2 jmnode.txt{font-size:13px;color:#000; background-color:#ECEFF1;box-shadow: 0 0 0;text-decoration:underline}

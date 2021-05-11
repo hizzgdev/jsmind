@@ -2882,6 +2882,10 @@
                     expander.style.display = 'none';
                     continue;
                 }
+                if (view_data.width > 150) {
+                    node_element.className = 'txt';
+                }
+
                 this.reset_node_custom_style(node);
                 p = this.layout.get_node_point(node);
                 view_data.abs_x = _offset.x + p.x;

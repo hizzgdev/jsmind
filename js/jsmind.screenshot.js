@@ -6,27 +6,33 @@
  *   https://github.com/hizzgdev/jsmind/
  */
 
-(function ($w) {
+(function($w) {
     'use strict';
 
     var __name__ = 'jsMind';
     var jsMind = $w[__name__];
-    if (!jsMind) { return; }
-    if (typeof jsMind.screenshot != 'undefined') { return; }
+    if (!jsMind) {
+        return;
+    }
+    if (typeof jsMind.screenshot != 'undefined') {
+        return;
+    }
 
     var $d = $w.document;
-    var $c = function (tag) { return $d.createElement(tag); };
+    var $c = function(tag) {
+        return $d.createElement(tag);
+    };
 
-    var css = function (cstyle, property_name) {
+    var css = function(cstyle, property_name) {
         return cstyle.getPropertyValue(property_name);
     };
-    var is_visible = function (cstyle) {
+    var is_visible = function(cstyle) {
         var visibility = css(cstyle, 'visibility');
         var display = css(cstyle, 'display');
         return (visibility !== 'hidden' && display !== 'none');
     };
     var jcanvas = jsMind.util.canvas;
-    jcanvas.rect = function (ctx, x, y, w, h, r) {
+    jcanvas.rect = function(ctx, x, y, w, h, r) {
         if (w < 2 * r) r = w / 2;
         if (h < 2 * r) r = h / 2;
         ctx.moveTo(x + r, y);
@@ -36,7 +42,7 @@
         ctx.arcTo(x, y, x + w, y, r);
     };
 
-    jcanvas.text_multiline = function (ctx, text, x, y, w, h, lineheight) {
+    jcanvas.text_multiline = function(ctx, text, x, y, w, h, lineheight) {
         var line = '';
         var text_len = text.length;
         var chars = text.split('');
@@ -56,7 +62,7 @@
         ctx.fillText(line, x, y);
     };
 
-    jcanvas.text_ellipsis = function (ctx, text, x, y, w, h) {
+    jcanvas.text_ellipsis = function(ctx, text, x, y, w, h) {
         var center_y = y + h / 2;
         var text = jcanvas.fittingString(ctx, text, w);
         ctx.textAlign = 'left';
@@ -64,7 +70,7 @@
         ctx.fillText(text, x, center_y, w);
     };
 
-    jcanvas.fittingString = function (ctx, text, max_width) {
+    jcanvas.fittingString = function(ctx, text, max_width) {
         var width = ctx.measureText(text).width;
         var ellipsis = '…'
         var ellipsis_width = ctx.measureText(ellipsis).width;
@@ -80,9 +86,9 @@
         }
     };
 
-    jcanvas.image = function (ctx, backgroundUrl, x, y, w, h, r, rotation, callback) {
+    jcanvas.image = function(ctx, backgroundUrl, x, y, w, h, r, rotation, callback) {
         var img = new Image();
-        img.onload = function () {
+        img.onload = function() {
             ctx.save();
             ctx.translate(x, y);
             ctx.save();
@@ -100,7 +106,7 @@
         img.src = backgroundUrl;
     };
 
-    jsMind.screenshot = function (jm) {
+    jsMind.screenshot = function(jm) {
         this.jm = jm;
         this.canvas_elem = null;
         this.canvas_ctx = null;
@@ -108,8 +114,10 @@
     };
 
     jsMind.screenshot.prototype = {
-        init: function () {
-            if (this._inited) { return; }
+        init: function() {
+            if (this._inited) {
+                return;
+            }
             console.log('init');
             var c = $c('canvas');
             var ctx = c.getContext('2d');
@@ -121,10 +129,10 @@
             this.resize();
         },
 
-        shoot: function (callback) {
+        shoot: function(callback) {
             this.init();
             var jms = this;
-            this._draw(function () {
+            this._draw(function() {
                 if (!!callback) {
                     callback(jms);
                 }
@@ -133,20 +141,24 @@
             this._watermark();
         },
 
-        shootDownload: function () {
-            this.shoot(function (jms) {
+        shootDownload: function(qrcode_url) {
+            this.qrcode_url = qrcode_url;
+            this.shoot(function(jms) {
                 jms._download();
             });
+            this.qrcode_url = null;
         },
 
-        shootAsDataURL: function (callback) {
-            this.shoot(function (jms) {
+        shootAsDataURL: function(callback, qrcode_url) {
+            this.qrcode_url = qrcode_url
+            this.shoot(function(jms) {
                 callback(jms.canvas_elem.toDataURL());
             });
+            this.qrcode_url = null;
         },
 
-        shootAsDataURL_center: function (callback) {
-            this.shoot(function (jms) {
+        shootAsDataURL_center: function(callback) {
+            this.shoot(function(jms) {
                 var w = 960;
                 var h = 800;
                 var l = (jms.canvas_elem.width - w) / 2;
@@ -162,27 +174,30 @@
             });
         },
 
-        resize: function () {
+        resize: function() {
             if (this._inited) {
                 this.canvas_elem.width = this.jm.view.size.w;
                 this.canvas_elem.height = this.jm.view.size.h;
             }
         },
 
-        clean: function () {
+        clean: function() {
             var c = this.canvas_elem;
             this.canvas_ctx.clearRect(0, 0, c.width, c.height);
         },
 
-        _draw: function (callback) {
+        _draw: function(callback) {
             var ctx = this.canvas_ctx;
+            var c = this.canvas_elem;
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
+            ctx.fillStyle = '#FFF'
+            ctx.fillRect(0, 0, c.width, c.height);
             this._draw_lines();
             this._draw_nodes(callback);
         },
 
-        _watermark: function () {
+        _watermark: function() {
             var c = this.canvas_elem;
             var ctx = this.canvas_ctx;
             ctx.textAlign = 'right';
@@ -191,14 +206,51 @@
             ctx.font = '11px Verdana,Arial,Helvetica,sans-serif';
             // ctx.fillText('hizzgdev.github.io/jsmind', c.width - 5.5, c.height - 2.5);
             ctx.textAlign = 'left';
-            ctx.fillText($w.location, 5.5, c.height - 2.5);
+            // ctx.fillText($w.location, 5.5, c.height - 2.5);
+
+            var img = new Image();
+            img.setAttribute("crossOrigin", 'Anonymous')
+            img.onload = function() {
+                ctx.drawImage(img, c.width - 300, c.height - 115, 90, 90);
+            };
+            img.src = 'https://www.socialwiki.cn/static/template/logo.jpg';
+            // img.src = 'http://127.0.0.1:9000/static/template/logo.jpg';
+
+            if (!this.qrcode_url) {
+                return;
+            }
+
+            var img2 = new Image();
+            img2.setAttribute("crossOrigin", 'Anonymous')
+            img2.onload = function() {
+                ctx.drawImage(img2, c.width - 150, c.height - 120, 100, 100);
+            };
+            img2.src = this.qrcode_url;
+
         },
 
-        _draw_lines: function () {
-            this.jm.view.show_lines(this.canvas_ctx);
+        _draw_lines: function() {
+            // this.jm.view.show_lines(this.canvas_ctx);
+            var nodes = this.jm.mind.nodes;
+            var node = null;
+            var pin = null;
+            var pout = null;
+            var _offset = this.jm.view.get_view_offset();
+            for (var nodeid in nodes) {
+                node = nodes[nodeid];
+                if (!!node.isroot) {
+                    continue;
+                }
+                if (('visible' in node._data.layout) && !node._data.layout.visible) {
+                    continue;
+                }
+                pin = this.jm.view.layout.get_node_point_in(node);
+                pout = this.jm.view.layout.get_node_point_out(node.parent);
+                this.jm.view.draw_line(pout, pin, _offset, this.canvas_ctx);
+            }
         },
 
-        _draw_nodes: function (callback) {
+        _draw_nodes: function(callback) {
             var nodes = this.jm.mind.nodes;
             var node;
             for (var nodeid in nodes) {
@@ -223,7 +275,7 @@
             check_nodes_ready();
         },
 
-        _draw_node: function (node) {
+        _draw_node: function(node) {
             var ctx = this.canvas_ctx;
             var view_data = node._data.view;
             var node_element = view_data.element;
@@ -276,7 +328,7 @@
                     rotation = node.data['background-rotation'];
                 }
                 jcanvas.image(ctx, backgroundUrl, rb.x, rb.y, rb.w, rb.h, round_radius, rotation,
-                    function () {
+                    function() {
                         node.ready = true;
                     });
             }
@@ -296,10 +348,12 @@
             }
         },
 
-        _draw_expander: function (expander) {
+        _draw_expander: function(expander) {
             var ctx = this.canvas_ctx;
             var ncs = getComputedStyle(expander);
-            if (!is_visible(ncs)) { return; }
+            if (!is_visible(ncs)) {
+                return;
+            }
 
             var style_left = css(ncs, 'left');
             var style_top = css(ncs, 'top');
@@ -322,7 +376,7 @@
             ctx.stroke();
         },
 
-        _download: function () {
+        _download: function() {
             var c = this.canvas_elem;
             var name = this.jm.mind.name + '.png';
 
@@ -347,20 +401,20 @@
             }
         },
 
-        jm_event_handle: function (type, data) {
+        jm_event_handle: function(type, data) {
             if (type === jsMind.event_type.resize) {
                 this.resize();
             }
         }
     };
 
-    var screenshot_plugin = new jsMind.plugin('screenshot', function (jm) {
+    var screenshot_plugin = new jsMind.plugin('screenshot', function(jm) {
         var jss = new jsMind.screenshot(jm);
         jm.screenshot = jss;
-        jm.shoot = function () {
+        jm.shoot = function() {
             jss.shoot();
         };
-        jm.add_event_listener(function (type, data) {
+        jm.add_event_listener(function(type, data) {
             jss.jm_event_handle.call(jss, type, data);
         });
     });
