@@ -1,0 +1,113 @@
+<html>
+
+    <head>
+        <meta charset="utf-8">
+
+        <link rel="stylesheet" href="style/jsmind.css"/>
+
+        <style>
+        
+
+            
+        </style>
+    </head>
+
+    <body>
+
+        <div id="mind" style="width:400px;height:400px;margin:0 auto;"></div>
+
+    </body>
+    <script src="js/jsmind.js"></script>
+    <script src="js/jsmind.draggable.js"></script>
+
+
+    <script>
+
+        var mindData = {
+            "meta":{
+                "name":"jsMind remote",
+                "author":"hizzgdev@163.com",
+                "version":"0.2"
+            },
+            "format":"node_tree",
+            "data":{"id":"root","topic":"jsMind","children":[
+                {"id":"easy","topic":"Easy","direction":"left","expanded":true,"children":[
+                    {"id":"easy1","topic":"Easy to show"},
+                    {"id":"easy2","topic":"Easy to edit"},
+                    {"id":"easy3","topic":"Easy to store"},
+                    {"id":"easy4","topic":"Easy to embed","children":[
+                        {"id":"easy41","topic":"Easy to show"},
+                        {"id":"easy42","topic":"Easy to edit"},
+                        {"id":"easy43","topic":"Easy to store"},
+                        {"id":"open44","topic":"BSD License","children":[
+                            {"id":"open441","topic":"on GitHub"},
+                            {"id":"open442","topic":"BSD License"}
+                        ]},
+                        {"id":"easy45","topic":"Easy to embed"}
+                    ]}
+                ]},
+                {"id":"open","topic":"Open Source","direction":"right","children":[
+                    {"id":"open1","topic":"on GitHub"},
+                    {"id":"open2","topic":"BSD License","children":[
+                        {"id":"open21","topic":"on GitHub"},
+                        {"id":"open22","topic":"BSD License","children":[
+                            {"id":"open221","topic":"on GitHub"},
+                            {"id":"open222","topic":"BSD License"}
+                        ]}
+                    ]}
+                ]},
+                {"id":"powerful","topic":"Powerful","direction":"right","expanded":true,"children":[
+                    {"id":"powerful1","topic":"Base on Javascript"},
+                    {"id":"powerful2","topic":"Base on HTML5"},
+                    {"id":"powerful3","topic":"Depends on you","expanded":true,"children":[
+                        {"id":"powerful31","topic":"Base on Javascript"},
+                        {"id":"powerful32","topic":"Base on HTML5"},
+                        {"id":"powerful33","topic":"Depends on you"}
+                    ]}
+                ]},
+                {"id":"other","topic":"test node","direction":"left","children":[
+                    {"id":"other1","topic":"I'm from ajax"},
+                    {"id":"other2","topic":"I can do everything"}
+                ]}
+            ]}
+        }
+
+        var options = {
+            container:'mind',
+            editable:true,
+            theme:'primary',
+            fullScreen: true,
+            showTip: true,
+            shortcut: {
+                enable: true,
+                handles: {
+                },
+                mapping: {
+                    addchild: {which: 9 , key: 'tab 制表符' , desc: '插入子节点'}, // Insert
+                    addbrother: {which: 13 , key: 'enter' , desc: '插入同级节点'}, // Enter
+                    editnode: {which: 113 , key: 'F2' , desc: '编辑'},// F2
+                    delnode: {which: 46 , key: 'delete' , desc: '删除节点'}, // Delete
+                    toggle: {which: 32 , key: '空格' , desc: '展开或隐藏节点'}, // Space
+                    left: {which: 37 , key: '←' , desc: '光标向左移动'}, // Left
+                    up: {which: 38 , key: '↑' , desc: '光标向上移动'}, // Up
+                    right: {which: 39 , key: '→' , desc: '光标向右移动'}, // Right
+                    down: {which: 40 , key: '↓' , desc: '光标向下移动'} // Down
+                }
+            }
+        };
+
+        var jm = new jsMind(options)
+        jm.show(mindData)
+
+
+        var doEvent = function(e){
+            console.log(e);
+        }
+
+        document.body.onkeydown = doEvent;
+
+
+    
+    </script>
+
+</html>
