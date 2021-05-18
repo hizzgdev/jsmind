@@ -2313,6 +2313,7 @@
             this.graph = this.opts.engine.toLowerCase() === 'svg' ? new jm.graph_svg(this) : new jm.graph_canvas(this);
 
             this.e_panel.className = 'jsmind-inner';
+            this.e_panel.tabIndex = 1;
             this.e_panel.appendChild(this.graph.element());
             this.e_panel.appendChild(this.e_nodes);
 
@@ -2810,7 +2811,7 @@
 
     jm.shortcut_provider.prototype = {
         init: function () {
-            jm.util.dom.add_event($d, 'keydown', this.handler.bind(this));
+            jm.util.dom.add_event(this.jm.view.e_panel, 'keydown', this.handler.bind(this));
 
             this.handles['addchild'] = this.handle_addchild;
             this.handles['addbrother'] = this.handle_addbrother;
