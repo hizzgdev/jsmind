@@ -7,7 +7,7 @@
  */
 
 /* important section */
-.jsmind-inner{position:relative;overflow:auto;width:100%;height:100%;}/*box-shadow:0 0 2px #000;*/
+.jsmind-inner{position:relative;overflow:auto;width:100%;height:100%;outline:none;}/*box-shadow:0 0 2px #000;*/
 .jsmind-inner{
     moz-user-select:-moz-none;
     -moz-user-select:none;
