@@ -153,7 +153,7 @@
                     if (node.id == this.active_node.id) {
                         continue;
                     }
-                    if (!layout.is_visible(node)){
+                    if (!layout.is_visible(node)) {
                         continue;
                     }
                     ns = node.get_size();
@@ -241,8 +241,8 @@
                 if (!node.isroot) {
                     this.reset_shadow(el);
                     this.active_node = node;
-                    this.offset_x = (e.clientX || e.touches[0].clientX) - el.offsetLeft;
-                    this.offset_y = (e.clientY || e.touches[0].clientY) - el.offsetTop;
+                    this.offset_x = (e.clientX || e.touches[0].clientX) / jview.actualZoom - el.offsetLeft;
+                    this.offset_y = (e.clientY || e.touches[0].clientY) / jview.actualZoom - el.offsetTop;
                     this.client_hw = Math.floor(el.clientWidth / 2);
                     this.client_hh = Math.floor(el.clientHeight / 2);
                     if (this.hlookup_delay != 0) {
@@ -270,10 +270,9 @@
                 this.show_shadow();
                 this.moved = true;
                 clear_selection();
-                var px = (e.clientX || e.touches[0].clientX) - this.offset_x;
-                var py = (e.clientY || e.touches[0].clientY) - this.offset_y;
-                var cx = px + this.client_hw;
-                var cy = py + this.client_hh;
+                var jview = this.jm.view;
+                var px = (e.clientX || e.touches[0].clientX) / jview.actualZoom - this.offset_x;
+                var py = (e.clientY || e.touches[0].clientY) / jview.actualZoom - this.offset_y;
                 this.shadow.style.left = px + 'px';
                 this.shadow.style.top = py + 'px';
                 clear_selection();

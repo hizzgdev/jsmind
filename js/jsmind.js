@@ -533,7 +533,7 @@
                     d = node_json.direction == 'left' ? jm.direction.left : jm.direction.right;
                 }
                 var node = mind.add_node(node_parent, node_json.id, node_json.topic, data, null, d, node_json.expanded);
-                if ('children' in node_json) {
+                if (!!node_json['children']) {
                     var children = node_json.children;
                     for (var i = 0; i < children.length; i++) {
                         df._extract_subnode(mind, node, children[i]);
