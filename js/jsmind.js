@@ -2328,7 +2328,7 @@
             var v = this;
             jm.util.dom.add_event(this.e_editor, 'keydown', function (e) {
                 var evt = e || event;
-                if (evt.keyCode == 13) { v.edit_node_end(); v.e_panel.focus(); evt.stopPropagation(); }
+                if (evt.keyCode == 13) { v.edit_node_end(); evt.stopPropagation(); }
             });
             jm.util.dom.add_event(this.e_editor, 'blur', function (e) {
                 v.edit_node_end();
