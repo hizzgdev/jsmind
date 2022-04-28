@@ -2565,6 +2565,7 @@
                     this.jm.update_node(node.id, topic);
                 }
             }
+            this.e_panel.focus();
         },
 
         get_view_offset: function () {
