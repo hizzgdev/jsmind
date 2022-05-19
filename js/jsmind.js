@@ -12,7 +12,7 @@
     // __name__ should be a const value, Never try to change it easily.
     var __name__ = 'jsMind';
     // library version
-    var __version__ = '0.4.6';
+    var __version__ = '0.4.7';
     // author
     var __author__ = 'hizzgdev@163.com';
 
@@ -54,6 +54,7 @@
         theme: null,
         mode: 'full',    // full or side
         support_html: true,
+        draggable: false, // drag the mind map with your mouse, when it's larger that the container
 
         view: {
             engine: 'canvas',
@@ -1099,6 +1100,8 @@
             this._event_bind();
 
             jm.init_plugins(this);
+
+            this._drag_nodes()
         },
 
         enable_edit: function () {
@@ -1665,6 +1668,31 @@
             var l = this.event_handles.length;
             for (var i = 0; i < l; i++) {
                 this.event_handles[i](type, data);
+            }
+        },
+
+        // Drag the whole mind map with your mouse, when it's larger that the container
+        _drag_nodes: function () {
+            if (this.options.draggable) {
+                // Avoid scrollbars when mind map is larger than the container (e_panel = jsmind-inner)
+                this.view.e_panel.style = 'overflow: hidden'
+                // Move the whole mind map with mouse moves, while button is down.
+                this.view.container.onmousedown = (eventDown) => {
+                    // Record initial mouse position.
+                    let x = eventDown.clientX
+                    let y = eventDown.clientY
+                    // Stop moving mind map once mouse button is released.
+                    this.view.container.onmouseup = () => {
+                        this.view.container.onmousemove = null
+                    }
+                    // Follow current mouse position and move mind map accordingly.
+                    this.view.container.onmousemove = (eventMove) => {
+                        this.view.e_panel.scrollBy(x - eventMove.clientX, y - eventMove.clientY)
+                        // Record new reference position.
+                        x = eventMove.clientX
+                        y = eventMove.clientY
+                    }
+                }
             }
         }
 
@@ -3027,4 +3055,3 @@
         $w[__name__] = jm;
     }
 })(typeof window !== 'undefined' ? window : global);
-
