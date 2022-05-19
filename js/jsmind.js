@@ -232,11 +232,13 @@
             if (parent_node.isroot) {
                 var d = jm.direction.right;
                 if (isNaN(direction)) {
-                    var children = parent_node.children;
-                    var children_len = children.length;
-                    var r = 0;
-                    for (var i = 0; i < children_len; i++) { if (children[i].direction === jm.direction.left) { r--; } else { r++; } }
-                    d = (children_len > 1 && r > 0) ? jm.direction.left : jm.direction.right;
+                    if (jm.current.options.mode !== 'side') {
+                        var children = parent_node.children;
+                        var children_len = children.length;
+                        var r = 0;
+                        for (var i = 0; i < children_len; i++) { if (children[i].direction === jm.direction.left) { r--; } else { r++; } }
+                        d = (children_len > 1 && r > 0) ? jm.direction.left : jm.direction.right;
+                    }
                 } else {
                     d = (direction != jm.direction.left) ? jm.direction.right : jm.direction.left;
                 }

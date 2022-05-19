@@ -14,6 +14,7 @@ Links:
 * Demo :
   * <http://hizzgdev.github.io/jsmind/example/1_basic.html>
   * <http://hizzgdev.github.io/jsmind/example/2_features.html>
+  * <http://hizzgdev.github.io/jsmind/example/3_mathjax.html>
 * Documents :
   * [简体中文][1]
   * [English(draft)][2]
