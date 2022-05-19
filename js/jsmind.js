@@ -1678,7 +1678,7 @@
                 this.view.e_panel.style = 'overflow: hidden'
                 // Move the whole mind map with mouse moves, while button is down.
                 this.view.container.onmousedown = (eventDown) => {
-                    // Record initial mouse position.
+                    // Record current mouse position.
                     let x = eventDown.clientX
                     let y = eventDown.clientY
                     // Stop moving mind map once mouse button is released.
@@ -1688,7 +1688,7 @@
                     // Follow current mouse position and move mind map accordingly.
                     this.view.container.onmousemove = (eventMove) => {
                         this.view.e_panel.scrollBy(x - eventMove.clientX, y - eventMove.clientY)
-                        // Record new reference position.
+                        // Record new current position.
                         x = eventMove.clientX
                         y = eventMove.clientY
                     }
