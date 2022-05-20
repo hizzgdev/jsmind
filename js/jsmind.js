@@ -2809,6 +2809,7 @@
 
         // Drag the whole mind map with your mouse, when it's larger that the container
         _drag_nodes: function () {
+            // If draggable option is true.
             if (this.opts.draggable) {
                 // Dragging disabled by default.
                 let dragging = false
