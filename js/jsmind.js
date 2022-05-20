@@ -12,7 +12,7 @@
     // __name__ should be a const value, Never try to change it easily.
     var __name__ = 'jsMind';
     // library version
-    var __version__ = '0.4.6';
+    var __version__ = '0.4.7';
     // author
     var __author__ = 'hizzgdev@163.com';
 
@@ -60,7 +60,9 @@
             hmargin: 100,
             vmargin: 50,
             line_width: 2,
-            line_color: '#555'
+            line_color: '#555',
+            draggable: false, // drag the mind map with your mouse, when it's larger that the container
+            hide_scrollbars_when_draggable: false // hide container scrollbars, when mind map is larger than container and draggable option is true.
         },
         layout: {
             hspace: 30,
@@ -1083,7 +1085,9 @@
                 hmargin: opts.view.hmargin,
                 vmargin: opts.view.vmargin,
                 line_width: opts.view.line_width,
-                line_color: opts.view.line_color
+                line_color: opts.view.line_color,
+                draggable: opts.view.draggable,
+                hide_scrollbars_when_draggable: opts.view.hide_scrollbars_when_draggable
             };
             // create instance of function provider
             this.data = new jm.data_provider(this);
@@ -1666,7 +1670,7 @@
             for (var i = 0; i < l; i++) {
                 this.event_handles[i](type, data);
             }
-        }
+        },
 
     };
 
@@ -2337,6 +2341,8 @@
             });
 
             this.container.appendChild(this.e_panel);
+
+            this.enable_draggable_canvas()
         },
 
         add_event: function (obj, event_name, event_handle) {
@@ -2800,6 +2806,41 @@
                 this.graph.draw_line(pout, pin, _offset);
             }
         },
+
+        // Drag the whole mind map with your mouse, when it's larger that the container
+        enable_draggable_canvas: function () {
+            // If draggable option is true.
+            if (this.opts.draggable) {
+                // Dragging disabled by default.
+                let dragging = false
+                let x, y
+                if (this.opts.hide_scrollbars_when_draggable) {
+                    // Avoid scrollbars when mind map is larger than the container (e_panel = id jsmind-inner)
+                    this.e_panel.style = 'overflow: hidden'
+                }
+                // Move the whole mind map with mouse moves, while button is down.
+                jm.util.dom.add_event(this.container, 'mousedown', (eventDown) => {
+                    dragging = true
+                    // Record current mouse position.
+                    x = eventDown.clientX
+                    y = eventDown.clientY
+                })
+                // Stop moving mind map once mouse button is released.
+                jm.util.dom.add_event(this.container, 'mouseup', () => {
+                    dragging = false
+                })
+                // Follow current mouse position and move mind map accordingly.
+                jm.util.dom.add_event(this.container, 'mousemove', (eventMove) => {
+                    if (dragging) {
+                        this.e_panel.scrollBy(x - eventMove.clientX, y - eventMove.clientY)
+                        // Record new current position.
+                        x = eventMove.clientX
+                        y = eventMove.clientY
+                    }
+                })
+            }
+        },
+
     };
 
     // shortcut provider
@@ -3027,4 +3068,3 @@
         $w[__name__] = jm;
     }
 })(typeof window !== 'undefined' ? window : global);
-
