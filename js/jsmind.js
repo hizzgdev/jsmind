@@ -54,14 +54,15 @@
         theme: null,
         mode: 'full',    // full or side
         support_html: true,
-        draggable: false, // drag the mind map with your mouse, when it's larger that the container
 
         view: {
             engine: 'canvas',
             hmargin: 100,
             vmargin: 50,
             line_width: 2,
-            line_color: '#555'
+            line_color: '#555',
+            draggable: false, // drag the mind map with your mouse, when it's larger that the container
+            hide_scrollbars: false // hide container scrollbars, when mind map is larger than container and draggable option is true.
         },
         layout: {
             hspace: 30,
@@ -1084,7 +1085,9 @@
                 hmargin: opts.view.hmargin,
                 vmargin: opts.view.vmargin,
                 line_width: opts.view.line_width,
-                line_color: opts.view.line_color
+                line_color: opts.view.line_color,
+                draggable: opts.view.draggable,
+                hide_scrollbars: opts.view.hide_scrollbars
             };
             // create instance of function provider
             this.data = new jm.data_provider(this);
@@ -1100,8 +1103,6 @@
             this._event_bind();
 
             jm.init_plugins(this);
-
-            this._drag_nodes()
         },
 
         enable_edit: function () {
@@ -1670,31 +1671,6 @@
                 this.event_handles[i](type, data);
             }
         },
-
-        // Drag the whole mind map with your mouse, when it's larger that the container
-        _drag_nodes: function () {
-            if (this.options.draggable) {
-                // Avoid scrollbars when mind map is larger than the container (e_panel = jsmind-inner)
-                this.view.e_panel.style = 'overflow: hidden'
-                // Move the whole mind map with mouse moves, while button is down.
-                this.view.container.onmousedown = (eventDown) => {
-                    // Record current mouse position.
-                    let x = eventDown.clientX
-                    let y = eventDown.clientY
-                    // Stop moving mind map once mouse button is released.
-                    this.view.container.onmouseup = () => {
-                        this.view.container.onmousemove = null
-                    }
-                    // Follow current mouse position and move mind map accordingly.
-                    this.view.container.onmousemove = (eventMove) => {
-                        this.view.e_panel.scrollBy(x - eventMove.clientX, y - eventMove.clientY)
-                        // Record new current position.
-                        x = eventMove.clientX
-                        y = eventMove.clientY
-                    }
-                }
-            }
-        }
 
     };
 
@@ -2365,6 +2341,8 @@
             });
 
             this.container.appendChild(this.e_panel);
+
+            this._drag_nodes()
         },
 
         add_event: function (obj, event_name, event_handle) {
@@ -2828,6 +2806,40 @@
                 this.graph.draw_line(pout, pin, _offset);
             }
         },
+
+        // Drag the whole mind map with your mouse, when it's larger that the container
+        _drag_nodes: function () {
+            if (this.opts.draggable) {
+                // Dragging disabled by default.
+                let dragging = false
+                let x, y
+                if (this.opts.hide_scrollbars) {
+                    // Avoid scrollbars when mind map is larger than the container (e_panel = id jsmind-inner)
+                    this.e_panel.style = 'overflow: hidden'
+                }
+                // Move the whole mind map with mouse moves, while button is down.
+                jm.util.dom.add_event(this.container, 'mousedown', (eventDown) => {
+                    dragging = true
+                    // Record current mouse position.
+                    x = eventDown.clientX
+                    y = eventDown.clientY
+                })
+                // Stop moving mind map once mouse button is released.
+                jm.util.dom.add_event(this.container, 'mouseup', () => {
+                    dragging = false
+                })
+                // Follow current mouse position and move mind map accordingly.
+                jm.util.dom.add_event(this.container, 'mousemove', (eventMove) => {
+                    if (dragging) {
+                        this.e_panel.scrollBy(x - eventMove.clientX, y - eventMove.clientY)
+                        // Record new current position.
+                        x = eventMove.clientX
+                        y = eventMove.clientY
+                    }
+                })
+            }
+        },
+
     };
 
     // shortcut provider
