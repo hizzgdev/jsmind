@@ -62,7 +62,7 @@
             line_width: 2,
             line_color: '#555',
             draggable: false, // drag the mind map with your mouse, when it's larger that the container
-            hide_scrollbars: false // hide container scrollbars, when mind map is larger than container and draggable option is true.
+            hide_scrollbars_when_draggable: false // hide container scrollbars, when mind map is larger than container and draggable option is true.
         },
         layout: {
             hspace: 30,
@@ -1087,7 +1087,7 @@
                 line_width: opts.view.line_width,
                 line_color: opts.view.line_color,
                 draggable: opts.view.draggable,
-                hide_scrollbars: opts.view.hide_scrollbars
+                hide_scrollbars_when_draggable: opts.view.hide_scrollbars_when_draggable
             };
             // create instance of function provider
             this.data = new jm.data_provider(this);
@@ -2342,7 +2342,7 @@
 
             this.container.appendChild(this.e_panel);
 
-            this._drag_nodes()
+            this.enable_draggable_canvas()
         },
 
         add_event: function (obj, event_name, event_handle) {
@@ -2808,13 +2808,13 @@
         },
 
         // Drag the whole mind map with your mouse, when it's larger that the container
-        _drag_nodes: function () {
+        enable_draggable_canvas: function () {
             // If draggable option is true.
             if (this.opts.draggable) {
                 // Dragging disabled by default.
                 let dragging = false
                 let x, y
-                if (this.opts.hide_scrollbars) {
+                if (this.opts.hide_scrollbars_when_draggable) {
                     // Avoid scrollbars when mind map is larger than the container (e_panel = id jsmind-inner)
                     this.e_panel.style = 'overflow: hidden'
                 }
