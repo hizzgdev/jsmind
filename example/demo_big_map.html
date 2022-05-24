@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>jsMind</title>
+    <link type="text/css" rel="stylesheet" href="../style/jsmind.css" />
+    <style type="text/css">
+        #jsmind_container {
+            width: 800px;
+            height: 500px;
+            border: solid 1px #ccc;
+            /*background:#f4f4f4;*/
+            background: #f4f4f4;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="jsmind_container"></div>
+    <script type="text/javascript" src="../js/jsmind.js"></script>
+    <script type="text/javascript">
+        function page_load() {
+            var options = {
+                container: 'jsmind_container',
+                editable: true,
+                theme: 'primary',
+                view: {
+                    draggable: true
+                }
+            }
+
+            _jm = new jsMind(options)
+
+            jsMind.util.ajax.get('data_example_big_map.json', function (mind) {
+                _jm.show(mind);
+            });
+        }
+
+        page_load();
+    </script>
+</body>
+
+</html>
