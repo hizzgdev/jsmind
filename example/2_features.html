@@ -97,8 +97,7 @@
                 <li><button class="sub" onclick="expand_all();">expand all</button></li>
                 <li><button class="sub" onclick="collapse_all();">collapse all</button></li>
             </ol>
-            <li>zoom</li>
-
+            <li>zoom(ctrl+mousewheel)</li>
             <button id="zoom-in-button" style="width:50px" onclick="zoomIn();">
                 In
             </button>
@@ -147,7 +146,10 @@
         var options = {
             container:'jsmind_container',
             theme:'greensea',
-            editable:true
+            editable:true,
+            view: {
+                draggable: true
+            }
         }
         _jm = jsMind.show(options);
         // _jm = jsMind.show(options,mind);
