@@ -12,7 +12,7 @@
     // __name__ should be a const value, Never try to change it easily.
     var __name__ = 'jsMind';
     // library version
-    var __version__ = '0.4.7';
+    var __version__ = '0.4.8';
     // author
     var __author__ = 'hizzgdev@163.com';
 
@@ -72,7 +72,8 @@
         default_event_handle: {
             enable_mousedown_handle: true,
             enable_click_handle: true,
-            enable_dblclick_handle: true
+            enable_dblclick_handle: true,
+            enable_mousewheel_handle: true
         },
         shortcut: {
             enable: true,
@@ -1141,6 +1142,7 @@
             this.view.add_event(this, 'mousedown', this.mousedown_handle);
             this.view.add_event(this, 'click', this.click_handle);
             this.view.add_event(this, 'dblclick', this.dblclick_handle);
+            this.view.add_event(this, "mousewheel", this.mousewheel_handle)
         },
 
         mousedown_handle: function (e) {
@@ -1182,6 +1184,23 @@
                 if (!!nodeid) {
                     this.begin_edit(nodeid);
                 }
+            }
+        },
+
+        // Use [Ctrl] + Mousewheel, to zoom in/out.
+        mousewheel_handle: function(event) {
+            // Test if mousewheel option is enabled and Ctrl key is pressed.
+            if (!this.options.default_event_handle["enable_mousewheel_handle"] || !window.event.ctrlKey) {
+                return
+            }
+            // Avoid default page scrolling behavior.
+            event.preventDefault()
+
+            var dir = event.deltaY > 0 ? "Up" : "Down"
+            if (dir == "Up") {
+                this.view.zoomIn()
+            } else {
+                this.view.zoomOut()
             }
         },
 
