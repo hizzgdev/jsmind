@@ -15,6 +15,10 @@ test('create node', () => {
         _data: {}
     }
     expect(node).toEqual(expected_node)
+    expect(new jm.node()).toEqual({});
+    expect(new jm.node('1', '2')).toEqual({});
+    expect(new jm.node('1', 'a')).toEqual({});
+    expect(new jm.node('1', null)).toEqual({});
 });
 
 test('compare node', () => {
