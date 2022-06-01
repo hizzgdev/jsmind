@@ -15,6 +15,9 @@ test('create node', () => {
         _data: {}
     }
     expect(node).toEqual(expected_node)
+
+    const error = jest.spyOn(console, "error").mockImplementation(() => { });
+
     expect(new jm.node()).toEqual({});
     expect(new jm.node('1', '2')).toEqual({});
     expect(new jm.node('1', 'a')).toEqual({});

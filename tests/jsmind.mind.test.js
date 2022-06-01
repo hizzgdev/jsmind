@@ -1,2 +1,13 @@
 const jm = require('../js/jsmind');
-// TODO: add unit test
+
+test('create mind', () => {
+    const mind = new jm.mind();
+    expect(new jm.mind()).toEqual({
+        name: null,
+        author: null,
+        version: null,
+        root: null,
+        selected: null,
+        nodes: {}
+    })
+});
