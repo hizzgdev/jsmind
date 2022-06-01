@@ -119,7 +119,7 @@
     jm.key = { meta: 1 << 13, ctrl: 1 << 12, alt: 1 << 11, shift: 1 << 10 };
 
     jm.node = function (sId, iIndex, sTopic, oData, bIsRoot, oParent, eDirection, bExpanded) {
-        if (!sId) { logger.error('invalid nodeid'); return; }
+        if (!sId) { logger.error('invalid node id'); return; }
         if (typeof iIndex != 'number') { logger.error('invalid node index'); return; }
         if (typeof bExpanded === 'undefined') { bExpanded = true; }
         this.id = sId;
