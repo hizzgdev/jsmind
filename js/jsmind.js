@@ -292,7 +292,8 @@
             if (node.isroot) { return null; }
             var idx = node.index;
             var brothers = node.parent.children;
-            if (brothers.length >= idx) {
+            console.log('debug', brothers.length, idx)
+            if (brothers.length > idx) {
                 return node.parent.children[idx];
             } else {
                 return null;
