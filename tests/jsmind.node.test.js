@@ -1,6 +1,10 @@
 const jm = require('../js/jsmind');
 
-test('create node', () => {
+beforeEach(() => {
+    jest.restoreAllMocks();
+});
+
+test('initial', () => {
     const node = new jm.node('1', 1, 'topic', null, false, null, jm.direction.right)
     const expected_node = {
         id: '1',
@@ -16,7 +20,7 @@ test('create node', () => {
     }
     expect(node).toEqual(expected_node)
 
-    const error = jest.spyOn(console, "error").mockImplementation(() => { });
+    jest.spyOn(console, "error").mockImplementation(() => { });
 
     expect(new jm.node()).toEqual({});
     expect(new jm.node('1', '2')).toEqual({});
