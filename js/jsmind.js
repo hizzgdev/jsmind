@@ -12,7 +12,7 @@
     // __name__ should be a const value, Never try to change it easily.
     var __name__ = 'jsMind';
     // library version
-    var __version__ = '0.4.8';
+    var __version__ = '0.4.9';
     // author
     var __author__ = 'hizzgdev@163.com';
 
@@ -107,7 +107,7 @@
             return;
         }
         this.options = opts;
-        this.inited = false;
+        this.initialized = false;
         this.mind = null;
         this.event_handles = [];
         this.init();
@@ -215,39 +215,22 @@
             if (this.root == null) {
                 this.root = new jm.node(nodeid, 0, topic, data, true);
                 this._put_node(this.root);
+                return this.root;
             } else {
                 logger.error('root node is already exist');
+                return null;
             }
         },
 
-        add_node: function (parent_node, nodeid, topic, data, idx, direction, expanded) {
+        add_node: function (parent_node, nodeid, topic, data, direction, expanded, idx) {
             if (!jm.util.is_node(parent_node)) {
-                var the_parent_node = this.get_node(parent_node);
-                if (!the_parent_node) {
-                    logger.error('the parent_node[id=' + parent_node + '] can not be found.');
-                    return null;
-                } else {
-                    return this.add_node(the_parent_node, nodeid, topic, data, idx, direction, expanded);
-                }
+                logger.error('the parent_node '+parent_node+' is not a node.');
+                return null;
             }
-            var nodeindex = idx || -1;
-            var node = null;
+            var node_index = idx || -1;
+            var node = new jm.node(nodeid, node_index, topic, data, false, parent_node, parent_node.direction, expanded);
             if (parent_node.isroot) {
-                var d = jm.direction.right;
-                if (isNaN(direction)) {
-                    if (jm.current.options.mode !== 'side') {
-                        var children = parent_node.children;
-                        var children_len = children.length;
-                        var r = 0;
-                        for (var i = 0; i < children_len; i++) { if (children[i].direction === jm.direction.left) { r--; } else { r++; } }
-                        d = (children_len > 1 && r > 0) ? jm.direction.left : jm.direction.right;
-                    }
-                } else {
-                    d = (direction != jm.direction.left) ? jm.direction.right : jm.direction.left;
-                }
-                node = new jm.node(nodeid, nodeindex, topic, data, false, parent_node, d, expanded);
-            } else {
-                node = new jm.node(nodeid, nodeindex, topic, data, false, parent_node, parent_node.direction, expanded);
+                node.direction = direction || jm.direction.right;
             }
             if (this._put_node(node)) {
                 parent_node.children.push(node);
@@ -259,18 +242,13 @@
             return node;
         },
 
-        insert_node_before: function (node_before, nodeid, topic, data) {
+        insert_node_before: function (node_before, nodeid, topic, data, direction) {
             if (!jm.util.is_node(node_before)) {
-                var the_node_before = this.get_node(node_before);
-                if (!the_node_before) {
-                    logger.error('the node_before[id=' + node_before + '] can not be found.');
-                    return null;
-                } else {
-                    return this.insert_node_before(the_node_before, nodeid, topic, data);
-                }
+                logger.error('the node_before '+node_before+' is not a node.');
+                return null;
             }
             var node_index = node_before.index - 0.5;
-            return this.add_node(node_before.parent, nodeid, topic, data, node_index);
+            return this.add_node(node_before.parent, nodeid, topic, data, direction, true, node_index);
         },
 
         get_node_before: function (node) {
@@ -292,18 +270,13 @@
             }
         },
 
-        insert_node_after: function (node_after, nodeid, topic, data) {
+        insert_node_after: function (node_after, nodeid, topic, data, direction) {
             if (!jm.util.is_node(node_after)) {
-                var the_node_after = this.get_node(node_after);
-                if (!the_node_after) {
-                    logger.error('the node_after[id=' + node_after + '] can not be found.');
-                    return null;
-                } else {
-                    return this.insert_node_after(the_node_after, nodeid, topic, data);
-                }
+                logger.error('the node_after '+node_after+' is not a node.');
+                return null;
             }
             var node_index = node_after.index + 0.5;
-            return this.add_node(node_after.parent, nodeid, topic, data, node_index);
+            return this.add_node(node_after.parent, nodeid, topic, data, direction, true, node_index);
         },
 
         get_node_after: function (node) {
@@ -319,7 +292,8 @@
             if (node.isroot) { return null; }
             var idx = node.index;
             var brothers = node.parent.children;
-            if (brothers.length >= idx) {
+            console.log('debug', brothers.length, idx)
+            if (brothers.length > idx) {
                 return node.parent.children[idx];
             } else {
                 return null;
@@ -537,7 +511,7 @@
                 if (node_parent.isroot) {
                     d = node_json.direction == 'left' ? jm.direction.left : jm.direction.right;
                 }
-                var node = mind.add_node(node_parent, node_json.id, node_json.topic, data, null, d, node_json.expanded);
+                var node = mind.add_node(node_parent, node_json.id, node_json.topic, data, d, node_json.expanded);
                 if (!!node_json['children']) {
                     var children = node_json.children;
                     for (var i = 0; i < children.length; i++) {
@@ -616,9 +590,9 @@
                 var narray = node_array.slice(0);
                 // reverse array for improving looping performance
                 narray.reverse();
-                var root_id = df._extract_root(mind, narray);
-                if (!!root_id) {
-                    df._extract_subnode(mind, root_id, narray);
+                var root_node = df._extract_root(mind, narray);
+                if (!!root_node) {
+                    df._extract_subnode(mind, root_node, narray);
                 } else {
                     logger.error('root node can not be found');
                 }
@@ -631,15 +605,15 @@
                     if ('isroot' in node_array[i] && node_array[i].isroot) {
                         var root_json = node_array[i];
                         var data = df._extract_data(root_json);
-                        mind.set_root(root_json.id, root_json.topic, data);
+                        var node = mind.set_root(root_json.id, root_json.topic, data);
                         node_array.splice(i, 1);
-                        return root_json.id;
+                        return node;
                     }
                 }
                 return null;
             },
 
-            _extract_subnode: function (mind, parentid, node_array) {
+            _extract_subnode: function (mind, parent_node, node_array) {
                 var df = jm.format.node_array;
                 var i = node_array.length;
                 var node_json = null;
@@ -647,17 +621,17 @@
                 var extract_count = 0;
                 while (i--) {
                     node_json = node_array[i];
-                    if (node_json.parentid == parentid) {
+                    if (node_json.parentid == parent_node.id) {
                         data = df._extract_data(node_json);
                         var d = null;
                         var node_direction = node_json.direction;
                         if (!!node_direction) {
                             d = node_direction == 'left' ? jm.direction.left : jm.direction.right;
                         }
-                        mind.add_node(parentid, node_json.id, node_json.topic, data, null, d, node_json.expanded);
+                        var node = mind.add_node(parent_node, node_json.id, node_json.topic, data, d, node_json.expanded);
                         node_array.splice(i, 1);
                         extract_count++;
-                        var sub_extract_count = df._extract_subnode(mind, node_json.id, node_array);
+                        var sub_extract_count = df._extract_subnode(mind, node, node_array);
                         if (sub_extract_count > 0) {
                             // reset loop index after extract subordinate node
                             i = node_array.length;
@@ -794,7 +768,7 @@
                 return node;
             },
 
-            _load_node: function (mind, parent_id, xml_node) {
+            _load_node: function (mind, parent_node, xml_node) {
                 var df = jm.format.freemind;
                 var node_id = xml_node.getAttribute('ID');
                 var node_topic = xml_node.getAttribute('TEXT');
@@ -821,17 +795,18 @@
                     node_direction = node_position == 'left' ? jm.direction.left : jm.direction.right;
                 }
                 //logger.debug(node_position +':'+ node_direction);
-                if (!!parent_id) {
-                    mind.add_node(parent_id, node_id, node_topic, node_data, null, node_direction, node_expanded);
+                var node = null;
+                if (!!parent_node) {
+                    node = mind.add_node(parent_node, node_id, node_topic, node_data, node_direction, node_expanded);
                 } else {
-                    mind.set_root(node_id, node_topic, node_data);
+                    node = mind.set_root(node_id, node_topic, node_data);
                 }
                 var children = xml_node.childNodes;
                 var child = null;
                 for (var i = 0; i < children.length; i++) {
                     child = children[i];
                     if (child.nodeType == 1 && child.tagName == 'node') {
-                        df._load_node(mind, node_id, child);
+                        df._load_node(mind, node, child);
                     }
                 }
             },
@@ -1068,8 +1043,8 @@
 
     jm.prototype = {
         init: function () {
-            if (this.inited) { return; }
-            this.inited = true;
+            if (this.initialized) { return; }
+            this.initialized = true;
 
             var opts = this.options;
 
@@ -1188,7 +1163,7 @@
         },
 
         // Use [Ctrl] + Mousewheel, to zoom in/out.
-        mousewheel_handle: function(event) {
+        mousewheel_handle: function (event) {
             // Test if mousewheel option is enabled and Ctrl key is pressed.
             if (!this.options.default_event_handle["enable_mousewheel_handle"] || !window.event.ctrlKey) {
                 return
@@ -1343,20 +1318,25 @@
             return this.mind.root;
         },
 
-        get_node: function (nodeid) {
-            return this.mind.get_node(nodeid);
+        get_node: function (node) {
+            if(jm.util.is_node(node)){
+                return node;
+            }
+            return this.mind.get_node(node);
         },
 
         add_node: function (parent_node, nodeid, topic, data) {
             if (this.get_editable()) {
-                var node = this.mind.add_node(parent_node, nodeid, topic, data);
+                var the_parent_node = this.get_node(parent_node);
+                var direction = this.layout.calculate_next_child_direction(the_parent_node);
+                var node = this.mind.add_node(the_parent_node, nodeid, topic, data, direction);
                 if (!!node) {
                     this.view.add_node(node);
                     this.layout.layout();
                     this.view.show(false);
                     this.view.reset_node_custom_style(node);
-                    this.expand_node(parent_node);
-                    this.invoke_event_handle(jm.event_type.edit, { evt: 'add_node', data: [parent_node.id, nodeid, topic, data], node: nodeid });
+                    this.expand_node(the_parent_node);
+                    this.invoke_event_handle(jm.event_type.edit, { evt: 'add_node', data: [the_parent_node.id, nodeid, topic, data], node: nodeid });
                 }
                 return node;
             } else {
@@ -1367,13 +1347,14 @@
 
         insert_node_before: function (node_before, nodeid, topic, data) {
             if (this.get_editable()) {
-                var beforeid = jm.util.is_node(node_before) ? node_before.id : node_before;
-                var node = this.mind.insert_node_before(node_before, nodeid, topic, data);
+                var the_node_before = this.get_node(node_before);
+                var direction = this.layout.calculate_next_child_direction(the_node_before.parent);
+                var node = this.mind.insert_node_before(the_node_before, nodeid, topic, data, direction);
                 if (!!node) {
                     this.view.add_node(node);
                     this.layout.layout();
                     this.view.show(false);
-                    this.invoke_event_handle(jm.event_type.edit, { evt: 'insert_node_before', data: [beforeid, nodeid, topic, data], node: nodeid });
+                    this.invoke_event_handle(jm.event_type.edit, { evt: 'insert_node_before', data: [the_node_before.id, nodeid, topic, data], node: nodeid });
                 }
                 return node;
             } else {
@@ -1384,13 +1365,14 @@
 
         insert_node_after: function (node_after, nodeid, topic, data) {
             if (this.get_editable()) {
-                var afterid = jm.util.is_node(node_after) ? node_after.id : node_after;
-                var node = this.mind.insert_node_after(node_after, nodeid, topic, data);
+                var the_node_after = this.get_node(node_after);
+                var direction = this.layout.calculate_next_child_direction(the_node_after.parent);
+                var node = this.mind.insert_node_after(the_node_after, nodeid, topic, data, direction);
                 if (!!node) {
                     this.view.add_node(node);
                     this.layout.layout();
                     this.view.show(false);
-                    this.invoke_event_handle(jm.event_type.edit, { evt: 'insert_node_after', data: [afterid, nodeid, topic, data], node: nodeid });
+                    this.invoke_event_handle(jm.event_type.edit, { evt: 'insert_node_after', data: [the_node_after.id, nodeid, topic, data], node: nodeid });
                 }
                 return node;
             } else {
@@ -1763,10 +1745,23 @@
         init: function () {
             logger.debug('layout.init');
         },
+
         reset: function () {
             logger.debug('layout.reset');
             this.bounds = { n: 0, s: 0, w: 0, e: 0 };
         },
+
+        calculate_next_child_direction: function(node) {
+            if (this.isside) {
+                return jm.direction.right;
+            }
+            var children = node.children || [];
+            var children_len = children.length;
+            var r = 0;
+            for (var i = 0; i < children_len; i++) { if (children[i].direction === jm.direction.left) { r--; } else { r++; } }
+            return (children_len > 1 && r > 0) ? jm.direction.left : jm.direction.right;
+        },
+
         layout: function () {
             logger.debug('layout.layout');
             this.layout_direction();
