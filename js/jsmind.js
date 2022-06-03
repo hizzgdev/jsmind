@@ -299,20 +299,15 @@
             }
         },
 
-        move_node: function (node, beforeid, parentid, direction) {
+        move_node: function (node, before_id, parent_id, direction) {
             if (!jm.util.is_node(node)) {
-                var the_node = this.get_node(node);
-                if (!the_node) {
-                    logger.error('the node[id=' + node + '] can not be found.');
-                    return null;
-                } else {
-                    return this.move_node(the_node, beforeid, parentid, direction);
-                }
+                logger.error('the parameter node '+node+' is not a node.');
+                return null;
             }
-            if (!parentid) {
-                parentid = node.parent.id;
+            if (!parent_id) {
+                parent_id = node.parent.id;
             }
-            return this._move_node(node, beforeid, parentid, direction);
+            return this._move_node(node, before_id, parent_id, direction);
         },
 
         _flow_node_direction: function (node, direction) {
@@ -348,6 +343,11 @@
 
         _move_node: function (node, beforeid, parentid, direction) {
             if (!!node && !!parentid) {
+                var parent_node = this.get_node(parentid)
+                if(jm.node.inherited(node, parent_node)){
+                    logger.error('can not move a node to its children');
+                    return null;
+                }
                 if (node.parent.id != parentid) {
                     // remove from parent's children
                     var sibling = node.parent.children;
@@ -358,8 +358,8 @@
                             break;
                         }
                     }
-                    node.parent = this.get_node(parentid);
-                    node.parent.children.push(node);
+                    node.parent = parent_node;
+                    parent_node.children.push(node);
                 }
 
                 if (node.parent.isroot) {
@@ -1439,9 +1439,10 @@
 
         move_node: function (nodeid, beforeid, parentid, direction) {
             if (this.get_editable()) {
-                var node = this.mind.move_node(nodeid, beforeid, parentid, direction);
-                if (!!node) {
-                    this.view.update_node(node);
+                var node = this.get_node(nodeid);
+                var updated_node = this.mind.move_node(node, beforeid, parentid, direction);
+                if (!!updated_node) {
+                    this.view.update_node(updated_node);
                     this.layout.layout();
                     this.view.show(false);
                     this.invoke_event_handle(jm.event_type.edit, { evt: 'move_node', data: [nodeid, beforeid, parentid, direction], node: nodeid });

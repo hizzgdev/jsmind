@@ -119,10 +119,47 @@ test('get node before/after', () => {
     const node1 = mind.add_node(root, '1', 'node1');
     const node2 = mind.add_node(root, '2', 'node2');
     const node3 = mind.add_node(root, '3', 'node3');
-    expect(mind.get_node_before(node1)).toBe(null)
-    expect(mind.get_node_before(node2)).toBe(node1)
-    expect(mind.get_node_before(node3)).toBe(node2)
-    expect(mind.get_node_after(node1)).toBe(node2)
-    expect(mind.get_node_after(node2)).toBe(node3)
-    expect(mind.get_node_after(node3)).toBe(null)
+    expect(mind.get_node_before(node1)).toBe(null);
+    expect(mind.get_node_before(node2)).toBe(node1);
+    expect(mind.get_node_before(node3)).toBe(node2);
+    expect(mind.get_node_after(node1)).toBe(node2);
+    expect(mind.get_node_after(node2)).toBe(node3);
+    expect(mind.get_node_after(node3)).toBe(null);
 })
+
+test('move node', () => {
+    const mind = new jm.mind();
+    const root = mind.set_root('0', 'root');
+    const node1 = mind.add_node(root, '1', 'node1', null);
+    const node2 = mind.add_node(root, '2', 'node2', null);
+    const node3 = mind.add_node(root, '3', 'node3', null);
+
+    mind.move_node(node3, node2.id);
+    expect(mind.get_node_after(node1)).toBe(node3);
+    expect(mind.get_node_after(node3)).toBe(node2);
+
+    mind.move_node(node3, '_first_');
+    expect(mind.get_node_after(node3)).toBe(node1);
+    expect(mind.get_node_before(node3)).toBe(null);
+
+    mind.move_node(node3, '_last_');
+    expect(mind.get_node_before(node3)).toBe(node2);
+    expect(mind.get_node_after(node3)).toBe(null);
+
+    mind.move_node(node3, '_last_', node1.id);
+    expect(node3.parent).toBe(node1);
+    expect(root.children.length).toBe(2);
+    expect(node1.children[0]).toBe(node3);
+
+    mind.move_node(node2, '_first_', node1.id);
+    expect(node2.parent).toBe(node1);
+    expect(root.children.length).toBe(1);
+    expect(node1.children[0]).toBe(node2);
+    expect(node1.children[1]).toBe(node3);
+
+    jest.spyOn(console, "error").mockImplementation(() => { });
+    mind.move_node(node1, '_first_', node2.id);
+    expect(node1.parent).toBe(root);
+    expect(node2.children.length).toBe(0);
+
+});
