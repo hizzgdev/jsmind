@@ -163,3 +163,22 @@ test('move node', () => {
     expect(node2.children.length).toBe(0);
 
 });
+
+test('remove node', () => {
+    const mind = new jm.mind();
+    const root = mind.set_root('0', 'root');
+    const node1 = mind.add_node(root, '1', 'node1', null);
+    const node2 = mind.add_node(node1, '2', 'node2', null);
+    const node3 = mind.add_node(node2, '3', 'node3', null);
+    mind.selected = node3
+
+    mind.remove_node(root);
+    expect(mind.get_node('0')).toBe(root)
+    mind.remove_node(node1);
+    expect(root.children.length).toBe(0)
+    jest.spyOn(console, "warn").mockImplementation(() => { });
+    expect(mind.get_node('1')).toBe(null)
+    expect(mind.get_node('2')).toBe(null)
+    expect(mind.get_node('3')).toBe(null)
+    expect(mind.selected).toBe(null)
+});
