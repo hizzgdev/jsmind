@@ -224,7 +224,7 @@
 
         add_node: function (parent_node, nodeid, topic, data, direction, expanded, idx) {
             if (!jm.util.is_node(parent_node)) {
-                logger.error('the parent_node '+parent_node+' is not a node.');
+                logger.error('the parent_node ' + parent_node + ' is not a node.');
                 return null;
             }
             var node_index = idx || -1;
@@ -244,7 +244,7 @@
 
         insert_node_before: function (node_before, nodeid, topic, data, direction) {
             if (!jm.util.is_node(node_before)) {
-                logger.error('the node_before '+node_before+' is not a node.');
+                logger.error('the node_before ' + node_before + ' is not a node.');
                 return null;
             }
             var node_index = node_before.index - 0.5;
@@ -272,7 +272,7 @@
 
         insert_node_after: function (node_after, nodeid, topic, data, direction) {
             if (!jm.util.is_node(node_after)) {
-                logger.error('the node_after '+node_after+' is not a node.');
+                logger.error('the node_after ' + node_after + ' is not a node.');
                 return null;
             }
             var node_index = node_after.index + 0.5;
@@ -301,7 +301,7 @@
 
         move_node: function (node, before_id, parent_id, direction) {
             if (!jm.util.is_node(node)) {
-                logger.error('the parameter node '+node+' is not a node.');
+                logger.error('the parameter node ' + node + ' is not a node.');
                 return null;
             }
             if (!parent_id) {
@@ -344,7 +344,7 @@
         _move_node: function (node, beforeid, parentid, direction) {
             if (!!node && !!parentid) {
                 var parent_node = this.get_node(parentid)
-                if(jm.node.inherited(node, parent_node)){
+                if (jm.node.inherited(node, parent_node)) {
                     logger.error('can not move a node to its children');
                     return null;
                 }
@@ -379,16 +379,7 @@
 
         remove_node: function (node) {
             if (!jm.util.is_node(node)) {
-                var the_node = this.get_node(node);
-                if (!the_node) {
-                    logger.error('the node[id=' + node + '] can not be found.');
-                    return false;
-                } else {
-                    return this.remove_node(the_node);
-                }
-            }
-            if (!node) {
-                logger.error('fail, the node can not be found');
+                logger.error('the parameter node ' + node + ' is not a node.');
                 return false;
             }
             if (node.isroot) {
@@ -1318,7 +1309,7 @@
         },
 
         get_node: function (node) {
-            if(jm.util.is_node(node)){
+            if (jm.util.is_node(node)) {
                 return node;
             }
             return this.mind.get_node(node);
@@ -1751,7 +1742,7 @@
             this.bounds = { n: 0, s: 0, w: 0, e: 0 };
         },
 
-        calculate_next_child_direction: function(node) {
+        calculate_next_child_direction: function (node) {
             if (this.isside) {
                 return jm.direction.right;
             }
