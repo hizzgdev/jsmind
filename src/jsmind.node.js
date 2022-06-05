@@ -6,10 +6,11 @@
  *   https://github.com/hizzgdev/jsmind/
  */
 
+import { logger } from "./jsmind.common.js";
 export class Node {
     constructor(sId, iIndex, sTopic, oData, bIsRoot, oParent, eDirection, bExpanded) {
-        if (!sId) { jm.logger.error('invalid node id'); return; }
-        if (typeof iIndex != 'number') { jm.logger.error('invalid node index'); return; }
+        if (!sId) { logger.error('invalid node id'); return; }
+        if (typeof iIndex != 'number') { logger.error('invalid node index'); return; }
         if (typeof bExpanded === 'undefined') { bExpanded = true; }
         this.id = sId;
         this.index = iIndex;
