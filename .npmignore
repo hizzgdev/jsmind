@@ -1,0 +1,8 @@
+.github
+example
+features
+node_modules
+screenshots
+src
+tests
+.gitignore
