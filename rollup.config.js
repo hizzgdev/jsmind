@@ -6,7 +6,7 @@ export default [{
     output: {
         name: 'jsMind',
         file: 'es6/jsmind.js',
-        format: 'iife',
+        format: 'umd',
         banner: "/**\n* @license BSD-3-Clause\n* @copyright 2014-2022 hizzgdev@163.com\n*\n* Project Home:\n*   https://github.com/hizzgdev/jsmind/\n*/",
         sourcemap: true,
     },

@@ -8,6 +8,7 @@
 
 import { __version__, logger, EventType, Direction } from "./jsmind.common.js";
 import { merge_option } from "./jsmind.option.js";
+import { Mind } from "./jsmind.mind.js";
 import { Node } from "./jsmind.node.js";
 import { DataProvider } from "./jsmind.data_provider.js";
 import { LayoutProvider } from "./jsmind.layout_provider.js";
@@ -20,6 +21,7 @@ import { util as _util } from "./jsmind.util.js"
 
 
 class jm {
+    static mind = Mind;
     static node = Node;
     static direction = Direction;
     static event_type = EventType;
@@ -629,5 +631,4 @@ class jm {
     }
 }
 
-export default jsMind = jm;
-// window.jsMind = jsMind;
+export default jm;

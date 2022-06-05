@@ -1,4 +1,4 @@
-const jm = require('../js/jsmind');
+const jm = require('./jsmind.versions')
 
 beforeEach(() => {
     jest.restoreAllMocks();
