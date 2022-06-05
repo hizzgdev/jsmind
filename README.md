@@ -1,23 +1,29 @@
 jsMind
 ======
+![build-test](https://github.com/hizzgdev/jsmind/actions/workflows/node.js.yml/badge.svg)
 
-jsMind 是一个显示/编辑思维导图的纯 javascript 类库，其基于 html5 的 canvas 进行设计。jsMind 以 BSD 协议开源，在此基础上你可以在你的项目上任意使用。你可以在此浏览[适用于 jsMind 的 BSD 许可协议(中英文版本)][3]。
+jsMind 是一个显示/编辑思维导图的纯 javascript 类库，其基于 html5 canvas (和 svg) 进行设计。jsMind 以 BSD 协议开源，在此基础上你可以在你的项目上任意使用。你可以在此浏览[适用于 jsMind 的 BSD 许可协议(中英文版本)][3]。
 
-jsMind is a pure javascript library for mindmap, it base on html5 canvas. jsMind was released under BSD license, you can embed it in any project, if only you observe the license. You can read [the BSD license agreement for jsMind in English and Chinese version][3] here.
+jsMind is a pure javascript library for mindmap, it base on html5 canvas and svg. jsMind was released under BSD license, you can embed it in any project, if only you observe the license. You can read [the BSD license agreement for jsMind in English and Chinese version][3] here.
 
-**jsmind 现已发布到 npm https://www.npmjs.com/package/jsmind**
+ES6 Pilot Version:
+* 目前处于测试阶段，欢迎试用找bug
+* ES6 代码位于 `/src`
+* 可运行于浏览器的 js 文件位于 `/es6`
+* Demo <http://hizzgdev.github.io/jsmind/example/2_features_es6.html>
 
 Links:
 
 * App : <http://jsmind.sinaapp.com>
 * Home : <http://hizzgdev.github.io/jsmind/developer.html>
+* npm : <https://www.npmjs.com/package/jsmind>
 * Demo :
   * <http://hizzgdev.github.io/jsmind/example/1_basic.html>
   * <http://hizzgdev.github.io/jsmind/example/2_features.html>
   * <http://hizzgdev.github.io/jsmind/example/3_mathjax.html>
 * Documents :
   * [简体中文][1]
-  * [English(draft)][2]
+  * [English][2]
 * Wiki :
   * [邮件列表 Mailing List](../../wiki/MailingList)
   * [热点问题 Hot Topics](../../wiki/HotTopics)
