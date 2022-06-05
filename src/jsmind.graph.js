@@ -1,0 +1,115 @@
+/**
+ * @license BSD
+ * @copyright 2014-2022 hizzgdev@163.com
+ *
+ * Project Home:
+ *   https://github.com/hizzgdev/jsmind/
+ */
+
+import { $ } from "./jsmind.dom.js";
+
+class graph_svg {
+    constructor(view) {
+        this.view = view;
+        this.opts = view.opts;
+        this.e_svg = graph_svg.c('svg');
+        this.e_svg.setAttribute('class', 'jsmind');
+        this.size = { w: 0, h: 0 };
+        this.lines = [];
+    }
+    static c(tag) {
+        return $.d.createElementNS('http://www.w3.org/2000/svg', tag);
+    }
+    element() {
+        return this.e_svg;
+    }
+    set_size(w, h) {
+        this.size.w = w;
+        this.size.h = h;
+        this.e_svg.setAttribute('width', w);
+        this.e_svg.setAttribute('height', h);
+    }
+    clear() {
+        var len = this.lines.length;
+        while (len--) {
+            this.e_svg.removeChild(this.lines[len]);
+        }
+        this.lines.length = 0;
+    }
+    draw_line(pout, pin, offset) {
+        var line = graph_svg.c('path');
+        line.setAttribute('stroke', this.opts.line_color);
+        line.setAttribute('stroke-width', this.opts.line_width);
+        line.setAttribute('fill', 'transparent');
+        this.lines.push(line);
+        this.e_svg.appendChild(line);
+        this._bezier_to(line, pin.x + offset.x, pin.y + offset.y, pout.x + offset.x, pout.y + offset.y);
+    }
+    copy_to(dest_canvas_ctx, callback) {
+        var img = new Image();
+        img.onload = function () {
+            dest_canvas_ctx.drawImage(img, 0, 0);
+            !!callback && callback();
+        };
+        img.src = 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString(this.e_svg));
+    }
+    _bezier_to(path, x1, y1, x2, y2) {
+        path.setAttribute('d', 'M' + x1 + ' ' + y1 + ' C ' + (x1 + (x2 - x1) * 2 / 3) + ' ' + y1 + ', ' + x1 + ' ' + y2 + ', ' + x2 + ' ' + y2);
+    }
+    _line_to(path, x1, y1, x2, y2) {
+        path.setAttribute('d', 'M ' + x1 + ' ' + y1 + ' L ' + x2 + ' ' + y2);
+    }
+}
+
+
+class graph_canvas {
+    constructor(view) {
+        this.opts = view.opts;
+        this.e_canvas = $.c('canvas');
+        this.e_canvas.className = 'jsmind';
+        this.canvas_ctx = this.e_canvas.getContext('2d');
+        this.size = { w: 0, h: 0 };
+    }
+    element() {
+        return this.e_canvas;
+    }
+    set_size(w, h) {
+        this.size.w = w;
+        this.size.h = h;
+        this.e_canvas.width = w;
+        this.e_canvas.height = h;
+    }
+    clear() {
+        this.canvas_ctx.clearRect(0, 0, this.size.w, this.size.h);
+    }
+    draw_line(pout, pin, offset) {
+        var ctx = this.canvas_ctx;
+        ctx.strokeStyle = this.opts.line_color;
+        ctx.lineWidth = this.opts.line_width;
+        ctx.lineCap = 'round';
+
+        this._bezier_to(ctx,
+            pin.x + offset.x,
+            pin.y + offset.y,
+            pout.x + offset.x,
+            pout.y + offset.y);
+    }
+    copy_to(dest_canvas_ctx, callback) {
+        dest_canvas_ctx.drawImage(this.e_canvas, 0, 0);
+        !!callback && callback();
+    }
+    _bezier_to(ctx, x1, y1, x2, y2) {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.bezierCurveTo(x1 + (x2 - x1) * 2 / 3, y1, x1, y2, x2, y2);
+        ctx.stroke();
+    }
+    _line_to(ctx, x1, y1, x2, y2) {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+    }
+}
+
+export const graph = { svg: graph_svg, canvas: graph_canvas };
