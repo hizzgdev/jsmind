@@ -17,6 +17,7 @@ jobs:
     strategy:
       matrix:
         node-version: [12.x, 14.x, 16.x]
+        jm-lang: [ES5, ES6]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -29,3 +30,5 @@ jobs:
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
+      env: 
+        JM_LANG: ${{ matrix.jm-lang }}
