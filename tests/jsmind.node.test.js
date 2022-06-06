@@ -66,3 +66,12 @@ test('get location and size', () => {
     expect(fakeNode.get_location()).toEqual({ x: 1, y: 2 })
     expect(fakeNode.get_size()).toEqual({ w: 3, h: 4 })
 });
+
+test('check if it is a node', ()=>{
+    const fakeNode = new jm.node('1', 1)
+    expect(jm.node.is_node({})).toBeFalsy()
+    expect(jm.node.is_node(null)).toBeFalsy()
+    expect(jm.node.is_node()).toBeFalsy()
+    expect(jm.node.is_node('node')).toBeFalsy()
+    expect(jm.node.is_node(fakeNode)).toBeTruthy()
+});

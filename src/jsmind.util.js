@@ -11,31 +11,9 @@ import { logger } from "./jsmind.common.js";
 
 export const util = {
     ajax: {
-        _xhr: function () {
-            var xhr = null;
-            if (window.XMLHttpRequest) {
-                xhr = new XMLHttpRequest();
-            } else {
-                try {
-                    xhr = new ActiveXObject('Microsoft.XMLHTTP');
-                } catch (e) { }
-            }
-            return xhr;
-        },
-        _eurl: function (url) {
-            return encodeURIComponent(url);
-        },
         request: function (url, param, method, callback, fail_callback) {
-            var a = util.ajax;
-            var p = null;
-            var tmp_param = [];
-            for (var k in param) {
-                tmp_param.push(a._eurl(k) + '=' + a._eurl(param[k]));
-            }
-            if (tmp_param.length > 0) {
-                p = tmp_param.join('&');
-            }
-            var xhr = a._xhr();
+            var p = Object.keys(param).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(param[k])).join('&');
+            var xhr = new XMLHttpRequest();
             if (!xhr) { return; }
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == 4) {
@@ -120,28 +98,10 @@ export const util = {
 
     json: {
         json2string: function (json) {
-            if (!!JSON) {
-                try {
-                    var json_str = JSON.stringify(json);
-                    return json_str;
-                } catch (e) {
-                    logger.warn(e);
-                    logger.warn('can not convert to string');
-                    return null;
-                }
-            }
+            return JSON.stringify(json);
         },
         string2json: function (json_str) {
-            if (!!JSON) {
-                try {
-                    var json = JSON.parse(json_str);
-                    return json;
-                } catch (e) {
-                    logger.warn(e);
-                    logger.warn('can not parse to json');
-                    return null;
-                }
-            }
+            return JSON.parse(json_str);
         },
         merge: function (b, a) {
             for (var o in a) {
@@ -163,7 +123,7 @@ export const util = {
 
     uuid: {
         newid: function () {
-            return (new Date().getTime().toString(16) + Math.random().toString(16).substr(2)).substr(2, 16);
+            return (new Date().getTime().toString(16) + Math.random().toString(16).substring(2)).substring(2, 18);
         }
     },
 
