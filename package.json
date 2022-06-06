@@ -10,7 +10,7 @@
   "scripts": {
     "build": "rollup -c",
     "test": "jest",
-    "mt": "jest && JM_LANG=ES6 jest"
+    "test6": "JM_LANG=ES6 jest"
   },
   "repository": {
     "type": "git",
