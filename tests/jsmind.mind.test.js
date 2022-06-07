@@ -172,6 +172,7 @@ test('remove node', () => {
     const node3 = mind.add_node(node2, '3', 'node3', null);
     mind.selected = node3
 
+    jest.spyOn(console, "error").mockImplementation(() => { });
     mind.remove_node(root);
     expect(mind.get_node('0')).toBe(root)
     mind.remove_node(node1);
