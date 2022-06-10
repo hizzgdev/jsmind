@@ -1,4 +1,4 @@
-const jm = require('./jsmind.versions')
+const jm = require('./jsmind.versions');
 
 test('json serialization', () => {
     const jsonObject = { name: 'jsMind' };
@@ -11,14 +11,14 @@ test('json serialization', () => {
 test('json merge', () => {
     const o1 = { name: 'jsMind', license: 'BSD' };
     const o2 = { name: 'jsMind ES6', lang: 'ES6' };
-    const o3 = jm.util.json.merge({}, o1)
-    const o4 = jm.util.json.merge(o3, o2)
-    const o5 = jm.util.json.merge({}, o4)
+    const o3 = jm.util.json.merge({}, o1);
+    const o4 = jm.util.json.merge(o3, o2);
+    const o5 = jm.util.json.merge({}, o4);
 
-    expect(o3).toBe(o4)
-    expect(o4).toEqual({ name: 'jsMind ES6', lang: 'ES6', license: 'BSD' })
-    expect(o5).toEqual(o4)
-    expect(jm.util.json.merge(o5, {})).toEqual(o4)
+    expect(o3).toBe(o4);
+    expect(o4).toEqual({ name: 'jsMind ES6', lang: 'ES6', license: 'BSD' });
+    expect(o5).toEqual(o4);
+    expect(jm.util.json.merge(o5, {})).toEqual(o4);
 });
 
 test('uuid newid', () => {

@@ -6,15 +6,19 @@
  *   https://github.com/hizzgdev/jsmind/
  */
 
-import { $ } from "./jsmind.dom.js";
-import { logger } from "./jsmind.common.js";
+import { $ } from './jsmind.dom.js';
+import { logger } from './jsmind.common.js';
 
 export const util = {
     ajax: {
         request: function (url, param, method, callback, fail_callback) {
-            var p = Object.keys(param).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(param[k])).join('&');
+            var p = Object.keys(param)
+                .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(param[k]))
+                .join('&');
             var xhr = new XMLHttpRequest();
-            if (!xhr) { return; }
+            if (!xhr) {
+                return;
+            }
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == 4) {
                     if (xhr.status == 200 || xhr.status == 0) {
@@ -34,12 +38,15 @@ export const util = {
                         }
                     }
                 }
-            }
+            };
             method = method || 'GET';
             xhr.open(method, url, true);
             xhr.setRequestHeader('If-Modified-Since', '0');
             if (method == 'POST') {
-                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=utf-8');
+                xhr.setRequestHeader(
+                    'Content-Type',
+                    'application/x-www-form-urlencoded;charset=utf-8'
+                );
                 xhr.send(p);
             } else {
                 xhr.send();
@@ -50,7 +57,7 @@ export const util = {
         },
         post: function (url, param, callback) {
             return util.ajax.request(url, param, 'POST', callback);
-        }
+        },
     },
 
     file: {
@@ -69,7 +76,11 @@ export const util = {
             if (typeof $.w.Blob === 'function') {
                 blob = new Blob([file_data], { type: type });
             } else {
-                var BlobBuilder = $.w.BlobBuilder || $.w.MozBlobBuilder || $.w.WebKitBlobBuilder || $.w.MSBlobBuilder;
+                var BlobBuilder =
+                    $.w.BlobBuilder ||
+                    $.w.MozBlobBuilder ||
+                    $.w.WebKitBlobBuilder ||
+                    $.w.MSBlobBuilder;
                 var bb = new BlobBuilder();
                 bb.append(file_data);
                 blob = bb.getBlob(type);
@@ -93,7 +104,7 @@ export const util = {
                     location.href = bloburl;
                 }
             }
-        }
+        },
     },
 
     json: {
@@ -106,9 +117,11 @@ export const util = {
         merge: function (b, a) {
             for (var o in a) {
                 if (o in b) {
-                    if (typeof b[o] === 'object' &&
+                    if (
+                        typeof b[o] === 'object' &&
                         Object.prototype.toString.call(b[o]).toLowerCase() == '[object object]' &&
-                        !b[o].length) {
+                        !b[o].length
+                    ) {
                         util.json.merge(b[o], a[o]);
                     } else {
                         b[o] = a[o];
@@ -118,19 +131,23 @@ export const util = {
                 }
             }
             return b;
-        }
+        },
     },
 
     uuid: {
         newid: function () {
-            return (new Date().getTime().toString(16) + Math.random().toString(16).substring(2)).substring(2, 18);
-        }
+            return (
+                new Date().getTime().toString(16) + Math.random().toString(16).substring(2)
+            ).substring(2, 18);
+        },
     },
 
     text: {
         is_empty: function (s) {
-            if (!s) { return true; }
+            if (!s) {
+                return true;
+            }
             return s.replace(/\s*/, '').length == 0;
-        }
-    }
+        },
+    },
 };

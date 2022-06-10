@@ -1,13 +1,14 @@
 /**
  * @license BSD
  * @copyright 2014-2022 hizzgdev@163.com
- * 
+ *
  * Project Home:
  *   https://github.com/hizzgdev/jsmind/
  */
 
-
-if (!jsMind) { throw new Error('jsMind is not defined'); }
+if (!jsMind) {
+    throw new Error('jsMind is not defined');
+}
 
 const $ = jsMind.$;
 
@@ -17,7 +18,7 @@ var css = function (cStyle, property_name) {
 var is_visible = function (cStyle) {
     var visibility = css(cStyle, 'visibility');
     var display = css(cStyle, 'display');
-    return (visibility !== 'hidden' && display !== 'none');
+    return visibility !== 'hidden' && display !== 'none';
 };
 var jcanvas = {};
 jcanvas.rect = function (ctx, x, y, w, h, r) {
@@ -85,12 +86,12 @@ jcanvas.image = function (ctx, url, x, y, w, h, r, rotation, callback) {
         ctx.closePath();
         ctx.clip();
         ctx.translate(w / 2, h / 2);
-        ctx.rotate(rotation * Math.PI / 180);
+        ctx.rotate((rotation * Math.PI) / 180);
         ctx.drawImage(img, -w / 2, -h / 2);
         ctx.restore();
         ctx.restore();
         !!callback && callback();
-    }
+    };
     img.src = url;
 };
 
@@ -102,7 +103,9 @@ class screenshot {
         this._inited = false;
     }
     init() {
-        if (this._inited) { return; }
+        if (this._inited) {
+            return;
+        }
         console.log('init');
         var c = $.c('canvas');
         var ctx = c.getContext('2d');
@@ -115,21 +118,27 @@ class screenshot {
     }
     shoot(callback) {
         this.init();
-        this._draw(function () {
-            !!callback && callback();
-            this.clean();
-        }.bind(this));
+        this._draw(
+            function () {
+                !!callback && callback();
+                this.clean();
+            }.bind(this)
+        );
         this._watermark();
     }
     shootDownload() {
-        this.shoot(function () {
-            this._download();
-        }.bind(this));
+        this.shoot(
+            function () {
+                this._download();
+            }.bind(this)
+        );
     }
     shootAsDataURL(callback) {
-        this.shoot(function () {
-            !!callback && callback(this.canvas_elem.toDataURL());
-        }.bind(this));
+        this.shoot(
+            function () {
+                !!callback && callback(this.canvas_elem.toDataURL());
+            }.bind(this)
+        );
     }
     resize() {
         if (this._inited) {
@@ -145,9 +154,11 @@ class screenshot {
         var ctx = this.canvas_ctx;
         ctx.textAlign = 'left';
         ctx.textBaseline = 'top';
-        this._draw_lines(function () {
-            this._draw_nodes(callback);
-        }.bind(this));
+        this._draw_lines(
+            function () {
+                this._draw_nodes(callback);
+            }.bind(this)
+        );
     }
     _watermark() {
         var c = this.canvas_elem;
@@ -205,23 +216,30 @@ class screenshot {
         var padding_top = parseInt(css(ncs, 'padding-top'));
         var padding_bottom = parseInt(css(ncs, 'padding-bottom'));
         var text_overflow = css(ncs, 'text-overflow');
-        var font = css(ncs, 'font-style') + ' ' +
-            css(ncs, 'font-variant') + ' ' +
-            css(ncs, 'font-weight') + ' ' +
-            css(ncs, 'font-size') + '/' + css(ncs, 'line-height') + ' ' +
+        var font =
+            css(ncs, 'font-style') +
+            ' ' +
+            css(ncs, 'font-variant') +
+            ' ' +
+            css(ncs, 'font-weight') +
+            ' ' +
+            css(ncs, 'font-size') +
+            '/' +
+            css(ncs, 'line-height') +
+            ' ' +
             css(ncs, 'font-family');
 
         var rb = {
             x: view_data.abs_x,
             y: view_data.abs_y,
             w: view_data.width + 1,
-            h: view_data.height + 1
+            h: view_data.height + 1,
         };
         var tb = {
             x: rb.x + padding_left,
             y: rb.y + padding_top,
             w: rb.w - padding_left - padding_right,
-            h: rb.h - padding_top - padding_bottom
+            h: rb.h - padding_top - padding_bottom,
         };
 
         ctx.font = font;
@@ -239,10 +257,19 @@ class screenshot {
             if ('background-rotation' in node.data) {
                 rotation = node.data['background-rotation'];
             }
-            jcanvas.image(ctx, backgroundUrl, rb.x, rb.y, rb.w, rb.h, round_radius, rotation,
+            jcanvas.image(
+                ctx,
+                backgroundUrl,
+                rb.x,
+                rb.y,
+                rb.w,
+                rb.h,
+                round_radius,
+                rotation,
                 function () {
                     node.ready = true;
-                });
+                }
+            );
         }
         if (!!node.topic) {
             if (text_overflow === 'ellipsis') {
@@ -262,7 +289,9 @@ class screenshot {
     _draw_expander(expander) {
         var ctx = this.canvas_ctx;
         var ncs = getComputedStyle(expander);
-        if (!is_visible(ncs)) { return; }
+        if (!is_visible(ncs)) {
+            return;
+        }
 
         var style_left = css(ncs, 'left');
         var style_top = css(ncs, 'top');
@@ -288,7 +317,7 @@ class screenshot {
         var c = this.canvas_elem;
         var name = this.jm.mind.name + '.png';
 
-        if (navigator.msSaveBlob && (!!c.msToBlob)) {
+        if (navigator.msSaveBlob && !!c.msToBlob) {
             var blob = c.msToBlob();
             navigator.msSaveBlob(blob, name);
         } else {
@@ -314,7 +343,6 @@ class screenshot {
         }
     }
 }
-
 
 var screenshot_plugin = new jsMind.plugin('screenshot', function (jm) {
     var jss = new screenshot(jm);

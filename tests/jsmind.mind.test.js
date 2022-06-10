@@ -1,4 +1,4 @@
-const jm = require('./jsmind.versions')
+const jm = require('./jsmind.versions');
 
 beforeEach(() => {
     jest.restoreAllMocks();
@@ -12,71 +12,71 @@ test('initial', () => {
         version: null,
         root: null,
         selected: null,
-        nodes: {}
-    })
+        nodes: {},
+    });
 });
 
 test('get node', () => {
     const mind = new jm.mind();
     const fake_node = new jm.node('1', 1);
-    mind.nodes = { '1': fake_node }
-    expect(mind.get_node('1')).toBe(fake_node)
+    mind.nodes = { 1: fake_node };
+    expect(mind.get_node('1')).toBe(fake_node);
 
-    jest.spyOn(console, "warn").mockImplementation(() => { });
-    expect(mind.get_node('2')).toBe(null)
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    expect(mind.get_node('2')).toBe(null);
 });
 
 test('set root', () => {
     const mind = new jm.mind();
-    mind.set_root('1', 'root', { 'addition': 'test' });
-    const root_node = new jm.node('1', 0, 'root', { 'addition': 'test' }, true);
+    mind.set_root('1', 'root', { addition: 'test' });
+    const root_node = new jm.node('1', 0, 'root', { addition: 'test' }, true);
     expect(mind).toEqual({
         name: null,
         author: null,
         version: null,
         root: root_node,
         selected: null,
-        nodes: { '1': root_node }
+        nodes: { 1: root_node },
     });
-    jest.spyOn(console, "warn").mockImplementation(() => { });
-    expect(mind.get_node('2')).toBe(null)
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    expect(mind.get_node('2')).toBe(null);
 });
 
 test('add node', () => {
     const mind = new jm.mind();
     const root = mind.set_root('1', 'root');
-    const node2 = mind.add_node(root, '2', 'node2', { 'addition': 'test 2' })
-    const node3 = mind.add_node(root, '3', 'node3', { 'addition': 'test 3' }, jm.direction.left)
-    const node4 = mind.add_node(root, '4', 'node4')
+    const node2 = mind.add_node(root, '2', 'node2', { addition: 'test 2' });
+    const node3 = mind.add_node(root, '3', 'node3', { addition: 'test 3' }, jm.direction.left);
+    const node4 = mind.add_node(root, '4', 'node4');
 
-    expect(mind.get_node('1')).toBe(root)
-    expect(mind.get_node('2')).toBe(node2)
-    expect(mind.get_node('3')).toBe(node3)
-    expect(mind.get_node('4')).toBe(node4)
+    expect(mind.get_node('1')).toBe(root);
+    expect(mind.get_node('2')).toBe(node2);
+    expect(mind.get_node('3')).toBe(node3);
+    expect(mind.get_node('4')).toBe(node4);
 
     expect(node2).toEqual({
         id: '2',
         index: 1,
         topic: 'node2',
-        data: { 'addition': 'test 2' },
+        data: { addition: 'test 2' },
         isroot: false,
         parent: root,
         direction: jm.direction.right,
         expanded: true,
         children: [],
-        _data: {}
+        _data: {},
     });
     expect(node3).toEqual({
         id: '3',
         index: 2,
         topic: 'node3',
-        data: { 'addition': 'test 3' },
+        data: { addition: 'test 3' },
         isroot: false,
         parent: root,
         direction: jm.direction.left,
         expanded: true,
         children: [],
-        _data: {}
+        _data: {},
     });
     expect(node4).toEqual({
         id: '4',
@@ -88,15 +88,15 @@ test('add node', () => {
         direction: jm.direction.right,
         expanded: true,
         children: [],
-        _data: {}
+        _data: {},
     });
-    expect(node2.index).toBe(1)
-    expect(node3.index).toBe(2)
-    expect(node4.index).toBe(3)
+    expect(node2.index).toBe(1);
+    expect(node3.index).toBe(2);
+    expect(node4.index).toBe(3);
 
-    jest.spyOn(console, "error").mockImplementation(() => { });
-    jest.spyOn(console, "warn").mockImplementation(() => { });
-    expect(mind.add_node('100')).toBe(null)
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    expect(mind.add_node('100')).toBe(null);
 });
 
 test('insert node before/after', () => {
@@ -111,7 +111,7 @@ test('insert node before/after', () => {
     expect(node_a.index).toBe(1);
     expect(node1.index).toBe(2);
     expect(node_b.index).toBe(3);
-})
+});
 
 test('get node before/after', () => {
     const mind = new jm.mind();
@@ -125,7 +125,7 @@ test('get node before/after', () => {
     expect(mind.get_node_after(node1)).toBe(node2);
     expect(mind.get_node_after(node2)).toBe(node3);
     expect(mind.get_node_after(node3)).toBe(null);
-})
+});
 
 test('move node', () => {
     const mind = new jm.mind();
@@ -157,11 +157,10 @@ test('move node', () => {
     expect(node1.children[0]).toBe(node2);
     expect(node1.children[1]).toBe(node3);
 
-    jest.spyOn(console, "error").mockImplementation(() => { });
+    jest.spyOn(console, 'error').mockImplementation(() => {});
     mind.move_node(node1, '_first_', node2.id);
     expect(node1.parent).toBe(root);
     expect(node2.children.length).toBe(0);
-
 });
 
 test('remove node', () => {
@@ -170,16 +169,16 @@ test('remove node', () => {
     const node1 = mind.add_node(root, '1', 'node1', null);
     const node2 = mind.add_node(node1, '2', 'node2', null);
     const node3 = mind.add_node(node2, '3', 'node3', null);
-    mind.selected = node3
+    mind.selected = node3;
 
-    jest.spyOn(console, "error").mockImplementation(() => { });
+    jest.spyOn(console, 'error').mockImplementation(() => {});
     mind.remove_node(root);
-    expect(mind.get_node('0')).toBe(root)
+    expect(mind.get_node('0')).toBe(root);
     mind.remove_node(node1);
-    expect(root.children.length).toBe(0)
-    jest.spyOn(console, "warn").mockImplementation(() => { });
-    expect(mind.get_node('1')).toBe(null)
-    expect(mind.get_node('2')).toBe(null)
-    expect(mind.get_node('3')).toBe(null)
-    expect(mind.selected).toBe(null)
+    expect(root.children.length).toBe(0);
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    expect(mind.get_node('1')).toBe(null);
+    expect(mind.get_node('2')).toBe(null);
+    expect(mind.get_node('3')).toBe(null);
+    expect(mind.selected).toBe(null);
 });
