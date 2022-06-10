@@ -6,20 +6,20 @@
  *   https://github.com/hizzgdev/jsmind/
  */
 
-import { __author__, __version__ , logger, Direction} from "./jsmind.common.js";
-import { Mind } from "./jsmind.mind.js";
-import { Node } from "./jsmind.node.js";
+import { __author__, __version__, logger, Direction } from './jsmind.common.js';
+import { Mind } from './jsmind.mind.js';
+import { Node } from './jsmind.node.js';
 
 export const format = {
     node_tree: {
         example: {
-            "meta": {
-                "name": 'jsMind node_tree simple',
-                "author": __author__,
-                "version": __version__
+            meta: {
+                name: 'jsMind node_tree simple',
+                author: __author__,
+                version: __version__,
             },
-            "format": "node_tree",
-            "data": { "id": "root", "topic": "jsMind Example" }
+            format: 'node_tree',
+            data: { id: 'root', topic: 'jsMind Example' },
         },
         get_mind: function (source) {
             var df = format.node_tree;
@@ -36,7 +36,7 @@ export const format = {
             json.meta = {
                 name: mind.name,
                 author: mind.author,
-                version: mind.version
+                version: mind.version,
             };
             json.format = 'node_tree';
             json.data = df._buildnode(mind.root);
@@ -58,7 +58,13 @@ export const format = {
         _extract_data: function (node_json) {
             var data = {};
             for (var k in node_json) {
-                if (k == 'id' || k == 'topic' || k == 'children' || k == 'direction' || k == 'expanded') {
+                if (
+                    k == 'id' ||
+                    k == 'topic' ||
+                    k == 'children' ||
+                    k == 'direction' ||
+                    k == 'expanded'
+                ) {
                     continue;
                 }
                 data[k] = node_json[k];
@@ -73,7 +79,14 @@ export const format = {
             if (node_parent.isroot) {
                 d = node_json.direction == 'left' ? Direction.left : Direction.right;
             }
-            var node = mind.add_node(node_parent, node_json.id, node_json.topic, data, d, node_json.expanded);
+            var node = mind.add_node(
+                node_parent,
+                node_json.id,
+                node_json.topic,
+                data,
+                d,
+                node_json.expanded
+            );
             if (!!node_json['children']) {
                 var children = node_json.children;
                 for (var i = 0; i < children.length; i++) {
@@ -84,11 +97,13 @@ export const format = {
 
         _buildnode: function (node) {
             var df = format.node_tree;
-            if (!(node instanceof Node)) { return; }
+            if (!(node instanceof Node)) {
+                return;
+            }
             var o = {
                 id: node.id,
                 topic: node.topic,
-                expanded: node.expanded
+                expanded: node.expanded,
             };
             if (!!node.parent && node.parent.isroot) {
                 o.direction = node.direction == Direction.left ? 'left' : 'right';
@@ -107,20 +122,18 @@ export const format = {
                 }
             }
             return o;
-        }
+        },
     },
 
     node_array: {
         example: {
-            "meta": {
-                "name": 'jsMind node_array simple',
-                "author": __author__,
-                "version": __version__
+            meta: {
+                name: 'jsMind node_array simple',
+                author: __author__,
+                version: __version__,
             },
-            "format": "node_array",
-            "data": [
-                { "id": "root", "topic": "jsMind Example", "isroot": true }
-            ]
+            format: 'node_array',
+            data: [{ id: 'root', topic: 'jsMind Example', isroot: true }],
         },
 
         get_mind: function (source) {
@@ -139,7 +152,7 @@ export const format = {
             json.meta = {
                 name: mind.name,
                 author: mind.author,
-                version: mind.version
+                version: mind.version,
             };
             json.format = 'node_array';
             json.data = [];
@@ -190,7 +203,14 @@ export const format = {
                     if (!!node_direction) {
                         d = node_direction == 'left' ? Direction.left : Direction.right;
                     }
-                    var node = mind.add_node(parent_node, node_json.id, node_json.topic, data, d, node_json.expanded);
+                    var node = mind.add_node(
+                        parent_node,
+                        node_json.id,
+                        node_json.topic,
+                        data,
+                        d,
+                        node_json.expanded
+                    );
                     node_array.splice(i, 1);
                     extract_count++;
                     var sub_extract_count = df._extract_subnode(mind, node, node_array);
@@ -207,7 +227,14 @@ export const format = {
         _extract_data: function (node_json) {
             var data = {};
             for (var k in node_json) {
-                if (k == 'id' || k == 'topic' || k == 'parentid' || k == 'isroot' || k == 'direction' || k == 'expanded') {
+                if (
+                    k == 'id' ||
+                    k == 'topic' ||
+                    k == 'parentid' ||
+                    k == 'isroot' ||
+                    k == 'direction' ||
+                    k == 'expanded'
+                ) {
                     continue;
                 }
                 data[k] = node_json[k];
@@ -222,11 +249,13 @@ export const format = {
 
         _array_node: function (node, node_array) {
             var df = format.node_array;
-            if (!(node instanceof Node)) { return; }
+            if (!(node instanceof Node)) {
+                return;
+            }
             var o = {
                 id: node.id,
                 topic: node.topic,
-                expanded: node.expanded
+                expanded: node.expanded,
             };
             if (!!node.parent) {
                 o.parentid = node.parent.id;
@@ -235,7 +264,7 @@ export const format = {
                 o.isroot = true;
             }
             if (!!node.parent && node.parent.isroot) {
-                    o.direction = node.direction == Direction.left ? 'left' : 'right';
+                o.direction = node.direction == Direction.left ? 'left' : 'right';
             }
             if (node.data != null) {
                 var node_data = node.data;
@@ -253,13 +282,13 @@ export const format = {
 
     freemind: {
         example: {
-            "meta": {
-                "name": 'jsMind freemind example',
-                "author": __author__,
-                "version": __version__
+            meta: {
+                name: 'jsMind freemind example',
+                author: __author__,
+                version: __version__,
             },
-            "format": "freemind",
-            "data": "<map version=\"1.0.1\"><node ID=\"root\" TEXT=\"freemind Example\"/></map>"
+            format: 'freemind',
+            data: '<map version="1.0.1"><node ID="root" TEXT="freemind Example"/></map>',
         },
         get_mind: function (source) {
             var df = format.freemind;
@@ -280,11 +309,11 @@ export const format = {
             json.meta = {
                 name: mind.name,
                 author: mind.author,
-                version: mind.version
+                version: mind.version,
             };
             json.format = 'freemind';
             var xmllines = [];
-            xmllines.push('<map version=\"1.0.1\">');
+            xmllines.push('<map version="1.0.1">');
             df._buildmap(mind.root, xmllines);
             xmllines.push('</map>');
             json.data = xmllines.join(' ');
@@ -296,7 +325,8 @@ export const format = {
             if (window.DOMParser) {
                 var parser = new DOMParser();
                 xml_doc = parser.parseFromString(xml, 'text/xml');
-            } else { // Internet Explorer
+            } else {
+                // Internet Explorer
                 xml_doc = new ActiveXObject('Microsoft.XMLDOM');
                 xml_doc.async = false;
                 xml_doc.loadXML(xml);
@@ -347,7 +377,7 @@ export const format = {
                 }
             }
             var node_data = df._load_attributes(xml_node);
-            var node_expanded = ('expanded' in node_data) ? (node_data.expanded == 'true') : true;
+            var node_expanded = 'expanded' in node_data ? node_data.expanded == 'true' : true;
             delete node_data.expanded;
 
             var node_position = xml_node.getAttribute('POSITION');
@@ -357,7 +387,14 @@ export const format = {
             }
             var node = null;
             if (!!parent_node) {
-                node = mind.add_node(parent_node, node_id, node_topic, node_data, node_direction, node_expanded);
+                node = mind.add_node(
+                    parent_node,
+                    node_id,
+                    node_topic,
+                    node_data,
+                    node_direction,
+                    node_expanded
+                );
             } else {
                 node = mind.set_root(node_id, node_topic, node_data);
             }
@@ -391,20 +428,20 @@ export const format = {
                 pos = node.direction === Direction.left ? 'left' : 'right';
             }
             xmllines.push('<node');
-            xmllines.push('ID=\"' + node.id + '\"');
+            xmllines.push('ID="' + node.id + '"');
             if (!!pos) {
-                xmllines.push('POSITION=\"' + pos + '\"');
+                xmllines.push('POSITION="' + pos + '"');
             }
-            xmllines.push('TEXT=\"' + node.topic + '\">');
+            xmllines.push('TEXT="' + node.topic + '">');
 
             // store expanded status as an attribute
-            xmllines.push('<attribute NAME=\"expanded\" VALUE=\"' + node.expanded + '\"/>');
+            xmllines.push('<attribute NAME="expanded" VALUE="' + node.expanded + '"/>');
 
             // for attributes
             var node_data = node.data;
             if (node_data != null) {
                 for (var k in node_data) {
-                    xmllines.push('<attribute NAME=\"' + k + '\" VALUE=\"' + node_data[k] + '\"/>');
+                    xmllines.push('<attribute NAME="' + k + '" VALUE="' + node_data[k] + '"/>');
                 }
             }
 
@@ -416,5 +453,5 @@ export const format = {
 
             xmllines.push('</node>');
         },
-    }
+    },
 };

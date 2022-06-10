@@ -6,19 +6,18 @@
  *   https://github.com/hizzgdev/jsmind/
  */
 
-import { __version__, logger, EventType, Direction } from "./jsmind.common.js";
-import { merge_option } from "./jsmind.option.js";
-import { Mind } from "./jsmind.mind.js";
-import { Node } from "./jsmind.node.js";
-import { DataProvider } from "./jsmind.data_provider.js";
-import { LayoutProvider } from "./jsmind.layout_provider.js";
-import { ViewProvider } from "./jsmind.view_provider.js";
-import { ShortcutProvider } from "./jsmind.shortcut_provider.js";
-import { Plugin, register as _register_plugin, apply as apply_plugins } from "./jsmind.plugin.js";
-import { format } from "./jsmind.format.js";
-import { $ } from "./jsmind.dom.js";
-import { util as _util } from "./jsmind.util.js"
-
+import { __version__, logger, EventType, Direction } from './jsmind.common.js';
+import { merge_option } from './jsmind.option.js';
+import { Mind } from './jsmind.mind.js';
+import { Node } from './jsmind.node.js';
+import { DataProvider } from './jsmind.data_provider.js';
+import { LayoutProvider } from './jsmind.layout_provider.js';
+import { ViewProvider } from './jsmind.view_provider.js';
+import { ShortcutProvider } from './jsmind.shortcut_provider.js';
+import { Plugin, register as _register_plugin, apply as apply_plugins } from './jsmind.plugin.js';
+import { format } from './jsmind.format.js';
+import { $ } from './jsmind.dom.js';
+import { util as _util } from './jsmind.util.js';
 
 class jm {
     static mind = Mind;
@@ -26,9 +25,9 @@ class jm {
     static direction = Direction;
     static event_type = EventType;
     static $ = $;
-    static plugin = Plugin
-    static register_plugin = _register_plugin
-    static util = _util
+    static plugin = Plugin;
+    static register_plugin = _register_plugin;
+    static util = _util;
 
     constructor(options) {
         jm.current = this;
@@ -41,13 +40,15 @@ class jm {
     }
 
     init() {
-        if (!!this.initialized) { return; }
+        if (!!this.initialized) {
+            return;
+        }
         this.initialized = true;
         var opts_layout = {
             mode: this.options.mode,
             hspace: this.options.layout.hspace,
             vspace: this.options.layout.vspace,
-            pspace: this.options.layout.pspace
+            pspace: this.options.layout.pspace,
         };
         var opts_view = {
             container: this.options.container,
@@ -58,7 +59,7 @@ class jm {
             line_width: this.options.view.line_width,
             line_color: this.options.view.line_color,
             draggable: this.options.view.draggable,
-            hide_scrollbars_when_draggable: this.options.view.hide_scrollbars_when_draggable
+            hide_scrollbars_when_draggable: this.options.view.hide_scrollbars_when_draggable,
         };
         // create instance of function provider
         this.data = new DataProvider(this);
@@ -96,7 +97,7 @@ class jm {
     }
     set_theme(theme) {
         var theme_old = this.options.theme;
-        this.options.theme = (!!theme) ? theme : null;
+        this.options.theme = !!theme ? theme : null;
         if (theme_old != this.options.theme) {
             this.view.reset_theme();
             this.view.reset_custom_style();
@@ -106,7 +107,7 @@ class jm {
         this.view.add_event(this, 'mousedown', this.mousedown_handle);
         this.view.add_event(this, 'click', this.click_handle);
         this.view.add_event(this, 'dblclick', this.dblclick_handle);
-        this.view.add_event(this, "mousewheel", this.mousewheel_handle);
+        this.view.add_event(this, 'mousewheel', this.mousewheel_handle);
     }
     mousedown_handle(e) {
         if (!this.options.default_event_handle['enable_mousedown_handle']) {
@@ -150,14 +151,17 @@ class jm {
     // Use [Ctrl] + Mousewheel, to zoom in/out.
     mousewheel_handle(event) {
         // Test if mousewheel option is enabled and Ctrl key is pressed.
-        if (!this.options.default_event_handle["enable_mousewheel_handle"] || !window.event.ctrlKey) {
+        if (
+            !this.options.default_event_handle['enable_mousewheel_handle'] ||
+            !window.event.ctrlKey
+        ) {
             return;
         }
         // Avoid default page scrolling behavior.
         event.preventDefault();
 
-        var dir = event.deltaY > 0 ? "Up" : "Down";
-        if (dir == "Up") {
+        var dir = event.deltaY > 0 ? 'Up' : 'Down';
+        if (dir == 'Up') {
             this.view.zoomIn();
         } else {
             this.view.zoomOut();
@@ -193,7 +197,9 @@ class jm {
                 return this.toggle_node(the_node);
             }
         }
-        if (node.isroot) { return; }
+        if (node.isroot) {
+            return;
+        }
         this.view.save_location(node);
         this.layout.toggle_node(node);
         this.view.relayout();
@@ -209,7 +215,9 @@ class jm {
                 return this.expand_node(the_node);
             }
         }
-        if (node.isroot) { return; }
+        if (node.isroot) {
+            return;
+        }
         this.view.save_location(node);
         this.layout.expand_node(node);
         this.view.relayout();
@@ -225,7 +233,9 @@ class jm {
                 return this.collapse_node(the_node);
             }
         }
-        if (node.isroot) { return; }
+        if (node.isroot) {
+            return;
+        }
         this.view.save_location(node);
         this.layout.collapse_node(node);
         this.view.relayout();
@@ -278,7 +288,7 @@ class jm {
         return {
             name: this.mind.name,
             author: this.mind.author,
-            version: this.mind.version
+            version: this.mind.version,
         };
     }
     get_data(data_format) {
@@ -305,7 +315,11 @@ class jm {
                 this.view.show(false);
                 this.view.reset_node_custom_style(node);
                 this.expand_node(the_parent_node);
-                this.invoke_event_handle(EventType.edit, { evt: 'add_node', data: [the_parent_node.id, nodeid, topic, data], node: nodeid });
+                this.invoke_event_handle(EventType.edit, {
+                    evt: 'add_node',
+                    data: [the_parent_node.id, nodeid, topic, data],
+                    node: nodeid,
+                });
             }
             return node;
         } else {
@@ -317,12 +331,22 @@ class jm {
         if (this.get_editable()) {
             var the_node_before = this.get_node(node_before);
             var direction = this.layout.calculate_next_child_direction(the_node_before.parent);
-            var node = this.mind.insert_node_before(the_node_before, nodeid, topic, data, direction);
+            var node = this.mind.insert_node_before(
+                the_node_before,
+                nodeid,
+                topic,
+                data,
+                direction
+            );
             if (!!node) {
                 this.view.add_node(node);
                 this.layout.layout();
                 this.view.show(false);
-                this.invoke_event_handle(EventType.edit, { evt: 'insert_node_before', data: [the_node_before.id, nodeid, topic, data], node: nodeid });
+                this.invoke_event_handle(EventType.edit, {
+                    evt: 'insert_node_before',
+                    data: [the_node_before.id, nodeid, topic, data],
+                    node: nodeid,
+                });
             }
             return node;
         } else {
@@ -339,7 +363,11 @@ class jm {
                 this.view.add_node(node);
                 this.layout.layout();
                 this.view.show(false);
-                this.invoke_event_handle(EventType.edit, { evt: 'insert_node_after', data: [the_node_after.id, nodeid, topic, data], node: nodeid });
+                this.invoke_event_handle(EventType.edit, {
+                    evt: 'insert_node_after',
+                    data: [the_node_after.id, nodeid, topic, data],
+                    node: nodeid,
+                });
             }
             return node;
         } else {
@@ -371,7 +399,11 @@ class jm {
             this.layout.layout();
             this.view.show(false);
             this.view.restore_location(parent_node);
-            this.invoke_event_handle(EventType.edit, { evt: 'remove_node', data: [nodeid], node: parentid });
+            this.invoke_event_handle(EventType.edit, {
+                evt: 'remove_node',
+                data: [nodeid],
+                node: parentid,
+            });
             return true;
         } else {
             logger.error('fail, this mind map is not editable');
@@ -395,7 +427,11 @@ class jm {
                 this.view.update_node(node);
                 this.layout.layout();
                 this.view.show(false);
-                this.invoke_event_handle(EventType.edit, { evt: 'update_node', data: [nodeid, topic], node: nodeid });
+                this.invoke_event_handle(EventType.edit, {
+                    evt: 'update_node',
+                    data: [nodeid, topic],
+                    node: nodeid,
+                });
             }
         } else {
             logger.error('fail, this mind map is not editable');
@@ -410,7 +446,11 @@ class jm {
                 this.view.update_node(updated_node);
                 this.layout.layout();
                 this.view.show(false);
-                this.invoke_event_handle(EventType.edit, { evt: 'move_node', data: [nodeid, beforeid, parentid, direction], node: nodeid });
+                this.invoke_event_handle(EventType.edit, {
+                    evt: 'move_node',
+                    data: [nodeid, beforeid, parentid, direction],
+                    node: nodeid,
+                });
             }
         } else {
             logger.error('fail, this mind map is not editable');
@@ -460,7 +500,9 @@ class jm {
                 return this.find_node_before(the_node);
             }
         }
-        if (node.isroot) { return null; }
+        if (node.isroot) {
+            return null;
+        }
         var n = null;
         if (node.parent.isroot) {
             var c = node.parent.children;
@@ -490,7 +532,9 @@ class jm {
                 return this.find_node_after(the_node);
             }
         }
-        if (node.isroot) { return null; }
+        if (node.isroot) {
+            return null;
+        }
         var n = null;
         if (node.parent.isroot) {
             var c = node.parent.children;
@@ -584,7 +628,9 @@ class jm {
             var node = this.mind.get_node(nodeid);
             if (!!node) {
                 if (!node.data['background-image']) {
-                    logger.error('fail, only can change rotation angle of node with background image');
+                    logger.error(
+                        'fail, only can change rotation angle of node with background image'
+                    );
                     return null;
                 }
                 node.data['background-rotation'] = rotation;

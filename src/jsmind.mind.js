@@ -6,8 +6,8 @@
  *   https://github.com/hizzgdev/jsmind/
  */
 
-import { Node } from "./jsmind.node.js";
-import { logger, Direction } from "./jsmind.common.js";
+import { Node } from './jsmind.node.js';
+import { logger, Direction } from './jsmind.common.js';
 
 export class Mind {
     constructor() {
@@ -42,7 +42,16 @@ export class Mind {
             return null;
         }
         var node_index = idx || -1;
-        var node = new Node(nodeid, node_index, topic, data, false, parent_node, parent_node.direction, expanded);
+        var node = new Node(
+            nodeid,
+            node_index,
+            topic,
+            data,
+            false,
+            parent_node,
+            parent_node.direction,
+            expanded
+        );
         if (parent_node.isroot) {
             node.direction = direction || Direction.right;
         }
@@ -50,7 +59,7 @@ export class Mind {
             parent_node.children.push(node);
             this._reindex(parent_node);
         } else {
-            logger.error('fail, the nodeid \'' + node.id + '\' has been already exist.');
+            logger.error("fail, the nodeid '" + node.id + "' has been already exist.");
             node = null;
         }
         return node;
@@ -73,7 +82,9 @@ export class Mind {
                 return this.get_node_before(the_node);
             }
         }
-        if (node.isroot) { return null; }
+        if (node.isroot) {
+            return null;
+        }
         var idx = node.index - 2;
         if (idx >= 0) {
             return node.parent.children[idx];
@@ -99,7 +110,9 @@ export class Mind {
                 return this.get_node_after(the_node);
             }
         }
-        if (node.isroot) { return null; }
+        if (node.isroot) {
+            return null;
+        }
         var idx = node.index;
         var brothers = node.parent.children;
         if (brothers.length > idx) {
@@ -138,8 +151,12 @@ export class Mind {
                 node.index = 0;
                 this._reindex(node.parent);
             } else {
-                var node_before = (!!beforeid) ? this.get_node(beforeid) : null;
-                if (node_before != null && node_before.parent != null && node_before.parent.id == node.parent.id) {
+                var node_before = !!beforeid ? this.get_node(beforeid) : null;
+                if (
+                    node_before != null &&
+                    node_before.parent != null &&
+                    node_before.parent.id == node.parent.id
+                ) {
                     node.index = node_before.index - 0.5;
                     this._reindex(node.parent);
                 }
@@ -224,7 +241,7 @@ export class Mind {
     }
     _put_node(node) {
         if (node.id in this.nodes) {
-            logger.warn('the nodeid \'' + node.id + '\' has been already exist.');
+            logger.warn("the nodeid '" + node.id + "' has been already exist.");
             return false;
         } else {
             this.nodes[node.id] = node;
@@ -240,5 +257,3 @@ export class Mind {
         }
     }
 }
-
-

@@ -1,7 +1,7 @@
 /*
  * Released under BSD License
  * Copyright (c) 2014-2021 hizzgdev@163.com
- * 
+ *
  * Project Home:
  *   https://github.com/hizzgdev/jsmind/
  */
@@ -11,11 +11,15 @@
     var $d = $w.document;
     var __name__ = 'jsMind';
     var jsMind = $w[__name__];
-    if (!jsMind) { return; }
-    if (typeof (jsMind.shell) != 'undefined') { return; }
+    if (!jsMind) {
+        return;
+    }
+    if (typeof jsMind.shell != 'undefined') {
+        return;
+    }
 
     var options = {
-        play_delay: 1000
+        play_delay: 1000,
     };
 
     jsMind.shell = function (jm) {
@@ -35,7 +39,11 @@
             if (!this.playing) {
                 var command = { action: action, data: obj.data, node: obj.node };
                 var prev_command = this.commands[this.step - 1];
-                if (command.action === 'update_node' && prev_command.action === 'add_node' && prev_command.data[2] === 'New Node') {
+                if (
+                    command.action === 'update_node' &&
+                    prev_command.action === 'add_node' &&
+                    prev_command.data[2] === 'New Node'
+                ) {
                     prev_command.data[2] = command.data[1];
                     this.commands[this.step - 1] = prev_command;
                 } else {
@@ -100,7 +108,7 @@
                 delete data.evt;
                 this.record(action, data);
             }
-        }
+        },
     };
 
     var shell_plugin = new jsMind.plugin('shell', function (jm) {
