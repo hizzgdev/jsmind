@@ -8,11 +8,11 @@
 
 import { $ } from './jsmind.dom.js';
 
-class graph_svg {
+class SvgGraph {
     constructor(view) {
         this.view = view;
         this.opts = view.opts;
-        this.e_svg = graph_svg.c('svg');
+        this.e_svg = SvgGraph.c('svg');
         this.e_svg.setAttribute('class', 'jsmind');
         this.size = { w: 0, h: 0 };
         this.lines = [];
@@ -37,7 +37,7 @@ class graph_svg {
         this.lines.length = 0;
     }
     draw_line(pout, pin, offset) {
-        var line = graph_svg.c('path');
+        var line = SvgGraph.c('path');
         line.setAttribute('stroke', this.opts.line_color);
         line.setAttribute('stroke-width', this.opts.line_width);
         line.setAttribute('fill', 'transparent');
@@ -63,7 +63,7 @@ class graph_svg {
     _bezier_to(path, x1, y1, x2, y2) {
         path.setAttribute(
             'd',
-            'M' +
+            'M ' +
                 x1 +
                 ' ' +
                 y1 +
@@ -86,7 +86,7 @@ class graph_svg {
     }
 }
 
-class graph_canvas {
+class CanvasGraph {
     constructor(view) {
         this.opts = view.opts;
         this.e_canvas = $.c('canvas');
@@ -138,4 +138,6 @@ class graph_canvas {
     }
 }
 
-export const graph = { svg: graph_svg, canvas: graph_canvas };
+export function init_graph(view, engine) {
+    return engine.toLowerCase() === 'svg' ? new SvgGraph(view) : new CanvasGraph(view);
+}
