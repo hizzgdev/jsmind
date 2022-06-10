@@ -10,13 +10,30 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  static_check:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run format-check
+
+  test:
 
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [16.x, 18.x]
+        node-version: [18.x]
         jm-lang: [ES5, ES6]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
