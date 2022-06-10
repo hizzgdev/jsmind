@@ -1,26 +1,31 @@
 /**
  * @license BSD
  * @copyright 2014-2022 hizzgdev@163.com
- * 
+ *
  * Project Home:
  *   https://github.com/hizzgdev/jsmind/
  */
 
-if (!jsMind) { throw new Error('jsMind is not defined'); }
+if (!jsMind) {
+    throw new Error('jsMind is not defined');
+}
 
 const jm = jsMind;
 const $ = jm.$;
 
-const clear_selection = 'getSelection' in $.w ? function () {
-    $.w.getSelection().removeAllRanges();
-} : function () {
-    $.d.selection.empty();
-};
+const clear_selection =
+    'getSelection' in $.w
+        ? function () {
+              $.w.getSelection().removeAllRanges();
+          }
+        : function () {
+              $.d.selection.empty();
+          };
 
 const options = {
     line_width: 5,
     lookup_delay: 500,
-    lookup_interval: 80
+    lookup_interval: 80,
 };
 
 class draggable {
@@ -80,7 +85,6 @@ class draggable {
         s.transform = el.style.transform;
         this.shadow_w = this.shadow.clientWidth;
         this.shadow_h = this.shadow.clientHeight;
-
     }
     show_shadow() {
         if (!this.moved) {
@@ -121,8 +125,7 @@ class draggable {
 
         var ns, nl;
 
-        var direct = (sx + sw / 2) >= root_x ?
-            jsMind.direction.right : jsMind.direction.left;
+        var direct = sx + sw / 2 >= root_x ? jsMind.direction.right : jsMind.direction.left;
         var nodes = this.jm.mind.nodes;
         var node = null;
         var layout = this.jm.layout;
@@ -144,12 +147,16 @@ class draggable {
                 ns = node.get_size();
                 nl = node.get_location();
                 if (direct == jsMind.direction.right) {
-                    if (sx - nl.x - ns.w <= 0) { continue; }
+                    if (sx - nl.x - ns.w <= 0) {
+                        continue;
+                    }
                     distance = Math.abs(sx - nl.x - ns.w) + Math.abs(sy + sh / 2 - nl.y - ns.h / 2);
                     np = { x: nl.x + ns.w - options.line_width, y: nl.y + ns.h / 2 };
                     sp = { x: sx + options.line_width, y: sy + sh / 2 };
                 } else {
-                    if (nl.x - sx - sw <= 0) { continue; }
+                    if (nl.x - sx - sw <= 0) {
+                        continue;
+                    }
                     distance = Math.abs(sx + sw - nl.x) + Math.abs(sy + sh / 2 - nl.y - ns.h / 2);
                     np = { x: nl.x + options.line_width, y: nl.y + ns.h / 2 };
                     sp = { x: sx + sw - options.line_width, y: sy + sh / 2 };
@@ -168,7 +175,7 @@ class draggable {
                 node: closest_node,
                 direction: direct,
                 sp: shadow_p,
-                np: closest_p
+                np: closest_p,
             };
         }
         return result_node;
@@ -210,21 +217,29 @@ class draggable {
         });
     }
     dragstart(e) {
-        if (!this.jm.get_editable()) { return; }
-        if (this.capture) { return; }
+        if (!this.jm.get_editable()) {
+            return;
+        }
+        if (this.capture) {
+            return;
+        }
         this.active_node = null;
 
         var jview = this.jm.view;
         var el = e.target || event.srcElement;
-        if (el.tagName.toLowerCase() != 'jmnode') { return; }
+        if (el.tagName.toLowerCase() != 'jmnode') {
+            return;
+        }
         var nodeid = jview.get_binded_nodeid(el);
         if (!!nodeid) {
             var node = this.jm.get_node(nodeid);
             if (!node.isroot) {
                 this.reset_shadow(el);
                 this.active_node = node;
-                this.offset_x = (e.clientX || e.touches[0].clientX) / jview.actualZoom - el.offsetLeft;
-                this.offset_y = (e.clientY || e.touches[0].clientY) / jview.actualZoom - el.offsetTop;
+                this.offset_x =
+                    (e.clientX || e.touches[0].clientX) / jview.actualZoom - el.offsetLeft;
+                this.offset_y =
+                    (e.clientY || e.touches[0].clientY) / jview.actualZoom - el.offsetTop;
                 this.client_hw = Math.floor(el.clientWidth / 2);
                 this.client_hh = Math.floor(el.clientHeight / 2);
                 if (this.hlookup_delay != 0) {
@@ -245,7 +260,9 @@ class draggable {
         }
     }
     drag(e) {
-        if (!this.jm.get_editable()) { return; }
+        if (!this.jm.get_editable()) {
+            return;
+        }
         if (this.capture) {
             e.preventDefault();
             this.show_shadow();
@@ -260,7 +277,9 @@ class draggable {
         }
     }
     dragend(e) {
-        if (!this.jm.get_editable()) { return; }
+        if (!this.jm.get_editable()) {
+            return;
+        }
         if (this.capture) {
             if (this.hlookup_delay != 0) {
                 $.w.clearTimeout(this.hlookup_delay);
@@ -304,7 +323,9 @@ class draggable {
                     }
                 }
             }
-            if (!!node_before) { beforeid = node_before.id; }
+            if (!!node_before) {
+                beforeid = node_before.id;
+            }
             this.jm.move_node(src_node.id, beforeid, target_node.id, target_direct);
         }
         this.active_node = null;
@@ -317,7 +338,6 @@ class draggable {
         }
     }
 }
-
 
 var draggable_plugin = new jm.plugin('draggable', function (jm) {
     var jd = new draggable(jm);

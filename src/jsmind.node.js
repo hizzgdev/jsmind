@@ -6,12 +6,20 @@
  *   https://github.com/hizzgdev/jsmind/
  */
 
-import { logger } from "./jsmind.common.js";
+import { logger } from './jsmind.common.js';
 export class Node {
     constructor(sId, iIndex, sTopic, oData, bIsRoot, oParent, eDirection, bExpanded) {
-        if (!sId) { logger.error('invalid node id'); return; }
-        if (typeof iIndex != 'number') { logger.error('invalid node index'); return; }
-        if (typeof bExpanded === 'undefined') { bExpanded = true; }
+        if (!sId) {
+            logger.error('invalid node id');
+            return;
+        }
+        if (typeof iIndex != 'number') {
+            logger.error('invalid node index');
+            return;
+        }
+        if (typeof bExpanded === 'undefined') {
+            bExpanded = true;
+        }
         this.id = sId;
         this.index = iIndex;
         this.topic = sTopic;
@@ -28,15 +36,15 @@ export class Node {
         var vd = this._data.view;
         return {
             x: vd.abs_x,
-            y: vd.abs_y
+            y: vd.abs_y,
         };
     }
     get_size() {
         var vd = this._data.view;
         return {
             w: vd.width,
-            h: vd.height
-        }
+            h: vd.height,
+        };
     }
 
     static compare(node1, node2) {
@@ -80,5 +88,3 @@ export class Node {
         return !!n && n instanceof Node;
     }
 }
-
-

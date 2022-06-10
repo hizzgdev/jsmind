@@ -1,103 +1,102 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>jsMind</title>
-    <link type="text/css" rel="stylesheet" href="../style/jsmind.css" />
-    <style type="text/css">
-        #jsmind_container{
-            width:800px;
-            height:500px;
-            border:solid 1px #ccc;
-            /*background:#f4f4f4;*/
-            background:#f4f4f4;
-        }
-    </style>
-</head>
-<body>
-<input type="file" onchange="load_file(this);"/>
-<button onclick="save_nodetree();">nodetree</button>
-<button onclick="replay();">replay</button>
-<div id="jsmind_container"></div>
-<script type="text/javascript" src="../js/jsmind.js"></script>
-<script type="text/javascript" src="../js/jsmind.draggable.js"></script>
-<script type="text/javascript" src="../features/jsmind.shell.js"></script>
-<script type="text/javascript">
-    var _jm = null;
-    function load_jsmind(){
-        var mind = {
-            meta:{
-                name:'demo',
-                author:'hizzgdev@163.com',
-                version:'0.2'
-            },
-            format:'node_array',
-            data:[
-                {"id":"root", "isroot":true, "topic":"jsMind"},
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>jsMind</title>
+        <link type="text/css" rel="stylesheet" href="../style/jsmind.css" />
+        <style type="text/css">
+            #jsmind_container {
+                width: 800px;
+                height: 500px;
+                border: solid 1px #ccc;
+                /*background:#f4f4f4;*/
+                background: #f4f4f4;
+            }
+        </style>
+    </head>
+    <body>
+        <input type="file" onchange="load_file(this);" />
+        <button onclick="save_nodetree();">nodetree</button>
+        <button onclick="replay();">replay</button>
+        <div id="jsmind_container"></div>
+        <script type="text/javascript" src="../js/jsmind.js"></script>
+        <script type="text/javascript" src="../js/jsmind.draggable.js"></script>
+        <script type="text/javascript" src="../features/jsmind.shell.js"></script>
+        <script type="text/javascript">
+            var _jm = null;
+            function load_jsmind() {
+                var mind = {
+                    meta: {
+                        name: 'demo',
+                        author: 'hizzgdev@163.com',
+                        version: '0.2',
+                    },
+                    format: 'node_array',
+                    data: [
+                        { id: 'root', isroot: true, topic: 'jsMind' },
 
-                {"id":"sub1", "parentid":"root", "topic":"sub1"},
-                {"id":"sub11", "parentid":"sub1", "topic":"sub11"},
-                {"id":"sub12", "parentid":"sub1", "topic":"sub12"},
-                {"id":"sub13", "parentid":"sub1", "topic":"sub13"},
+                        { id: 'sub1', parentid: 'root', topic: 'sub1' },
+                        { id: 'sub11', parentid: 'sub1', topic: 'sub11' },
+                        { id: 'sub12', parentid: 'sub1', topic: 'sub12' },
+                        { id: 'sub13', parentid: 'sub1', topic: 'sub13' },
 
-                {"id":"sub2", "parentid":"root", "topic":"sub2"},
-                {"id":"sub21", "parentid":"sub2", "topic":"sub21"},
-                {"id":"sub22", "parentid":"sub2", "topic":"sub22"},
+                        { id: 'sub2', parentid: 'root', topic: 'sub2' },
+                        { id: 'sub21', parentid: 'sub2', topic: 'sub21' },
+                        { id: 'sub22', parentid: 'sub2', topic: 'sub22' },
 
-                {"id":"sub3", "parentid":"root", "topic":"sub3"},
-            ]
-        };
-        var options = {
-            container:'jsmind_container',
-            editable:true,
-            theme:'primary',
-            shortcut:{
-                handles:{
-                    test:function(j,e){
-                        console.log(j);
-                    }
-                },
-                mapping:{
-                    test:89
+                        { id: 'sub3', parentid: 'root', topic: 'sub3' },
+                    ],
+                };
+                var options = {
+                    container: 'jsmind_container',
+                    editable: true,
+                    theme: 'primary',
+                    shortcut: {
+                        handles: {
+                            test: function (j, e) {
+                                console.log(j);
+                            },
+                        },
+                        mapping: {
+                            test: 89,
+                        },
+                    },
+                };
+                _jm = jsMind.show(options, mind);
+                // jm.set_readonly(true);
+                // var mind_data = jm.get_data();
+                // alert(mind_data);
+            }
+
+            function load_file(fi) {
+                var files = fi.files;
+                if (files.length > 0) {
+                    var file_data = files[0];
+                    jsMind.util.file.read(file_data, function (freemind_data, jsmind_name) {
+                        var mind = jsmind_data;
+                        if (!!mind) {
+                            _jm.show(mind);
+                        } else {
+                            console.error('can not open this file as mindmap');
+                        }
+                    });
                 }
             }
-        }
-        _jm = jsMind.show(options,mind);
-        // jm.set_readonly(true);
-        // var mind_data = jm.get_data();
-        // alert(mind_data);
-    }
-    
-    function load_file(fi){
-        var files = fi.files;
-        if(files.length > 0){
-            var file_data = files[0];
-            jsMind.util.file.read(file_data, function(freemind_data, jsmind_name){
-                var mind = jsmind_data;
-                if(!!mind){
-                    _jm.show(mind);
-                }else{
-                    console.error('can not open this file as mindmap');
+
+            function save_nodetree() {
+                var mind_data = _jm.get_data('node_tree');
+                console.log(mind_data);
+            }
+
+            function replay() {
+                var shell = _jm.shell;
+                if (!!shell) {
+                    shell.replay();
                 }
-            });
-        }
-    }
+            }
 
-    function save_nodetree(){
-        var mind_data = _jm.get_data('node_tree');
-        console.log(mind_data);
-    }
-
-    function replay(){
-        var shell = _jm.shell;
-        if(!!shell){
-            shell.replay();
-        }
-    }
-
-    load_jsmind();
-</script>
-</body>
-<script src="/scripts/analytics.js"></script>
+            load_jsmind();
+        </script>
+    </body>
 </html>
