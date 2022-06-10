@@ -1,9 +1,10 @@
 .github
 .vscode
-example
-features
+docs
+es6
+js
 node_modules
 screenshots
-src
-tests
-.gitignore
+.*
+LICENSE
+package-lock.json
