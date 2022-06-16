@@ -5,23 +5,23 @@
  * Project Home:
  *   https://github.com/hizzgdev/jsmind/
  */
-const RegScreenShotPlugin = function(jsMind) {
+const RegScreenShotPlugin = function (jsMind) {
     if (!jsMind) {
         throw new Error('jsMind is not defined');
     }
 
     const $ = jsMind.$;
 
-    var css = function(cStyle, property_name) {
+    var css = function (cStyle, property_name) {
         return cStyle.getPropertyValue(property_name);
     };
-    var is_visible = function(cStyle) {
+    var is_visible = function (cStyle) {
         var visibility = css(cStyle, 'visibility');
         var display = css(cStyle, 'display');
         return visibility !== 'hidden' && display !== 'none';
     };
     var jcanvas = {};
-    jcanvas.rect = function(ctx, x, y, w, h, r) {
+    jcanvas.rect = function (ctx, x, y, w, h, r) {
         if (w < 2 * r) r = w / 2;
         if (h < 2 * r) r = h / 2;
         ctx.moveTo(x + r, y);
@@ -31,7 +31,7 @@ const RegScreenShotPlugin = function(jsMind) {
         ctx.arcTo(x, y, x + w, y, r);
     };
 
-    jcanvas.text_multiline = function(ctx, text, x, y, w, h, lineheight) {
+    jcanvas.text_multiline = function (ctx, text, x, y, w, h, lineheight) {
         var line = '';
         var text_len = text.length;
         var chars = text.split('');
@@ -51,7 +51,7 @@ const RegScreenShotPlugin = function(jsMind) {
         ctx.fillText(line, x, y);
     };
 
-    jcanvas.text_ellipsis = function(ctx, text, x, y, w, h) {
+    jcanvas.text_ellipsis = function (ctx, text, x, y, w, h) {
         var center_y = y + h / 2;
         var text = jcanvas.fittingString(ctx, text, w);
         ctx.textAlign = 'left';
@@ -59,7 +59,7 @@ const RegScreenShotPlugin = function(jsMind) {
         ctx.fillText(text, x, center_y, w);
     };
 
-    jcanvas.fittingString = function(ctx, text, max_width) {
+    jcanvas.fittingString = function (ctx, text, max_width) {
         var width = ctx.measureText(text).width;
         var ellipsis = '…';
         var ellipsis_width = ctx.measureText(ellipsis).width;
@@ -75,9 +75,9 @@ const RegScreenShotPlugin = function(jsMind) {
         }
     };
 
-    jcanvas.image = function(ctx, url, x, y, w, h, r, rotation, callback) {
+    jcanvas.image = function (ctx, url, x, y, w, h, r, rotation, callback) {
         var img = new Image();
-        img.onload = function() {
+        img.onload = function () {
             ctx.save();
             ctx.translate(x, y);
             ctx.save();
@@ -119,7 +119,7 @@ const RegScreenShotPlugin = function(jsMind) {
         shoot(callback) {
             this.init();
             this._draw(
-                function() {
+                function () {
                     !!callback && callback();
                     this.clean();
                 }.bind(this)
@@ -128,14 +128,14 @@ const RegScreenShotPlugin = function(jsMind) {
         }
         shootDownload() {
             this.shoot(
-                function() {
+                function () {
                     this._download();
                 }.bind(this)
             );
         }
         shootAsDataURL(callback) {
             this.shoot(
-                function() {
+                function () {
                     !!callback && callback(this.canvas_elem.toDataURL());
                 }.bind(this)
             );
@@ -155,7 +155,7 @@ const RegScreenShotPlugin = function(jsMind) {
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
             this._draw_lines(
-                function() {
+                function () {
                     this._draw_nodes(callback);
                 }.bind(this)
             );
@@ -266,7 +266,7 @@ const RegScreenShotPlugin = function(jsMind) {
                     rb.h,
                     round_radius,
                     rotation,
-                    function() {
+                    function () {
                         node.ready = true;
                     }
                 );
@@ -344,18 +344,17 @@ const RegScreenShotPlugin = function(jsMind) {
         }
     }
 
-    var screenshot_plugin = new jsMind.plugin('screenshot', function(jm) {
+    var screenshot_plugin = new jsMind.plugin('screenshot', function (jm) {
         var jss = new screenshot(jm);
         jm.screenshot = jss;
-        jm.shoot = function() {
+        jm.shoot = function () {
             jss.shoot();
         };
-        jm.add_event_listener(function(type, data) {
+        jm.add_event_listener(function (type, data) {
             jss.jm_event_handle.call(jss, type, data);
         });
     });
 
     jsMind.register_plugin(screenshot_plugin);
-
-}
+};
 export default RegScreenShotPlugin;

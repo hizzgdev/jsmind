@@ -6,8 +6,7 @@
  *   https://github.com/hizzgdev/jsmind/
  */
 
-const RegDraggablePlugin = function(jsMind) {
-
+const RegDraggablePlugin = function (jsMind) {
     if (!jsMind) {
         throw new Error('jsMind is not defined');
     }
@@ -16,14 +15,13 @@ const RegDraggablePlugin = function(jsMind) {
     const $ = jm.$;
 
     const clear_selection =
-        'getSelection' in $.w ?
-
-        function() {
-            $.w.getSelection().removeAllRanges();
-        } :
-        function() {
-            $.d.selection.empty();
-        };
+        'getSelection' in $.w
+            ? function () {
+                  $.w.getSelection().removeAllRanges();
+              }
+            : function () {
+                  $.d.selection.empty();
+              };
 
     const options = {
         line_width: 5,
@@ -153,14 +151,16 @@ const RegDraggablePlugin = function(jsMind) {
                         if (sx - nl.x - ns.w <= 0) {
                             continue;
                         }
-                        distance = Math.abs(sx - nl.x - ns.w) + Math.abs(sy + sh / 2 - nl.y - ns.h / 2);
+                        distance =
+                            Math.abs(sx - nl.x - ns.w) + Math.abs(sy + sh / 2 - nl.y - ns.h / 2);
                         np = { x: nl.x + ns.w - options.line_width, y: nl.y + ns.h / 2 };
                         sp = { x: sx + options.line_width, y: sy + sh / 2 };
                     } else {
                         if (nl.x - sx - sw <= 0) {
                             continue;
                         }
-                        distance = Math.abs(sx + sw - nl.x) + Math.abs(sy + sh / 2 - nl.y - ns.h / 2);
+                        distance =
+                            Math.abs(sx + sw - nl.x) + Math.abs(sy + sh / 2 - nl.y - ns.h / 2);
                         np = { x: nl.x + options.line_width, y: nl.y + ns.h / 2 };
                         sp = { x: sx + sw - options.line_width, y: sy + sh / 2 };
                     }
@@ -194,27 +194,27 @@ const RegDraggablePlugin = function(jsMind) {
         _event_bind() {
             var jd = this;
             var container = this.jm.view.container;
-            $.on(container, 'mousedown', function(e) {
+            $.on(container, 'mousedown', function (e) {
                 var evt = e || event;
                 jd.dragstart.call(jd, evt);
             });
-            $.on(container, 'mousemove', function(e) {
+            $.on(container, 'mousemove', function (e) {
                 var evt = e || event;
                 jd.drag.call(jd, evt);
             });
-            $.on(container, 'mouseup', function(e) {
+            $.on(container, 'mouseup', function (e) {
                 var evt = e || event;
                 jd.dragend.call(jd, evt);
             });
-            $.on(container, 'touchstart', function(e) {
+            $.on(container, 'touchstart', function (e) {
                 var evt = e || event;
                 jd.dragstart.call(jd, evt);
             });
-            $.on(container, 'touchmove', function(e) {
+            $.on(container, 'touchmove', function (e) {
                 var evt = e || event;
                 jd.drag.call(jd, evt);
             });
-            $.on(container, 'touchend', function(e) {
+            $.on(container, 'touchend', function (e) {
                 var evt = e || event;
                 jd.dragend.call(jd, evt);
             });
@@ -252,9 +252,9 @@ const RegDraggablePlugin = function(jsMind) {
                         $.w.clearInterval(this.hlookup_timer);
                     }
                     var jd = this;
-                    this.hlookup_delay = $.w.setTimeout(function() {
+                    this.hlookup_delay = $.w.setTimeout(function () {
                         jd.hlookup_delay = 0;
-                        jd.hlookup_timer = $.w.setInterval(function() {
+                        jd.hlookup_timer = $.w.setInterval(function () {
                             jd.lookup_close_node.call(jd);
                         }, options.lookup_interval);
                     }, options.lookup_delay);
@@ -342,16 +342,15 @@ const RegDraggablePlugin = function(jsMind) {
         }
     }
 
-    var draggable_plugin = new jm.plugin('draggable', function(jm) {
+    var draggable_plugin = new jm.plugin('draggable', function (jm) {
         var jd = new draggable(jm);
         jd.init();
-        jm.add_event_listener(function(type, data) {
+        jm.add_event_listener(function (type, data) {
             jd.jm_event_handle.call(jd, type, data);
         });
     });
 
     jsMind.register_plugin(draggable_plugin);
-
-}
+};
 
 export default RegDraggablePlugin;
