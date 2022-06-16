@@ -9,7 +9,8 @@ jsMind is a pure javascript library for mindmap, it base on html5 canvas and svg
 ES6 Pilot Version:
 
 -   目前处于测试阶段，欢迎试用找 bug
--   ES6 代码位于 `/es6`
+-   ES6 代码位于 `/src`
+-   支持项目`import`的代码位于 `/es6`
 -   可运行于浏览器的 js 文件位于 `/js`
 -   Demo <http://hizzgdev.github.io/jsmind/example/2_features_es6.html>
 
