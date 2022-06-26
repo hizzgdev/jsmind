@@ -1,4 +1,4 @@
-import { describe, expect, test } from '@jest/globals';
+import { expect, test } from '@jest/globals';
 import { format } from '../../src/jsmind.format.js';
 import { Direction } from '../../src/jsmind.common.js';
 
