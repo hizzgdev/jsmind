@@ -3,7 +3,6 @@ import { DataProvider } from '../../src/jsmind.data_provider.js';
 import { format } from '../../src/jsmind.format.js';
 import { logger } from '../../src/jsmind.common.js';
 
-const mockFormat = { get_mind: jest.fn(), get_data: jest.fn() };
 const mockMind = { mock: true };
 const data_provider = new DataProvider({ mind: mockMind });
 
