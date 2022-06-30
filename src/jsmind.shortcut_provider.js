@@ -74,22 +74,22 @@ export class ShortcutProvider {
     handle_addchild(_jm, e) {
         var selected_node = _jm.get_selected_node();
         if (!!selected_node) {
-            var nodeid = this._newid();
-            var node = _jm.add_node(selected_node, nodeid, 'New Node');
+            var node_id = this._newid();
+            var node = _jm.add_node(selected_node, node_id, 'New Node');
             if (!!node) {
-                _jm.select_node(nodeid);
-                _jm.begin_edit(nodeid);
+                _jm.select_node(node_id);
+                _jm.begin_edit(node_id);
             }
         }
     }
     handle_addbrother(_jm, e) {
         var selected_node = _jm.get_selected_node();
         if (!!selected_node && !selected_node.isroot) {
-            var nodeid = this._newid();
-            var node = _jm.insert_node_after(selected_node, nodeid, 'New Node');
+            var node_id = this._newid();
+            var node = _jm.insert_node_after(selected_node, node_id, 'New Node');
             if (!!node) {
-                _jm.select_node(nodeid);
-                _jm.begin_edit(nodeid);
+                _jm.select_node(node_id);
+                _jm.begin_edit(node_id);
             }
         }
     }
@@ -173,9 +173,9 @@ export class ShortcutProvider {
                 node = c[children[Math.floor((children.length - 1) / 2)]];
             } else if (selected_node.direction === d) {
                 var children = selected_node.children;
-                var childrencount = children.length;
-                if (childrencount > 0) {
-                    node = children[Math.floor((childrencount - 1) / 2)];
+                var children_count = children.length;
+                if (children_count > 0) {
+                    node = children[Math.floor((children_count - 1) / 2)];
                 }
             } else {
                 node = selected_node.parent;

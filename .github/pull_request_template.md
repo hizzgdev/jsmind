@@ -8,7 +8,7 @@ Please describe the proposal of your pull-request. why, how and what.
 <!--
 额外说明 | Additional notes
 
-- 提交 pull-request 之前，请确保其已经通过了你的测试，如果尚未完工，请先创建 Draft pull request。
+- 提交 pull-request 前，请确保其已经通过了你的测试，如果尚未完工，请先创建 Draft pull request。
 - Before submitting the pull-request, make sure it has passed your tests, otherwise, please create the Draft pull request first.
 
 - 提交 pull-request 前，请在你的电脑上执行 `npm run format` 对代码进行格式化。

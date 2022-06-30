@@ -112,10 +112,10 @@ class jm {
             return;
         }
         var element = e.target || event.srcElement;
-        var nodeid = this.view.get_binded_nodeid(element);
-        if (!!nodeid) {
+        var node_id = this.view.get_binded_nodeid(element);
+        if (!!node_id) {
             if (element.tagName.toLowerCase() == 'jmnode') {
-                this.select_node(nodeid);
+                this.select_node(node_id);
             }
         } else {
             this.select_clear();
@@ -126,11 +126,11 @@ class jm {
             return;
         }
         var element = e.target || event.srcElement;
-        var isexpander = this.view.is_expander(element);
-        if (isexpander) {
-            var nodeid = this.view.get_binded_nodeid(element);
-            if (!!nodeid) {
-                this.toggle_node(nodeid);
+        var is_expander = this.view.is_expander(element);
+        if (is_expander) {
+            var node_id = this.view.get_binded_nodeid(element);
+            if (!!node_id) {
+                this.toggle_node(node_id);
             }
         }
     }
@@ -140,9 +140,9 @@ class jm {
         }
         if (this.get_editable()) {
             var element = e.target || event.srcElement;
-            var nodeid = this.view.get_binded_nodeid(element);
-            if (!!nodeid) {
-                this.begin_edit(nodeid);
+            var node_id = this.view.get_binded_nodeid(element);
+            if (!!node_id) {
+                this.begin_edit(node_id);
             }
         }
     }
@@ -299,11 +299,11 @@ class jm {
         }
         return this.mind.get_node(node);
     }
-    add_node(parent_node, nodeid, topic, data) {
+    add_node(parent_node, node_id, topic, data) {
         if (this.get_editable()) {
             var the_parent_node = this.get_node(parent_node);
             var direction = this.layout.calculate_next_child_direction(the_parent_node);
-            var node = this.mind.add_node(the_parent_node, nodeid, topic, data, direction);
+            var node = this.mind.add_node(the_parent_node, node_id, topic, data, direction);
             if (!!node) {
                 this.view.add_node(node);
                 this.layout.layout();
@@ -312,8 +312,8 @@ class jm {
                 this.expand_node(the_parent_node);
                 this.invoke_event_handle(EventType.edit, {
                     evt: 'add_node',
-                    data: [the_parent_node.id, nodeid, topic, data],
-                    node: nodeid,
+                    data: [the_parent_node.id, node_id, topic, data],
+                    node: node_id,
                 });
             }
             return node;
@@ -322,13 +322,13 @@ class jm {
             return null;
         }
     }
-    insert_node_before(node_before, nodeid, topic, data) {
+    insert_node_before(node_before, node_id, topic, data) {
         if (this.get_editable()) {
             var the_node_before = this.get_node(node_before);
             var direction = this.layout.calculate_next_child_direction(the_node_before.parent);
             var node = this.mind.insert_node_before(
                 the_node_before,
-                nodeid,
+                node_id,
                 topic,
                 data,
                 direction
@@ -339,8 +339,8 @@ class jm {
                 this.view.show(false);
                 this.invoke_event_handle(EventType.edit, {
                     evt: 'insert_node_before',
-                    data: [the_node_before.id, nodeid, topic, data],
-                    node: nodeid,
+                    data: [the_node_before.id, node_id, topic, data],
+                    node: node_id,
                 });
             }
             return node;
@@ -349,19 +349,19 @@ class jm {
             return null;
         }
     }
-    insert_node_after(node_after, nodeid, topic, data) {
+    insert_node_after(node_after, node_id, topic, data) {
         if (this.get_editable()) {
             var the_node_after = this.get_node(node_after);
             var direction = this.layout.calculate_next_child_direction(the_node_after.parent);
-            var node = this.mind.insert_node_after(the_node_after, nodeid, topic, data, direction);
+            var node = this.mind.insert_node_after(the_node_after, node_id, topic, data, direction);
             if (!!node) {
                 this.view.add_node(node);
                 this.layout.layout();
                 this.view.show(false);
                 this.invoke_event_handle(EventType.edit, {
                     evt: 'insert_node_after',
-                    data: [the_node_after.id, nodeid, topic, data],
-                    node: nodeid,
+                    data: [the_node_after.id, node_id, topic, data],
+                    node: node_id,
                 });
             }
             return node;
@@ -385,9 +385,9 @@ class jm {
                 logger.error('fail, can not remove root node');
                 return false;
             }
-            var nodeid = node.id;
-            var parentid = node.parent.id;
-            var parent_node = this.get_node(parentid);
+            var node_id = node.id;
+            var parent_id = node.parent.id;
+            var parent_node = this.get_node(parent_id);
             this.view.save_location(parent_node);
             this.view.remove_node(node);
             this.mind.remove_node(node);
@@ -396,8 +396,8 @@ class jm {
             this.view.restore_location(parent_node);
             this.invoke_event_handle(EventType.edit, {
                 evt: 'remove_node',
-                data: [nodeid],
-                node: parentid,
+                data: [node_id],
+                node: parent_id,
             });
             return true;
         } else {
@@ -405,13 +405,13 @@ class jm {
             return false;
         }
     }
-    update_node(nodeid, topic) {
+    update_node(node_id, topic) {
         if (this.get_editable()) {
             if (_util.text.is_empty(topic)) {
                 logger.warn('fail, topic can not be empty');
                 return;
             }
-            var node = this.get_node(nodeid);
+            var node = this.get_node(node_id);
             if (!!node) {
                 if (node.topic === topic) {
                     logger.info('nothing changed');
@@ -424,8 +424,8 @@ class jm {
                 this.view.show(false);
                 this.invoke_event_handle(EventType.edit, {
                     evt: 'update_node',
-                    data: [nodeid, topic],
-                    node: nodeid,
+                    data: [node_id, topic],
+                    node: node_id,
                 });
             }
         } else {
@@ -433,18 +433,18 @@ class jm {
             return;
         }
     }
-    move_node(nodeid, beforeid, parentid, direction) {
+    move_node(node_id, before_id, parent_id, direction) {
         if (this.get_editable()) {
-            var node = this.get_node(nodeid);
-            var updated_node = this.mind.move_node(node, beforeid, parentid, direction);
+            var node = this.get_node(node_id);
+            var updated_node = this.mind.move_node(node, before_id, parent_id, direction);
             if (!!updated_node) {
                 this.view.update_node(updated_node);
                 this.layout.layout();
                 this.view.show(false);
                 this.invoke_event_handle(EventType.edit, {
                     evt: 'move_node',
-                    data: [nodeid, beforeid, parentid, direction],
-                    node: nodeid,
+                    data: [node_id, before_id, parent_id, direction],
+                    node: node_id,
                 });
             }
         } else {
@@ -533,17 +533,17 @@ class jm {
         var n = null;
         if (node.parent.isroot) {
             var c = node.parent.children;
-            var getthis = false;
+            var found = false;
             var ni = null;
             for (var i = 0; i < c.length; i++) {
                 ni = c[i];
                 if (node.direction === ni.direction) {
-                    if (getthis) {
+                    if (found) {
                         n = ni;
                         break;
                     }
                     if (node.id === ni.id) {
-                        getthis = true;
+                        found = true;
                     }
                 }
             }
@@ -552,15 +552,15 @@ class jm {
         }
         return n;
     }
-    set_node_color(nodeid, bgcolor, fgcolor) {
+    set_node_color(node_id, bg_color, fg_color) {
         if (this.get_editable()) {
-            var node = this.mind.get_node(nodeid);
+            var node = this.mind.get_node(node_id);
             if (!!node) {
-                if (!!bgcolor) {
-                    node.data['background-color'] = bgcolor;
+                if (!!bg_color) {
+                    node.data['background-color'] = bg_color;
                 }
-                if (!!fgcolor) {
-                    node.data['foreground-color'] = fgcolor;
+                if (!!fg_color) {
+                    node.data['foreground-color'] = fg_color;
                 }
                 this.view.reset_node_custom_style(node);
             }
@@ -569,9 +569,9 @@ class jm {
             return null;
         }
     }
-    set_node_font_style(nodeid, size, weight, style) {
+    set_node_font_style(node_id, size, weight, style) {
         if (this.get_editable()) {
-            var node = this.mind.get_node(nodeid);
+            var node = this.mind.get_node(node_id);
             if (!!node) {
                 if (!!size) {
                     node.data['font-size'] = size;
@@ -592,9 +592,9 @@ class jm {
             return null;
         }
     }
-    set_node_background_image(nodeid, image, width, height, rotation) {
+    set_node_background_image(node_id, image, width, height, rotation) {
         if (this.get_editable()) {
-            var node = this.mind.get_node(nodeid);
+            var node = this.mind.get_node(node_id);
             if (!!node) {
                 if (!!image) {
                     node.data['background-image'] = image;
@@ -618,9 +618,9 @@ class jm {
             return null;
         }
     }
-    set_node_background_rotation(nodeid, rotation) {
+    set_node_background_rotation(node_id, rotation) {
         if (this.get_editable()) {
-            var node = this.mind.get_node(nodeid);
+            var node = this.mind.get_node(node_id);
             if (!!node) {
                 if (!node.data['background-image']) {
                     logger.error(
