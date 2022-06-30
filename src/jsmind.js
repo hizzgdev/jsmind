@@ -19,7 +19,7 @@ import { format } from './jsmind.format.js';
 import { $ } from './jsmind.dom.js';
 import { util as _util } from './jsmind.util.js';
 
-class jm {
+export default class jsMind {
     static mind = Mind;
     static node = Node;
     static direction = Direction;
@@ -30,7 +30,7 @@ class jm {
     static util = _util;
 
     constructor(options) {
-        jm.current = this;
+        jsMind.current = this;
         this.version = __version__;
         this.initialized = false;
         this.mind = null;
@@ -666,10 +666,8 @@ class jm {
 
     // quick way
     static show(options, mind) {
-        var _jm = new jm(options);
+        var _jm = new jsMind(options);
         _jm.show(mind);
         return _jm;
     }
 }
-
-export default jm;
