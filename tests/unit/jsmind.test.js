@@ -541,4 +541,3 @@ function create_fake_mind() {
     jsmind.mind = mind;
     return jsmind;
 }
-
