@@ -282,8 +282,8 @@ export class LayoutProvider {
         var nodes = this.jm.mind.nodes;
         var node = null;
         var pout = null;
-        for (var nodeid in nodes) {
-            node = nodes[nodeid];
+        for (var node_id in nodes) {
+            node = nodes[node_id];
             pout = this.get_node_point_out(node);
             if (pout.x > this.bounds.e) {
                 this.bounds.e = pout.x;
@@ -331,8 +331,8 @@ export class LayoutProvider {
         var nodes = this.jm.mind.nodes;
         var c = 0;
         var node;
-        for (var nodeid in nodes) {
-            node = nodes[nodeid];
+        for (var node_id in nodes) {
+            node = nodes[node_id];
             if (!node.expanded) {
                 node.expanded = true;
                 c++;
@@ -348,8 +348,8 @@ export class LayoutProvider {
         var nodes = this.jm.mind.nodes;
         var c = 0;
         var node;
-        for (var nodeid in nodes) {
-            node = nodes[nodeid];
+        for (var node_id in nodes) {
+            node = nodes[node_id];
             if (node.expanded && !node.isroot) {
                 node.expanded = false;
                 c++;

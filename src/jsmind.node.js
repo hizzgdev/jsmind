@@ -48,7 +48,7 @@ export class Node {
     }
 
     static compare(node1, node2) {
-        // '-1' is alwary the last
+        // '-1' is always the latest
         var r = 0;
         var i1 = node1.index;
         var i2 = node2.index;
@@ -65,15 +65,15 @@ export class Node {
         }
         return r;
     }
-    static inherited(pnode, node) {
-        if (!!pnode && !!node) {
-            if (pnode.id === node.id) {
+    static inherited(parent_node, node) {
+        if (!!parent_node && !!node) {
+            if (parent_node.id === node.id) {
                 return true;
             }
-            if (pnode.isroot) {
+            if (parent_node.isroot) {
                 return true;
             }
-            var pid = pnode.id;
+            var pid = parent_node.id;
             var p = node;
             while (!p.isroot) {
                 p = p.parent;
