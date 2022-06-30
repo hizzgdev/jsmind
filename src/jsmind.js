@@ -82,13 +82,11 @@ class jm {
     disable_edit() {
         this.options.editable = false;
     }
-    // call enable_event_handle('dblclick')
-    // options are 'mousedown', 'click', 'dblclick'
+    // options are 'mousedown', 'click', 'dblclick', 'mousewheel'
     enable_event_handle(event_handle) {
         this.options.default_event_handle['enable_' + event_handle + '_handle'] = true;
     }
-    // call disable_event_handle('dblclick')
-    // options are 'mousedown', 'click', 'dblclick'
+    // options are 'mousedown', 'click', 'dblclick', 'mousewheel'
     disable_event_handle(event_handle) {
         this.options.default_event_handle['enable_' + event_handle + '_handle'] = false;
     }
@@ -149,20 +147,17 @@ class jm {
         }
     }
     // Use [Ctrl] + Mousewheel, to zoom in/out.
-    mousewheel_handle(event) {
+    mousewheel_handle(e) {
         // Test if mousewheel option is enabled and Ctrl key is pressed.
-        if (
-            !this.options.default_event_handle['enable_mousewheel_handle'] ||
-            !window.event.ctrlKey
-        ) {
+        if (!this.options.default_event_handle['enable_mousewheel_handle'] || !e.ctrlKey) {
             return;
         }
+        var evt = e || event;
         // Avoid default page scrolling behavior.
-        event.preventDefault();
+        evt.preventDefault();
 
-        var dir = event.deltaY > 0 ? 'Up' : 'Down';
-        if (dir == 'Up') {
-            this.view.zoomIn();
+        if (evt.deltaY > 0) {
+            this.view.zoomIn(); // wheel up
         } else {
             this.view.zoomOut();
         }
