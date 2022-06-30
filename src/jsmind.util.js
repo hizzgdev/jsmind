@@ -89,11 +89,11 @@ export const util = {
                 navigator.msSaveBlob(blob, name);
             } else {
                 var URL = $.w.URL || $.w.webkitURL;
-                var bloburl = URL.createObjectURL(blob);
+                var blob_url = URL.createObjectURL(blob);
                 var anchor = $.c('a');
                 if ('download' in anchor) {
                     anchor.style.visibility = 'hidden';
-                    anchor.href = bloburl;
+                    anchor.href = blob_url;
                     anchor.download = name;
                     $.d.body.appendChild(anchor);
                     var evt = $.d.createEvent('MouseEvents');
@@ -101,7 +101,7 @@ export const util = {
                     anchor.dispatchEvent(evt);
                     $.d.body.removeChild(anchor);
                 } else {
-                    location.href = bloburl;
+                    location.href = blob_url;
                 }
             }
         },

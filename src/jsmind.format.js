@@ -39,7 +39,7 @@ export const format = {
                 version: mind.version,
             };
             json.format = 'node_tree';
-            json.data = df._buildnode(mind.root);
+            json.data = df._build_node(mind.root);
             return json;
         },
 
@@ -95,7 +95,7 @@ export const format = {
             }
         },
 
-        _buildnode: function (node) {
+        _build_node: function (node) {
             var df = format.node_tree;
             if (!(node instanceof Node)) {
                 return;
@@ -118,7 +118,7 @@ export const format = {
             if (children.length > 0) {
                 o.children = [];
                 for (var i = 0; i < children.length; i++) {
-                    o.children.push(df._buildnode(children[i]));
+                    o.children.push(df._build_node(children[i]));
                 }
             }
             return o;
@@ -162,12 +162,12 @@ export const format = {
 
         _parse: function (mind, node_array) {
             var df = format.node_array;
-            var narray = node_array.slice(0);
+            var nodes = node_array.slice(0);
             // reverse array for improving looping performance
-            narray.reverse();
-            var root_node = df._extract_root(mind, narray);
+            nodes.reverse();
+            var root_node = df._extract_root(mind, nodes);
             if (!!root_node) {
-                df._extract_subnode(mind, root_node, narray);
+                df._extract_subnode(mind, root_node, nodes);
             } else {
                 logger.error('root node can not be found');
             }
@@ -312,11 +312,11 @@ export const format = {
                 version: mind.version,
             };
             json.format = 'freemind';
-            var xmllines = [];
-            xmllines.push('<map version="1.0.1">');
-            df._buildmap(mind.root, xmllines);
-            xmllines.push('</map>');
-            json.data = xmllines.join(' ');
+            var xml_lines = [];
+            xml_lines.push('<map version="1.0.1">');
+            df._build_map(mind.root, xml_lines);
+            xml_lines.push('</map>');
+            json.data = xml_lines.join(' ');
             return json;
         },
 
@@ -421,37 +421,37 @@ export const format = {
             return attr_data;
         },
 
-        _buildmap: function (node, xmllines) {
+        _build_map: function (node, xml_lines) {
             var df = format.freemind;
             var pos = null;
             if (!!node.parent && node.parent.isroot) {
                 pos = node.direction === Direction.left ? 'left' : 'right';
             }
-            xmllines.push('<node');
-            xmllines.push('ID="' + node.id + '"');
+            xml_lines.push('<node');
+            xml_lines.push('ID="' + node.id + '"');
             if (!!pos) {
-                xmllines.push('POSITION="' + pos + '"');
+                xml_lines.push('POSITION="' + pos + '"');
             }
-            xmllines.push('TEXT="' + node.topic + '">');
+            xml_lines.push('TEXT="' + node.topic + '">');
 
             // store expanded status as an attribute
-            xmllines.push('<attribute NAME="expanded" VALUE="' + node.expanded + '"/>');
+            xml_lines.push('<attribute NAME="expanded" VALUE="' + node.expanded + '"/>');
 
             // for attributes
             var node_data = node.data;
             if (node_data != null) {
                 for (var k in node_data) {
-                    xmllines.push('<attribute NAME="' + k + '" VALUE="' + node_data[k] + '"/>');
+                    xml_lines.push('<attribute NAME="' + k + '" VALUE="' + node_data[k] + '"/>');
                 }
             }
 
             // for children
             var children = node.children;
             for (var i = 0; i < children.length; i++) {
-                df._buildmap(children[i], xmllines);
+                df._build_map(children[i], xml_lines);
             }
 
-            xmllines.push('</node>');
+            xml_lines.push('</node>');
         },
     },
 };
