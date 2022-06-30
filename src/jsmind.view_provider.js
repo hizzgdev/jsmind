@@ -7,7 +7,7 @@
  */
 import { logger, EventType } from './jsmind.common.js';
 import { $ } from './jsmind.dom.js';
-import { graph } from './jsmind.graph.js';
+import { init_graph } from './jsmind.graph.js';
 import { util } from './jsmind.util.js';
 
 export class ViewProvider {
@@ -35,13 +35,11 @@ export class ViewProvider {
             logger.error('the options.view.container was not be found in dom');
             return;
         }
+        this.graph = init_graph(this, this.opts.engine);
+
         this.e_panel = $.c('div');
         this.e_nodes = $.c('jmnodes');
         this.e_editor = $.c('input');
-
-        this.graph =
-            this.opts.engine.toLowerCase() === 'svg' ? new graph.svg(this) : new graph.canvas(this);
-
         this.e_panel.className = 'jsmind-inner';
         this.e_panel.tabIndex = 1;
         this.e_panel.appendChild(this.graph.element());
