@@ -8,6 +8,7 @@
         "example": "example"
     },
     "scripts": {
+        "server": "http-server",
         "build": "rollup -c .config/rollup.config.js",
         "test": "NODE_OPTIONS=--experimental-vm-modules jest",
         "test-legacy": "jest tests/legacy",
@@ -38,6 +39,7 @@
         }
     ],
     "devDependencies": {
+        "http-server": "^14.1.1",
         "jest": "^28.1.0",
         "jest-environment-jsdom": "^28.1.0",
         "prettier": "2.6.2",
