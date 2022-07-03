@@ -1,0 +1,17 @@
+{
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "modificationsIfAvailable",
+    "prettier.configPath": ".config/prettierrc.json",
+    "prettier.ignorePath": ".config/prettierignore",
+    "cSpell.customDictionaries": {
+        "project-words": {
+            "name": "project-words",
+            "path": "${workspaceRoot}/.vscode/project-words.txt",
+            "description": "Words used in this project",
+            "addWords": true
+          },
+          "custom": true,
+          "internal-terms": false
+    }
+}
