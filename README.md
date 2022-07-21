@@ -63,6 +63,10 @@ jsMind is a pure javascript library for mindmap, it base on html5 canvas and svg
 -   Currently it's in the testing stage, You are welcome to serve as a guinea pig, the ES6 code is located in `/src`, and the js files that can run in browsers are located in `/es6`
 -   Demo <http://hizzgdev.github.io/jsmind/example/2_features_es6.html>
 
+## Maintainer
+- [张志刚 | Zhigang Zhang](https://hizzgdev.github.io)
+- hizzgdev@163.com
+
 [1]: docs/zh/index.md
 [2]: docs/en/index.md
 [3]: LICENSE
