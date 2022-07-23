@@ -24,6 +24,10 @@
     user-select: none;
 }
 
+.jsmind-inner canvas {
+    position: absolute;
+}
+
 /* z-index:1 */
 svg.jsmind {
     position: absolute;
