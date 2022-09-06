@@ -1,0 +1,10 @@
+.config
+.github
+.vscode
+docs
+es6
+js
+node_modules
+screenshots
+LICENSE
+package-lock.json

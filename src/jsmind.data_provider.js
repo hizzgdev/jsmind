@@ -6,8 +6,8 @@
  *   https://github.com/hizzgdev/jsmind/
  */
 
-import { logger } from "./jsmind.common.js";
-import { format } from "./jsmind.format.js";
+import { logger } from './jsmind.common.js';
+import { format } from './jsmind.format.js';
 
 export class DataProvider {
     constructor(jm) {
@@ -58,5 +58,3 @@ export class DataProvider {
         return data;
     }
 }
-
-

@@ -1,4 +1,6 @@
+.config
 .github
+.vscode
 example
 features
 node_modules

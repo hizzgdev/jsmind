@@ -6,15 +6,15 @@
  *   https://github.com/hizzgdev/jsmind/
  */
 
-import { $ } from "./jsmind.dom.js";
+import { $ } from './jsmind.dom.js';
 
 const plugin_data = {
-    plugins: []
-}
+    plugins: [],
+};
 
 export function register(plugin) {
     if (!plugin instanceof Plugin) {
-        throw new Error('plugin ' + plugin + ' is not a supported plugin')
+        throw new Error('plugin ' + plugin + ' is not a supported plugin');
     }
     plugin_data.plugins.push(plugin);
 }

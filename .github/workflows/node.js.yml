@@ -10,25 +10,20 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
-
+  npm-run:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [16.x, 18.x]
-        jm-lang: [ES5, ES6]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        command: [format-check, test-es6, test-legacy]
 
     steps:
     - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Use Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: 18.x
         cache: 'npm'
     - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
-      env: 
-        JM_LANG: ${{ matrix.jm-lang }}
+    # - run: npm run build --if-present
+    - run: npm run ${{ matrix.command }}

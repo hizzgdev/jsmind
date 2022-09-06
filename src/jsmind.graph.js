@@ -6,13 +6,13 @@
  *   https://github.com/hizzgdev/jsmind/
  */
 
-import { $ } from "./jsmind.dom.js";
+import { $ } from './jsmind.dom.js';
 
-class graph_svg {
+class SvgGraph {
     constructor(view) {
         this.view = view;
         this.opts = view.opts;
-        this.e_svg = graph_svg.c('svg');
+        this.e_svg = SvgGraph.c('svg');
         this.e_svg.setAttribute('class', 'jsmind');
         this.size = { w: 0, h: 0 };
         this.lines = [];
@@ -37,13 +37,19 @@ class graph_svg {
         this.lines.length = 0;
     }
     draw_line(pout, pin, offset) {
-        var line = graph_svg.c('path');
+        var line = SvgGraph.c('path');
         line.setAttribute('stroke', this.opts.line_color);
         line.setAttribute('stroke-width', this.opts.line_width);
         line.setAttribute('fill', 'transparent');
         this.lines.push(line);
         this.e_svg.appendChild(line);
-        this._bezier_to(line, pin.x + offset.x, pin.y + offset.y, pout.x + offset.x, pout.y + offset.y);
+        this._bezier_to(
+            line,
+            pin.x + offset.x,
+            pin.y + offset.y,
+            pout.x + offset.x,
+            pout.y + offset.y
+        );
     }
     copy_to(dest_canvas_ctx, callback) {
         var img = new Image();
@@ -51,18 +57,36 @@ class graph_svg {
             dest_canvas_ctx.drawImage(img, 0, 0);
             !!callback && callback();
         };
-        img.src = 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString(this.e_svg));
+        img.src =
+            'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString(this.e_svg));
     }
     _bezier_to(path, x1, y1, x2, y2) {
-        path.setAttribute('d', 'M' + x1 + ' ' + y1 + ' C ' + (x1 + (x2 - x1) * 2 / 3) + ' ' + y1 + ', ' + x1 + ' ' + y2 + ', ' + x2 + ' ' + y2);
+        path.setAttribute(
+            'd',
+            'M ' +
+                x1 +
+                ' ' +
+                y1 +
+                ' C ' +
+                (x1 + ((x2 - x1) * 2) / 3) +
+                ' ' +
+                y1 +
+                ', ' +
+                x1 +
+                ' ' +
+                y2 +
+                ', ' +
+                x2 +
+                ' ' +
+                y2
+        );
     }
     _line_to(path, x1, y1, x2, y2) {
         path.setAttribute('d', 'M ' + x1 + ' ' + y1 + ' L ' + x2 + ' ' + y2);
     }
 }
 
-
-class graph_canvas {
+class CanvasGraph {
     constructor(view) {
         this.opts = view.opts;
         this.e_canvas = $.c('canvas');
@@ -88,11 +112,13 @@ class graph_canvas {
         ctx.lineWidth = this.opts.line_width;
         ctx.lineCap = 'round';
 
-        this._bezier_to(ctx,
+        this._bezier_to(
+            ctx,
             pin.x + offset.x,
             pin.y + offset.y,
             pout.x + offset.x,
-            pout.y + offset.y);
+            pout.y + offset.y
+        );
     }
     copy_to(dest_canvas_ctx, callback) {
         dest_canvas_ctx.drawImage(this.e_canvas, 0, 0);
@@ -101,7 +127,7 @@ class graph_canvas {
     _bezier_to(ctx, x1, y1, x2, y2) {
         ctx.beginPath();
         ctx.moveTo(x1, y1);
-        ctx.bezierCurveTo(x1 + (x2 - x1) * 2 / 3, y1, x1, y2, x2, y2);
+        ctx.bezierCurveTo(x1 + ((x2 - x1) * 2) / 3, y1, x1, y2, x2, y2);
         ctx.stroke();
     }
     _line_to(ctx, x1, y1, x2, y2) {
@@ -112,4 +138,6 @@ class graph_canvas {
     }
 }
 
-export const graph = { svg: graph_svg, canvas: graph_canvas };
+export function init_graph(view, engine) {
+    return engine.toLowerCase() === 'svg' ? new SvgGraph(view) : new CanvasGraph(view);
+}

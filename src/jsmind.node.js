@@ -6,12 +6,20 @@
  *   https://github.com/hizzgdev/jsmind/
  */
 
-import { logger } from "./jsmind.common.js";
+import { logger } from './jsmind.common.js';
 export class Node {
     constructor(sId, iIndex, sTopic, oData, bIsRoot, oParent, eDirection, bExpanded) {
-        if (!sId) { logger.error('invalid node id'); return; }
-        if (typeof iIndex != 'number') { logger.error('invalid node index'); return; }
-        if (typeof bExpanded === 'undefined') { bExpanded = true; }
+        if (!sId) {
+            logger.error('invalid node id');
+            return;
+        }
+        if (typeof iIndex != 'number') {
+            logger.error('invalid node index');
+            return;
+        }
+        if (typeof bExpanded === 'undefined') {
+            bExpanded = true;
+        }
         this.id = sId;
         this.index = iIndex;
         this.topic = sTopic;
@@ -28,19 +36,19 @@ export class Node {
         var vd = this._data.view;
         return {
             x: vd.abs_x,
-            y: vd.abs_y
+            y: vd.abs_y,
         };
     }
     get_size() {
         var vd = this._data.view;
         return {
             w: vd.width,
-            h: vd.height
-        }
+            h: vd.height,
+        };
     }
 
     static compare(node1, node2) {
-        // '-1' is alwary the last
+        // '-1' is always the latest
         var r = 0;
         var i1 = node1.index;
         var i2 = node2.index;
@@ -57,15 +65,15 @@ export class Node {
         }
         return r;
     }
-    static inherited(pnode, node) {
-        if (!!pnode && !!node) {
-            if (pnode.id === node.id) {
+    static inherited(parent_node, node) {
+        if (!!parent_node && !!node) {
+            if (parent_node.id === node.id) {
                 return true;
             }
-            if (pnode.isroot) {
+            if (parent_node.isroot) {
                 return true;
             }
-            var pid = pnode.id;
+            var pid = parent_node.id;
             var p = node;
             while (!p.isroot) {
                 p = p.parent;
@@ -80,5 +88,3 @@ export class Node {
         return !!n && n instanceof Node;
     }
 }
-
-

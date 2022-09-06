@@ -5,10 +5,10 @@
  * Project Home:
  *   https://github.com/hizzgdev/jsmind/
  */
-import { logger, EventType } from "./jsmind.common.js";
-import { $ } from "./jsmind.dom.js";
-import { graph } from "./jsmind.graph.js";
-import { util } from "./jsmind.util.js";
+import { logger, EventType } from './jsmind.common.js';
+import { $ } from './jsmind.dom.js';
+import { init_graph } from './jsmind.graph.js';
+import { util } from './jsmind.util.js';
 
 export class ViewProvider {
     constructor(jm, options) {
@@ -35,12 +35,11 @@ export class ViewProvider {
             logger.error('the options.view.container was not be found in dom');
             return;
         }
+        this.graph = init_graph(this, this.opts.engine);
+
         this.e_panel = $.c('div');
         this.e_nodes = $.c('jmnodes');
         this.e_editor = $.c('input');
-
-        this.graph = this.opts.engine.toLowerCase() === 'svg' ? new graph.svg(this) : new graph.canvas(this);
-
         this.e_panel.className = 'jsmind-inner';
         this.e_panel.tabIndex = 1;
         this.e_panel.appendChild(this.graph.element());
@@ -57,7 +56,10 @@ export class ViewProvider {
         var v = this;
         $.on(this.e_editor, 'keydown', function (e) {
             var evt = e || event;
-            if (evt.keyCode == 13) { v.edit_node_end(); evt.stopPropagation(); }
+            if (evt.keyCode == 13) {
+                v.edit_node_end();
+                evt.stopPropagation();
+            }
         });
         $.on(this.e_editor, 'blur', function (e) {
             v.edit_node_end();
@@ -88,7 +90,7 @@ export class ViewProvider {
         }
     }
     is_expander(element) {
-        return (element.tagName.toLowerCase() == 'jmexpander');
+        return element.tagName.toLowerCase() == 'jmexpander';
     }
     reset() {
         logger.debug('view.reset');
@@ -121,8 +123,12 @@ export class ViewProvider {
         var min_height = min_size.h + this.opts.vmargin * 2;
         var client_w = this.e_panel.clientWidth;
         var client_h = this.e_panel.clientHeight;
-        if (client_w < min_width) { client_w = min_width; }
-        if (client_h < min_height) { client_h = min_height; }
+        if (client_w < min_width) {
+            client_w = min_width;
+        }
+        if (client_h < min_height) {
+            client_h = min_height;
+        }
         this.size.w = client_w;
         this.size.h = client_h;
     }
@@ -217,9 +223,8 @@ export class ViewProvider {
     }
     select_node(node) {
         if (!!this.selected_node) {
-            this.selected_node._data.view.element.className =
-                this.selected_node._data.view.element.className.replace(/\s*selected\b/i, '');
-            this.reset_node_custom_style(this.selected_node);
+            var element = this.selected_node._data.view.element;
+            element.className = element.className.replace(/\s*selected\b/i, '');
         }
         if (!!node) {
             this.selected_node = node;
@@ -234,7 +239,7 @@ export class ViewProvider {
         return this.editing_node;
     }
     is_editing() {
-        return (!!this.editing_node);
+        return !!this.editing_node;
     }
     edit_node_begin(node) {
         if (!node.topic) {
@@ -250,7 +255,11 @@ export class ViewProvider {
         var topic = node.topic;
         var ncs = getComputedStyle(element);
         this.e_editor.value = topic;
-        this.e_editor.style.width = (element.clientWidth - parseInt(ncs.getPropertyValue('padding-left')) - parseInt(ncs.getPropertyValue('padding-right'))) + 'px';
+        this.e_editor.style.width =
+            element.clientWidth -
+            parseInt(ncs.getPropertyValue('padding-left')) -
+            parseInt(ncs.getPropertyValue('padding-right')) +
+            'px';
         element.innerHTML = '';
         element.appendChild(this.e_editor);
         element.style.zIndex = 5;
@@ -308,16 +317,15 @@ export class ViewProvider {
         return this.setZoom(this.actualZoom - this.zoomStep);
     }
     setZoom(zoom) {
-        if ((zoom < this.minZoom) || (zoom > this.maxZoom)) {
+        if (zoom < this.minZoom || zoom > this.maxZoom) {
             return false;
         }
         this.actualZoom = zoom;
         for (var i = 0; i < this.e_panel.children.length; i++) {
             this.e_panel.children[i].style.transform = 'scale(' + zoom + ')';
-        };
+        }
         this.show(true);
         return true;
-
     }
     _center_root() {
         // center root node
@@ -393,15 +401,15 @@ export class ViewProvider {
             p = this.layout.get_node_point(node);
             view_data.abs_x = _offset.x + p.x;
             view_data.abs_y = _offset.y + p.y;
-            node_element.style.left = (_offset.x + p.x) + 'px';
-            node_element.style.top = (_offset.y + p.y) + 'px';
+            node_element.style.left = _offset.x + p.x + 'px';
+            node_element.style.top = _offset.y + p.y + 'px';
             node_element.style.display = '';
             node_element.style.visibility = 'visible';
             if (!node.isroot && node.children.length > 0) {
                 expander_text = node.expanded ? '-' : '+';
                 p_expander = this.layout.get_expander_point(node);
-                expander.style.left = (_offset.x + p_expander.x) + 'px';
-                expander.style.top = (_offset.y + p_expander.y) + 'px';
+                expander.style.left = _offset.x + p_expander.x + 'px';
+                expander.style.top = _offset.y + p_expander.y + 'px';
                 expander.style.display = '';
                 expander.style.visibility = 'visible';
                 $.t(expander, expander_text);
@@ -450,27 +458,33 @@ export class ViewProvider {
                     var img = this;
                     if (c.getContext) {
                         var ctx = c.getContext('2d');
-                        ctx.drawImage(img, 2, 2, node_element.clientWidth, node_element.clientHeight);
+                        ctx.drawImage(
+                            img,
+                            2,
+                            2,
+                            node_element.clientWidth,
+                            node_element.clientHeight
+                        );
                         var scaledImageData = c.toDataURL();
                         node_element.style.backgroundImage = 'url(' + scaledImageData + ')';
                     }
                 };
                 img.src = backgroundImage;
-
             } else {
                 node_element.style.backgroundImage = 'url(' + backgroundImage + ')';
             }
             node_element.style.backgroundSize = '99%';
 
             if ('background-rotation' in node_data) {
-                node_element.style.transform = 'rotate(' + node_data['background-rotation'] + 'deg)';
+                node_element.style.transform =
+                    'rotate(' + node_data['background-rotation'] + 'deg)';
             }
         }
     }
     clear_node_custom_style(node) {
         var node_element = node._data.view.element;
-        node_element.style.backgroundColor = "";
-        node_element.style.color = "";
+        node_element.style.backgroundColor = '';
+        node_element.style.color = '';
     }
     clear_lines() {
         this.graph.clear();
@@ -484,8 +498,12 @@ export class ViewProvider {
         var _offset = this.get_view_offset();
         for (var nodeid in nodes) {
             node = nodes[nodeid];
-            if (!!node.isroot) { continue; }
-            if (('visible' in node._data.layout) && !node._data.layout.visible) { continue; }
+            if (!!node.isroot) {
+                continue;
+            }
+            if ('visible' in node._data.layout && !node._data.layout.visible) {
+                continue;
+            }
             pin = this.layout.get_node_point_in(node);
             pout = this.layout.get_node_point_out(node.parent);
             this.graph.draw_line(pout, pin, _offset);
@@ -503,7 +521,7 @@ export class ViewProvider {
                 this.e_panel.style = 'overflow: hidden';
             }
             // Move the whole mind map with mouse moves, while button is down.
-            $.on(this.container, 'mousedown', (eventDown) => {
+            $.on(this.container, 'mousedown', eventDown => {
                 dragging = true;
                 // Record current mouse position.
                 x = eventDown.clientX;
@@ -514,7 +532,7 @@ export class ViewProvider {
                 dragging = false;
             });
             // Follow current mouse position and move mind map accordingly.
-            $.on(this.container, 'mousemove', (eventMove) => {
+            $.on(this.container, 'mousemove', eventMove => {
                 if (dragging) {
                     this.e_panel.scrollBy(x - eventMove.clientX, y - eventMove.clientY);
                     // Record new current position.
@@ -525,5 +543,3 @@ export class ViewProvider {
         }
     }
 }
-
-
