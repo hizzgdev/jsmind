@@ -12,7 +12,7 @@
     // __name__ should be a const value, Never try to change it easily.
     var __name__ = 'jsMind';
     // library version
-    var __version__ = '0.4.9';
+    var __version__ = '0.4.10';
     // author
     var __author__ = 'hizzgdev@163.com';
 
@@ -1025,7 +1025,8 @@
                 line_width: opts.view.line_width,
                 line_color: opts.view.line_color,
                 draggable: opts.view.draggable,
-                hide_scrollbars_when_draggable: opts.view.hide_scrollbars_when_draggable
+                hide_scrollbars_when_draggable: opts.view.hide_scrollbars_when_draggable,
+                editable: opts.editable
             };
             // create instance of function provider
             this.data = new jm.data_provider(this);
@@ -2784,7 +2785,7 @@
             }
         },
 
-        // Drag the whole mind map with your mouse, when it's larger that the container
+        // Drag the whole mind map with your mouse (usefull when it's larger that the container).
         enable_draggable_canvas: function () {
             // If draggable option is true.
             if (this.opts.draggable) {
@@ -2797,10 +2798,13 @@
                 }
                 // Move the whole mind map with mouse moves, while button is down.
                 jm.util.dom.add_event(this.container, 'mousedown', (eventDown) => {
-                    dragging = true
-                    // Record current mouse position.
-                    x = eventDown.clientX
-                    y = eventDown.clientY
+                    // Avoid map dragging when a node is selected in edit mode.
+                    if(!this.opts.editable || !this.selected_node || (this.selected_node && this.selected_node._data.view.element.className.trim() !== 'selected')) {
+                        dragging = true
+                        // Record current mouse position.
+                        x = eventDown.clientX
+                        y = eventDown.clientY
+                    }
                 })
                 // Stop moving mind map once mouse button is released.
                 jm.util.dom.add_event(this.container, 'mouseup', () => {
