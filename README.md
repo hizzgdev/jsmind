@@ -14,8 +14,8 @@ jsMind is a pure javascript library for mindmap, it base on html5 canvas and svg
         <link type="text/css" rel="stylesheet" href="style/jsmind.css" />
         <script type="text/javascript" src="js/jsmind.js"></script>
         <!--
-            enable drag-and-drop feature
-            <script type="text/javascript" src="js/jsmind.draggable.js"></script>
+            enable draggable node feature
+            <script type="text/javascript" src="js/jsmind.draggable-node.js"></script>
         -->
     </head>
     <body>

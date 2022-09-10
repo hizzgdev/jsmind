@@ -23,9 +23,9 @@ export default [
         ],
     },
     {
-        input: 'src/plugins/jsmind.draggable.js',
+        input: 'src/plugins/jsmind.draggable-node.js',
         output: {
-            file: 'es6/jsmind.draggable.js',
+            file: 'es6/jsmind.draggable-node.js',
             format: 'iife',
             banner: '/**\n* @license BSD-3-Clause\n* @copyright 2014-2022 hizzgdev@163.com\n*\n* Project Home:\n*   https://github.com/hizzgdev/jsmind/\n*/',
             sourcemap: true,
