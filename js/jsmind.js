@@ -1025,8 +1025,7 @@
                 line_width: opts.view.line_width,
                 line_color: opts.view.line_color,
                 draggable: opts.view.draggable,
-                hide_scrollbars_when_draggable: opts.view.hide_scrollbars_when_draggable,
-                editable: opts.editable
+                hide_scrollbars_when_draggable: opts.view.hide_scrollbars_when_draggable
             };
             // create instance of function provider
             this.data = new jm.data_provider(this);
@@ -2320,7 +2319,10 @@
 
             this.container.appendChild(this.e_panel);
 
-            this.enable_draggable_canvas()
+            // Used to avoid dragging, while editing node.
+            this.dragging_enabled = true
+
+            this.draggable_canvas()
         },
 
         add_event: function (obj, event_name, event_handle) {
@@ -2786,7 +2788,7 @@
         },
 
         // Drag the whole mind map with your mouse (usefull when it's larger that the container).
-        enable_draggable_canvas: function () {
+        draggable_canvas: function () {
             // If draggable option is true.
             if (this.opts.draggable) {
                 // Dragging disabled by default.
@@ -2798,13 +2800,10 @@
                 }
                 // Move the whole mind map with mouse moves, while button is down.
                 jm.util.dom.add_event(this.container, 'mousedown', (eventDown) => {
-                    // Avoid map dragging when a node is selected in edit mode.
-                    if(!this.opts.editable || !this.selected_node || (this.selected_node && this.selected_node._data.view.element.className.trim() !== 'selected')) {
-                        dragging = true
-                        // Record current mouse position.
-                        x = eventDown.clientX
-                        y = eventDown.clientY
-                    }
+                    dragging = true
+                    // Record current mouse position.
+                    x = eventDown.clientX
+                    y = eventDown.clientY
                 })
                 // Stop moving mind map once mouse button is released.
                 jm.util.dom.add_event(this.container, 'mouseup', () => {
@@ -2812,7 +2811,7 @@
                 })
                 // Follow current mouse position and move mind map accordingly.
                 jm.util.dom.add_event(this.container, 'mousemove', (eventMove) => {
-                    if (dragging) {
+                    if (this.dragging_enabled && dragging) {
                         this.e_panel.scrollBy(x - eventMove.clientX, y - eventMove.clientY)
                         // Record new current position.
                         x = eventMove.clientX
@@ -2820,6 +2819,18 @@
                     }
                 })
             }
+        },
+
+        get_draggable_canvas: function () {
+            return this.opts.draggable
+        },
+
+        enable_draggable_canvas: function () {
+            this.dragging_enabled = true
+        },
+
+        disable_draggable_canvas: function () {
+            this.dragging_enabled = false
         },
 
     };
