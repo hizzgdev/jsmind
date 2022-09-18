@@ -6,7 +6,7 @@
  *   https://github.com/hizzgdev/jsmind/
  */
 
-import { __version__, logger, EventType, Direction } from './jsmind.common.js';
+import { __version__, logger, EventType, Direction, LogLevel } from './jsmind.common.js';
 import { merge_option } from './jsmind.option.js';
 import { Mind } from './jsmind.mind.js';
 import { Node } from './jsmind.node.js';
@@ -31,11 +31,12 @@ export default class jsMind {
 
     constructor(options) {
         jsMind.current = this;
+        this.options = merge_option(options);
+        logger.level = LogLevel[this.options.log_level];
         this.version = __version__;
         this.initialized = false;
         this.mind = null;
         this.event_handles = [];
-        this.options = merge_option(options);
         this.init();
     }
 
@@ -76,11 +77,25 @@ export default class jsMind {
 
         apply_plugins(this);
     }
+    get_editable() {
+        return this.options.editable;
+    }
     enable_edit() {
         this.options.editable = true;
     }
     disable_edit() {
         this.options.editable = false;
+    }
+    get_view_draggable() {
+        return this.options.view.draggable;
+    }
+    enable_view_draggable() {
+        this.options.view.draggable = true;
+        this.view.setup_canvas_draggable(true);
+    }
+    disable_view_draggable() {
+        this.options.view.draggable = false;
+        this.view.setup_canvas_draggable(false);
     }
     // options are 'mousedown', 'click', 'dblclick', 'mousewheel'
     enable_event_handle(event_handle) {
@@ -89,9 +104,6 @@ export default class jsMind {
     // options are 'mousedown', 'click', 'dblclick', 'mousewheel'
     disable_event_handle(event_handle) {
         this.options.default_event_handle['enable_' + event_handle + '_handle'] = false;
-    }
-    get_editable() {
-        return this.options.editable;
     }
     set_theme(theme) {
         var theme_old = this.options.theme;

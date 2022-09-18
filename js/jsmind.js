@@ -12,7 +12,7 @@
     // __name__ should be a const value, Never try to change it easily.
     var __name__ = 'jsMind';
     // library version
-    var __version__ = '0.4.9';
+    var __version__ = '0.4.10';
     // author
     var __author__ = 'hizzgdev@163.com';
 
@@ -2319,7 +2319,10 @@
 
             this.container.appendChild(this.e_panel);
 
-            this.enable_draggable_canvas()
+            // Used to avoid dragging, while editing node.
+            this.dragging_enabled = true
+
+            this.draggable_canvas()
         },
 
         add_event: function (obj, event_name, event_handle) {
@@ -2784,8 +2787,8 @@
             }
         },
 
-        // Drag the whole mind map with your mouse, when it's larger that the container
-        enable_draggable_canvas: function () {
+        // Drag the whole mind map with your mouse (usefull when it's larger that the container).
+        draggable_canvas: function () {
             // If draggable option is true.
             if (this.opts.draggable) {
                 // Dragging disabled by default.
@@ -2808,7 +2811,7 @@
                 })
                 // Follow current mouse position and move mind map accordingly.
                 jm.util.dom.add_event(this.container, 'mousemove', (eventMove) => {
-                    if (dragging) {
+                    if (this.dragging_enabled && dragging) {
                         this.e_panel.scrollBy(x - eventMove.clientX, y - eventMove.clientY)
                         // Record new current position.
                         x = eventMove.clientX
@@ -2816,6 +2819,18 @@
                     }
                 })
             }
+        },
+
+        get_draggable_canvas: function () {
+            return this.opts.draggable
+        },
+
+        enable_draggable_canvas: function () {
+            this.dragging_enabled = true
+        },
+
+        disable_draggable_canvas: function () {
+            this.dragging_enabled = false
         },
 
     };
