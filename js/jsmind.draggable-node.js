@@ -235,6 +235,7 @@
             var jview = this.jm.view;
             var el = e.target || event.srcElement;
             if (el.tagName.toLowerCase() != 'jmnode') { return; }
+            if (jview.get_draggable_canvas()) { jview.disable_draggable_canvas() }
             var nodeid = jview.get_binded_nodeid(el);
             if (!!nodeid) {
                 var node = this.jm.get_node(nodeid);
@@ -281,6 +282,7 @@
 
         dragend: function (e) {
             if (!this.jm.get_editable()) { return; }
+            if (this.jm.view.get_draggable_canvas()) { this.jm.view.enable_draggable_canvas() }
             if (this.capture) {
                 if (this.hlookup_delay != 0) {
                     $w.clearTimeout(this.hlookup_delay);
