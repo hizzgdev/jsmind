@@ -5,6 +5,7 @@ import {
     Direction,
     EventType,
     Key,
+    LogLevel,
 } from '../../src/jsmind.common.js';
 
 test('test exported elements', () => {
@@ -25,4 +26,9 @@ test('test exported elements', () => {
     expect(Key.ctrl).toBe(1 << 12);
     expect(Key.alt).toBe(1 << 11);
     expect(Key.shift).toBe(1 << 10);
+    expect(LogLevel.debug).toBe(1);
+    expect(LogLevel.info).toBe(2);
+    expect(LogLevel.warn).toBe(3);
+    expect(LogLevel.error).toBe(4);
+    expect(LogLevel.disable).toBe(9);
 });

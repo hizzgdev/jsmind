@@ -6,7 +6,7 @@
  *   https://github.com/hizzgdev/jsmind/
  */
 
-import { __version__, logger, EventType, Direction } from './jsmind.common.js';
+import { __version__, logger, EventType, Direction, LogLevel } from './jsmind.common.js';
 import { merge_option } from './jsmind.option.js';
 import { Mind } from './jsmind.mind.js';
 import { Node } from './jsmind.node.js';
@@ -31,11 +31,12 @@ export default class jsMind {
 
     constructor(options) {
         jsMind.current = this;
+        this.options = merge_option(options);
+        logger.level = LogLevel[this.options.log_level];
         this.version = __version__;
         this.initialized = false;
         this.mind = null;
         this.event_handles = [];
-        this.options = merge_option(options);
         this.init();
     }
 
