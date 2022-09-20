@@ -219,8 +219,16 @@ export class ViewProvider {
                 $.t(element, node.topic);
             }
         }
-        view_data.width = element.clientWidth;
-        view_data.height = element.clientHeight;
+        if (this.layout.is_visible(node)) {
+            view_data.width = element.clientWidth;
+            view_data.height = element.clientHeight;
+        } else {
+            let origin_style = element.getAttribute('style');
+            element.style = 'visibility: visible; left:0; top:0;';
+            view_data.width = element.clientWidth;
+            view_data.height = element.clientHeight;
+            element.style = origin_style;
+        }
     }
     select_node(node) {
         if (!!this.selected_node) {
