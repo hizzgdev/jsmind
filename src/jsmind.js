@@ -32,7 +32,7 @@ export default class jsMind {
     constructor(options) {
         jsMind.current = this;
         this.options = merge_option(options);
-        logger.level = LogLevel[this.options.log_level];
+        logger.level(LogLevel[this.options.log_level]);
         this.version = __version__;
         this.initialized = false;
         this.mind = null;
