@@ -1,6 +1,6 @@
 {
     "name": "jsmind",
-    "version": "0.4.8",
+    "version": "0.4.10",
     "description": "jsMind is a pure javascript library for mindmap, it base on html5 canvas. jsMind was released under BSD license, you can embed it in any project, if only you observe the license.",
     "main": "js/jsmind.js",
     "directories": {
