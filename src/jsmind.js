@@ -18,6 +18,7 @@ import { Plugin, register as _register_plugin, apply as apply_plugins } from './
 import { format } from './jsmind.format.js';
 import { $ } from './jsmind.dom.js';
 import { util as _util } from './jsmind.util.js';
+import { registerPlugin, enablePlugin } from './jsmind.plugins.ts';
 
 export default class jsMind {
     static mind = Mind;
@@ -36,6 +37,9 @@ export default class jsMind {
         this.mind = null;
         this.event_handles = [];
         this.options = merge_option(options);
+        this.plugins = options.plugins || [];
+        this.registerPlugin = registerPlugin;
+        this.enablePlugin = enablePlugin;
         this.init();
     }
 
@@ -75,6 +79,13 @@ export default class jsMind {
         this._event_bind();
 
         apply_plugins(this);
+
+        if (this.plugins && this.plugins.length > 0) {
+            this.plugins.forEach(plugin => {
+                this.registerPlugin(plugin);
+                this.enablePlugin(plugin.name, this);
+            });
+        }
     }
     enable_edit() {
         this.options.editable = true;

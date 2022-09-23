@@ -6,12 +6,13 @@
  *   https://github.com/hizzgdev/jsmind/
  */
 
-if (!jsMind) {
-    throw new Error('jsMind is not defined');
-}
+// if (!jsMind) {
+//     throw new Error('jsMind is not defined');
+// }
 
-const jm = jsMind;
-const $ = jm.$;
+import jsMind from '../jsmind'
+import { $ } from '../jsmind.dom'
+import { Plugin } from '../jsmind.plugins.ts'
 
 const clear_selection =
     'getSelection' in $.w
@@ -48,13 +49,14 @@ class draggable {
         this.capture = false;
         this.moved = false;
     }
+
     init() {
         this._create_canvas();
         this._create_shadow();
         this._event_bind();
     }
     resize() {
-        this.jm.view.e_nodes.appendChild(this.shadow);
+        this.shadow && this.jm.view.e_nodes.appendChild(this.shadow);
         this.e_canvas.width = this.jm.view.size.w;
         this.e_canvas.height = this.jm.view.size.h;
     }
@@ -339,12 +341,15 @@ class draggable {
     }
 }
 
-var draggable_plugin = new jm.plugin('draggable', function (jm) {
-    var jd = new draggable(jm);
-    jd.init();
-    jm.add_event_listener(function (type, data) {
-        jd.jm_event_handle.call(jd, type, data);
-    });
-});
+function installDragPlugin() { 
+    const plugin = new Plugin('draggable', function (jm) {
+        const dragPlugin = new draggable(jm)
+        dragPlugin.init()
+        jm.add_event_listener(function (type, data) {
+            dragPlugin.jm_event_handle.call(dragPlugin, type, data);
+        });
+    })
+    return plugin
+}
 
-jsMind.register_plugin(draggable_plugin);
+export default installDragPlugin;

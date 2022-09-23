@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "target": "es2015",
+        "module": "ES2015",
+        "sourceMap": true,
+        "baseUrl": ".",
+        "paths": {
+            "tslib": ["node_modules/tslib/tslib.d.ts"]
+        },
+        "allowJs": true
+    },
+    "include": ["src/**/*.ts"]
+}
