@@ -26,6 +26,7 @@ export class ViewProvider {
         this.editing_node = null;
 
         this.graph = null;
+        this._initialized = false;
     }
     init() {
         logger.debug('view.init');
@@ -66,8 +67,6 @@ export class ViewProvider {
         });
 
         this.container.appendChild(this.e_panel);
-
-        this.enable_draggable_canvas();
     }
     add_event(obj, event_name, event_handle) {
         $.on(this.e_nodes, event_name, function (e) {
@@ -115,7 +114,9 @@ export class ViewProvider {
     }
     load() {
         logger.debug('view.load');
+        this.setup_canvas_draggable(this.opts.draggable);
         this.init_nodes();
+        this._initialized = true;
     }
     expand_size() {
         var min_size = this.layout.get_min_size();
@@ -218,8 +219,16 @@ export class ViewProvider {
                 $.t(element, node.topic);
             }
         }
-        view_data.width = element.clientWidth;
-        view_data.height = element.clientHeight;
+        if (this.layout.is_visible(node)) {
+            view_data.width = element.clientWidth;
+            view_data.height = element.clientHeight;
+        } else {
+            let origin_style = element.getAttribute('style');
+            element.style = 'visibility: visible; left:0; top:0;';
+            view_data.width = element.clientWidth;
+            view_data.height = element.clientHeight;
+            element.style = origin_style;
+        }
     }
     select_node(node) {
         if (!!this.selected_node) {
@@ -510,10 +519,9 @@ export class ViewProvider {
         }
     }
     // Drag the whole mind map with your mouse, when it's larger that the container
-    enable_draggable_canvas() {
-        // If draggable option is true.
-        if (this.opts.draggable) {
-            // Dragging disabled by default.
+    setup_canvas_draggable(enabled) {
+        this.opts.draggable = enabled;
+        if (!this._initialized) {
             let dragging = false;
             let x, y;
             if (this.opts.hide_scrollbars_when_draggable) {
@@ -522,10 +530,12 @@ export class ViewProvider {
             }
             // Move the whole mind map with mouse moves, while button is down.
             $.on(this.container, 'mousedown', eventDown => {
-                dragging = true;
-                // Record current mouse position.
-                x = eventDown.clientX;
-                y = eventDown.clientY;
+                if (this.opts.draggable) {
+                    dragging = true;
+                    // Record current mouse position.
+                    x = eventDown.clientX;
+                    y = eventDown.clientY;
+                }
             });
             // Stop moving mind map once mouse button is released.
             $.on(this.container, 'mouseup', () => {
@@ -533,11 +543,13 @@ export class ViewProvider {
             });
             // Follow current mouse position and move mind map accordingly.
             $.on(this.container, 'mousemove', eventMove => {
-                if (dragging) {
-                    this.e_panel.scrollBy(x - eventMove.clientX, y - eventMove.clientY);
-                    // Record new current position.
-                    x = eventMove.clientX;
-                    y = eventMove.clientY;
+                if (this.opts.draggable) {
+                    if (dragging) {
+                        this.e_panel.scrollBy(x - eventMove.clientX, y - eventMove.clientY);
+                        // Record new current position.
+                        x = eventMove.clientX;
+                        y = eventMove.clientY;
+                    }
                 }
             });
         }

@@ -10,9 +10,9 @@
 //     throw new Error('jsMind is not defined');
 // }
 
-import jsMind from '../jsmind'
-import { $ } from '../jsmind.dom'
-import { Plugin } from '../jsmind.plugins.ts'
+import jsMind from '../jsmind';
+import { $ } from '../jsmind.dom';
+import { Plugin } from '../jsmind.plugins.ts';
 
 const clear_selection =
     'getSelection' in $.w
@@ -29,7 +29,7 @@ const options = {
     lookup_interval: 80,
 };
 
-class draggable {
+class DraggableNode {
     constructor(jm) {
         this.jm = jm;
         this.e_canvas = null;
@@ -48,6 +48,7 @@ class draggable {
         this.hlookup_timer = 0;
         this.capture = false;
         this.moved = false;
+        this.canvas_draggable = this.jm.get_view_draggable();
     }
 
     init() {
@@ -226,11 +227,15 @@ class draggable {
             return;
         }
         this.active_node = null;
+        this.view_draggable = this.jm.get_view_draggable();
 
         var jview = this.jm.view;
         var el = e.target || event.srcElement;
         if (el.tagName.toLowerCase() != 'jmnode') {
             return;
+        }
+        if (this.view_draggable) {
+            this.jm.disable_view_draggable();
         }
         var nodeid = jview.get_binded_nodeid(el);
         if (!!nodeid) {
@@ -281,6 +286,9 @@ class draggable {
     dragend(e) {
         if (!this.jm.get_editable()) {
             return;
+        }
+        if (this.view_draggable) {
+            this.jm.enable_view_draggable();
         }
         if (this.capture) {
             if (this.hlookup_delay != 0) {
@@ -341,15 +349,15 @@ class draggable {
     }
 }
 
-function installDragPlugin() { 
+function installDragPlugin() {
     const plugin = new Plugin('draggable', function (jm) {
-        const dragPlugin = new draggable(jm)
-        dragPlugin.init()
+        const dragPlugin = new draggable(jm);
+        dragPlugin.init();
         jm.add_event_listener(function (type, data) {
             dragPlugin.jm_event_handle.call(dragPlugin, type, data);
         });
-    })
-    return plugin
+    });
+    return plugin;
 }
 
 export default installDragPlugin;

@@ -14,6 +14,7 @@ const default_options = {
     theme: null,
     mode: 'full', // full or side
     support_html: true,
+    log_level: 'info',
 
     view: {
         engine: 'canvas',
