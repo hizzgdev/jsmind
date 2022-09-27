@@ -2604,7 +2604,7 @@
             }
             this.actualZoom = zoom;
             for (var i = 0; i < this.e_panel.children.length; i++) {
-                this.e_panel.children[i].style.transform = 'scale(' + zoom + ')';
+                this.e_panel.children[i].style.zoom = zoom;
             };
             this.show(true);
             return true;
