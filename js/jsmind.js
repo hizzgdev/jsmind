@@ -12,7 +12,7 @@
     // __name__ should be a const value, Never try to change it easily.
     var __name__ = 'jsMind';
     // library version
-    var __version__ = '0.4.10';
+    var __version__ = '0.4.11';
     // author
     var __author__ = 'hizzgdev@163.com';
 
