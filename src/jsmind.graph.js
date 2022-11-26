@@ -36,9 +36,9 @@ class SvgGraph {
         }
         this.lines.length = 0;
     }
-    draw_line(pout, pin, offset) {
+    draw_line(pout, pin, offset, color) {
         var line = SvgGraph.c('path');
-        line.setAttribute('stroke', this.opts.line_color);
+        line.setAttribute('stroke', color || this.opts.line_color);
         line.setAttribute('stroke-width', this.opts.line_width);
         line.setAttribute('fill', 'transparent');
         this.lines.push(line);
@@ -106,9 +106,9 @@ class CanvasGraph {
     clear() {
         this.canvas_ctx.clearRect(0, 0, this.size.w, this.size.h);
     }
-    draw_line(pout, pin, offset) {
+    draw_line(pout, pin, offset, color) {
         var ctx = this.canvas_ctx;
-        ctx.strokeStyle = this.opts.line_color;
+        ctx.strokeStyle = color || this.opts.line_color;
         ctx.lineWidth = this.opts.line_width;
         ctx.lineCap = 'round';
 

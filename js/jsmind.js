@@ -12,7 +12,7 @@
     // __name__ should be a const value, Never try to change it easily.
     var __name__ = 'jsMind';
     // library version
-    var __version__ = '0.4.10';
+    var __version__ = '0.4.11';
     // author
     var __author__ = 'hizzgdev@163.com';
 
@@ -2604,7 +2604,7 @@
             }
             this.actualZoom = zoom;
             for (var i = 0; i < this.e_panel.children.length; i++) {
-                this.e_panel.children[i].style.transform = 'scale(' + zoom + ')';
+                this.e_panel.children[i].style.zoom = zoom;
             };
             this.show(true);
             return true;
