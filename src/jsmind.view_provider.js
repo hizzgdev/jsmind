@@ -504,6 +504,7 @@ export class ViewProvider {
         var node = null;
         var pin = null;
         var pout = null;
+        var color = null;
         var _offset = this.get_view_offset();
         for (var nodeid in nodes) {
             node = nodes[nodeid];
@@ -515,7 +516,8 @@ export class ViewProvider {
             }
             pin = this.layout.get_node_point_in(node);
             pout = this.layout.get_node_point_out(node.parent);
-            this.graph.draw_line(pout, pin, _offset);
+            color = node.data['leading-line-color'];
+            this.graph.draw_line(pout, pin, _offset, color);
         }
     }
     // Drag the whole mind map with your mouse, when it's larger that the container
