@@ -274,13 +274,13 @@ describe('event handler', () => {
         jsmind.enable_event_handle('mousewheel');
         evt.deltaY = 1;
         jsmind.mousewheel_handle(evt);
-        expect(jsmind.view.zoomIn).toBeCalledTimes(1);
-        expect(jsmind.view.zoomOut).toBeCalledTimes(0);
+        expect(jsmind.view.zoomOut).toBeCalledTimes(1);
+        expect(jsmind.view.zoomIn).toBeCalledTimes(0);
 
         evt.deltaY = -1;
         jsmind.mousewheel_handle(evt);
-        expect(jsmind.view.zoomIn).toBeCalledTimes(1);
         expect(jsmind.view.zoomOut).toBeCalledTimes(1);
+        expect(jsmind.view.zoomIn).toBeCalledTimes(1);
 
         evt.ctrlKey = false;
         jsmind.mousewheel_handle(evt);
