@@ -1133,8 +1133,7 @@
             // Avoid default page scrolling behavior.
             event.preventDefault()
 
-            var dir = event.deltaY > 0 ? "Up" : "Down"
-            if (dir == "Up") {
+            if (event.deltaY < 0) {
                 this.view.zoomIn()
             } else {
                 this.view.zoomOut()
