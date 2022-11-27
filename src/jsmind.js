@@ -168,8 +168,8 @@ export default class jsMind {
         // Avoid default page scrolling behavior.
         evt.preventDefault();
 
-        if (evt.deltaY > 0) {
-            this.view.zoomIn(); // wheel up
+        if (evt.deltaY < 0) {
+            this.view.zoomIn(); // wheel down
         } else {
             this.view.zoomOut();
         }
