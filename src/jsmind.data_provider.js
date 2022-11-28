@@ -39,6 +39,8 @@ export class DataProvider {
             mind = format.node_tree.get_mind(mind_data);
         } else if (df == 'freemind') {
             mind = format.freemind.get_mind(mind_data);
+        } else if (df == 'text') {
+            mind = format.text.get_mind(mind_data);
         } else {
             logger.warn('unsupported format');
         }
@@ -52,6 +54,8 @@ export class DataProvider {
             data = format.node_tree.get_data(this.jm.mind);
         } else if (data_format == 'freemind') {
             data = format.freemind.get_data(this.jm.mind);
+        } else if (data_format == 'text') {
+            data = format.text.get_data(this.jm.mind);
         } else {
             logger.error('unsupported ' + data_format + ' format');
         }
