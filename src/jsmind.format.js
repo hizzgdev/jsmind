@@ -9,6 +9,7 @@
 import { __author__, __version__, logger, Direction } from './jsmind.common.js';
 import { Mind } from './jsmind.mind.js';
 import { Node } from './jsmind.node.js';
+import { util } from './jsmind.util.js';
 
 export const format = {
     node_tree: {
@@ -452,6 +453,92 @@ export const format = {
             }
 
             xml_lines.push('</node>');
+        },
+    },
+    text: {
+        example: {
+            meta: {
+                name: 'jsMind text example',
+                author: __author__,
+                version: __version__,
+            },
+            format: 'text',
+            data: 'Text Example\n node1\n  node1-sub\n  node1-sub\n node2',
+        },
+        _line_regex: /\s*/,
+        get_mind: function (source) {
+            var df = format.text;
+            var mind = new Mind();
+            mind.name = source.meta.name;
+            mind.author = source.meta.author;
+            mind.version = source.meta.version;
+            var lines = source.data.split(/\n|\r/);
+            df._fill_nodes(mind, lines, 0, 0);
+            return mind;
+        },
+
+        _fill_nodes: function (mind, lines) {
+            let node_path = [];
+            let i = 0;
+            while (i < lines.length) {
+                let line = lines[i];
+                let level = line.match(/\s*/)[0].length;
+                let topic = line.substr(level);
+
+                if (level == 0 && node_path.length > 0) {
+                    log.error('more than 1 root node was found: ' + topic);
+                    return;
+                }
+                if (level > node_path.length) {
+                    log.error('a suspended node was found: ' + topic);
+                    return;
+                }
+                let diff = node_path.length - level;
+                while (diff--) {
+                    node_path.pop();
+                }
+
+                if (level == 0 && node_path.length == 0) {
+                    let node = mind.set_root(util.uuid.newid(), topic);
+                    node_path.push(node);
+                } else {
+                    let node = mind.add_node(
+                        node_path[level - 1],
+                        util.uuid.newid(),
+                        topic,
+                        {},
+                        null
+                    );
+                    node_path.push(node);
+                }
+                i++;
+            }
+            node_path.length = 0;
+        },
+
+        get_data: function (mind) {
+            var df = format.text;
+            var json = {};
+            json.meta = {
+                name: mind.name,
+                author: mind.author,
+                version: mind.version,
+            };
+            json.format = 'text';
+            let lines = [];
+            df._build_lines(lines, [mind.root], 0);
+            json.data = lines.join('\n');
+            return json;
+        },
+
+        _build_lines: function (lines, nodes, level) {
+            let prefix = new Array(level + 1).join(' ');
+            for (let node of nodes) {
+                lines.push(prefix + node.topic);
+                if (!!node.children) {
+                    format.text._build_lines(lines, node.children, level + 1);
+                }
+            }
         },
     },
 };
