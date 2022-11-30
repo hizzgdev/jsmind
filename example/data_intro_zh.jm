@@ -1,0 +1,107 @@
+{
+    "meta": {
+        "name": "jsMind-intro",
+        "author": "hizzgdev@163.com",
+        "version": "0.4.12"
+    },
+    "format": "node_tree",
+    "data": {
+        "id": "root",
+        "topic": "jsMind 介绍",
+        "children": [
+            {
+                "id": "b587",
+                "topic": "动手试一试吧!",
+                "direction": "left",
+                "background-color": "#f39c12",
+                "leading-line-color": "#e67e22"
+            },
+            {
+                "id": "a387",
+                "topic": "中文 | <a href='#en'>EN</a>",
+                "direction": "left"
+            },
+            {
+                "id": "5b35",
+                "topic": "鼠标操作",
+                "direction": "right",
+                "children": [
+                    {
+                        "id": "d27d",
+                        "topic": "单击: 选择节点"
+                    },
+                    {
+                        "id": "4c7d",
+                        "topic": "双击: 进入编辑模式，回车保存"
+                    },
+                    {
+                        "id": "9bc0",
+                        "topic": "拖动: 摆放节点"
+                    },
+                    {
+                        "id": "5ad8",
+                        "topic": "点小圆圈: 展开/收缩子节点"
+                    }
+                ]
+            },
+            {
+                "id": "0b5c",
+                "topic": "键盘操作",
+                "direction": "right",
+                "children": [
+                    {
+                        "id": "1007",
+                        "topic": "Enter: 添加同级节点"
+                    },
+                    {
+                        "id": "f389",
+                        "topic": "Insert: 添加下级节点"
+                    },
+                    {
+                        "id": "9b69",
+                        "topic": "F2: 进入编辑模式，回车保存"
+                    },
+                    {
+                        "id": "15e3",
+                        "topic": "Delete: 删除节点"
+                    },
+                    {
+                        "id": "1565",
+                        "topic": "Space: 展开/收缩子节点"
+                    },
+                    {
+                        "id": "27ca",
+                        "topic": "快捷键能改也能加"
+                    }
+                ]
+            },
+            {
+                "id": "d974",
+                "topic": "用 jsMind 的理由?",
+                "direction": "left",
+                "children": [
+                    {
+                        "id": "693b",
+                        "topic": "快, 很快"
+                    },
+                    {
+                        "id": "1405",
+                        "topic": "简洁"
+                    },
+                    {
+                        "id": "394a",
+                        "topic": "支持主题也能自定义样式"
+                    },
+                    {
+                        "id": "2a63",
+                        "topic": "免费无广告"
+                    },
+                    {
+                        "id": "5e48",
+                        "topic": "一个浏览器足够"
+                    }
+                ]
+            }
+        ]
+    }
+}

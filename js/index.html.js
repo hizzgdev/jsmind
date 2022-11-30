@@ -29,16 +29,26 @@
     }
 
     function register_event(){
-		jsMind.util.dom.add_event($w,'resize',reset_container_size);
-        jsMind.util.dom.add_event($g('jsmind_tools'),'click',tools_handler);
-        jsMind.util.dom.add_event($d,'click',hide_setting_visible);
+        jsMind.$.on($w,'hashchange',load_mind)
+        jsMind.$.on($w,'resize',reset_container_size);
+        jsMind.$.on($g('jsmind_tools'),'click',tools_handler);
+        jsMind.$.on($d,'click',hide_setting_visible);
     }
 
-    function load_mind(){
-        var mind_url = 'example/data_example.json';
+    function _load_mind(lang){
+        var mind_url = 'example/data_intro_'+lang+'.jm';
         jsMind.util.ajax.get(mind_url,function(mind){
             _jm.show(mind);
         });
+    }
+
+    var _current_lang='';
+    function load_mind(){
+        var lang = location.hash==='#zh'?'zh':'en'
+        if(_current_lang!==lang){
+            _current_lang=lang
+            _load_mind(lang);
+        }
     }
 
 	var _resize_timeout_id = -1;

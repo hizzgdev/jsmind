@@ -1,0 +1,107 @@
+{
+    "meta": {
+        "name": "jsMind-intro",
+        "author": "hizzgdev@163.com",
+        "version": "0.4.12"
+    },
+    "format": "node_tree",
+    "data": {
+        "id": "root",
+        "topic": "jsMind Intro",
+        "children": [
+            {
+                "id": "b587",
+                "topic": "Hey, try it!",
+                "direction": "left",
+                "background-color": "#f39c12",
+                "leading-line-color": "#e67e22"
+            },
+            {
+                "id": "a387",
+                "topic": "<a href='#zh'>中文</a> | EN",
+                "direction": "left"
+            },
+            {
+                "id": "5b35",
+                "topic": "Use mouse",
+                "direction": "right",
+                "children": [
+                    {
+                        "id": "d27d",
+                        "topic": "Click node: select it"
+                    },
+                    {
+                        "id": "4c7d",
+                        "topic": "Double click node: edit mode, [Enter] to save"
+                    },
+                    {
+                        "id": "9bc0",
+                        "topic": "Drag node: place it"
+                    },
+                    {
+                        "id": "5ad8",
+                        "topic": "Click the little circle: expand/collapse children"
+                    }
+                ]
+            },
+            {
+                "id": "0b5c",
+                "topic": "Use keyboard",
+                "direction": "right",
+                "children": [
+                    {
+                        "id": "1007",
+                        "topic": "Enter: new brother node"
+                    },
+                    {
+                        "id": "f389",
+                        "topic": "Insert: new child node"
+                    },
+                    {
+                        "id": "9b69",
+                        "topic": "F2: edit mode"
+                    },
+                    {
+                        "id": "15e3",
+                        "topic": "Delete: delete node"
+                    },
+                    {
+                        "id": "1565",
+                        "topic": "Space: expand/collapse children"
+                    },
+                    {
+                        "id": "27ca",
+                        "topic": "You can customize the shortcuts"
+                    }
+                ]
+            },
+            {
+                "id": "d974",
+                "topic": "Why jsMind?",
+                "direction": "left",
+                "children": [
+                    {
+                        "id": "693b",
+                        "topic": "Fast and Faster"
+                    },
+                    {
+                        "id": "1405",
+                        "topic": "Simple and clear"
+                    },
+                    {
+                        "id": "394a",
+                        "topic": "Themes and custom style"
+                    },
+                    {
+                        "id": "2a63",
+                        "topic": "Free w/o Ads"
+                    },
+                    {
+                        "id": "5e48",
+                        "topic": "Only a browser is required"
+                    }
+                ]
+            }
+        ]
+    }
+}

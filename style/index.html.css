@@ -11,6 +11,7 @@ header nav a.latest{float:right;border:none;}
 header nav a:hover{color:#0a0;background-color:#f8f8f8;}
 
 .jsmind-container{clear:both}
+.jsmind-container a{color:#fff}
 
 .jsmind-tools{position:absolute;z-index:100;top:70px;left:10px;border:solid 1px #fff;background-color:#fff;border-radius:5px;opacity:0.3;}
 .jsmind-tools:hover{opacity:1;}
