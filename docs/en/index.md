@@ -5,6 +5,7 @@ Contents.
   * 1.1 Basic Framework
   * 1.2 Data Format
   * 1.3 Themes
+  * 1.4 Styles
 * [2. Options](2.options.md)
   * 2.1 Introduction
   * 2.2 Conventional Options
