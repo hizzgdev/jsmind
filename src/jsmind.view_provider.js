@@ -234,11 +234,12 @@ export class ViewProvider {
         if (!!this.selected_node) {
             var element = this.selected_node._data.view.element;
             element.className = element.className.replace(/\s*selected\b/i, '');
+            this.restore_selected_node_custom_style(this.selected_node);
         }
         if (!!node) {
             this.selected_node = node;
             node._data.view.element.className += ' selected';
-            this.clear_node_custom_style(node);
+            this.clear_selected_node_custom_style(node);
         }
     }
     select_clear() {
@@ -490,7 +491,17 @@ export class ViewProvider {
             }
         }
     }
-    clear_node_custom_style(node) {
+    restore_selected_node_custom_style(node) {
+        var node_element = node._data.view.element;
+        var node_data = node.data;
+        if ('background-color' in node_data) {
+            node_element.style.backgroundColor = node_data['background-color'];
+        }
+        if ('foreground-color' in node_data) {
+            node_element.style.color = node_data['foreground-color'];
+        }
+    }
+    clear_selected_node_custom_style(node) {
         var node_element = node._data.view.element;
         node_element.style.backgroundColor = '';
         node_element.style.color = '';
