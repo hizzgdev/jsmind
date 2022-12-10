@@ -40,7 +40,7 @@ const default_options = {
         enable: true,
         handles: {},
         mapping: {
-            addchild: 45, // Insert
+            addchild: [45, 4096 + 13], // Insert, Ctrl+Enter
             addbrother: 13, // Enter
             editnode: 113, // F2
             delnode: 46, // Delete
