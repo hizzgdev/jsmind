@@ -12,7 +12,7 @@
     // __name__ should be a const value, Never try to change it easily.
     var __name__ = 'jsMind';
     // library version
-    var __version__ = '0.4.12';
+    var __version__ = '0.5.0';
     // author
     var __author__ = 'hizzgdev@163.com';
 
@@ -80,7 +80,7 @@
             handles: {
             },
             mapping: {
-                addchild: 45, // Insert
+                addchild: [45, 4096+13], // Insert, Ctrl+Enter
                 addbrother: 13, // Enter
                 editnode: 113,// F2
                 delnode: 46, // Delete
@@ -2868,7 +2868,13 @@
 
             for (var handle in this.mapping) {
                 if (!!this.mapping[handle] && (handle in this.handles)) {
-                    this._mapping[this.mapping[handle]] = this.handles[handle];
+                    var keys = this.mapping[handle];
+                    if(!Array.isArray(keys)){
+                        keys = [keys]
+                    }
+                    for(let key of keys){
+                        this._mapping[key] = this.handles[handle];
+                    }
                 }
             }
 

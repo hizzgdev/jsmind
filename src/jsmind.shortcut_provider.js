@@ -34,7 +34,13 @@ export class ShortcutProvider {
 
         for (var handle in this.mapping) {
             if (!!this.mapping[handle] && handle in this.handles) {
-                this._mapping[this.mapping[handle]] = this.handles[handle];
+                let keys = this.mapping[handle];
+                if (!Array.isArray(keys)) {
+                    keys = [keys];
+                }
+                for (let key of keys) {
+                    this._mapping[key] = this.handles[handle];
+                }
             }
         }
 
