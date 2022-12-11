@@ -40,9 +40,9 @@ jsMind is mind map library built by javascript, it base on html5 canvas and svg.
 
 ## Links
 
--   App1 : <http://jsmind.online>
--   App2 : <http://jsmind.sinaapp.com>
--   Home : <http://github.com/hizzgdev/jsmind>
+-   App1 : <https://jsmind.online>
+-   App2 : <https://jsmind.sinaapp.com>
+-   Home : <https://github.com/hizzgdev/jsmind>
 -   npm : <https://www.npmjs.com/package/jsmind>
 -   Demo :
     -   <http://hizzgdev.github.io/jsmind/example/1_basic.html>
