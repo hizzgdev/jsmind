@@ -12,11 +12,18 @@ jsMind is mind map library built by javascript, it base on html5 canvas and svg.
 ```html
 <html>
     <head>
-        <link type="text/css" rel="stylesheet" href="style/jsmind.css" />
-        <script type="text/javascript" src="js/jsmind.js"></script>
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/jsmind@0.5/style/jsmind.css"
+        />
+        <script
+            type="text/javascript"
+            src="https://cdn.jsdelivr.net/npm/jsmind@0.5/es6/jsmind.js"
+        ></script>
         <!--
             enable draggable node feature
-            <script type="text/javascript" src="js/jsmind.draggable-node.js"></script>
+            <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jsmind@0.5/es6/jsmind.draggable-node.js"></script>
         -->
     </head>
     <body>
@@ -43,7 +50,8 @@ jsMind is mind map library built by javascript, it base on html5 canvas and svg.
 
 -   Project Home :
     -   on Github: <https://github.com/hizzgdev/jsmind>
-    -   on npm : <https://www.npmjs.com/package/jsmind>
+    -   on NPM: <https://www.npmjs.com/package/jsmind>
+    -   on CDN: <https://www.jsdelivr.com/package/npm/jsmind>
 -   Apps :
     -   <https://jsmind.online>
     -   <https://jsmind.sinaapp.com>
@@ -68,8 +76,8 @@ jsMind is mind map library built by javascript, it base on html5 canvas and svg.
     -   Will be launched in 2023 H1
 -   NPM Pilot Version: `0.5.1`
 -   Code Location
-    -   源码位于 `/src`, 可运行于浏览器的 js 文件位于 `/es6`
-    -   The source code is located in `/src`, and the js files that can run in browsers are located in `/es6`
+    -   源码位于 `/src`, 可运行于浏览器的 js 文件将生成于 `/es6`
+    -   The source code is located in `/src`, and the js files that can run in browsers will be generated into `/es6`
 -   Demo: <http://hizzgdev.github.io/jsmind/example/2_features_es6.html>
 
 ## Maintainer
