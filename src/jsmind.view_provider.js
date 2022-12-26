@@ -343,10 +343,10 @@ export class ViewProvider {
         var outer_h = this.e_panel.clientHeight;
         if (this.size.w > outer_w) {
             var _offset = this.get_view_offset();
-            this.e_panel.scrollLeft = _offset.x - outer_w / 2;
+            this.e_panel.scrollLeft = _offset.x * this.actualZoom - outer_w / 2;
         }
         if (this.size.h > outer_h) {
-            this.e_panel.scrollTop = (this.size.h - outer_h) / 2;
+            this.e_panel.scrollTop = (this.size.h * this.actualZoom - outer_h) / 2;
         }
     }
     show(keep_center) {
