@@ -12,3 +12,6 @@ navigation:                # accepts {file, title, url, icon, sidebaricon}
   - {url: "/", title: "About jsMind", icon: bolt}
   - {url: "/docs/", title: "Documents", icon: book}
   - {url: "https://github.com/hizzgdev/jsmind", title: "GitHub", icon: github}
+
+stats:
+  google: G-JL176YVWE0
