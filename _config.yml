@@ -2,3 +2,8 @@ remote_theme: niklasbuschmann/contrast@v2.11
 plugins:
 - jekyll-remote-theme
 - jekyll-feed
+
+navigation:                # accepts {file, title, url, icon, sidebaricon}
+  - {url: "https://github.com/hizzgdev/jsmind", title: "GitHub"}
+  - {file: "docs/", title: "Document"}
+  - {file: "index.html", title: "About"}
