@@ -81,5 +81,6 @@ jsMind is mind map library built by javascript, it base on html5 canvas and svg.
 -   [张志刚 - Zhigang Zhang](https://hizzgdev.github.io)
 
 ## Donate
+
 -   [资助本项目](https://hizzgdev.github.io/sponsor.html)
 -   [Become a sponsor](https://github.com/sponsors/hizzgdev)
