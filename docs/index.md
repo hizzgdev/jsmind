@@ -9,7 +9,7 @@
 
 ## English
 
-* [Contents](en/index.md)
+* [Table of Contents](en/index.md)
 * [1. Usage](en/1.usage.md)
 * [2. Options](en/2.options.md)
 * [3. API / Operation](en/3.operation.md)
