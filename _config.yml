@@ -9,6 +9,6 @@ description: " "
 show_sidebar: true
 
 navigation:                # accepts {file, title, url, icon, sidebaricon}
-  - {url: "/", title: "About jsMind", icon: "bolt"}
-  - {url: "/docs/", title: "Documents", icon: "book"}
-  - {url: "https://github.com/hizzgdev/jsmind", title: "GitHub", icon: "github"}
+  - {url: "/", title: "About jsMind", icon: bolt}
+  - {url: "/docs/", title: "Documents", icon: book}
+  - {url: "https://github.com/hizzgdev/jsmind", title: "GitHub", icon: github}
