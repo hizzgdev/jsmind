@@ -1,3 +1,4 @@
 remote_theme: niklasbuschmann/contrast@v2.11
 plugins:
 - jekyll-remote-theme
+- jekyll-feed
