@@ -1,4 +1,4 @@
-remote_theme: niklasbuschmann/contrast@v2.11
+remote_theme: https://github.com/hizzgdev/contrast
 plugins:
 - jekyll-remote-theme
 
@@ -10,5 +10,5 @@ show_sidebar: true
 
 navigation:                # accepts {file, title, url, icon, sidebaricon}
   - {url: "/", title: "jsMind"}
-  - {url: "/docs/", title: "Document"}
+  - {url: "/docs/", title: "Documents"}
   - {url: "https://github.com/hizzgdev/jsmind", title: "GitHub"}
