@@ -1,5 +1,3 @@
-# Summary
-
 ## 中文
 
 * [目录](zh/index.md)
