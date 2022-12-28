@@ -52,6 +52,7 @@ jsMind is mind map library built by javascript, it base on html5 canvas and svg.
 ```
 
 ## Links
+
 -   Resources:
     -   [NPM - jsmind](https://www.npmjs.com/package/jsmind)
     -   [CDN - jsDeliver](https://www.jsdelivr.com/package/npm/jsmind)
