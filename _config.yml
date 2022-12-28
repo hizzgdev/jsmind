@@ -4,10 +4,11 @@ plugins:
 
 title: "jsMind"
 author: "hizzgdev@163.com"
+description: " "
 
 show_sidebar: true
 
 navigation:                # accepts {file, title, url, icon, sidebaricon}
-  - {url: "/", title: "jsMind", icon: "bolt", sidebaricon: "bolt"}
-  - {url: "/docs/", title: "Document", icon: "book", sidebaricon: "book"}
-  - {url: "https://github.com/hizzgdev/jsmind", title: "GitHub", icon: "github", sidebaricon: "githuub"}
+  - {url: "/", title: "jsMind"}
+  - {url: "/docs/", title: "Document"}
+  - {url: "https://github.com/hizzgdev/jsmind", title: "GitHub"}
