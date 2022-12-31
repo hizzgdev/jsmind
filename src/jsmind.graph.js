@@ -1,6 +1,6 @@
 /**
  * @license BSD
- * @copyright 2014-2022 hizzgdev@163.com
+ * @copyright 2014-2023 hizzgdev@163.com
  *
  * Project Home:
  *   https://github.com/hizzgdev/jsmind/
