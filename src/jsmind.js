@@ -311,11 +311,11 @@ export default class jsMind {
         }
         return this.mind.get_node(node);
     }
-    add_node(parent_node, node_id, topic, data) {
+    add_node(parent_node, node_id, topic, data, direction) {
         if (this.get_editable()) {
             var the_parent_node = this.get_node(parent_node);
-            var direction = this.layout.calculate_next_child_direction(the_parent_node);
-            var node = this.mind.add_node(the_parent_node, node_id, topic, data, direction);
+            var dir = direction || this.layout.calculate_next_child_direction(the_parent_node);
+            var node = this.mind.add_node(the_parent_node, node_id, topic, data, dir);
             if (!!node) {
                 this.view.add_node(node);
                 this.layout.layout();
@@ -324,7 +324,7 @@ export default class jsMind {
                 this.expand_node(the_parent_node);
                 this.invoke_event_handle(EventType.edit, {
                     evt: 'add_node',
-                    data: [the_parent_node.id, node_id, topic, data],
+                    data: [the_parent_node.id, node_id, topic, data, dir],
                     node: node_id,
                 });
             }
@@ -334,24 +334,19 @@ export default class jsMind {
             return null;
         }
     }
-    insert_node_before(node_before, node_id, topic, data) {
+    insert_node_before(node_before, node_id, topic, data, direction) {
         if (this.get_editable()) {
             var the_node_before = this.get_node(node_before);
-            var direction = this.layout.calculate_next_child_direction(the_node_before.parent);
-            var node = this.mind.insert_node_before(
-                the_node_before,
-                node_id,
-                topic,
-                data,
-                direction
-            );
+            var dir =
+                direction || this.layout.calculate_next_child_direction(the_node_before.parent);
+            var node = this.mind.insert_node_before(the_node_before, node_id, topic, data, dir);
             if (!!node) {
                 this.view.add_node(node);
                 this.layout.layout();
                 this.view.show(false);
                 this.invoke_event_handle(EventType.edit, {
                     evt: 'insert_node_before',
-                    data: [the_node_before.id, node_id, topic, data],
+                    data: [the_node_before.id, node_id, topic, data, dir],
                     node: node_id,
                 });
             }
@@ -361,18 +356,19 @@ export default class jsMind {
             return null;
         }
     }
-    insert_node_after(node_after, node_id, topic, data) {
+    insert_node_after(node_after, node_id, topic, data, direction) {
         if (this.get_editable()) {
             var the_node_after = this.get_node(node_after);
-            var direction = this.layout.calculate_next_child_direction(the_node_after.parent);
-            var node = this.mind.insert_node_after(the_node_after, node_id, topic, data, direction);
+            var dir =
+                direction || this.layout.calculate_next_child_direction(the_node_after.parent);
+            var node = this.mind.insert_node_after(the_node_after, node_id, topic, data, dir);
             if (!!node) {
                 this.view.add_node(node);
                 this.layout.layout();
                 this.view.show(false);
                 this.invoke_event_handle(EventType.edit, {
                     evt: 'insert_node_after',
-                    data: [the_node_after.id, node_id, topic, data],
+                    data: [the_node_after.id, node_id, topic, data, dir],
                     node: node_id,
                 });
             }
