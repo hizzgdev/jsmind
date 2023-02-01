@@ -1286,18 +1286,18 @@
             return this.mind.get_node(node);
         },
 
-        add_node: function (parent_node, nodeid, topic, data) {
+        add_node: function (parent_node, nodeid, topic, data, direction) {
             if (this.get_editable()) {
                 var the_parent_node = this.get_node(parent_node);
-                var direction = this.layout.calculate_next_child_direction(the_parent_node);
-                var node = this.mind.add_node(the_parent_node, nodeid, topic, data, direction);
+                var dir = direction || this.layout.calculate_next_child_direction(the_parent_node);
+                var node = this.mind.add_node(the_parent_node, nodeid, topic, data, dir);
                 if (!!node) {
                     this.view.add_node(node);
                     this.layout.layout();
                     this.view.show(false);
                     this.view.reset_node_custom_style(node);
                     this.expand_node(the_parent_node);
-                    this.invoke_event_handle(jm.event_type.edit, { evt: 'add_node', data: [the_parent_node.id, nodeid, topic, data], node: nodeid });
+                    this.invoke_event_handle(jm.event_type.edit, { evt: 'add_node', data: [the_parent_node.id, nodeid, topic, data, dir], node: nodeid });
                 }
                 return node;
             } else {
@@ -1306,16 +1306,16 @@
             }
         },
 
-        insert_node_before: function (node_before, nodeid, topic, data) {
+        insert_node_before: function (node_before, nodeid, topic, data, direction) {
             if (this.get_editable()) {
                 var the_node_before = this.get_node(node_before);
-                var direction = this.layout.calculate_next_child_direction(the_node_before.parent);
-                var node = this.mind.insert_node_before(the_node_before, nodeid, topic, data, direction);
+                var dir = direction || this.layout.calculate_next_child_direction(the_node_before.parent);
+                var node = this.mind.insert_node_before(the_node_before, nodeid, topic, data, dir);
                 if (!!node) {
                     this.view.add_node(node);
                     this.layout.layout();
                     this.view.show(false);
-                    this.invoke_event_handle(jm.event_type.edit, { evt: 'insert_node_before', data: [the_node_before.id, nodeid, topic, data], node: nodeid });
+                    this.invoke_event_handle(jm.event_type.edit, { evt: 'insert_node_before', data: [the_node_before.id, nodeid, topic, data, dir], node: nodeid });
                 }
                 return node;
             } else {
@@ -1324,16 +1324,16 @@
             }
         },
 
-        insert_node_after: function (node_after, nodeid, topic, data) {
+        insert_node_after: function (node_after, nodeid, topic, data, direction) {
             if (this.get_editable()) {
                 var the_node_after = this.get_node(node_after);
-                var direction = this.layout.calculate_next_child_direction(the_node_after.parent);
-                var node = this.mind.insert_node_after(the_node_after, nodeid, topic, data, direction);
+                var dir = direction || this.layout.calculate_next_child_direction(the_node_after.parent);
+                var node = this.mind.insert_node_after(the_node_after, nodeid, topic, data, dir);
                 if (!!node) {
                     this.view.add_node(node);
                     this.layout.layout();
                     this.view.show(false);
-                    this.invoke_event_handle(jm.event_type.edit, { evt: 'insert_node_after', data: [the_node_after.id, nodeid, topic, data], node: nodeid });
+                    this.invoke_event_handle(jm.event_type.edit, { evt: 'insert_node_after', data: [the_node_after.id, nodeid, topic, data, dir], node: nodeid });
                 }
                 return node;
             } else {
