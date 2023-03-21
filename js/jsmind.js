@@ -62,7 +62,8 @@
             line_width: 2,
             line_color: '#555',
             draggable: false, // drag the mind map with your mouse, when it's larger that the container
-            hide_scrollbars_when_draggable: false // hide container scrollbars, when mind map is larger than container and draggable option is true.
+            hide_scrollbars_when_draggable: false, // hide container scrollbars, when mind map is larger than container and draggable option is true.
+            node_overflow: 'hidden' // hidden or wrap
         },
         layout: {
             hspace: 30,
@@ -1025,7 +1026,8 @@
                 line_width: opts.view.line_width,
                 line_color: opts.view.line_color,
                 draggable: opts.view.draggable,
-                hide_scrollbars_when_draggable: opts.view.hide_scrollbars_when_draggable
+                hide_scrollbars_when_draggable: opts.view.hide_scrollbars_when_draggable,
+                node_overflow: opts.view.node_overflow
             };
             // create instance of function provider
             this.data = new jm.data_provider(this);
@@ -2293,8 +2295,7 @@
             this.e_editor = $c('input');
 
             this.graph = this.opts.engine.toLowerCase() === 'svg' ? new jm.graph_svg(this) : new jm.graph_canvas(this);
-
-            this.e_panel.className = 'jsmind-inner';
+            this.e_panel.className = 'jsmind-inner jmnode-overflow-' + this.opts.node_overflow;
             this.e_panel.tabIndex = 1;
             this.e_panel.appendChild(this.graph.element());
             this.e_panel.appendChild(this.e_nodes);

@@ -61,6 +61,7 @@ export default class jsMind {
             line_color: this.options.view.line_color,
             draggable: this.options.view.draggable,
             hide_scrollbars_when_draggable: this.options.view.hide_scrollbars_when_draggable,
+            node_overflow: this.options.view.node_overflow,
         };
         // create instance of function provider
         this.data = new DataProvider(this);
