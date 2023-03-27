@@ -115,7 +115,25 @@
     };
 
     // ============= static object =============================================
-    jm.direction = { left: -1, center: 0, right: 1 };
+    jm.direction = {
+        left: -1, center: 0, right: 1, of: function (dir) {
+            if (!dir || dir === -1 || dir === 0 || dir === 1) {
+                return dir;
+            }
+            if (dir === '-1' || dir === '0' || dir === '1') {
+                return parseInt(dir);
+            }
+            if (dir.toLowerCase() === 'left') {
+                return this.left;
+            }
+            if (dir.toLowerCase() === 'right') {
+                return this.right;
+            }
+            if (dir.toLowerCase() === 'center') {
+                return this.center;
+            }
+        }
+    };
     jm.event_type = { show: 1, resize: 2, edit: 3, select: 4 };
     jm.key = { meta: 1 << 13, ctrl: 1 << 12, alt: 1 << 11, shift: 1 << 10 };
 
@@ -1291,7 +1309,10 @@
         add_node: function (parent_node, nodeid, topic, data, direction) {
             if (this.get_editable()) {
                 var the_parent_node = this.get_node(parent_node);
-                var dir = direction || this.layout.calculate_next_child_direction(the_parent_node);
+                var dir = jm.direction.of(direction)
+                if (dir === undefined) {
+                    dir = this.layout.calculate_next_child_direction(the_parent_node);
+                }
                 var node = this.mind.add_node(the_parent_node, nodeid, topic, data, dir);
                 if (!!node) {
                     this.view.add_node(node);
@@ -1311,7 +1332,10 @@
         insert_node_before: function (node_before, nodeid, topic, data, direction) {
             if (this.get_editable()) {
                 var the_node_before = this.get_node(node_before);
-                var dir = direction || this.layout.calculate_next_child_direction(the_node_before.parent);
+                var dir = jm.direction.of(direction)
+                if (dir === undefined) {
+                    dir = this.layout.calculate_next_child_direction(the_node_before.parent);
+                }
                 var node = this.mind.insert_node_before(the_node_before, nodeid, topic, data, dir);
                 if (!!node) {
                     this.view.add_node(node);
@@ -1329,7 +1353,10 @@
         insert_node_after: function (node_after, nodeid, topic, data, direction) {
             if (this.get_editable()) {
                 var the_node_after = this.get_node(node_after);
-                var dir = direction || this.layout.calculate_next_child_direction(the_node_after.parent);
+                var dir = jm.direction.of(direction)
+                if (dir === undefined) {
+                    dir = this.layout.calculate_next_child_direction(the_node_after.parent);
+                }
                 var node = this.mind.insert_node_after(the_node_after, nodeid, topic, data, dir);
                 if (!!node) {
                     this.view.add_node(node);
