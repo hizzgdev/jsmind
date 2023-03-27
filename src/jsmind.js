@@ -315,7 +315,7 @@ export default class jsMind {
     add_node(parent_node, node_id, topic, data, direction) {
         if (this.get_editable()) {
             var the_parent_node = this.get_node(parent_node);
-            var dir = Direction.of(direction)
+            var dir = Direction.of(direction);
             if (dir === undefined) {
                 dir = this.layout.calculate_next_child_direction(the_parent_node);
             }
@@ -341,7 +341,7 @@ export default class jsMind {
     insert_node_before(node_before, node_id, topic, data, direction) {
         if (this.get_editable()) {
             var the_node_before = this.get_node(node_before);
-            var dir = Direction.of(direction)
+            var dir = Direction.of(direction);
             if (dir === undefined) {
                 dir = this.layout.calculate_next_child_direction(the_node_before.parent);
             }
@@ -365,7 +365,7 @@ export default class jsMind {
     insert_node_after(node_after, node_id, topic, data, direction) {
         if (this.get_editable()) {
             var the_node_after = this.get_node(node_after);
-            var dir = Direction.of(direction)
+            var dir = Direction.of(direction);
             if (dir === undefined) {
                 dir = this.layout.calculate_next_child_direction(the_node_after.parent);
             }

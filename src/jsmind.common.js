@@ -16,7 +16,10 @@ if (typeof String.prototype.startsWith != 'function') {
 }
 
 export const Direction = {
-    left: -1, center: 0, right: 1, of: function (dir) {
+    left: -1,
+    center: 0,
+    right: 1,
+    of: function (dir) {
         if (!dir || dir === -1 || dir === 0 || dir === 1) {
             return dir;
         }
@@ -32,7 +35,7 @@ export const Direction = {
         if (dir.toLowerCase() === 'center') {
             return this.center;
         }
-    }
+    },
 };
 export const EventType = { show: 1, resize: 2, edit: 3, select: 4 };
 export const Key = { meta: 1 << 13, ctrl: 1 << 12, alt: 1 << 11, shift: 1 << 10 };
