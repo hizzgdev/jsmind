@@ -315,7 +315,10 @@ export default class jsMind {
     add_node(parent_node, node_id, topic, data, direction) {
         if (this.get_editable()) {
             var the_parent_node = this.get_node(parent_node);
-            var dir = direction || this.layout.calculate_next_child_direction(the_parent_node);
+            var dir = Direction.of(direction)
+            if (dir === undefined) {
+                dir = this.layout.calculate_next_child_direction(the_parent_node);
+            }
             var node = this.mind.add_node(the_parent_node, node_id, topic, data, dir);
             if (!!node) {
                 this.view.add_node(node);
@@ -338,8 +341,10 @@ export default class jsMind {
     insert_node_before(node_before, node_id, topic, data, direction) {
         if (this.get_editable()) {
             var the_node_before = this.get_node(node_before);
-            var dir =
-                direction || this.layout.calculate_next_child_direction(the_node_before.parent);
+            var dir = Direction.of(direction)
+            if (dir === undefined) {
+                dir = this.layout.calculate_next_child_direction(the_node_before.parent);
+            }
             var node = this.mind.insert_node_before(the_node_before, node_id, topic, data, dir);
             if (!!node) {
                 this.view.add_node(node);
@@ -360,8 +365,10 @@ export default class jsMind {
     insert_node_after(node_after, node_id, topic, data, direction) {
         if (this.get_editable()) {
             var the_node_after = this.get_node(node_after);
-            var dir =
-                direction || this.layout.calculate_next_child_direction(the_node_after.parent);
+            var dir = Direction.of(direction)
+            if (dir === undefined) {
+                dir = this.layout.calculate_next_child_direction(the_node_after.parent);
+            }
             var node = this.mind.insert_node_after(the_node_after, node_id, topic, data, dir);
             if (!!node) {
                 this.view.add_node(node);
