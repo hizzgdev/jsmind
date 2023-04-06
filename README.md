@@ -20,15 +20,15 @@ jsMind is mind map library built by javascript, it base on html5 canvas and svg.
         <link
             type="text/css"
             rel="stylesheet"
-            href="https://cdn.jsdelivr.net/npm/jsmind@0.5/style/jsmind.css"
+            href="https://unpkg.com/jsmind@0.5/style/jsmind.css"
         />
         <script
             type="text/javascript"
-            src="https://cdn.jsdelivr.net/npm/jsmind@0.5/es6/jsmind.js"
+            src="https://unpkg.com/jsmind@0.5/es6/jsmind.js"
         ></script>
         <!--
             enable draggable node feature
-            <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jsmind@0.5/es6/jsmind.draggable-node.js"></script>
+            <script type="text/javascript" src="https://unpkg.com/jsmind@0.5/es6/jsmind.draggable-node.js"></script>
         -->
     </head>
     <body>
@@ -55,7 +55,7 @@ jsMind is mind map library built by javascript, it base on html5 canvas and svg.
 
 -   Resources:
     -   [NPM - jsmind](https://www.npmjs.com/package/jsmind)
-    -   [CDN - jsDeliver](https://www.jsdelivr.com/package/npm/jsmind)
+    -   CDN - [UNPKG](https://unpkg.com/browse/jsmind/), [jsDelivr](https://www.jsdelivr.com/package/npm/jsmind)
     -   [文档 - Documents](https://hizzgdev.github.io/jsmind/docs)
 -   Apps :
     -   <https://jsmind.online>
