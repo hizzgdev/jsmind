@@ -30,6 +30,7 @@ const default_options = {
         hspace: 30,
         vspace: 20,
         pspace: 13,
+        cousin_space: 0,
     },
     default_event_handle: {
         enable_mousedown_handle: true,
