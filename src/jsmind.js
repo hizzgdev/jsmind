@@ -681,8 +681,10 @@ export default class jsMind {
         }
     }
 
-    // quick way
     static show(options, mind) {
+        logger.warn(
+            '`jsMind.show(options, mind)` is deprecated, please use `jm = new jsMind(options); jm.show(mind);` instead'
+        );
         var _jm = new jsMind(options);
         _jm.show(mind);
         return _jm;
