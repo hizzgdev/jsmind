@@ -3093,8 +3093,8 @@
         }
     };
 
-    // quick way
     jm.show = function (options, mind) {
+        logger.warn('`jsMind.show(options, mind)` is deprecated, please use `jm = new jsMind(options); jm.show(mind);` instead')
         var _jm = new jm(options);
         _jm.show(mind);
         return _jm;

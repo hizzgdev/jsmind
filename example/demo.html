@@ -63,7 +63,8 @@
                         },
                     },
                 };
-                _jm = jsMind.show(options, mind);
+                _jm = new jsMind(options);
+                _jm.show(mind);
                 // jm.set_readonly(true);
                 // var mind_data = jm.get_data();
                 // alert(mind_data);
