@@ -278,7 +278,7 @@
                 var jview = this.jm.view;
                 var px = (e.clientX || e.touches[0].clientX) / jview.actualZoom - this.offset_x;
                 var py = (e.clientY || e.touches[0].clientY) / jview.actualZoom - this.offset_y;
-                // scrolling container axisX if drag nodes exceeding container
+                // scrolling container axisY if drag nodes exceeding container
                 if (
                     e.clientY - this.innerElSize.top < 10 &&
                     this.innerEl.scrollTop > 15
@@ -293,6 +293,17 @@
                     this.innerEl.scrollBy(0, 10);
                     this.offset_y -= 10 / jview.actualZoom;
                   }
+                // scrolling container axisX if drag nodes exceeding container
+                if (e.clientX - this.innerElSize.left < 10 && this.innerEl.scrollLeft > 15) {
+                    this.innerEl.scrollBy(-10, 0);
+                    this.offset_x += 10 / jview.actualZoom;
+                } else if (
+                    this.innerElSize.right - e.clientX < 50 &&
+                    this.innerEl.scrollLeft < this.innerEl.scrollWidth - this.innerElSize.width - 55
+                    ) {
+                    this.innerEl.scrollBy(10, 0);
+                    this.offset_x -= 10 / jview.actualZoom;
+                }
                 this.shadow.style.left = px + 'px';
                 this.shadow.style.top = py + 'px';
                 clear_selection();
