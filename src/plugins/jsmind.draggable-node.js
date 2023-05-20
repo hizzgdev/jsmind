@@ -24,8 +24,11 @@ const clear_selection =
 
 const options = {
     line_width: 5,
+    line_color: 'rgba(0,0,0,0.3)',
     lookup_delay: 500,
     lookup_interval: 80,
+    scrolling_trigger_width: 20,
+    scrolling_step_length: 10,
 };
 
 class DraggableNode {
@@ -48,8 +51,8 @@ class DraggableNode {
         this.capture = false;
         this.moved = false;
         this.canvas_draggable = this.jm.get_view_draggable();
-        this.innerEl = null;
-        this.innerElSize = null;
+        this.view_panel = jm.view.e_panel;
+        this.view_panel_rect = null;
     }
     init() {
         this._create_canvas();
@@ -100,7 +103,7 @@ class DraggableNode {
     _magnet_shadow(node) {
         if (!!node) {
             this.canvas_ctx.lineWidth = options.line_width;
-            this.canvas_ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+            this.canvas_ctx.strokeStyle = options.line_color;
             this.canvas_ctx.lineCap = 'round';
             this._clear_lines();
             this._canvas_lineto(node.sp.x, node.sp.y, node.np.x, node.np.y);
@@ -242,9 +245,7 @@ class DraggableNode {
             var node = this.jm.get_node(nodeid);
             if (!node.isroot) {
                 this.reset_shadow(el);
-                this.innerEl =
-                    el.parentNode.nodeName === 'JMNODES' ? el.parentNode.parentNode : el.parentNode;
-                this.innerElSize = this.innerEl.getBoundingClientRect();
+                this.view_panel_rect = this.view_panel.getBoundingClientRect();
                 this.active_node = node;
                 this.offset_x =
                     (e.clientX || e.touches[0].clientX) / jview.actualZoom - el.offsetLeft;
@@ -282,26 +283,38 @@ class DraggableNode {
             var px = (e.clientX || e.touches[0].clientX) / jview.actualZoom - this.offset_x;
             var py = (e.clientY || e.touches[0].clientY) / jview.actualZoom - this.offset_y;
             // scrolling container axisY if drag nodes exceeding container
-            if (e.clientY - this.innerElSize.top < 10 && this.innerEl.scrollTop > 15) {
-                this.innerEl.scrollBy(0, -10);
-                this.offset_y += 10 / jview.actualZoom;
-            } else if (
-                this.innerElSize.bottom - e.clientY < 10 &&
-                this.innerEl.scrollTop < this.innerEl.scrollHeight - this.innerElSize.height - 15
+            if (
+                e.clientY - this.view_panel_rect.top < options.scrolling_trigger_width &&
+                this.view_panel.scrollTop > options.scrolling_step_length
             ) {
-                this.innerEl.scrollBy(0, 10);
-                this.offset_y -= 10 / jview.actualZoom;
+                this.view_panel.scrollBy(0, -options.scrolling_step_length);
+                this.offset_y += options.scrolling_step_length / jview.actualZoom;
+            } else if (
+                this.view_panel_rect.bottom - e.clientY < options.scrolling_trigger_width &&
+                this.view_panel.scrollTop <
+                    this.view_panel.scrollHeight -
+                        this.view_panel_rect.height -
+                        options.scrolling_step_length
+            ) {
+                this.view_panel.scrollBy(0, options.scrolling_step_length);
+                this.offset_y -= options.scrolling_step_length / jview.actualZoom;
             }
             // scrolling container axisX if drag nodes exceeding container
-            if (e.clientX - this.innerElSize.left < 10 && this.innerEl.scrollLeft > 15) {
-                this.innerEl.scrollBy(-10, 0);
-                this.offset_x += 10 / jview.actualZoom;
-            } else if (
-                this.innerElSize.right - e.clientX < 50 &&
-                this.innerEl.scrollLeft < this.innerEl.scrollWidth - this.innerElSize.width - 55
+            if (
+                e.clientX - this.view_panel_rect.left < options.scrolling_trigger_width &&
+                this.view_panel.scrollLeft > options.scrolling_step_length
             ) {
-                this.innerEl.scrollBy(10, 0);
-                this.offset_x -= 10 / jview.actualZoom;
+                this.view_panel.scrollBy(-options.scrolling_step_length, 0);
+                this.offset_x += options.scrolling_step_length / jview.actualZoom;
+            } else if (
+                this.view_panel_rect.right - e.clientX < options.scrolling_trigger_width &&
+                this.view_panel.scrollLeft <
+                    this.view_panel.scrollWidth -
+                        this.view_panel_rect.width -
+                        options.scrolling_step_length
+            ) {
+                this.view_panel.scrollBy(options.scrolling_step_length, 0);
+                this.offset_x -= options.scrolling_step_length / jview.actualZoom;
             }
             this.shadow.style.left = px + 'px';
             this.shadow.style.top = py + 'px';
@@ -334,8 +347,7 @@ class DraggableNode {
             }
             this.hide_shadow();
         }
-        this.innerEl = null;
-        this.innerElSize = null;
+        this.view_panel_rect = null;
         this.moved = false;
         this.capture = false;
     }
