@@ -196,14 +196,16 @@ describe('event handler', () => {
 
         jsmind.select_node = jest.fn();
         jsmind.select_clear = jest.fn();
-        jsmind.view = { get_binded_nodeid: jest.fn() };
+        jsmind.view = { get_binded_nodeid: jest.fn(), is_node: jest.fn() };
         jsmind.view.get_binded_nodeid.mockReturnValue('node1');
+        jsmind.view.is_node.mockReturnValue(true);
 
         jsmind.enable_event_handle('mousedown');
         jsmind.mousedown_handle({ target: { tagName: 'jmnode' } });
         expect(jsmind.select_node).toBeCalledWith('node1');
         expect(jsmind.select_clear).toBeCalledTimes(0);
 
+        jsmind.view.is_node.mockReturnValue(false);
         jsmind.mousedown_handle({ target: { tagName: 'DIV' } });
         expect(jsmind.select_node).toBeCalledTimes(1);
         expect(jsmind.select_clear).toBeCalledTimes(0);
@@ -213,6 +215,7 @@ describe('event handler', () => {
         expect(jsmind.select_node).toBeCalledTimes(1);
         expect(jsmind.select_clear).toBeCalledTimes(1);
 
+        jsmind.view.is_node.mockReturnValue(true);
         jsmind.disable_event_handle('mousedown');
         jsmind.mousedown_handle({ target: { tagName: 'jmnode' } });
         expect(jsmind.select_node).toBeCalledTimes(1);
@@ -244,7 +247,8 @@ describe('event handler', () => {
         const jsmind = create_fake_mind();
         jsmind.get_editable = jest.fn();
         jsmind.begin_edit = jest.fn();
-        jsmind.view = { get_binded_nodeid: jest.fn() };
+        jsmind.view = { get_binded_nodeid: jest.fn(), is_node: jest.fn() };
+        jsmind.view.is_node.mockReturnValue(true);
 
         jsmind.enable_event_handle('dblclick');
         jsmind.get_editable.mockReturnValue(true);
