@@ -79,13 +79,25 @@ export class ViewProvider {
             return null;
         }
         var tagName = element.tagName.toLowerCase();
-        if (tagName == 'jmnodes' || tagName == 'body' || tagName == 'html') {
-            return null;
-        }
         if (tagName == 'jmnode' || tagName == 'jmexpander') {
             return element.getAttribute('nodeid');
+        } else if (tagName == 'jmnodes' || tagName == 'body' || tagName == 'html') {
+            return null;
         } else {
             return this.get_binded_nodeid(element.parentElement);
+        }
+    }
+    is_node(element) {
+        if (element == null) {
+            return false;
+        }
+        var tagName = element.tagName.toLowerCase();
+        if (tagName == 'jmnode') {
+            return true;
+        } else if (tagName == 'jmnodes' || tagName == 'body' || tagName == 'html') {
+            return false;
+        } else {
+            return this.is_node(element.parentElement);
         }
     }
     is_expander(element) {

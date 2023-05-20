@@ -128,7 +128,7 @@ export default class jsMind {
         var element = e.target || event.srcElement;
         var node_id = this.view.get_binded_nodeid(element);
         if (!!node_id) {
-            if (element.tagName.toLowerCase() == 'jmnode') {
+            if (this.view.is_node(element)) {
                 this.select_node(node_id);
             }
         } else {
@@ -154,9 +154,12 @@ export default class jsMind {
         }
         if (this.get_editable()) {
             var element = e.target || event.srcElement;
-            var node_id = this.view.get_binded_nodeid(element);
-            if (!!node_id) {
-                this.begin_edit(node_id);
+            var is_node = this.view.is_node(element);
+            if (is_node) {
+                var node_id = this.view.get_binded_nodeid(element);
+                if (!!node_id) {
+                    this.begin_edit(node_id);
+                }
             }
         }
     }
