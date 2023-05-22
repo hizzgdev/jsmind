@@ -12,6 +12,12 @@ jsMind is mind map library built by javascript, it base on html5 canvas and svg.
 -   [jsMind on Github](https://github.com/hizzgdev/jsmind)
 -   [国内镜像 - Gitee](https://gitee.com/hizzgdev/jsmind)
 
+## ES6 Version Update
+
+ES6 版本现已发布，详情请查阅 [es6/README.md](es6/README.md)
+
+The ES6 version of jsMind has been launched. see details from [es6/README.md](es6/README.md)
+
 ## Get Started
 
 ```html
@@ -20,12 +26,15 @@ jsMind is mind map library built by javascript, it base on html5 canvas and svg.
         <link
             type="text/css"
             rel="stylesheet"
-            href="https://unpkg.com/jsmind@0.5/style/jsmind.css"
+            href="//cdn.jsdelivr.net/npm/jsmind@0.6/style/jsmind.css"
         />
-        <script type="text/javascript" src="https://unpkg.com/jsmind@0.5/es6/jsmind.js"></script>
+        <script
+            type="text/javascript"
+            src="//cdn.jsdelivr.net/npm/jsmind@0.6/es6/jsmind.js"
+        ></script>
         <!--
             enable draggable node feature
-            <script type="text/javascript" src="https://unpkg.com/jsmind@0.5/es6/jsmind.draggable-node.js"></script>
+            <script type="text/javascript" src="//cdn.jsdelivr.net/npm/jsmind@0.6/es6/jsmind.draggable-node.js"></script>
         -->
     </head>
     <body>
@@ -60,18 +69,6 @@ jsMind is mind map library built by javascript, it base on html5 canvas and svg.
 -   Demo :
     -   [显示一个脑图 Render a mindmap](https://hizzgdev.github.io/jsmind/example/1_basic.html) [[国内版](https://hizzgdev.github.io/jsmind/example/1_basic_cn.html)]
     -   [试用所有功能 Features simple](https://hizzgdev.github.io/jsmind/example/2_features.html) [[国内版](https://hizzgdev.github.io/jsmind/example/2_features_cn.html)]
-    -   [ES6 Version](https://hizzgdev.github.io/jsmind/example/2_features_es6.html)
-
-## ES6 Pilot Version
-
--   Launch Plan
-    -   将于 2023 年上半年正式启用
-    -   Will be launched in 2023 H1
--   NPM Pilot Version: `0.5.1`
--   Code Location
-    -   源码位于 `/src`, 可运行于浏览器的 js 文件将生成于 `/es6`
-    -   The source code is located in `/src`, and the js files that can run in browsers will be generated into `/es6`
--   Demo: <https://hizzgdev.github.io/jsmind/example/2_features_es6.html>
 
 ## Donate
 
