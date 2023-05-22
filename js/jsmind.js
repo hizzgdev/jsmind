@@ -12,7 +12,7 @@
     // __name__ should be a const value, Never try to change it easily.
     var __name__ = 'jsMind';
     // library version
-    var __version__ = '0.5.2';
+    var __version__ = '0.5.7';
     // author
     var __author__ = 'hizzgdev@163.com';
 
@@ -1111,7 +1111,7 @@
             var element = e.target || event.srcElement;
             var nodeid = this.view.get_binded_nodeid(element);
             if (!!nodeid) {
-                if (element.tagName.toLowerCase() == 'jmnode') {
+                if (this.view.is_node(element)) {
                     this.select_node(nodeid);
                 }
             } else {
@@ -1124,8 +1124,8 @@
                 return;
             }
             var element = e.target || event.srcElement;
-            var isexpander = this.view.is_expander(element);
-            if (isexpander) {
+            var is_expander = this.view.is_expander(element);
+            if (is_expander) {
                 var nodeid = this.view.get_binded_nodeid(element);
                 if (!!nodeid) {
                     this.toggle_node(nodeid);
@@ -1139,9 +1139,12 @@
             }
             if (this.get_editable()) {
                 var element = e.target || event.srcElement;
-                var nodeid = this.view.get_binded_nodeid(element);
-                if (!!nodeid) {
-                    this.begin_edit(nodeid);
+                var is_node = this.view.is_node(element);
+                if (is_node) {
+                    var nodeid = this.view.get_binded_nodeid(element);
+                    if (!!nodeid) {
+                        this.begin_edit(nodeid);
+                    }
                 }
             }
         },
@@ -2372,13 +2375,26 @@
                 return null;
             }
             var tagName = element.tagName.toLowerCase();
-            if (tagName == 'jmnodes' || tagName == 'body' || tagName == 'html') {
-                return null;
-            }
             if (tagName == 'jmnode' || tagName == 'jmexpander') {
                 return element.getAttribute('nodeid');
+            } else if (tagName == 'jmnodes' || tagName == 'body' || tagName == 'html') {
+                return null;
             } else {
                 return this.get_binded_nodeid(element.parentElement);
+            }
+        },
+
+        is_node: function (element) {
+            if (element == null) {
+                return false;
+            }
+            var tagName = element.tagName.toLowerCase();
+            if (tagName == 'jmnode') {
+                return true;
+            } else if (tagName == 'jmnodes' || tagName == 'body' || tagName == 'html') {
+                return false;
+            } else {
+                return this.is_node(element.parentElement);
             }
         },
 
