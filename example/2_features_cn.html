@@ -7,22 +7,26 @@
         <link
             type="text/css"
             rel="stylesheet"
-            href="//cdn.jsdelivr.net/npm/jsmind/style/jsmind.css"
+            href="//jsd.onmicrosoft.cn/npm/jsmind/style/jsmind.css"
         />
         <style type="text/css">
             li {
                 margin-top: 2px;
                 margin-bottom: 2px;
             }
+
             button {
                 width: 140px;
             }
+
             select {
                 width: 140px;
             }
+
             #layout {
                 width: 1230px;
             }
+
             #jsmind_nav {
                 width: 210px;
                 height: 600px;
@@ -30,9 +34,11 @@
                 overflow: auto;
                 float: left;
             }
+
             .file_input {
                 width: 100px;
             }
+
             button.sub {
                 width: 100px;
             }
@@ -46,6 +52,7 @@
             }
         </style>
     </head>
+
     <body>
         <div id="layout">
             <div id="jsmind_nav">
@@ -183,17 +190,6 @@
                         <li><input id="file_input_freemind" class="file_input" type="file" /></li>
                         <li><button class="sub" onclick="open_freemind();">open file</button></li>
                     </ol>
-                    <li>text</li>
-                    <ol>
-                        <li>
-                            <button class="sub" onclick="get_text_data();">show data</button>
-                        </li>
-                        <li>
-                            <button class="sub" onclick="save_text_file();">save file</button>
-                        </li>
-                        <li><input id="file_input_text" class="file_input" type="file" /></li>
-                        <li><button class="sub" onclick="open_text();">open file</button></li>
-                    </ol>
                 </ol>
             </div>
             <div id="jsmind_container"></div>
@@ -201,14 +197,14 @@
                 <input class="file" type="file" id="image-chooser" accept="image/*" />
             </div>
         </div>
-        <script type="text/javascript" src="//cdn.jsdelivr.net/npm/jsmind/es6/jsmind.js"></script>
+        <script type="text/javascript" src="//jsd.onmicrosoft.cn/npm/jsmind/es6/jsmind.js"></script>
         <script
             type="text/javascript"
-            src="//cdn.jsdelivr.net/npm/jsmind/es6/jsmind.draggable-node.js"
+            src="//jsd.onmicrosoft.cn/npm/jsmind/es6/jsmind.draggable-node.js"
         ></script>
         <script
             type="text/javascript"
-            src="//cdn.jsdelivr.net/npm/jsmind/es6/jsmind.screenshot.js"
+            src="//jsd.onmicrosoft.cn/npm/jsmind/es6/jsmind.screenshot.js"
         ></script>
         <script type="text/javascript">
             var _jm = null;
@@ -218,7 +214,6 @@
                     theme: 'greensea',
                     editable: true,
                     view: {
-                        engine: 'svg',
                         draggable: true,
                     },
                 };
@@ -265,13 +260,8 @@
                                         'topic': 'on GitHub',
                                         'background-color': '#eee',
                                         'foreground-color': 'blue',
-                                        'leading-line-color': '#3333ff',
                                     },
-                                    {
-                                        'id': 'open2',
-                                        'topic': 'BSD License',
-                                        'leading-line-color': '#ff33ff',
-                                    },
+                                    { id: 'open2', topic: 'BSD License' },
                                 ],
                             },
                             {
@@ -657,37 +647,6 @@
                                 format: 'freemind',
                                 data: freemind_data,
                             };
-                            _jm.show(mind);
-                        } else {
-                            prompt_info('can not open this file as mindmap');
-                        }
-                    });
-                } else {
-                    prompt_info('please choose a file first');
-                }
-            }
-
-            function get_text_data() {
-                var mind_data = _jm.get_data('text');
-                var mind_string = jsMind.util.json.json2string(mind_data);
-                prompt_info(mind_string);
-            }
-
-            function save_text_file() {
-                var mind_data = _jm.get_data('text');
-                var mind_name = mind_data.meta.name;
-                var mind_str = jsMind.util.json.json2string(mind_data);
-                jsMind.util.file.save(mind_str, 'text/jsmind', mind_name + '.jm');
-            }
-
-            function open_text() {
-                var file_input = document.getElementById('file_input_text');
-                var files = file_input.files;
-                if (files.length > 0) {
-                    var file_data = files[0];
-                    jsMind.util.file.read(file_data, function (jsmind_data, jsmind_name) {
-                        var mind = jsMind.util.json.string2json(jsmind_data);
-                        if (!!mind) {
                             _jm.show(mind);
                         } else {
                             prompt_info('can not open this file as mindmap');
