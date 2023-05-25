@@ -8,6 +8,7 @@
 
 ; (function ($w) {
     'use strict';
+    console.warn("The version is outdated. see details: https://hizzgdev.github.io/jsmind/es6/README.md")
     // set 'jsMind' as the library name.
     // __name__ should be a const value, Never try to change it easily.
     var __name__ = 'jsMind';
