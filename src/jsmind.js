@@ -119,7 +119,7 @@ export default class jsMind {
         this.view.add_event(this, 'mousedown', this.mousedown_handle);
         this.view.add_event(this, 'click', this.click_handle);
         this.view.add_event(this, 'dblclick', this.dblclick_handle);
-        this.view.add_event(this, 'mousewheel', this.mousewheel_handle);
+        this.view.add_event(this, 'mousewheel', this.mousewheel_handle, false);
     }
     mousedown_handle(e) {
         if (!this.options.default_event_handle['enable_mousedown_handle']) {
@@ -174,9 +174,9 @@ export default class jsMind {
         evt.preventDefault();
 
         if (evt.deltaY < 0) {
-            this.view.zoomIn(); // wheel down
+            this.view.zoomIn(evt); // wheel down
         } else {
-            this.view.zoomOut();
+            this.view.zoomOut(evt);
         }
     }
     begin_edit(node) {
