@@ -36,6 +36,12 @@ export class ViewProvider {
             logger.error('the options.view.container was not be found in dom');
             return;
         }
+        if (isNaN(this.opts.hmargin)) {
+            this.opts.hmargin = this.container.clientWidth;
+        }
+        if (isNaN(this.opts.vmargin)) {
+            this.opts.vmargin = this.container.clientHeight;
+        }
         this.graph = init_graph(this, this.opts.engine);
 
         this.e_panel = $.c('div');
@@ -52,7 +58,7 @@ export class ViewProvider {
         this.actualZoom = 1;
         this.zoomStep = 0.1;
         this.minZoom = 0.5;
-        this.maxZoom = 2;
+        this.maxZoom = 2.1;
 
         var v = this;
         $.on(this.e_editor, 'keydown', function (e) {
@@ -68,8 +74,9 @@ export class ViewProvider {
 
         this.container.appendChild(this.e_panel);
     }
-    add_event(obj, event_name, event_handle) {
-        $.on(this.e_nodes, event_name, function (e) {
+    add_event(obj, event_name, event_handle, capture_by_panel) {
+        let target = !!capture_by_panel ? this.e_panel : this.e_nodes;
+        $.on(target, event_name, function (e) {
             var evt = e || event;
             event_handle.call(obj, evt);
         });
@@ -332,21 +339,30 @@ export class ViewProvider {
         //this.layout.cache_valid = true;
         this.jm.invoke_event_handle(EventType.resize, { data: [] });
     }
-    zoomIn() {
-        return this.setZoom(this.actualZoom + this.zoomStep);
+    zoomIn(e) {
+        return this.setZoom(this.actualZoom + this.zoomStep, e);
     }
-    zoomOut() {
-        return this.setZoom(this.actualZoom - this.zoomStep);
+    zoomOut(e) {
+        return this.setZoom(this.actualZoom - this.zoomStep, e);
     }
-    setZoom(zoom) {
+    setZoom(zoom, e) {
         if (zoom < this.minZoom || zoom > this.maxZoom) {
             return false;
         }
+        let e_panel_rect = this.e_panel.getBoundingClientRect();
+        let mouse_offset = { x: e.x - e_panel_rect.x, y: e.y - e_panel_rect.y };
+        let panel_scroll_x =
+            ((this.e_panel.scrollLeft + mouse_offset.x) * zoom) / this.actualZoom - mouse_offset.x;
+        let panel_scroll_y =
+            ((this.e_panel.scrollTop + mouse_offset.y) * zoom) / this.actualZoom - mouse_offset.y;
+
         this.actualZoom = zoom;
         for (var i = 0; i < this.e_panel.children.length; i++) {
             this.e_panel.children[i].style.zoom = zoom;
         }
-        this.show(true);
+        this._show();
+        this.e_panel.scrollLeft = panel_scroll_x;
+        this.e_panel.scrollTop = panel_scroll_y;
         return true;
     }
     _center_root() {
