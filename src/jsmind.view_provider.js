@@ -350,7 +350,9 @@ export class ViewProvider {
             return false;
         }
         let e_panel_rect = this.e_panel.getBoundingClientRect();
-        let zoom_center = !!e ? { x: e.x - e_panel_rect.x, y: e.y - e_panel_rect.y } : { x: e_panel_rect.width / 2, y: e_panel_rect.height / 2 }
+        let zoom_center = !!e
+            ? { x: e.x - e_panel_rect.x, y: e.y - e_panel_rect.y }
+            : { x: e_panel_rect.width / 2, y: e_panel_rect.height / 2 };
         let panel_scroll_x =
             ((this.e_panel.scrollLeft + zoom_center.x) * zoom) / this.actualZoom - zoom_center.x;
         let panel_scroll_y =
