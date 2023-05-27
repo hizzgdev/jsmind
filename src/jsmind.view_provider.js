@@ -350,11 +350,11 @@ export class ViewProvider {
             return false;
         }
         let e_panel_rect = this.e_panel.getBoundingClientRect();
-        let mouse_offset = { x: e.x - e_panel_rect.x, y: e.y - e_panel_rect.y };
+        let zoom_center = !!e ? { x: e.x - e_panel_rect.x, y: e.y - e_panel_rect.y } : { x: e_panel_rect.width / 2, y: e_panel_rect.height / 2 }
         let panel_scroll_x =
-            ((this.e_panel.scrollLeft + mouse_offset.x) * zoom) / this.actualZoom - mouse_offset.x;
+            ((this.e_panel.scrollLeft + zoom_center.x) * zoom) / this.actualZoom - zoom_center.x;
         let panel_scroll_y =
-            ((this.e_panel.scrollTop + mouse_offset.y) * zoom) / this.actualZoom - mouse_offset.y;
+            ((this.e_panel.scrollTop + zoom_center.y) * zoom) / this.actualZoom - zoom_center.y;
 
         this.actualZoom = zoom;
         for (var i = 0; i < this.e_panel.children.length; i++) {
