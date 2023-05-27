@@ -505,6 +505,18 @@ export default class jsMind {
     is_node_visible(node) {
         return this.layout.is_visible(node);
     }
+    scroll_node_to_center(node) {
+        if (!Node.is_node(node)) {
+            var the_node = this.get_node(node);
+            if (!the_node) {
+                logger.error('the node[id=' + node + '] can not be found.');
+            } else {
+                this.scroll_node_to_center(the_node);
+            }
+            return;
+        }
+        this.view.center_node(node);
+    }
     find_node_before(node) {
         if (!Node.is_node(node)) {
             var the_node = this.get_node(node);
