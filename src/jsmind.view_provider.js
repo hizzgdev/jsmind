@@ -372,7 +372,7 @@ export class ViewProvider {
         this.expand_size();
         this._show();
         if (!!keep_center) {
-            this.center_node(this.jm.mind.root)
+            this.center_node(this.jm.mind.root);
         }
     }
     relayout() {
@@ -587,32 +587,32 @@ export class ViewProvider {
     }
     center_node(node) {
         if (!this.layout.is_visible(node)) {
-            logger.warn("can not scroll to the node, because it is invisible");
+            logger.warn('can not scroll to the node, because it is invisible');
             return false;
         }
-        let view_data = node._data.view
+        let view_data = node._data.view;
         let e_panel_rect = this.e_panel.getBoundingClientRect();
         let node_center_point = {
             x: view_data.abs_x + view_data.width / 2,
-            y: view_data.abs_y + view_data.height / 2
-        }
+            y: view_data.abs_y + view_data.height / 2,
+        };
         this.e_panel.scrollTo(
             node_center_point.x * this.zoom_current - e_panel_rect.width / 2,
             node_center_point.y * this.zoom_current - e_panel_rect.height / 2
-        )
+        );
         return true;
     }
 
     zoomIn(e) {
-        logger.warn('please use zoom_in instead')
+        logger.warn('please use zoom_in instead');
         return this.zoom_in(e);
     }
     zoomOut(e) {
-        logger.warn('please use zoom_out instead')
+        logger.warn('please use zoom_out instead');
         return this.zoom_out(e);
     }
     setZoom(zoom, e) {
-        logger.warn('please use set_zoom instead')
+        logger.warn('please use set_zoom instead');
         return this.set_zoom(zoom, e);
     }
 }
