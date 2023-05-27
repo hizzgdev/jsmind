@@ -55,10 +55,10 @@ export class ViewProvider {
         this.e_editor.className = 'jsmind-editor';
         this.e_editor.type = 'text';
 
-        this.actualZoom = 1;
-        this.zoomStep = 0.1;
-        this.minZoom = 0.5;
-        this.maxZoom = 2.1;
+        this.zoom_current = 1;
+        this.zoom_step = 0.1;
+        this.zoom_min = 0.5;
+        this.zoom_max = 2.1;
 
         var v = this;
         $.on(this.e_editor, 'keydown', function (e) {
@@ -339,14 +339,14 @@ export class ViewProvider {
         //this.layout.cache_valid = true;
         this.jm.invoke_event_handle(EventType.resize, { data: [] });
     }
-    zoomIn(e) {
-        return this.setZoom(this.actualZoom + this.zoomStep, e);
+    zoom_in(e) {
+        return this.set_zoom(this.zoom_current + this.zoom_step, e);
     }
-    zoomOut(e) {
-        return this.setZoom(this.actualZoom - this.zoomStep, e);
+    zoom_out(e) {
+        return this.set_zoom(this.zoom_current - this.zoom_step, e);
     }
-    setZoom(zoom, e) {
-        if (zoom < this.minZoom || zoom > this.maxZoom) {
+    set_zoom(zoom, e) {
+        if (zoom < this.zoom_min || zoom > this.zoom_max) {
             return false;
         }
         let e_panel_rect = this.e_panel.getBoundingClientRect();
@@ -354,11 +354,11 @@ export class ViewProvider {
             ? { x: e.x - e_panel_rect.x, y: e.y - e_panel_rect.y }
             : { x: e_panel_rect.width / 2, y: e_panel_rect.height / 2 };
         let panel_scroll_x =
-            ((this.e_panel.scrollLeft + zoom_center.x) * zoom) / this.actualZoom - zoom_center.x;
+            ((this.e_panel.scrollLeft + zoom_center.x) * zoom) / this.zoom_current - zoom_center.x;
         let panel_scroll_y =
-            ((this.e_panel.scrollTop + zoom_center.y) * zoom) / this.actualZoom - zoom_center.y;
+            ((this.e_panel.scrollTop + zoom_center.y) * zoom) / this.zoom_current - zoom_center.y;
 
-        this.actualZoom = zoom;
+        this.zoom_current = zoom;
         for (var i = 0; i < this.e_panel.children.length; i++) {
             this.e_panel.children[i].style.zoom = zoom;
         }
@@ -367,24 +367,12 @@ export class ViewProvider {
         this.e_panel.scrollTop = panel_scroll_y;
         return true;
     }
-    _center_root() {
-        // center root node
-        var outer_w = this.e_panel.clientWidth;
-        var outer_h = this.e_panel.clientHeight;
-        if (this.size.w > outer_w) {
-            var _offset = this.get_view_offset();
-            this.e_panel.scrollLeft = _offset.x * this.actualZoom - outer_w / 2;
-        }
-        if (this.size.h > outer_h) {
-            this.e_panel.scrollTop = (this.size.h * this.actualZoom - outer_h) / 2;
-        }
-    }
     show(keep_center) {
         logger.debug('view.show');
         this.expand_size();
         this._show();
         if (!!keep_center) {
-            this._center_root();
+            this.center_node(this.jm.mind.root);
         }
     }
     relayout() {
@@ -552,7 +540,7 @@ export class ViewProvider {
             if (!!node.isroot) {
                 continue;
             }
-            if ('visible' in node._data.layout && !node._data.layout.visible) {
+            if (!this.layout.is_visible(node)) {
                 continue;
             }
             pin = this.layout.get_node_point_in(node);
@@ -596,5 +584,35 @@ export class ViewProvider {
                 }
             });
         }
+    }
+    center_node(node) {
+        if (!this.layout.is_visible(node)) {
+            logger.warn('can not scroll to the node, because it is invisible');
+            return false;
+        }
+        let view_data = node._data.view;
+        let e_panel_rect = this.e_panel.getBoundingClientRect();
+        let node_center_point = {
+            x: view_data.abs_x + view_data.width / 2,
+            y: view_data.abs_y + view_data.height / 2,
+        };
+        this.e_panel.scrollTo(
+            node_center_point.x * this.zoom_current - e_panel_rect.width / 2,
+            node_center_point.y * this.zoom_current - e_panel_rect.height / 2
+        );
+        return true;
+    }
+
+    zoomIn(e) {
+        logger.warn('please use zoom_in instead');
+        return this.zoom_in(e);
+    }
+    zoomOut(e) {
+        logger.warn('please use zoom_out instead');
+        return this.zoom_out(e);
+    }
+    setZoom(zoom, e) {
+        logger.warn('please use set_zoom instead');
+        return this.set_zoom(zoom, e);
     }
 }
