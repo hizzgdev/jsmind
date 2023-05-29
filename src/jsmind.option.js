@@ -25,6 +25,11 @@ const default_options = {
         draggable: false, // drag the mind map with your mouse, when it's larger that the container
         hide_scrollbars_when_draggable: false, // hide container scrollbars, when mind map is larger than container and draggable option is true.
         node_overflow: 'hidden', // hidden or wrap
+        zoom: {
+            min: 0.5,
+            max: 2.1,
+            step: 0.1,
+        },
     },
     layout: {
         hspace: 30,

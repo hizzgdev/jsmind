@@ -63,6 +63,7 @@ export default class jsMind {
             draggable: this.options.view.draggable,
             hide_scrollbars_when_draggable: this.options.view.hide_scrollbars_when_draggable,
             node_overflow: this.options.view.node_overflow,
+            zoom: this.options.view.zoom,
         };
         // create instance of function provider
         this.data = new DataProvider(this);
@@ -77,7 +78,7 @@ export default class jsMind {
 
         this._event_bind();
 
-        apply_plugins(this);
+        apply_plugins(this, this.options);
     }
     get_editable() {
         return this.options.editable;
@@ -174,9 +175,9 @@ export default class jsMind {
         evt.preventDefault();
 
         if (evt.deltaY < 0) {
-            this.view.zoomIn(evt); // wheel down
+            this.view.zoom_in(evt); // wheel down
         } else {
-            this.view.zoomOut(evt);
+            this.view.zoom_out(evt);
         }
     }
     begin_edit(node) {

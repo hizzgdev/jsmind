@@ -13,32 +13,35 @@ const plugin_data = {
 };
 
 export function register(plugin) {
-    if (!plugin instanceof Plugin) {
-        throw new Error('plugin ' + plugin + ' is not a supported plugin');
+    if (!(plugin instanceof Plugin)) {
+        throw new Error('can not register plugin, it is not an instance of Plugin');
+    }
+    if (plugin_data.plugins.map(p => p.name).includes(plugin.name)) {
+        throw new Error('can not register plugin ' + plugin.name + ': plugin name already exist');
     }
     plugin_data.plugins.push(plugin);
 }
 
-export function apply(jm) {
+export function apply(jm, options) {
     $.w.setTimeout(function () {
-        _apply(jm);
+        _apply(jm, options);
     }, 0);
 }
 
-function _apply(jm) {
-    var l = plugin_data.plugins.length;
-    var fn_init = null;
-    for (var i = 0; i < l; i++) {
-        fn_init = plugin_data.plugins[i].init;
-        if (typeof fn_init === 'function') {
-            fn_init(jm);
-        }
-    }
+function _apply(jm, options) {
+    plugin_data.plugins.forEach(p => p.fn_init(jm, options[p.name]));
 }
 
 export class Plugin {
-    constructor(name, init) {
+    // fn_init(jm, options)
+    constructor(name, fn_init) {
+        if (!name) {
+            throw new Error('plugin must has a name');
+        }
+        if (!fn_init || typeof fn_init !== 'function') {
+            throw new Error('plugin must has an init function');
+        }
         this.name = name;
-        this.init = init;
+        this.fn_init = fn_init;
     }
 }

@@ -273,29 +273,29 @@ describe('event handler', () => {
     test('mousewheel', () => {
         const evt = { preventDefault: jest.fn(), ctrlKey: true };
         const jsmind = create_fake_mind();
-        jsmind.view = { zoomIn: jest.fn(), zoomOut: jest.fn() };
+        jsmind.view = { zoom_in: jest.fn(), zoom_out: jest.fn() };
 
         jsmind.enable_event_handle('mousewheel');
         evt.deltaY = 1;
         jsmind.mousewheel_handle(evt);
-        expect(jsmind.view.zoomOut).toBeCalledTimes(1);
-        expect(jsmind.view.zoomIn).toBeCalledTimes(0);
+        expect(jsmind.view.zoom_out).toBeCalledTimes(1);
+        expect(jsmind.view.zoom_in).toBeCalledTimes(0);
 
         evt.deltaY = -1;
         jsmind.mousewheel_handle(evt);
-        expect(jsmind.view.zoomOut).toBeCalledTimes(1);
-        expect(jsmind.view.zoomIn).toBeCalledTimes(1);
+        expect(jsmind.view.zoom_out).toBeCalledTimes(1);
+        expect(jsmind.view.zoom_in).toBeCalledTimes(1);
 
         evt.ctrlKey = false;
         jsmind.mousewheel_handle(evt);
-        expect(jsmind.view.zoomIn).toBeCalledTimes(1);
-        expect(jsmind.view.zoomOut).toBeCalledTimes(1);
+        expect(jsmind.view.zoom_in).toBeCalledTimes(1);
+        expect(jsmind.view.zoom_out).toBeCalledTimes(1);
 
         evt.ctrlKey = true;
         jsmind.disable_event_handle('mousewheel');
         jsmind.mousewheel_handle(evt);
-        expect(jsmind.view.zoomIn).toBeCalledTimes(1);
-        expect(jsmind.view.zoomOut).toBeCalledTimes(1);
+        expect(jsmind.view.zoom_in).toBeCalledTimes(1);
+        expect(jsmind.view.zoom_out).toBeCalledTimes(1);
     });
 });
 

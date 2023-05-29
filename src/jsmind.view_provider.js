@@ -29,6 +29,7 @@ export class ViewProvider {
         this._initialized = false;
     }
     init() {
+        logger.debug(this.opts);
         logger.debug('view.init');
 
         this.container = $.i(this.opts.container) ? this.opts.container : $.g(this.opts.container);
@@ -56,9 +57,6 @@ export class ViewProvider {
         this.e_editor.type = 'text';
 
         this.zoom_current = 1;
-        this.zoom_step = 0.1;
-        this.zoom_min = 0.5;
-        this.zoom_max = 2.1;
 
         var v = this;
         $.on(this.e_editor, 'keydown', function (e) {
@@ -340,13 +338,13 @@ export class ViewProvider {
         this.jm.invoke_event_handle(EventType.resize, { data: [] });
     }
     zoom_in(e) {
-        return this.set_zoom(this.zoom_current + this.zoom_step, e);
+        return this.set_zoom(this.zoom_current + this.opts.zoom.step, e);
     }
     zoom_out(e) {
-        return this.set_zoom(this.zoom_current - this.zoom_step, e);
+        return this.set_zoom(this.zoom_current - this.opts.zoom.step, e);
     }
     set_zoom(zoom, e) {
-        if (zoom < this.zoom_min || zoom > this.zoom_max) {
+        if (zoom < this.opts.zoom.min || zoom > this.opts.zoom.max) {
             return false;
         }
         let e_panel_rect = this.e_panel.getBoundingClientRect();
