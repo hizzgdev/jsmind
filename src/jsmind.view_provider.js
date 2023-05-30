@@ -37,12 +37,6 @@ export class ViewProvider {
             logger.error('the options.view.container was not be found in dom');
             return;
         }
-        if (isNaN(this.opts.hmargin)) {
-            this.opts.hmargin = this.container.clientWidth;
-        }
-        if (isNaN(this.opts.vmargin)) {
-            this.opts.vmargin = this.container.clientHeight;
-        }
         this.graph = init_graph(this, this.opts.engine);
 
         this.e_panel = $.c('div');
@@ -348,6 +342,13 @@ export class ViewProvider {
             return false;
         }
         let e_panel_rect = this.e_panel.getBoundingClientRect();
+        if (
+            zoom < 1 &&
+            this.size.w * zoom < e_panel_rect.width &&
+            this.size.h * zoom < e_panel_rect.height
+        ) {
+            return false;
+        }
         let zoom_center = !!e
             ? { x: e.x - e_panel_rect.x, y: e.y - e_panel_rect.y }
             : { x: e_panel_rect.width / 2, y: e_panel_rect.height / 2 };

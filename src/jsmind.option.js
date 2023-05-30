@@ -18,8 +18,8 @@ const default_options = {
 
     view: {
         engine: 'canvas',
-        hmargin: 'auto',
-        vmargin: 'auto',
+        hmargin: 100,
+        vmargin: 50,
         line_width: 2,
         line_color: '#555',
         draggable: false, // drag the mind map with your mouse, when it's larger that the container
