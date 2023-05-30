@@ -57,7 +57,7 @@ The ES6 version of jsMind has been launched. see details from [es6/README.md](es
 </html>
 ```
 
-> Read the [usage doc](docs/zh/1.usage.html) to learn more knowledge about CDN and version.
+> 查阅[文档](docs/zh/1.usage.md)以获取更多关于 CDN 以及版本的知识。 Read the [doc](docs/en/1.usage.md) to learn more knowledge about CDN and version.
 
 ## Links
 
