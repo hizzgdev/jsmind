@@ -32,8 +32,12 @@ const DEFAULT_OPTIONS = {
 
 class DraggableNode {
     constructor(jm, options) {
+        var opts = {};
+        jsMind.util.json.merge(opts, DEFAULT_OPTIONS);
+        jsMind.util.json.merge(opts, options);
+
         this.jm = jm;
-        this.options = jsMind.util.json.merge(options || {}, DEFAULT_OPTIONS);
+        this.options = opts;
         this.e_canvas = null;
         this.canvas_ctx = null;
         this.shadow = null;

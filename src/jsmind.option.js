@@ -58,6 +58,7 @@ const default_options = {
             down: 40, // Down
         },
     },
+    plugin: {},
 };
 
 export function merge_option(options) {
