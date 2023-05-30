@@ -97,6 +97,7 @@ jcanvas.image = function (ctx, url, x, y, w, h, r, rotation, callback) {
 
 class screenshot {
     constructor(jm) {
+        this.version = '0.1.0';
         this.jm = jm;
         this.canvas_elem = null;
         this.canvas_ctx = null;
