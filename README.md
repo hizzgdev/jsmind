@@ -26,15 +26,15 @@ The ES6 version of jsMind has been launched. see details from [es6/README.md](es
         <link
             type="text/css"
             rel="stylesheet"
-            href="//cdn.jsdelivr.net/npm/jsmind@0.6/style/jsmind.css"
+            href="//cdn.jsdelivr.net/npm/jsmind@0.6.3/style/jsmind.css"
         />
         <script
             type="text/javascript"
-            src="//cdn.jsdelivr.net/npm/jsmind@0.6/es6/jsmind.js"
+            src="//cdn.jsdelivr.net/npm/jsmind@0.6.3/es6/jsmind.js"
         ></script>
         <!--
             enable draggable node feature
-            <script type="text/javascript" src="//cdn.jsdelivr.net/npm/jsmind@0.6/es6/jsmind.draggable-node.js"></script>
+            <script type="text/javascript" src="//cdn.jsdelivr.net/npm/jsmind@0.6.3/es6/jsmind.draggable-node.js"></script>
         -->
     </head>
     <body>
@@ -57,11 +57,13 @@ The ES6 version of jsMind has been launched. see details from [es6/README.md](es
 </html>
 ```
 
+> Read the [usage doc](docs/zh/1.usage.html) to learn more knowledge about CDN and version.
+
 ## Links
 
 -   Resources:
     -   [NPM - jsmind](https://www.npmjs.com/package/jsmind)
-    -   CDN - [UNPKG](https://unpkg.com/browse/jsmind/), [jsDelivr](https://www.jsdelivr.com/package/npm/jsmind)
+    -   CDN - [UNPKG](https://unpkg.com/browse/jsmind/), [jsDelivr](https://www.jsdelivr.com/package/npm/jsmind/), [jsDelivr 的国内镜像](https://jsd.onmicrosoft.cn/npm/jsmind/)
     -   [文档 - Documents](https://hizzgdev.github.io/jsmind/docs)
 -   Apps :
     -   <https://jsmind.online>
