@@ -78,7 +78,7 @@ export default class jsMind {
 
         this._event_bind();
 
-        apply_plugins(this, this.options);
+        apply_plugins(this, this.options.plugin);
     }
     get_editable() {
         return this.options.editable;
