@@ -120,7 +120,7 @@ export default class jsMind {
         this.view.add_event(this, 'mousedown', this.mousedown_handle);
         this.view.add_event(this, 'click', this.click_handle);
         this.view.add_event(this, 'dblclick', this.dblclick_handle);
-        this.view.add_event(this, 'mousewheel', this.mousewheel_handle, false);
+        this.view.add_event(this, 'mousewheel', this.mousewheel_handle, true);
     }
     mousedown_handle(e) {
         if (!this.options.default_event_handle['enable_mousedown_handle']) {
