@@ -10,8 +10,7 @@ if (!jsMind) {
     throw new Error('jsMind is not defined');
 }
 
-const jm = jsMind;
-const $ = jm.$;
+const $ = jsMind.$;
 
 const clear_selection =
     'getSelection' in $.w
@@ -22,7 +21,7 @@ const clear_selection =
               $.d.selection.empty();
           };
 
-const options = {
+const DEFAULT_OPTIONS = {
     line_width: 5,
     line_color: 'rgba(0,0,0,0.3)',
     lookup_delay: 500,
@@ -32,8 +31,13 @@ const options = {
 };
 
 class DraggableNode {
-    constructor(jm) {
+    constructor(jm, options) {
+        var opts = {};
+        jsMind.util.json.merge(opts, DEFAULT_OPTIONS);
+        jsMind.util.json.merge(opts, options);
+
         this.jm = jm;
+        this.options = opts;
         this.e_canvas = null;
         this.canvas_ctx = null;
         this.shadow = null;
@@ -50,7 +54,7 @@ class DraggableNode {
         this.hlookup_timer = 0;
         this.capture = false;
         this.moved = false;
-        this.canvas_draggable = this.jm.get_view_draggable();
+        this.canvas_draggable = jm.get_view_draggable();
         this.view_panel = jm.view.e_panel;
         this.view_panel_rect = null;
     }
@@ -102,8 +106,8 @@ class DraggableNode {
     }
     _magnet_shadow(node) {
         if (!!node) {
-            this.canvas_ctx.lineWidth = options.line_width;
-            this.canvas_ctx.strokeStyle = options.line_color;
+            this.canvas_ctx.lineWidth = this.options.line_width;
+            this.canvas_ctx.strokeStyle = this.options.line_color;
             this.canvas_ctx.lineCap = 'round';
             this._clear_lines();
             this._canvas_lineto(node.sp.x, node.sp.y, node.np.x, node.np.y);
@@ -157,15 +161,15 @@ class DraggableNode {
                         continue;
                     }
                     distance = Math.abs(sx - nl.x - ns.w) + Math.abs(sy + sh / 2 - nl.y - ns.h / 2);
-                    np = { x: nl.x + ns.w - options.line_width, y: nl.y + ns.h / 2 };
-                    sp = { x: sx + options.line_width, y: sy + sh / 2 };
+                    np = { x: nl.x + ns.w - this.options.line_width, y: nl.y + ns.h / 2 };
+                    sp = { x: sx + this.options.line_width, y: sy + sh / 2 };
                 } else {
                     if (nl.x - sx - sw <= 0) {
                         continue;
                     }
                     distance = Math.abs(sx + sw - nl.x) + Math.abs(sy + sh / 2 - nl.y - ns.h / 2);
-                    np = { x: nl.x + options.line_width, y: nl.y + ns.h / 2 };
-                    sp = { x: sx + sw - options.line_width, y: sy + sh / 2 };
+                    np = { x: nl.x + this.options.line_width, y: nl.y + ns.h / 2 };
+                    sp = { x: sx + sw - this.options.line_width, y: sy + sh / 2 };
                 }
                 if (distance < min_distance) {
                     closest_node = node;
@@ -248,9 +252,9 @@ class DraggableNode {
                 this.view_panel_rect = this.view_panel.getBoundingClientRect();
                 this.active_node = node;
                 this.offset_x =
-                    (e.clientX || e.touches[0].clientX) / jview.actualZoom - el.offsetLeft;
+                    (e.clientX || e.touches[0].clientX) / jview.zoom_current - el.offsetLeft;
                 this.offset_y =
-                    (e.clientY || e.touches[0].clientY) / jview.actualZoom - el.offsetTop;
+                    (e.clientY || e.touches[0].clientY) / jview.zoom_current - el.offsetTop;
                 this.client_hw = Math.floor(el.clientWidth / 2);
                 this.client_hh = Math.floor(el.clientHeight / 2);
                 if (this.hlookup_delay != 0) {
@@ -264,8 +268,8 @@ class DraggableNode {
                     jd.hlookup_delay = 0;
                     jd.hlookup_timer = $.w.setInterval(function () {
                         jd.lookup_close_node.call(jd);
-                    }, options.lookup_interval);
-                }, options.lookup_delay);
+                    }, jd.options.lookup_interval);
+                }, this.options.lookup_delay);
                 this.capture = true;
             }
         }
@@ -280,41 +284,41 @@ class DraggableNode {
             this.moved = true;
             clear_selection();
             var jview = this.jm.view;
-            var px = (e.clientX || e.touches[0].clientX) / jview.actualZoom - this.offset_x;
-            var py = (e.clientY || e.touches[0].clientY) / jview.actualZoom - this.offset_y;
+            var px = (e.clientX || e.touches[0].clientX) / jview.zoom_current - this.offset_x;
+            var py = (e.clientY || e.touches[0].clientY) / jview.zoom_current - this.offset_y;
             // scrolling container axisY if drag nodes exceeding container
             if (
-                e.clientY - this.view_panel_rect.top < options.scrolling_trigger_width &&
-                this.view_panel.scrollTop > options.scrolling_step_length
+                e.clientY - this.view_panel_rect.top < this.options.scrolling_trigger_width &&
+                this.view_panel.scrollTop > this.options.scrolling_step_length
             ) {
-                this.view_panel.scrollBy(0, -options.scrolling_step_length);
-                this.offset_y += options.scrolling_step_length / jview.actualZoom;
+                this.view_panel.scrollBy(0, -this.options.scrolling_step_length);
+                this.offset_y += this.options.scrolling_step_length / jview.zoom_current;
             } else if (
-                this.view_panel_rect.bottom - e.clientY < options.scrolling_trigger_width &&
+                this.view_panel_rect.bottom - e.clientY < this.options.scrolling_trigger_width &&
                 this.view_panel.scrollTop <
                     this.view_panel.scrollHeight -
                         this.view_panel_rect.height -
-                        options.scrolling_step_length
+                        this.options.scrolling_step_length
             ) {
-                this.view_panel.scrollBy(0, options.scrolling_step_length);
-                this.offset_y -= options.scrolling_step_length / jview.actualZoom;
+                this.view_panel.scrollBy(0, this.options.scrolling_step_length);
+                this.offset_y -= this.options.scrolling_step_length / jview.zoom_current;
             }
             // scrolling container axisX if drag nodes exceeding container
             if (
-                e.clientX - this.view_panel_rect.left < options.scrolling_trigger_width &&
-                this.view_panel.scrollLeft > options.scrolling_step_length
+                e.clientX - this.view_panel_rect.left < this.options.scrolling_trigger_width &&
+                this.view_panel.scrollLeft > this.options.scrolling_step_length
             ) {
-                this.view_panel.scrollBy(-options.scrolling_step_length, 0);
-                this.offset_x += options.scrolling_step_length / jview.actualZoom;
+                this.view_panel.scrollBy(-this.options.scrolling_step_length, 0);
+                this.offset_x += this.options.scrolling_step_length / jview.zoom_current;
             } else if (
-                this.view_panel_rect.right - e.clientX < options.scrolling_trigger_width &&
+                this.view_panel_rect.right - e.clientX < this.options.scrolling_trigger_width &&
                 this.view_panel.scrollLeft <
                     this.view_panel.scrollWidth -
                         this.view_panel_rect.width -
-                        options.scrolling_step_length
+                        this.options.scrolling_step_length
             ) {
-                this.view_panel.scrollBy(options.scrolling_step_length, 0);
-                this.offset_x -= options.scrolling_step_length / jview.actualZoom;
+                this.view_panel.scrollBy(this.options.scrolling_step_length, 0);
+                this.offset_x -= this.options.scrolling_step_length / jview.zoom_current;
             }
             this.shadow.style.left = px + 'px';
             this.shadow.style.top = py + 'px';
@@ -388,8 +392,8 @@ class DraggableNode {
     }
 }
 
-var draggable_plugin = new jm.plugin('draggable_node', function (jm) {
-    var jd = new DraggableNode(jm);
+var draggable_plugin = new jsMind.plugin('draggable_node', function (jm, options) {
+    var jd = new DraggableNode(jm, options);
     jd.init();
     jm.add_event_listener(function (type, data) {
         jd.jm_event_handle.call(jd, type, data);
