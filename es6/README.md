@@ -1,35 +1,34 @@
 # jsMind ES6 Version
 
-jsMind is now written in ES6 code, the source code is in `/src`, and the dist directory is `/es6`.
+[中文 | [English](README-en.md)]
+
+jsMind 现在已经用 ES6 编写了，源代码位于 `/src`，构建目录为 `/es6`。
 
 
-### Compatible
+### 兼容性
 
-All features in the JS version are fully compatible in the ES6 version.
+之前 JS 版本里的所有功能，在 ES6 的版本中都是兼容的。
 
-### Migration
+### 迁移到新版
 
-If you use `jsMind` via `NPM`, no migration is required, we just changed the `main` file to `es6/jsmind.js`
+如果你是通过 `NPM` 引用的 `jsMind`，则无须手动迁移，我们只是在 `project.json` 里将 `main` 修改成了 `es6/jsmind.js` 。
 
-If you reference `jsMind` from CDN, the only thing you need to do is change the url from `js/*.js` to `es6/*.js`.
-
-E.g.
+如果你是通过 CDN 引用 `jsMind` 的话，你仅仅需要把 url 从 `js/*.js` 改成 `es6/*.js` 。 如：
 
 ```html
-<!-- before -->
+<!-- 修改前 -->
 <script type="text/javascript" src="//cdn.jsdelivr.net/npm/jsmind/js/jsmind.js"></script>
 
-<!-- after -->
+<!-- 修改后 -->
 <script type="text/javascript" src="//cdn.jsdelivr.net/npm/jsmind/es6/jsmind.js"></script>
 ```
 
-### Deprecation
+### 老版本下线
 
-The legacy version `/js` will be kept in repo for serval months, and then will be removed in a version with a break change alert.
+在未来的几个月，原先的版本仍将会保留在 `/js` 目录里，然后将会在某个带有不兼容警告的版本里移除。
 
-### Local build
+### 本地构建
 
-You probably notice that there is no `js` files or `es6` files in the directory `/es6`. Yes, we publish the dist file to `NPM` but don't store them in the repo. 
+你可以注意到了，在 `es6` 这个目录里没有任何 `js` 或 `es` 文件。是的，构建的文件仅会被包含在 `NPM` 里，但并不会保留在代码库中。
 
-If you can not refer the resource from CDN, the dist files can be built by running `npm run build` in the root dir of the project. see details for [development](../docs/en/5.development.md)
-
+你可以从 CDN 上下载这些文件，也可以在你本地构建，只需在项目根目录里运行 `npm run build` 即可。更详细的介绍可参考[贡献代码指南](../docs/en/5.development.md)里的相关内容。
