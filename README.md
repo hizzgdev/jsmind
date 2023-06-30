@@ -16,7 +16,7 @@ jsMind is mind map library built by javascript, it base on html5 canvas and svg.
 
 ES6 版本现已发布，详情请查阅 [es6/README.md](es6/README.md)
 
-The ES6 version of jsMind has been launched. see details from [es6/README.md](es6/README.md)
+The ES6 version of jsMind has been launched. see details from [es6/README-en.md](es6/README-en.md)
 
 ## Get Started
 
