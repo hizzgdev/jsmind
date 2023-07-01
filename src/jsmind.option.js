@@ -22,6 +22,7 @@ const default_options = {
         vmargin: 50,
         line_width: 2,
         line_color: '#555',
+        line_style: 'curved', // straight or curved
         draggable: false, // drag the mind map with your mouse, when it's larger that the container
         hide_scrollbars_when_draggable: false, // hide container scrollbars, when mind map is larger than container and draggable option is true.
         node_overflow: 'hidden', // hidden or wrap

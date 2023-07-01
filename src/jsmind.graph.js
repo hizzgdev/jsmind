@@ -16,6 +16,11 @@ class SvgGraph {
         this.e_svg.setAttribute('class', 'jsmind');
         this.size = { w: 0, h: 0 };
         this.lines = [];
+        this.line_drawing = {
+            straight: this._line_to,
+            curved: this._bezier_to,
+        };
+        this.drawing = this.line_drawing[this.opts.line_style] || this.line_drawing.curved;
     }
     static c(tag) {
         return $.d.createElementNS('http://www.w3.org/2000/svg', tag);
@@ -43,7 +48,7 @@ class SvgGraph {
         line.setAttribute('fill', 'transparent');
         this.lines.push(line);
         this.e_svg.appendChild(line);
-        this._bezier_to(
+        this.drawing(
             line,
             pin.x + offset.x,
             pin.y + offset.y,
@@ -51,6 +56,7 @@ class SvgGraph {
             pout.y + offset.y
         );
     }
+
     copy_to(dest_canvas_ctx, callback) {
         var img = new Image();
         img.onload = function () {
@@ -93,6 +99,11 @@ class CanvasGraph {
         this.e_canvas.className = 'jsmind';
         this.canvas_ctx = this.e_canvas.getContext('2d');
         this.size = { w: 0, h: 0 };
+        this.line_drawing = {
+            straight: this._line_to,
+            curved: this._bezier_to,
+        };
+        this.drawing = this.line_drawing[this.opts.line_style] || this.line_drawing.curved;
     }
     element() {
         return this.e_canvas;
@@ -111,14 +122,7 @@ class CanvasGraph {
         ctx.strokeStyle = color || this.opts.line_color;
         ctx.lineWidth = this.opts.line_width;
         ctx.lineCap = 'round';
-
-        this._bezier_to(
-            ctx,
-            pin.x + offset.x,
-            pin.y + offset.y,
-            pout.x + offset.x,
-            pout.y + offset.y
-        );
+        this.drawing(ctx, pin.x + offset.x, pin.y + offset.y, pout.x + offset.x, pout.y + offset.y);
     }
     copy_to(dest_canvas_ctx, callback) {
         dest_canvas_ctx.drawImage(this.e_canvas, 0, 0);
