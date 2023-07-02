@@ -2,7 +2,7 @@
 
 [中文] | [[English](README-en.md)]
 
-jsMind 现在已经用 ES6 编写了，源代码位于 `/src`，构建目录为 `/es6`。
+jsMind 使用 ES6 编写，源代码位于 `/src`，构建目录为 `/es6`。
 
 
 ### 兼容性
