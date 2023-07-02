@@ -8,7 +8,7 @@
 
 (function ($w) {
     'use strict';
-    console.warn("The version is outdated. see details: https://hizzgdev.github.io/jsmind/es6/README.md")
+    console.warn("The version is outdated. see details: https://hizzgdev.github.io/jsmind/es6/")
     var $d = $w.document;
     var __name__ = 'jsMind';
     var jsMind = $w[__name__];
