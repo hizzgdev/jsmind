@@ -1,6 +1,6 @@
 # jsMind ES6 Version
 
-[[中文](README.md) | English]
+[[中文](README.md)] | [English]
 
 jsMind is now written in ES6 code, the source code is in `/src`, and the dist directory is `/es6`.
 
@@ -27,7 +27,7 @@ E.g.
 
 ### Deprecation
 
-The legacy version `/js` will be kept in repo for several months, and then will be removed in a version with a break change alert.
+The legacy version `/js` will be kept in repo for several months, and then will be moved into another dir in a version with a break change alert.
 
 ### Local build
 
