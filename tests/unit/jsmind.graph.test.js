@@ -10,10 +10,19 @@ const view = {
     },
 };
 
+const view_straight_line = {
+    opts: {
+        line_color: 'color',
+        line_width: 1,
+        line_style: 'straight',
+    },
+};
+
 describe('graph over canvas', () => {
     const canvas_ctx = {
         beginPath: jest.fn(),
         moveTo: jest.fn(),
+        lineTo: jest.fn(),
         bezierCurveTo: jest.fn(),
         stroke: jest.fn(),
         clearRect: jest.fn(),
@@ -54,6 +63,19 @@ describe('graph over canvas', () => {
         expect(canvas_ctx.beginPath).toBeCalled();
         expect(canvas_ctx.moveTo).toBeCalledWith(5, 5);
         expect(canvas_ctx.bezierCurveTo).toBeCalledWith(5 - 2 / 3, 5, 5, 4, 4, 4);
+        expect(canvas_ctx.stroke).toBeCalled();
+    });
+
+    test('graph.draw_straight_line', () => {
+        let graph2 = init_graph(view_straight_line, 'canvas');
+        graph2.draw_line({ x: 1, y: 1 }, { x: 2, y: 2 }, { x: 3, y: 3 });
+        expect(canvas_ctx.strokeStyle).toBe(view_straight_line.opts.line_color);
+        expect(canvas_ctx.lineWidth).toBe(view_straight_line.opts.line_width);
+        expect(canvas_ctx.lineCap).toBe('round');
+
+        expect(canvas_ctx.beginPath).toBeCalled();
+        expect(canvas_ctx.moveTo).toBeCalledWith(5, 5);
+        expect(canvas_ctx.lineTo).toBeCalledWith(4, 4);
         expect(canvas_ctx.stroke).toBeCalled();
     });
 
@@ -115,6 +137,24 @@ describe('graph over svg', () => {
         expect(mockSetAttribute).toHaveBeenNthCalledWith(3, 'fill', 'transparent');
         const path = 'M 5 5 C ' + (5 - 2 / 3) + ' 5, 5 4, 4 4';
         expect(mockSetAttribute).toHaveBeenNthCalledWith(4, 'd', path);
+    });
+
+    test('graph.draw_straight_line', () => {
+        let graph2 = init_graph(view_straight_line, 'svg');
+        graph2.draw_line({ x: 1, y: 1 }, { x: 2, y: 2 }, { x: 3, y: 3 });
+        expect(mockSetAttribute).toHaveBeenNthCalledWith(
+            9,
+            'stroke',
+            view_straight_line.opts.line_color
+        );
+        expect(mockSetAttribute).toHaveBeenNthCalledWith(
+            10,
+            'stroke-width',
+            view_straight_line.opts.line_width
+        );
+        expect(mockSetAttribute).toHaveBeenNthCalledWith(11, 'fill', 'transparent');
+        const path = 'M 5 5 L 4 4';
+        expect(mockSetAttribute).toHaveBeenNthCalledWith(12, 'd', path);
     });
 
     test('graph.copy_to', () => {
