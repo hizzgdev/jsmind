@@ -9,6 +9,8 @@
             rel="stylesheet"
             href="//cdn.jsdelivr.net/npm/jsmind/style/jsmind.css"
         />
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
         <style type="text/css">
             #jsmind_container {
                 width: 800px;
@@ -71,6 +73,7 @@
                 // var mind_data = jm.get_data();
                 // alert(mind_data);
                 jm.add_node('sub2', 'sub23', 'new node', { 'background-color': 'red' });
+                jm.add_node('sub2', 'sub24', '$$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}$$');
                 jm.set_node_color('sub21', 'green', '#ccc');
             }
 

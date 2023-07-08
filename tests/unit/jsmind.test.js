@@ -2,7 +2,9 @@ import { describe, expect, test, jest, beforeAll } from '@jest/globals';
 import { __version__, logger, EventType } from '../../src/jsmind.common.js';
 import { $ } from '../../src/jsmind.dom.js';
 import jm from '../../src/jsmind.js';
-
+global.MathJax = {
+    typesetPromise: jest.fn(),
+};
 beforeAll(() => {
     $.c = jest.fn();
     $.g = jest.fn();
@@ -10,6 +12,9 @@ beforeAll(() => {
     logger.error = jest.fn();
     logger.warn = jest.fn();
     logger.debug = jest.fn();
+});
+afterEach(() => {
+    jest.clearAllMocks();
 });
 
 const mockElement = {

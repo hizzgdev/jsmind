@@ -225,9 +225,10 @@ export class ViewProvider {
         var element = view_data.element;
         if (!!node.topic) {
             if (this.opts.support_html) {
-                $.h(element, node.topic);
+                $.h(element, node.formatText(topic));
+                MathJax.typesetPromise([element]);
             } else {
-                $.t(element, node.topic);
+                $.t(element, node.formatText(topic));
             }
         }
         if (this.layout.is_visible(node)) {

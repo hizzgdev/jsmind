@@ -145,7 +145,7 @@
         if (typeof bExpanded === 'undefined') { bExpanded = true; }
         this.id = sId;
         this.index = iIndex;
-        this.topic = sTopic;
+        this.topic = this.formatText(sTopic);
         this.data = oData || {};
         this.isroot = bIsRoot;
         this.parent = oParent;

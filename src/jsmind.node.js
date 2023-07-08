@@ -22,7 +22,7 @@ export class Node {
         }
         this.id = sId;
         this.index = iIndex;
-        this.topic = sTopic;
+        this.topic = this.formatText(sTopic);
         this.data = oData || {};
         this.isroot = bIsRoot;
         this.parent = oParent;
@@ -45,6 +45,21 @@ export class Node {
             w: vd.width,
             h: vd.height,
         };
+    }
+    formatText(text) {
+        if (!text) {
+            return '';
+        }
+        // Check if the text is wrapped with $$, if it is, it's considered as LaTeX.
+        if (text.startsWith('$$') && text.endsWith('$$')) {
+            const latex = text.substring(2, text.length - 2);
+            // Use MathJax to convert LaTeX to HTML.
+
+            var text = MathJax.tex2svg(latex, {display: false}).outerHTML;
+            logger.log("MathJax",text)
+            return text
+        }
+        return text;
     }
 
     static compare(node1, node2) {

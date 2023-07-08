@@ -50,5 +50,8 @@
     "jest": {
         "verbose": true,
         "testEnvironment": "jsdom"
+    },
+    "dependencies": {
+        "katex": "^0.16.8"
     }
 }

@@ -440,7 +440,7 @@ export default class jsMind {
                     this.view.update_node(node);
                     return;
                 }
-                node.topic = topic;
+                node.topic = node.formatText(topic);
                 this.view.update_node(node);
                 this.layout.layout();
                 this.view.show(false);
