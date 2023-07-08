@@ -55,9 +55,8 @@ export class Node {
             const latex = text.substring(2, text.length - 2);
             // Use MathJax to convert LaTeX to HTML.
 
-            var text = MathJax.tex2svg(latex, {display: false}).outerHTML;
-            logger.log("MathJax",text)
-            return text
+            var text = MathJax.tex2svg(latex, { display: false }).outerHTML;
+            return text;
         }
         return text;
     }
