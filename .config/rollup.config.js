@@ -26,10 +26,14 @@ export default [
         input: 'src/plugins/jsmind.draggable-node.js',
         output: {
             file: 'es6/jsmind.draggable-node.js',
-            format: 'iife',
+            format: 'umd',
             banner: '/**\n* @license BSD-3-Clause\n* @copyright 2014-2023 hizzgdev@163.com\n*\n* Project Home:\n*   https://github.com/hizzgdev/jsmind/\n*/',
             sourcemap: true,
+            globals: {
+                jsmind: 'jsMind',
+            },
         },
+        external: ['jsmind'],
         plugins: [
             cleanup({
                 comments: 'none',
@@ -45,10 +49,14 @@ export default [
         input: 'src/plugins/jsmind.screenshot.js',
         output: {
             file: 'es6/jsmind.screenshot.js',
-            format: 'iife',
+            format: 'umd',
             banner: '/**\n* @license BSD-3-Clause\n* @copyright 2014-2023 hizzgdev@163.com\n*\n* Project Home:\n*   https://github.com/hizzgdev/jsmind/\n*/',
             sourcemap: true,
+            globals: {
+                jsmind: 'jsMind',
+            },
         },
+        external: ['jsmind'],
         plugins: [
             cleanup({
                 comments: 'none',
