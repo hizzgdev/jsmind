@@ -71,6 +71,7 @@ The ES6 version of jsMind has been launched. see details from [es6/README-en.md]
 -   Demo :
     -   [显示一个脑图 Render a mindmap](https://hizzgdev.github.io/jsmind/example/1_basic.html) [[国内版](https://hizzgdev.github.io/jsmind/example/1_basic_cn.html)]
     -   [试用所有功能 Features simple](https://hizzgdev.github.io/jsmind/example/2_features.html) [[国内版](https://hizzgdev.github.io/jsmind/example/2_features_cn.html)]
+    -   [requirejs + jsMind](https://hizzgdev.github.io/jsmind/example/3_requirejs.html)
 
 ## Donate
 

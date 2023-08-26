@@ -6,6 +6,8 @@
  *   https://github.com/hizzgdev/jsmind/
  */
 
+import jsMind from 'jsmind';
+
 if (!jsMind) {
     throw new Error('jsMind is not defined');
 }
@@ -107,7 +109,6 @@ class screenshot {
         if (this._inited) {
             return;
         }
-        console.log('init');
         var c = $.c('canvas');
         var ctx = c.getContext('2d');
 
