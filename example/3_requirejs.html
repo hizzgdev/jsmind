@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>jsMind</title>
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/jsmind@latest/style/jsmind.css" />
+    <style type="text/css">
+        #jsmind_container {
+            width: 900px;
+            height: 600px;
+            border: solid 1px #ccc;
+            background: #f4f4f4;
+        }
+    </style>
+</head>
+
+<body>
+    <p>查看页面源文件了解具体写法</p>
+    <p>See the page source for details</p>
+    <div id="jsmind_container"></div>
+</body>
+
+<script src="https://requirejs.org/docs/release/2.3.6/minified/require.js"></script>
+<script type="text/javascript">
+    require.config({
+        paths: {
+            // note: replace `latest` with a specific version on production
+            'jsmind': "https://unpkg.com/jsmind@latest/es6/jsmind",
+            'jsmind/draggable_node': "https://unpkg.com/jsmind@latest/es6/jsmind.draggable-node",
+        },
+    });
+    require(['jsmind', 'jsmind/draggable_node'], function (jsMind, _) {
+        let mind = {
+            meta: {
+                name: 'jsMind example',
+                author: 'hizzgdev@163.com',
+                version: '0.6.5',
+            },
+            format: 'node_tree',
+            data: {
+                id: 'root',
+                topic: 'jsMind',
+                children: [
+                ],
+            },
+        };
+        let options = {
+            container: 'jsmind_container',
+            editable: true,
+            theme: 'primary',
+        };
+        let jm = new jsMind(options);
+        jm.show(mind);
+    });
+</script>
+
+</html>
