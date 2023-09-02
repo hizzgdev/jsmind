@@ -12,11 +12,11 @@ jsMind is mind map library built by javascript, it base on html5 canvas and svg.
 -   [jsMind on Github](https://github.com/hizzgdev/jsmind)
 -   [国内镜像 - Gitee](https://gitee.com/hizzgdev/jsmind)
 
-## ES6 Version Update
+## !! BREAK CHANGE - Legacy Version is Deprecated !!
 
-ES6 版本现已发布，详情请查阅 [es6/README.md](es6/README.md)
+ES6 版本现已发布，老版本已下线，详情请查阅 [es6/README.md](es6/README.md)
 
-The ES6 version of jsMind has been launched. see details from [es6/README-en.md](es6/README-en.md)
+The ES6 version of jsMind has been launched, and legacy version has been deprecated. see details from [es6/README-en.md](es6/README-en.md)
 
 ## Get Started
 
@@ -26,15 +26,15 @@ The ES6 version of jsMind has been launched. see details from [es6/README-en.md]
         <link
             type="text/css"
             rel="stylesheet"
-            href="//cdn.jsdelivr.net/npm/jsmind@0.6.4/style/jsmind.css"
+            href="//cdn.jsdelivr.net/npm/jsmind@0.7.0/style/jsmind.css"
         />
         <script
             type="text/javascript"
-            src="//cdn.jsdelivr.net/npm/jsmind@0.6.4/es6/jsmind.js"
+            src="//cdn.jsdelivr.net/npm/jsmind@0.7.0/es6/jsmind.js"
         ></script>
         <!--
             enable draggable node feature
-            <script type="text/javascript" src="//cdn.jsdelivr.net/npm/jsmind@0.6.4/es6/jsmind.draggable-node.js"></script>
+            <script type="text/javascript" src="//cdn.jsdelivr.net/npm/jsmind@0.7.0/es6/jsmind.draggable-node.js"></script>
         -->
     </head>
     <body>
