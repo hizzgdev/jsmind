@@ -3,7 +3,7 @@
 .vscode
 docs
 es6
-js
+js-legacy
 node_modules
 screenshots
 LICENSE
