@@ -1,1 +1,1 @@
-module.exports = require('../../js/jsmind');
+module.exports = require('../../js-legacy/jsmind');
