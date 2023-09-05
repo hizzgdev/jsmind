@@ -27,7 +27,7 @@ E.g.
 
 ### Deprecation
 
-The legacy version `/js` will be kept in repo for several months, and then will be moved into another dir in a version with a break change alert.
+The legacy version of jsmind and plugins have been moved to `/js-legacy`. we will no longer update them, and will remove them one day in the future. It's recommended that everyone use the latest version to follow continuous feature updates and bug fixes.
 
 ### Local build
 
