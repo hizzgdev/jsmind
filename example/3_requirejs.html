@@ -31,16 +31,16 @@
             paths: {
                 // note: replace `latest` with a specific version on production
                 'jsmind': 'https://unpkg.com/jsmind@latest/es6/jsmind',
-                'jsmind/draggable_node':
+                'jsmind/draggable-node':
                     'https://unpkg.com/jsmind@latest/es6/jsmind.draggable-node',
             },
         });
-        require(['jsmind', 'jsmind/draggable_node'], function (jsMind, _) {
+        require(['jsmind', 'jsmind/draggable-node'], function (jsMind, _) {
             let mind = {
                 meta: {
                     name: 'jsMind example',
                     author: 'hizzgdev@163.com',
-                    version: '0.7.0',
+                    version: '0.7.1',
                 },
                 format: 'node_tree',
                 data: {
