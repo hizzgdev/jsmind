@@ -56,6 +56,7 @@ The ES6 version of jsMind has been launched, and legacy version has been depreca
     </body>
 </html>
 ```
+> More samples : https://github.com/hizzgdev/jsmind-samples
 
 > 查阅[文档](docs/zh/1.usage.md)以获取更多关于 CDN 以及版本的知识。 Read the [doc](docs/en/1.usage.md) to learn more knowledge about CDN and version.
 
