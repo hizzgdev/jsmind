@@ -33,7 +33,7 @@ function _apply(jm, options) {
 }
 
 export class Plugin {
-    // fn_init(jm, options)
+    // function fn_init(jm, options){ }
     constructor(name, fn_init) {
         if (!name) {
             throw new Error('plugin must has a name');

@@ -54,9 +54,10 @@ export default [
             sourcemap: true,
             globals: {
                 jsmind: 'jsMind',
+                'dom-to-image': 'domtoimage',
             },
         },
-        external: ['jsmind'],
+        external: ['jsmind', 'dom-to-image'],
         plugins: [
             cleanup({
                 comments: 'none',
