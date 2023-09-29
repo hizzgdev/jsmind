@@ -24,7 +24,7 @@ const DEFAULT_OPTIONS = {
     watermark: {
         left: $.w.location,
         right: 'https://github.com/hizzgdev/jsmind',
-    }
+    },
 };
 
 class JmScreenshot {
@@ -38,10 +38,6 @@ class JmScreenshot {
         this.options = opts;
     }
 
-    shootDownload() {
-        this.shoot();
-    }
-
     shoot() {
         let c = this.create_canvas();
         let ctx = c.getContext('2d');
@@ -50,8 +46,7 @@ class JmScreenshot {
             .then(() => this.draw_nodes(ctx))
             .then(() => this.draw_watermark(c, ctx))
             .then(() => this.download(c))
-            .then(() => this.clear(c))
-
+            .then(() => this.clear(c));
     }
 
     create_canvas() {
@@ -67,17 +62,23 @@ class JmScreenshot {
     }
 
     draw_lines(ctx) {
-        return new Promise(function (resolve, _) {
-            this.jm.view.graph.copy_to(ctx, function () {
-                resolve(ctx);
-            })
-        }.bind(this));
+        return new Promise(
+            function (resolve, _) {
+                this.jm.view.graph.copy_to(ctx, function () {
+                    resolve(ctx);
+                });
+            }.bind(this)
+        );
     }
 
     draw_nodes(ctx) {
-        return domtoimage.toSvg(this.jm.view.e_nodes)
+        return domtoimage
+            .toSvg(this.jm.view.e_nodes)
             .then(this.load_image)
-            .then(function (img) { ctx.drawImage(img, 0, 0); return ctx });
+            .then(function (img) {
+                ctx.drawImage(img, 0, 0);
+                return ctx;
+            });
     }
 
     draw_watermark(c, ctx) {
@@ -92,7 +93,7 @@ class JmScreenshot {
             ctx.textAlign = 'right';
             ctx.fillText(this.options.watermark.right, c.width - 5.5, c.height - 2.5);
         }
-        return ctx
+        return ctx;
     }
 
     load_image(url) {
