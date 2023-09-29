@@ -88,7 +88,7 @@ function open_ajax() {
 }
 
 function screen_shot() {
-    _jm.screenshot.shootDownload();
+    _jm.shoot();
 }
 
 function show_data() {
