@@ -16,10 +16,9 @@ export function register(plugin) {
     if (!(plugin instanceof Plugin)) {
         throw new Error('can not register plugin, it is not an instance of Plugin');
     }
-    if (plugin_data.plugins.map(p => p.name).includes(plugin.name)) {
-        throw new Error('can not register plugin ' + plugin.name + ': plugin name already exist');
+    if (!plugin_data.plugins.map(p => p.name).includes(plugin.name)) { 
+        plugin_data.plugins.push(plugin); 
     }
-    plugin_data.plugins.push(plugin);
 }
 
 export function apply(jm, options) {
