@@ -19,8 +19,9 @@ Table of Contents
   * 3.5 Setting Style
   * 3.6 Access to Data
   * 3.7 Other Operations
-* [4. Contribution](4.contribution.md)
-* [Attached: Development Guide](5.development.md)
+* [Experimental Features](experimental-features.md)
+* [Contribution](4.contribution.md)
+* [Development Guide](5.development.md)
 
 copyright notice
 ======

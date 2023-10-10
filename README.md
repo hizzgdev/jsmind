@@ -3,7 +3,7 @@
 [![npm version](https://badge.fury.io/js/jsmind.svg)](https://www.npmjs.com/package/jsmind)
 ![build-test](https://github.com/hizzgdev/jsmind/actions/workflows/node.js.yml/badge.svg)
 
-jsMind 是一个显示/编辑思维导图的纯 javascript 类库，其基于 html5 canvas (和 svg) 进行设计。jsMind 以 [BSD 协议开源](LICENSE)，在此基础上你可以在你的项目上任意使用。
+jsMind 是一个显示/编辑思维导图的纯 javascript 类库，其基于 html5 canvas 和 svg 进行设计。jsMind 以 [BSD 协议开源](LICENSE)，在此基础上你可以在你的项目上任意使用。
 
 jsMind is mind map library built by javascript, it base on html5 canvas and svg. jsMind is released under [the BSD license](LICENSE), you can embed it in any project as long as you abide by the license.
 
