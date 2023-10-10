@@ -19,8 +19,9 @@
   * 3.5. 设置样式
   * 3.6. 获取数据
   * 3.7. 其它操作
-* [4. 参与贡献](4.contribution.md)
-* [附：贡献代码指南](5.development.md)
+* [实验性功能](experimental-features.md)
+* [参与贡献](4.contribution.md)
+* [贡献代码指南](5.development.md)
 
 版权声明
 ======
