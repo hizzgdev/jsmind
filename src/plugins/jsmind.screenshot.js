@@ -7,327 +7,118 @@
  */
 
 import jsMind from 'jsmind';
+import domtoimage from 'dom-to-image';
 
 if (!jsMind) {
     throw new Error('jsMind is not defined');
 }
 
+if (!domtoimage) {
+    throw new Error('dom-to-image is required');
+}
+
 const $ = jsMind.$;
 
-var css = function (cStyle, property_name) {
-    return cStyle.getPropertyValue(property_name);
-};
-var is_visible = function (cStyle) {
-    var visibility = css(cStyle, 'visibility');
-    var display = css(cStyle, 'display');
-    return visibility !== 'hidden' && display !== 'none';
-};
-var jcanvas = {};
-jcanvas.rect = function (ctx, x, y, w, h, r) {
-    if (w < 2 * r) r = w / 2;
-    if (h < 2 * r) r = h / 2;
-    ctx.moveTo(x + r, y);
-    ctx.arcTo(x + w, y, x + w, y + h, r);
-    ctx.arcTo(x + w, y + h, x, y + h, r);
-    ctx.arcTo(x, y + h, x, y, r);
-    ctx.arcTo(x, y, x + w, y, r);
+const DEFAULT_OPTIONS = {
+    filename: null,
+    watermark: {
+        left: $.w.location,
+        right: 'https://github.com/hizzgdev/jsmind',
+    },
 };
 
-jcanvas.text_multiline = function (ctx, text, x, y, w, h, lineheight) {
-    var line = '';
-    var text_len = text.length;
-    var chars = text.split('');
-    var test_line = null;
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'top';
-    for (var i = 0; i < text_len; i++) {
-        test_line = line + chars[i];
-        if (ctx.measureText(test_line).width > w && i > 0) {
-            ctx.fillText(line, x, y);
-            line = chars[i];
-            y += lineheight;
-        } else {
-            line = test_line;
-        }
-    }
-    ctx.fillText(line, x, y);
-};
+class JmScreenshot {
+    constructor(jm, options) {
+        var opts = {};
+        jsMind.util.json.merge(opts, DEFAULT_OPTIONS);
+        jsMind.util.json.merge(opts, options);
 
-jcanvas.text_ellipsis = function (ctx, text, x, y, w, h) {
-    var center_y = y + h / 2;
-    var text = jcanvas.fittingString(ctx, text, w);
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(text, x, center_y, w);
-};
-
-jcanvas.fittingString = function (ctx, text, max_width) {
-    var width = ctx.measureText(text).width;
-    var ellipsis = '…';
-    var ellipsis_width = ctx.measureText(ellipsis).width;
-    if (width <= max_width || width <= ellipsis_width) {
-        return text;
-    } else {
-        var len = text.length;
-        while (width >= max_width - ellipsis_width && len-- > 0) {
-            text = text.substring(0, len);
-            width = ctx.measureText(text).width;
-        }
-        return text + ellipsis;
-    }
-};
-
-jcanvas.image = function (ctx, url, x, y, w, h, r, rotation, callback) {
-    var img = new Image();
-    img.onload = function () {
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.save();
-        ctx.beginPath();
-        jcanvas.rect(ctx, 0, 0, w, h, r);
-        ctx.closePath();
-        ctx.clip();
-        ctx.translate(w / 2, h / 2);
-        ctx.rotate((rotation * Math.PI) / 180);
-        ctx.drawImage(img, -w / 2, -h / 2);
-        ctx.restore();
-        ctx.restore();
-        !!callback && callback();
-    };
-    img.src = url;
-};
-
-class screenshot {
-    constructor(jm) {
-        this.version = '0.1.0';
+        this.version = '0.2.0';
         this.jm = jm;
-        this.canvas_elem = null;
-        this.canvas_ctx = null;
-        this._inited = false;
+        this.options = opts;
     }
-    init() {
-        if (this._inited) {
-            return;
-        }
-        var c = $.c('canvas');
-        var ctx = c.getContext('2d');
 
-        this.canvas_elem = c;
-        this.canvas_ctx = ctx;
+    shoot() {
+        let c = this.create_canvas();
+        let ctx = c.getContext('2d');
+        Promise.resolve(ctx)
+            .then(() => this.draw_lines(ctx))
+            .then(() => this.draw_nodes(ctx))
+            .then(() => this.draw_watermark(c, ctx))
+            .then(() => this.download(c))
+            .then(() => this.clear(c));
+    }
+
+    create_canvas() {
+        let c = $.c('canvas');
+        c.width = this.jm.view.size.w;
+        c.height = this.jm.view.size.h;
         this.jm.view.e_panel.appendChild(c);
-        this._inited = true;
-        this.resize();
+        return c;
     }
-    shoot(callback) {
-        this.init();
-        this._draw(
-            function () {
-                !!callback && callback();
-                this.clean();
-            }.bind(this)
-        );
-        this._watermark();
+
+    clear(c) {
+        c.parentNode.removeChild(c);
     }
-    shootDownload() {
-        this.shoot(
-            function () {
-                this._download();
+
+    draw_lines(ctx) {
+        return new Promise(
+            function (resolve, _) {
+                this.jm.view.graph.copy_to(ctx, function () {
+                    resolve(ctx);
+                });
             }.bind(this)
         );
     }
-    shootAsDataURL(callback) {
-        this.shoot(
-            function () {
-                !!callback && callback(this.canvas_elem.toDataURL());
-            }.bind(this)
-        );
+
+    draw_nodes(ctx) {
+        return domtoimage
+            .toSvg(this.jm.view.e_nodes)
+            .then(this.load_image)
+            .then(function (img) {
+                ctx.drawImage(img, 0, 0);
+                return ctx;
+            });
     }
-    resize() {
-        if (this._inited) {
-            this.canvas_elem.width = this.jm.view.size.w;
-            this.canvas_elem.height = this.jm.view.size.h;
-        }
-    }
-    clean() {
-        var c = this.canvas_elem;
-        this.canvas_ctx.clearRect(0, 0, c.width, c.height);
-    }
-    _draw(callback) {
-        var ctx = this.canvas_ctx;
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'top';
-        this._draw_lines(
-            function () {
-                this._draw_nodes(callback);
-            }.bind(this)
-        );
-    }
-    _watermark() {
-        var c = this.canvas_elem;
-        var ctx = this.canvas_ctx;
-        ctx.textAlign = 'right';
+
+    draw_watermark(c, ctx) {
         ctx.textBaseline = 'bottom';
         ctx.fillStyle = '#000';
         ctx.font = '11px Verdana,Arial,Helvetica,sans-serif';
-        ctx.fillText('github.com/hizzgdev/jsmind', c.width - 5.5, c.height - 2.5);
-        ctx.textAlign = 'left';
-        ctx.fillText($.w.location, 5.5, c.height - 2.5);
+        if (!!this.options.watermark.left) {
+            ctx.textAlign = 'left';
+            ctx.fillText(this.options.watermark.left, 5.5, c.height - 2.5);
+        }
+        if (!!this.options.watermark.right) {
+            ctx.textAlign = 'right';
+            ctx.fillText(this.options.watermark.right, c.width - 5.5, c.height - 2.5);
+        }
+        return ctx;
     }
-    _draw_lines(callback) {
-        this.jm.view.graph.copy_to(this.canvas_ctx, callback);
+
+    load_image(url) {
+        return new Promise(function (resolve, reject) {
+            let img = new Image();
+            img.onload = function () {
+                resolve(img);
+            };
+            img.onerror = reject;
+            img.src = url;
+        });
     }
-    _draw_nodes(callback) {
-        var nodes = this.jm.mind.nodes;
-        var node;
-        for (var nodeid in nodes) {
-            node = nodes[nodeid];
-            this._draw_node(node);
-        }
 
-        function check_nodes_ready() {
-            console.log('check_node_ready' + new Date());
-            var allOk = true;
-            for (var nodeid in nodes) {
-                node = nodes[nodeid];
-                allOk = allOk & node.ready;
-            }
-
-            if (!allOk) {
-                $.w.setTimeout(check_nodes_ready, 200);
-            } else {
-                $.w.setTimeout(callback, 200);
-            }
-        }
-        check_nodes_ready();
-    }
-    _draw_node(node) {
-        var ctx = this.canvas_ctx;
-        var view_data = node._data.view;
-        var node_element = view_data.element;
-        var ncs = getComputedStyle(node_element);
-        if (!is_visible(ncs)) {
-            node.ready = true;
-            return;
-        }
-
-        var bgcolor = css(ncs, 'background-color');
-        var round_radius = parseInt(css(ncs, 'border-top-left-radius'));
-        var color = css(ncs, 'color');
-        var padding_left = parseInt(css(ncs, 'padding-left'));
-        var padding_right = parseInt(css(ncs, 'padding-right'));
-        var padding_top = parseInt(css(ncs, 'padding-top'));
-        var padding_bottom = parseInt(css(ncs, 'padding-bottom'));
-        var text_overflow = css(ncs, 'text-overflow');
-        var font =
-            css(ncs, 'font-style') +
-            ' ' +
-            css(ncs, 'font-variant') +
-            ' ' +
-            css(ncs, 'font-weight') +
-            ' ' +
-            css(ncs, 'font-size') +
-            '/' +
-            css(ncs, 'line-height') +
-            ' ' +
-            css(ncs, 'font-family');
-
-        var rb = {
-            x: view_data.abs_x,
-            y: view_data.abs_y,
-            w: view_data.width + 1,
-            h: view_data.height + 1,
-        };
-        var tb = {
-            x: rb.x + padding_left,
-            y: rb.y + padding_top,
-            w: rb.w - padding_left - padding_right,
-            h: rb.h - padding_top - padding_bottom,
-        };
-
-        ctx.font = font;
-        ctx.fillStyle = bgcolor;
-        ctx.beginPath();
-        jcanvas.rect(ctx, rb.x, rb.y, rb.w, rb.h, round_radius);
-        ctx.closePath();
-        ctx.fill();
-
-        ctx.fillStyle = color;
-        if ('background-image' in node.data) {
-            var backgroundUrl = css(ncs, 'background-image').slice(5, -2);
-            node.ready = false;
-            var rotation = 0;
-            if ('background-rotation' in node.data) {
-                rotation = node.data['background-rotation'];
-            }
-            jcanvas.image(
-                ctx,
-                backgroundUrl,
-                rb.x,
-                rb.y,
-                rb.w,
-                rb.h,
-                round_radius,
-                rotation,
-                function () {
-                    node.ready = true;
-                }
-            );
-        }
-        if (!!node.topic) {
-            if (text_overflow === 'ellipsis') {
-                jcanvas.text_ellipsis(ctx, node.topic, tb.x, tb.y, tb.w, tb.h);
-            } else {
-                var line_height = parseInt(css(ncs, 'line-height'));
-                jcanvas.text_multiline(ctx, node.topic, tb.x, tb.y, tb.w, tb.h, line_height);
-            }
-        }
-        if (!!view_data.expander) {
-            this._draw_expander(view_data.expander);
-        }
-        if (!('background-image' in node.data)) {
-            node.ready = true;
-        }
-    }
-    _draw_expander(expander) {
-        var ctx = this.canvas_ctx;
-        var ncs = getComputedStyle(expander);
-        if (!is_visible(ncs)) {
-            return;
-        }
-
-        var style_left = css(ncs, 'left');
-        var style_top = css(ncs, 'top');
-        var font = css(ncs, 'font');
-        var left = parseInt(style_left);
-        var top = parseInt(style_top);
-        var is_plus = expander.innerHTML === '+';
-
-        ctx.lineWidth = 1;
-
-        ctx.beginPath();
-        ctx.arc(left + 7, top + 7, 5, 0, Math.PI * 2, true);
-        ctx.moveTo(left + 10, top + 7);
-        ctx.lineTo(left + 4, top + 7);
-        if (is_plus) {
-            ctx.moveTo(left + 7, top + 4);
-            ctx.lineTo(left + 7, top + 10);
-        }
-        ctx.closePath();
-        ctx.stroke();
-    }
-    _download() {
-        var c = this.canvas_elem;
-        var name = this.jm.mind.name + '.png';
+    download(c) {
+        var name = (this.options.filename || this.jm.mind.name) + '.png';
 
         if (navigator.msSaveBlob && !!c.msToBlob) {
             var blob = c.msToBlob();
             navigator.msSaveBlob(blob, name);
         } else {
-            var bloburl = this.canvas_elem.toDataURL();
+            var blob_url = c.toDataURL();
             var anchor = $.c('a');
             if ('download' in anchor) {
                 anchor.style.visibility = 'hidden';
-                anchor.href = bloburl;
+                anchor.href = blob_url;
                 anchor.download = name;
                 $.d.body.appendChild(anchor);
                 var evt = $.d.createEvent('MouseEvents');
@@ -335,26 +126,18 @@ class screenshot {
                 anchor.dispatchEvent(evt);
                 $.d.body.removeChild(anchor);
             } else {
-                location.href = bloburl;
+                location.href = blob_url;
             }
-        }
-    }
-    jm_event_handle(type, data) {
-        if (type === jsMind.event_type.resize) {
-            this.resize();
         }
     }
 }
 
-var screenshot_plugin = new jsMind.plugin('screenshot', function (jm) {
-    var jss = new screenshot(jm);
-    jm.screenshot = jss;
+let screenshot_plugin = new jsMind.plugin('screenshot', function (jm, options) {
+    var jmss = new JmScreenshot(jm, options);
+    jm.screenshot = jmss;
     jm.shoot = function () {
-        jss.shoot();
+        jmss.shoot();
     };
-    jm.add_event_listener(function (type, data) {
-        jss.jm_event_handle.call(jss, type, data);
-    });
 });
 
 jsMind.register_plugin(screenshot_plugin);

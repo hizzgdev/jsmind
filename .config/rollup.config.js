@@ -53,10 +53,11 @@ export default [
             banner: '/**\n* @license BSD-3-Clause\n* @copyright 2014-2023 hizzgdev@163.com\n*\n* Project Home:\n*   https://github.com/hizzgdev/jsmind/\n*/',
             sourcemap: true,
             globals: {
-                jsmind: 'jsMind',
+                'jsmind': 'jsMind',
+                'dom-to-image': 'domtoimage',
             },
         },
-        external: ['jsmind'],
+        external: ['jsmind', 'dom-to-image'],
         plugins: [
             cleanup({
                 comments: 'none',
