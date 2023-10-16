@@ -26,15 +26,15 @@ The ES6 version of jsMind has been launched, and legacy version has been depreca
         <link
             type="text/css"
             rel="stylesheet"
-            href="//cdn.jsdelivr.net/npm/jsmind@0.7.1/style/jsmind.css"
+            href="//cdn.jsdelivr.net/npm/jsmind@0.7.2/style/jsmind.css"
         />
         <script
             type="text/javascript"
-            src="//cdn.jsdelivr.net/npm/jsmind@0.7.1/es6/jsmind.js"
+            src="//cdn.jsdelivr.net/npm/jsmind@0.7.2/es6/jsmind.js"
         ></script>
         <!--
             enable draggable node feature
-            <script type="text/javascript" src="//cdn.jsdelivr.net/npm/jsmind@0.7.1/es6/jsmind.draggable-node.js"></script>
+            <script type="text/javascript" src="//cdn.jsdelivr.net/npm/jsmind@0.7.2/es6/jsmind.draggable-node.js"></script>
         -->
     </head>
     <body>
