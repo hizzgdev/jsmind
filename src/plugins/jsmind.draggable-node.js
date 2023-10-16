@@ -273,7 +273,9 @@ class DraggableNode {
                         jd.lookup_close_node.call(jd);
                     }, jd.options.lookup_interval);
                 }, this.options.lookup_delay);
-                this.capture = true;
+                $.w.setTimeout(function () {
+                    jd.capture = true;
+                }, 0);
             }
         }
     }
