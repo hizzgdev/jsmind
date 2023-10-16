@@ -26,6 +26,7 @@ const clear_selection =
 const DEFAULT_OPTIONS = {
     line_width: 5,
     line_color: 'rgba(0,0,0,0.3)',
+    drag_start_delay: 100,
     lookup_delay: 500,
     lookup_interval: 80,
     scrolling_trigger_width: 20,
@@ -55,6 +56,7 @@ class DraggableNode {
         this.offset_y = 0;
         this.hlookup_delay = 0;
         this.hlookup_timer = 0;
+        this.hdrag_start_delay = 0;
         this.capture = false;
         this.moved = false;
         this.canvas_draggable = jm.get_view_draggable();
@@ -206,7 +208,10 @@ class DraggableNode {
         var container = this.jm.view.container;
         $.on(container, 'mousedown', function (e) {
             var evt = e || event;
-            jd.dragstart.call(jd, evt);
+            jd.hdrag_start_delay = $.w.setTimeout(function () {
+                jd.hdrag_start_delay = 0;
+                jd.dragstart.call(jd, evt);
+            }, jd.options.drag_start_delay);
         });
         $.on(container, 'mousemove', function (e) {
             var evt = e || event;
@@ -214,11 +219,18 @@ class DraggableNode {
         });
         $.on(container, 'mouseup', function (e) {
             var evt = e || event;
+            if (jd.hdrag_start_delay != 0) {
+                $.w.clearTimeout(jd.hdrag_start_delay);
+                jd.hdrag_start_delay = 0;
+            }
             jd.dragend.call(jd, evt);
         });
         $.on(container, 'touchstart', function (e) {
             var evt = e || event;
-            jd.dragstart.call(jd, evt);
+            jd.hdrag_start_delay = $.w.setTimeout(function () {
+                jd.hdrag_start_delay = 0;
+                jd.dragstart.call(jd, evt);
+            }, jd.options.drag_start_delay);
         });
         $.on(container, 'touchmove', function (e) {
             var evt = e || event;
@@ -226,6 +238,10 @@ class DraggableNode {
         });
         $.on(container, 'touchend', function (e) {
             var evt = e || event;
+            if (jd.hdrag_start_delay != 0) {
+                $.w.clearTimeout(jd.hdrag_start_delay);
+                jd.hdrag_start_delay = 0;
+            }
             jd.dragend.call(jd, evt);
         });
     }
@@ -273,9 +289,7 @@ class DraggableNode {
                         jd.lookup_close_node.call(jd);
                     }, jd.options.lookup_interval);
                 }, this.options.lookup_delay);
-                $.w.setTimeout(function () {
-                    jd.capture = true;
-                }, 0);
+                jd.capture = true;
             }
         }
     }
