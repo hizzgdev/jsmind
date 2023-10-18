@@ -1,64 +1,27 @@
 
 [目录](index.md)
 
-* [1. 基本用法](1.usage.md)
-* [2. 选项](2.options.md)
-* [3. 界面操控](3.operation.md)
+* [基本用法](1.usage.md)
+* [选项](2.options.md)
+* [界面操控](3.operation.md)
 * [实验性功能 *](experimental-features.md)
+  * [截图 (导出图片)](plugin-screenshot.md)
 * [参与贡献](4.contribution.md)
 * [贡献代码指南](5.development.md)
 
-> 特别注意：这些实验性功能并不保证在后续的版本中会一直存在，也不保证其 API 的兼容性，若在项目中使用了实验性功能，后续请谨慎升级。
-
-导出图片/截图
+实验性功能
 ===
-此功能可将思维导图导出为 png 格式的图片。
 
-```html
+文档中有些内容标记了`[实验性]`注解，表明那些功能（特性）目前还处于实验阶段，这意味着这些功能在未来可能会发生变化。我们并不保证这些实验性功能在后续的版本中会一直存在，也不保证其的兼容性。如果你在项目中使用到了这些实验性功能，在后续对 jsMind 升级时，最好仔细测试它们。
 
-<!-- style -->
-<link type="text/css" rel="stylesheet" href="https://unpkg.com/jsmind@0.7.4/style/jsmind.css" />
-
-<!-- jsMind -->
-<script type="text/javascript" src="https://unpkg.com/jsmind@0.7.4/es6/jsmind.js"></script>
-
-<!-- dependency of screenshot -->
-<script type="text/javascript" src="https://unpkg.com/dom-to-image@2.6.0/dist/dom-to-image.min.js" ></script>
-
-<!-- screenshot plugin -->
-<script type="text/javascript" src="https://unpkg.com/jsmind@0.7.4/es6/jsmind.screenshot.js"></script>
+目前提供的实验性功能有：
+- [截图 (导出图片)](plugin-screenshot.md) : 可将显示的思维导图导出为一张图片。
 
 
-<script>
-    var jm = new jsMind(options);
-    jm.show(mind_data);
-    // export current mindmap to an image
-    jm.shoot()
-</script>
 
-```
+版权声明
+===
 
-如果使用 npm，则需要安装 jsmind 和 dom-to-image
+禁止转载、禁止演绎。
 
-```bash
-npm install jsmind
-npm install dom-to-image
-```
-
-然后在页面里一样的使用
-
-```html
-<script>
-    import domtoimage from 'dom-to-image';
-    import jsMind from 'jsmind'
-    import 'jsmind/screenshot'
-    import 'jsmind/style/jsmind.css'
-
-    // ...
-
-    var jm = new jsMind(options);
-    jm.show(mind_data);
-    // export current mindmap to an image
-    jm.shoot()
-</script>
-```
+jsMind 项目仍在不断升级变化，版本更新时会同时更新对应的文档。为避免给使用者带来困惑，在没有得到书面许可前，禁止转载本文档，同时禁止对本文档进行任何形式的更改。

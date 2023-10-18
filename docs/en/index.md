@@ -1,25 +1,26 @@
 Table of Contents
 ======
 
-* [1. Usage](1.usage.md)
-  * 1.1 Basic Framework
-  * 1.2 Data Format
-  * 1.3 Themes
-  * 1.4 Styles
-* [2. Options](2.options.md)
-  * 2.1 Introduction
-  * 2.2 Conventional Options
-  * 2.3 Layout Options
-  * 2.4 Shortcuts
-* [3. API / Operation](3.operation.md)
-  * 3.1 Displaying a Mindmap
-  * 3.2 Finding Nodes
-  * 3.3 Operation on Nodes
-  * 3.4 Editing Nodes
-  * 3.5 Setting Style
-  * 3.6 Access to Data
-  * 3.7 Other Operations
+* [Usage](1.usage.md)
+  * Basic Framework
+  * Data Format
+  * Themes
+  * Styles
+* [Options](2.options.md)
+  * Introduction
+  * Conventional Options
+  * Layout Options
+  * Shortcuts
+* [API / Operation](3.operation.md)
+  * Rendering a Mindmap
+  * Finding Nodes
+  * Operation on Nodes
+  * Editing Nodes
+  * Setting Style
+  * Access to Data
+  * Other Operations
 * [Experimental Features](experimental-features.md)
+  * [Screenshot (Export as Image)](plugin-screenshot.md)
 * [Contribution](4.contribution.md)
 * [Development Guide](5.development.md)
 
