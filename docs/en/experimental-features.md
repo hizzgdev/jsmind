@@ -1,63 +1,27 @@
 [Table of Contents](index.md)
 
-* [1. Usage](1.usage.md)
-* [2. Options](2.options.md)
-* [3. Operation](3.operation.md)
+* [Usage](1.usage.md)
+* [Options](2.options.md)
+* [Operation](3.operation.md)
 * [Experimental Features *](experimental-features.md)
+  * [Screenshot (Export as Image)](plugin-screenshot.md)
 * [Contribution](4.contribution.md)
 * [Development Guide](5.development.md)
 
-> Special note: These experimental features are not guaranteed to continue to exist in subsequent versions, nor are their API compatibility guaranteed. If experimental features are used in your project, please upgrade jsmind with caution in the future.
-
-Export Image/Screenshot
+Experimental Features
 ===
-This feature can support to export mind maps as png images.
 
-```html
-
-<!-- style -->
-<link type="text/css" rel="stylesheet" href="https://unpkg.com/jsmind@0.7.4/style/jsmind.css" />
-
-<!-- jsMind -->
-<script type="text/javascript" src="https://unpkg.com/jsmind@0.7.4/es6/jsmind.js"></script>
-
-<!-- dependency of screenshot -->
-<script type="text/javascript" src="https://unpkg.com/dom-to-image@2.6.0/dist/dom-to-image.min.js" ></script>
-
-<!-- screenshot plugin -->
-<script type="text/javascript" src="https://unpkg.com/jsmind@0.7.4/es6/jsmind.screenshot.js"></script>
+Some contents in the documents are annotated with `experimental`, indicating that those features are currently in experimental stage, which means those features may be changed in the future. The experimental features are neither guaranteed to continue to exist in subsequent versions, nor guaranteed their backward compatibility. If any experimental feature is used in your project, you'd better test them carefully when you upgrade jsmind in the future.
 
 
-<script>
-    var jm = new jsMind(options);
-    jm.show(mind_data);
-    // export current mindmap to an image
-    jm.shoot()
-</script>
+List of Experimental Features:
 
-```
+- [Screenshot (Export as Image)](plugin-screenshot.md)
 
-If you use npm, please install `jsmind` and `dom-to-image`
 
-```bash
-npm install jsmind
-npm install dom-to-image
-```
+copyright notice
+===
 
-And then use it the same way on the page.
+Reproduction and deduction are prohibited.
 
-```html
-<script>
-    import domtoimage from 'dom-to-image';
-    import jsMind from 'jsmind'
-    import 'jsmind/screenshot'
-    import 'jsmind/style/jsmind.css'
-
-    // ...
-
-    var jm = new jsMind(options);
-    jm.show(mind_data);
-    // export current mindmap to an image
-    jm.shoot()
-</script>
-```
+The jsMind project is still being updated and the corresponding documentation is updated at the same time as the version is updated. In order to avoid confusion to the user, it is forbidden to reprint this document without written permission and to make changes of any kind to this document.
