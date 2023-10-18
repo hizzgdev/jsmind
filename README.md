@@ -12,12 +12,6 @@ jsMind is mind map library built by javascript, it base on html5 canvas and svg.
 -   [jsMind on Github](https://github.com/hizzgdev/jsmind)
 -   [国内镜像 - Gitee](https://gitee.com/hizzgdev/jsmind)
 
-## !! BREAK CHANGE - Legacy Version is Deprecated !!
-
-ES6 版本现已发布，老版本已下线，详情请查阅 [es6/README.md](es6/README.md)
-
-The ES6 version of jsMind has been launched, and legacy version has been deprecated. see details from [es6/README-en.md](es6/README-en.md)
-
 ## Get Started
 
 ```html
@@ -32,10 +26,6 @@ The ES6 version of jsMind has been launched, and legacy version has been depreca
             type="text/javascript"
             src="//cdn.jsdelivr.net/npm/jsmind@0.7.4/es6/jsmind.js"
         ></script>
-        <!--
-            enable draggable node feature
-            <script type="text/javascript" src="//cdn.jsdelivr.net/npm/jsmind@0.7.4/es6/jsmind.draggable-node.js"></script>
-        -->
     </head>
     <body>
         <div id="jsmind_container"></div>
@@ -57,29 +47,28 @@ The ES6 version of jsMind has been launched, and legacy version has been depreca
 </html>
 ```
 
-> More samples : https://github.com/hizzgdev/jsmind-samples
-
-> 查阅[文档](docs/zh/1.usage.md)以获取更多关于 CDN 以及版本的知识。 Read the [doc](docs/en/1.usage.md) to learn more knowledge about CDN and version.
-
 ## Links
 
 -   Resources:
-    -   [NPM - jsmind](https://www.npmjs.com/package/jsmind)
-    -   CDN - [UNPKG](https://unpkg.com/browse/jsmind/), [jsDelivr](https://www.jsdelivr.com/package/npm/jsmind/), [jsDelivr 的国内镜像](https://jsd.onmicrosoft.cn/npm/jsmind/)
     -   [文档 - Documents](https://hizzgdev.github.io/jsmind/docs)
+    -   [NPM - jsmind](https://www.npmjs.com/package/jsmind)
+    -   CDN - [用法](docs/zh/1.usage.md) [Usage](docs/en/1.usage.md)
+        -   [UNPKG](https://unpkg.com/browse/jsmind/)
+        -   [jsDelivr](https://www.jsdelivr.com/package/npm/jsmind/)
+        -   [jsDelivr 国内镜像](https://jsd.onmicrosoft.cn/npm/jsmind/)
 -   Apps :
     -   <https://jsmind.online>
     -   <https://jsmind.sinaapp.com>
 -   Demo :
     -   [显示一个脑图 Render a mindmap](https://hizzgdev.github.io/jsmind/example/1_basic.html) [[国内版](https://hizzgdev.github.io/jsmind/example/1_basic_cn.html)]
-    -   [试用所有功能 Features simple](https://hizzgdev.github.io/jsmind/example/2_features.html) [[国内版](https://hizzgdev.github.io/jsmind/example/2_features_cn.html)]
+    -   [试用所有功能 Try all features](https://hizzgdev.github.io/jsmind/example/2_features.html) [[国内版](https://hizzgdev.github.io/jsmind/example/2_features_cn.html)]
     -   [requirejs + jsMind](https://hizzgdev.github.io/jsmind/example/3_requirejs.html)
+    -   [更多示例 - More samples](https://github.com/hizzgdev/jsmind-samples)
 
-## Donate
+## Funding
 
 -   [致谢 - Acknowledgement](https://hizzgdev.github.io/acknowledgement.html)
--   [资助本项目](https://hizzgdev.github.io/sponsor.html)
--   [Become a sponsor](https://github.com/sponsors/hizzgdev)
+-   [资助 - Sponsor](https://hizzgdev.github.io/sponsor.html)
 
 ## Maintainer
 
