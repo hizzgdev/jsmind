@@ -1,6 +1,6 @@
 ---
-name: freestyle issue template
-about: Default issue template
+name: Create an issue only when it is a real issue
+about: Create [discussion](https://github.com/hizzgdev/jsmind/discussions/new?category=general) when it is not an issue
 title: ''
 labels: ''
 assignees: ''
