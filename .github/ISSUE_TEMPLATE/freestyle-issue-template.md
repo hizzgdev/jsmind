@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 <!--
-我们调整了创建 issue 的策略，仅在它确实是个 issue 的时候再创建 issue，其它情况请稳步到 Discussion 区创建 discussion.
+我们调整了创建 issue 的策略，仅在它确实是个 issue 的时候再创建 issue，其它情况请移步到 Discussion 区创建 discussion.
 
 - 这些是 issue: 明确的bug，非预期的结果，安全风险等
 - 这些不是 issue: 咨询如何实现某一功能，讨论想法等
