@@ -1,6 +1,6 @@
 ---
 name: Create an issue only when it is a real issue
-about: Create discussion when it is not an issue: https://github.com/hizzgdev/jsmind/discussions/new?category=general
+about: 'Create discussion when it is not an issue: https://github.com/hizzgdev/jsmind/discussions/new?category=general'
 title: ''
 labels: ''
 assignees: ''
