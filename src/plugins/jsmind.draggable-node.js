@@ -206,7 +206,9 @@ class DraggableNode {
         var container = this.jm.view.container;
         $.on(container, 'mousedown', function (e) {
             var evt = e || event;
-            jd.dragstart.call(jd, evt);
+            if (evt.button === 0) {
+                jd.dragstart.call(jd, evt);
+            }
         });
         $.on(container, 'mousemove', function (e) {
             var evt = e || event;
