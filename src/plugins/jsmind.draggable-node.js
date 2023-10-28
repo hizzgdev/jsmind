@@ -44,6 +44,8 @@ class DraggableNode {
         this.e_canvas = null;
         this.canvas_ctx = null;
         this.shadow = null;
+        this.shadow_p_x = 0;
+        this.shadow_p_y = 0;
         this.shadow_w = 0;
         this.shadow_h = 0;
         this.active_node = null;
@@ -63,23 +65,23 @@ class DraggableNode {
         this.view_panel_rect = null;
     }
     init() {
-        this._create_canvas();
-        this._create_shadow();
-        this._event_bind();
+        this.create_canvas();
+        this.create_shadow();
+        this.event_bind();
     }
     resize() {
         this.jm.view.e_nodes.appendChild(this.shadow);
         this.e_canvas.width = this.jm.view.size.w;
         this.e_canvas.height = this.jm.view.size.h;
     }
-    _create_canvas() {
+    create_canvas() {
         var c = $.c('canvas');
         this.jm.view.e_panel.appendChild(c);
         var ctx = c.getContext('2d');
         this.e_canvas = c;
         this.canvas_ctx = ctx;
     }
-    _create_shadow() {
+    create_shadow() {
         var s = $.c('jmnode');
         s.style.visibility = 'hidden';
         s.style.zIndex = '3';
@@ -109,52 +111,37 @@ class DraggableNode {
     hide_shadow() {
         this.shadow.style.visibility = 'hidden';
     }
-    _magnet_shadow(node) {
+    magnet_shadow(node) {
         if (!!node) {
             this.canvas_ctx.lineWidth = this.options.line_width;
             this.canvas_ctx.strokeStyle = this.options.line_color;
             this.canvas_ctx.lineCap = 'round';
-            this._clear_lines();
-            this._canvas_lineto(node.sp.x, node.sp.y, node.np.x, node.np.y);
+            this.clear_lines();
+            this.canvas_lineto(node.sp.x, node.sp.y, node.np.x, node.np.y);
         }
     }
-    _clear_lines() {
+    clear_lines() {
         this.canvas_ctx.clearRect(0, 0, this.jm.view.size.w, this.jm.view.size.h);
     }
-    _canvas_lineto(x1, y1, x2, y2) {
+    canvas_lineto(x1, y1, x2, y2) {
         this.canvas_ctx.beginPath();
         this.canvas_ctx.moveTo(x1, y1);
         this.canvas_ctx.lineTo(x2, y2);
         this.canvas_ctx.stroke();
     }
-    _get_root_x() {
+    get_root_x() {
         let root = this.jm.get_root();
         let root_location = root.get_location();
         let root_size = root.get_size();
         return root_location.x + root_size.w / 2;
     }
-    _lookup_close_node() {
-        var root_x = this._get_root_x();
-
-        var sw = this.shadow_w;
-        var sh = this.shadow_h;
-        var sx = this.shadow.offsetLeft;
-        var sy = this.shadow.offsetTop;
-
+    lookup_close_node(direct) {
         var ns, nl;
-
-        var direct = sx + sw / 2 >= root_x ? jsMind.direction.right : jsMind.direction.left;
         var nodes = this.jm.mind.nodes;
-        var node = null;
         var layout = this.jm.layout;
-        var min_distance = Number.MAX_VALUE;
-        var distance = 0;
         var closest_node = null;
-        var closest_p = null;
-        var shadow_p = null;
         for (var nodeid in nodes) {
-            var np, sp;
-            node = nodes[nodeid];
+            let node = nodes[nodeid];
             if (!node.isroot && node.direction !== direct) {
                 continue;
             }
@@ -167,39 +154,23 @@ class DraggableNode {
             ns = node.get_size();
             nl = node.get_location();
             if (direct == jsMind.direction.right) {
-                if (sx - nl.x - ns.w <= 0) {
+                if (this.shadow_p_x - nl.x - ns.w <= 0) {
                     continue;
                 }
-                distance = Math.abs(sx - nl.x - ns.w) + Math.abs(sy + sh / 2 - nl.y - ns.h / 2);
-                np = { x: nl.x + ns.w - this.options.line_width, y: nl.y + ns.h / 2 };
-                sp = { x: sx + this.options.line_width, y: sy + sh / 2 };
             } else {
-                if (nl.x - sx - sw <= 0) {
+                if (nl.x - this.shadow_p_x - this.shadow_w <= 0) {
                     continue;
                 }
-                distance = Math.abs(sx + sw - nl.x) + Math.abs(sy + sh / 2 - nl.y - ns.h / 2);
-                np = { x: nl.x + this.options.line_width, y: nl.y + ns.h / 2 };
-                sp = { x: sx + sw - this.options.line_width, y: sy + sh / 2 };
             }
-            if (distance < min_distance) {
-                closest_node = node;
-                closest_p = np;
-                shadow_p = sp;
-                min_distance = distance;
+            let result = this.calc_distance(node, direct);
+            if (!closest_node || result.distance < closest_node.distance) {
+                closest_node = result;
             }
         }
-        var result_node = null;
-        if (!!closest_node) {
-            result_node = {
-                node: closest_node,
-                direction: direct,
-                sp: shadow_p,
-                np: closest_p,
-            };
-        }
-        return result_node;
+        return closest_node;
     }
-    _lookup_hovered_node_parent() {
+
+    lookup_hovered_node_parent(direct) {
         let hovered_node_id = this.jm.view.get_binded_nodeid(this.hovered_el);
         if (!hovered_node_id) {
             return null;
@@ -212,40 +183,55 @@ class DraggableNode {
         if (!node) {
             return null;
         }
-        var root_x = this._get_root_x();
-        var sw = this.shadow_w;
-        var sh = this.shadow_h;
-        var sx = this.shadow.offsetLeft;
-        var sy = this.shadow.offsetTop;
-        let direct = sx + sw / 2 >= root_x ? jsMind.direction.right : jsMind.direction.left;
+        return this.calc_distance(node, direct);
+    }
 
-        let ns = node.get_size();
-        let nl = node.get_location();
-        let np, sp;
+    calc_distance(node_candidate, direct) {
+        let ns = node_candidate.get_size();
+        let nl = node_candidate.get_location();
+        let np, sp, distance;
         if (direct == jsMind.direction.right) {
             np = { x: nl.x + ns.w - this.options.line_width, y: nl.y + ns.h / 2 };
-            sp = { x: sx + this.options.line_width, y: sy + sh / 2 };
+            sp = {
+                x: this.shadow_p_x + this.options.line_width,
+                y: this.shadow_p_y + this.shadow_h / 2,
+            };
+            distance =
+                Math.abs(this.shadow_p_x - nl.x - ns.w) +
+                Math.abs(this.shadow_p_y + this.shadow_h / 2 - nl.y - ns.h / 2);
         } else {
             np = { x: nl.x + this.options.line_width, y: nl.y + ns.h / 2 };
-            sp = { x: sx + sw - this.options.line_width, y: sy + sh / 2 };
+            sp = {
+                x: this.shadow_p_x + this.shadow_w - this.options.line_width,
+                y: this.shadow_p_y + this.shadow_h / 2,
+            };
+            distance =
+                Math.abs(this.shadow_p_x + this.shadow_w - nl.x) +
+                Math.abs(this.shadow_p_y + this.shadow_h / 2 - nl.y - ns.h / 2);
         }
-        return {
-            node: node,
-            direction: direct,
-            sp: sp,
-            np: np,
-        };
+        return { node: node_candidate, direction: direct, distance: distance, sp: sp, np: np };
     }
     lookup_target_node() {
-        var hovered_node_parent = this._lookup_hovered_node_parent();
-        var node_data = hovered_node_parent || this._lookup_close_node();
+        let sx = this.shadow.offsetLeft;
+        let sy = this.shadow.offsetTop;
+        if (sx === this.shadow_p_x && sy === this.shadow_p_y) {
+            return;
+        }
+        this.shadow_p_x = sx;
+        this.shadow_p_y = sy;
+        let direct =
+            this.shadow_p_x + this.shadow_w / 2 >= this.get_root_x()
+                ? jsMind.direction.right
+                : jsMind.direction.left;
+        var hovered_node_parent = this.lookup_hovered_node_parent(direct);
+        var node_data = hovered_node_parent || this.lookup_close_node(direct);
         if (!!node_data) {
-            this._magnet_shadow(node_data);
+            this.magnet_shadow(node_data);
             this.target_node = node_data.node;
             this.target_direct = node_data.direction;
         }
     }
-    _event_bind() {
+    event_bind() {
         var jd = this;
         var container = this.jm.view.container;
         $.on(container, 'mousedown', function (e) {
@@ -256,7 +242,7 @@ class DraggableNode {
         });
         $.on(container, 'mousemove', function (e) {
             var evt = e || event;
-            if (e.movementX > 0 || e.movementY > 0) {
+            if (e.movementX !== 0 || e.movementY !== 0) {
                 jd.drag.call(jd, evt);
             }
         });
@@ -334,6 +320,7 @@ class DraggableNode {
             return;
         }
         if (this.capture) {
+            console.log('move');
             e.preventDefault();
             this.show_shadow();
             this.moved = true;
@@ -391,12 +378,12 @@ class DraggableNode {
             if (this.hlookup_delay != 0) {
                 $.w.clearTimeout(this.hlookup_delay);
                 this.hlookup_delay = 0;
-                this._clear_lines();
+                this.clear_lines();
             }
             if (this.hlookup_timer != 0) {
                 $.w.clearInterval(this.hlookup_timer);
                 this.hlookup_timer = 0;
-                this._clear_lines();
+                this.clear_lines();
             }
             if (this.moved) {
                 var src_node = this.active_node;
