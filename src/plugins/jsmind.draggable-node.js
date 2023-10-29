@@ -235,36 +235,29 @@ class DraggableNode {
         var jd = this;
         var container = this.jm.view.container;
         $.on(container, 'mousedown', function (e) {
-            var evt = e || event;
-            if (evt.button === 0) {
-                jd.dragstart.call(jd, evt);
+            if (e.button === 0) {
+                jd.dragstart.call(jd, e);
             }
         });
         $.on(container, 'mousemove', function (e) {
-            var evt = e || event;
             if (e.movementX !== 0 || e.movementY !== 0) {
-                jd.drag.call(jd, evt);
+                jd.drag.call(jd, e);
             }
         });
         $.on(container, 'mouseup', function (e) {
-            var evt = e || event;
-            jd.dragend.call(jd, evt);
+            jd.dragend.call(jd, e);
         });
         $.on(container, 'mouseover', function (e) {
-            var evt = e || event;
             jd.hovered_el = e.target;
         });
         $.on(container, 'touchstart', function (e) {
-            var evt = e || event;
-            jd.dragstart.call(jd, evt);
+            jd.dragstart.call(jd, e);
         });
         $.on(container, 'touchmove', function (e) {
-            var evt = e || event;
-            jd.drag.call(jd, evt);
+            jd.drag.call(jd, e);
         });
         $.on(container, 'touchend', function (e) {
-            var evt = e || event;
-            jd.dragend.call(jd, evt);
+            jd.dragend.call(jd, e);
         });
     }
     dragstart(e) {
@@ -278,7 +271,7 @@ class DraggableNode {
         this.view_draggable = this.jm.get_view_draggable();
 
         var jview = this.jm.view;
-        var el = e.target || event.srcElement;
+        var el = e.target;
         if (el.tagName.toLowerCase() != 'jmnode') {
             return;
         }
