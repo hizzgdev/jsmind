@@ -26,10 +26,12 @@ const clear_selection =
 const DEFAULT_OPTIONS = {
     line_width: 5,
     line_color: 'rgba(0,0,0,0.3)',
-    lookup_delay: 500,
-    lookup_interval: 80,
+    line_color_invalid: 'rgba(255,51,51,0.6)',
+    lookup_delay: 200,
+    lookup_interval: 100,
     scrolling_trigger_width: 20,
     scrolling_step_length: 10,
+    shadow_node_class_name: 'jsmind-draggable-shadow-node',
 };
 
 class DraggableNode {
@@ -38,7 +40,7 @@ class DraggableNode {
         jsMind.util.json.merge(opts, DEFAULT_OPTIONS);
         jsMind.util.json.merge(opts, options);
 
-        this.version = '0.3.0';
+        this.version = '0.4.0';
         this.jm = jm;
         this.options = opts;
         this.e_canvas = null;
@@ -50,7 +52,6 @@ class DraggableNode {
         this.shadow_h = 0;
         this.active_node = null;
         this.target_node = null;
-        this.hovered_el = null;
         this.target_direct = null;
         this.client_w = 0;
         this.client_h = 0;
@@ -87,6 +88,7 @@ class DraggableNode {
         s.style.zIndex = '3';
         s.style.cursor = 'move';
         s.style.opacity = '0.7';
+        s.className = this.options.shadow_node_class_name;
         this.shadow = s;
     }
     reset_shadow(el) {
@@ -96,7 +98,6 @@ class DraggableNode {
         s.top = el.style.top;
         s.width = el.style.width;
         s.height = el.style.height;
-        s.pointerEvents = 'none';
         s.backgroundImage = el.style.backgroundImage;
         s.backgroundSize = el.style.backgroundSize;
         s.transform = el.style.transform;
@@ -111,14 +112,14 @@ class DraggableNode {
     hide_shadow() {
         this.shadow.style.visibility = 'hidden';
     }
-    magnet_shadow(node) {
-        if (!!node) {
-            this.canvas_ctx.lineWidth = this.options.line_width;
-            this.canvas_ctx.strokeStyle = this.options.line_color;
-            this.canvas_ctx.lineCap = 'round';
-            this.clear_lines();
-            this.canvas_lineto(node.sp.x, node.sp.y, node.np.x, node.np.y);
-        }
+    magnet_shadow(shadow_p, node_p, invalid) {
+        this.canvas_ctx.lineWidth = this.options.line_width;
+        this.canvas_ctx.strokeStyle = invalid
+            ? this.options.line_color_invalid
+            : this.options.line_color;
+        this.canvas_ctx.lineCap = 'round';
+        this.clear_lines();
+        this.canvas_lineto(shadow_p.x, shadow_p.y, node_p.x, node_p.y);
     }
     clear_lines() {
         this.canvas_ctx.clearRect(0, 0, this.jm.view.size.w, this.jm.view.size.h);
@@ -129,142 +130,30 @@ class DraggableNode {
         this.canvas_ctx.lineTo(x2, y2);
         this.canvas_ctx.stroke();
     }
-    get_root_x() {
-        let root = this.jm.get_root();
-        let root_location = root.get_location();
-        let root_size = root.get_size();
-        return root_location.x + root_size.w / 2;
-    }
-    lookup_close_node(direct) {
-        var ns, nl;
-        var nodes = this.jm.mind.nodes;
-        var layout = this.jm.layout;
-        var closest_node = null;
-        for (var nodeid in nodes) {
-            let node = nodes[nodeid];
-            if (!node.isroot && node.direction !== direct) {
-                continue;
-            }
-            if (node.id == this.active_node.id) {
-                continue;
-            }
-            if (!layout.is_visible(node)) {
-                continue;
-            }
-            ns = node.get_size();
-            nl = node.get_location();
-            if (direct == jsMind.direction.right) {
-                if (this.shadow_p_x - nl.x - ns.w <= 0) {
-                    continue;
-                }
-            } else {
-                if (nl.x - this.shadow_p_x - this.shadow_w <= 0) {
-                    continue;
-                }
-            }
-            let result = this.calc_distance(node, direct);
-            if (!closest_node || result.distance < closest_node.distance) {
-                closest_node = result;
-            }
-        }
-        return closest_node;
-    }
-
-    lookup_hovered_node_parent(direct) {
-        let hovered_node_id = this.jm.view.get_binded_nodeid(this.hovered_el);
-        if (!hovered_node_id) {
-            return null;
-        }
-        let hovered_node = this.jm.mind.nodes[hovered_node_id];
-        if (!hovered_node) {
-            return null;
-        }
-        let node = hovered_node.parent;
-        if (!node) {
-            return null;
-        }
-        return this.calc_distance(node, direct);
-    }
-
-    calc_distance(node_candidate, direct) {
-        let ns = node_candidate.get_size();
-        let nl = node_candidate.get_location();
-        let np, sp, distance;
-        if (direct == jsMind.direction.right) {
-            np = { x: nl.x + ns.w - this.options.line_width, y: nl.y + ns.h / 2 };
-            sp = {
-                x: this.shadow_p_x + this.options.line_width,
-                y: this.shadow_p_y + this.shadow_h / 2,
-            };
-            distance =
-                Math.abs(this.shadow_p_x - nl.x - ns.w) +
-                Math.abs(this.shadow_p_y + this.shadow_h / 2 - nl.y - ns.h / 2);
-        } else {
-            np = { x: nl.x + this.options.line_width, y: nl.y + ns.h / 2 };
-            sp = {
-                x: this.shadow_p_x + this.shadow_w - this.options.line_width,
-                y: this.shadow_p_y + this.shadow_h / 2,
-            };
-            distance =
-                Math.abs(this.shadow_p_x + this.shadow_w - nl.x) +
-                Math.abs(this.shadow_p_y + this.shadow_h / 2 - nl.y - ns.h / 2);
-        }
-        return { node: node_candidate, direction: direct, distance: distance, sp: sp, np: np };
-    }
-    lookup_target_node() {
-        let sx = this.shadow.offsetLeft;
-        let sy = this.shadow.offsetTop;
-        if (sx === this.shadow_p_x && sy === this.shadow_p_y) {
-            return;
-        }
-        this.shadow_p_x = sx;
-        this.shadow_p_y = sy;
-        let direct =
-            this.shadow_p_x + this.shadow_w / 2 >= this.get_root_x()
-                ? jsMind.direction.right
-                : jsMind.direction.left;
-        var hovered_node_parent = this.lookup_hovered_node_parent(direct);
-        var node_data = hovered_node_parent || this.lookup_close_node(direct);
-        if (!!node_data) {
-            this.magnet_shadow(node_data);
-            this.target_node = node_data.node;
-            this.target_direct = node_data.direction;
-        }
-    }
     event_bind() {
         var jd = this;
         var container = this.jm.view.container;
         $.on(container, 'mousedown', function (e) {
-            var evt = e || event;
-            if (evt.button === 0) {
-                jd.dragstart.call(jd, evt);
+            if (e.button === 0) {
+                jd.dragstart.call(jd, e);
             }
         });
         $.on(container, 'mousemove', function (e) {
-            var evt = e || event;
             if (e.movementX !== 0 || e.movementY !== 0) {
-                jd.drag.call(jd, evt);
+                jd.drag.call(jd, e);
             }
         });
         $.on(container, 'mouseup', function (e) {
-            var evt = e || event;
-            jd.dragend.call(jd, evt);
-        });
-        $.on(container, 'mouseover', function (e) {
-            var evt = e || event;
-            jd.hovered_el = e.target;
+            jd.dragend.call(jd, e);
         });
         $.on(container, 'touchstart', function (e) {
-            var evt = e || event;
-            jd.dragstart.call(jd, evt);
+            jd.dragstart.call(jd, e);
         });
         $.on(container, 'touchmove', function (e) {
-            var evt = e || event;
-            jd.drag.call(jd, evt);
+            jd.drag.call(jd, e);
         });
         $.on(container, 'touchend', function (e) {
-            var evt = e || event;
-            jd.dragend.call(jd, evt);
+            jd.dragend.call(jd, e);
         });
     }
     dragstart(e) {
@@ -278,7 +167,7 @@ class DraggableNode {
         this.view_draggable = this.jm.get_view_draggable();
 
         var jview = this.jm.view;
-        var el = e.target || event.srcElement;
+        var el = e.target;
         if (el.tagName.toLowerCase() != 'jmnode') {
             return;
         }
@@ -320,7 +209,6 @@ class DraggableNode {
             return;
         }
         if (this.capture) {
-            console.log('move');
             e.preventDefault();
             this.show_shadow();
             this.moved = true;
@@ -397,6 +285,130 @@ class DraggableNode {
         this.moved = false;
         this.capture = false;
     }
+    lookup_target_node() {
+        let sx = this.shadow.offsetLeft;
+        let sy = this.shadow.offsetTop;
+        if (sx === this.shadow_p_x && sy === this.shadow_p_y) {
+            return;
+        }
+        this.shadow_p_x = sx;
+        this.shadow_p_y = sy;
+
+        let target_direction =
+            this.shadow_p_x + this.shadow_w / 2 >= this.get_root_x()
+                ? jsMind.direction.right
+                : jsMind.direction.left;
+        let overlapping_node = this.lookup_overlapping_node_parent(target_direction);
+        let target_node = overlapping_node || this.lookup_close_node(target_direction);
+        if (!!target_node) {
+            let points = this.calc_point_of_node(target_node, target_direction);
+            let invalid = jsMind.node.inherited(this.active_node, target_node);
+            this.magnet_shadow(points.sp, points.np, invalid);
+            this.target_node = target_node;
+            this.target_direct = target_direction;
+        }
+    }
+    get_root_x() {
+        let root = this.jm.get_root();
+        let root_location = root.get_location();
+        let root_size = root.get_size();
+        return root_location.x + root_size.w / 2;
+    }
+
+    lookup_overlapping_node_parent(direction) {
+        let shadowRect = this.shadow.getBoundingClientRect();
+        let x = shadowRect.x + (shadowRect.width * (1 - direction)) / 2;
+        let deltaX = (this.jm.options.layout.hspace + this.jm.options.layout.pspace) * direction;
+        let deltaY = shadowRect.height;
+        let points = [
+            [x, shadowRect.y],
+            [x, shadowRect.y + deltaY / 2],
+            [x, shadowRect.y + deltaY],
+            [x + deltaX / 2, shadowRect.y],
+            [x + deltaX / 2, shadowRect.y + deltaY / 2],
+            [x + deltaX / 2, shadowRect.y + deltaY],
+            [x + deltaX, shadowRect.y],
+            [x + deltaX, shadowRect.y + deltaY / 2],
+            [x + deltaX, shadowRect.y + deltaY],
+        ];
+        for (const p of points) {
+            let n = this.lookup_node_parent_by_location(p[0], p[1]);
+            if (!!n) {
+                return n;
+            }
+        }
+    }
+
+    lookup_node_parent_by_location(x, y) {
+        return $.d
+            .elementsFromPoint(x, y)
+            .filter(
+                x => x.tagName === 'JMNODE' && x.className !== this.options.shadow_node_class_name
+            )
+            .map(el => this.jm.view.get_binded_nodeid(el))
+            .map(id => id && this.jm.mind.nodes[id])
+            .map(n => n && n.parent)
+            .find(n => n);
+    }
+
+    lookup_close_node(direction) {
+        return Object.values(this.jm.mind.nodes)
+            .filter(n => n.direction == direction || n.isroot)
+            .filter(n => this.jm.layout.is_visible(n))
+            .filter(n => this.shadow_on_target_side(n, direction))
+            .map(n => ({ node: n, distance: this.shadow_to_node(n, direction) }))
+            .reduce(
+                (prev, curr) => {
+                    return prev.distance < curr.distance ? prev : curr;
+                },
+                { node: this.jm.get_root(), distance: Number.MAX_VALUE }
+            ).node;
+    }
+
+    shadow_on_target_side(node, dir) {
+        return (
+            (dir == jsMind.direction.right && this.shadow_to_right_of_node(node) > 0) ||
+            (dir == jsMind.direction.left && this.shadow_to_left_of_node(node) > 0)
+        );
+    }
+
+    shadow_to_right_of_node(node) {
+        return this.shadow_p_x - node.get_location().x - node.get_size().w;
+    }
+
+    shadow_to_left_of_node(node) {
+        return node.get_location().x - this.shadow_p_x - this.shadow_w;
+    }
+
+    shadow_to_base_line_of_node(node) {
+        return this.shadow_p_y + this.shadow_h / 2 - node.get_location().y - node.get_size().h / 2;
+    }
+
+    shadow_to_node(node, dir) {
+        let distance_x =
+            dir === jsMind.direction.right
+                ? Math.abs(this.shadow_to_right_of_node(node))
+                : Math.abs(this.shadow_to_left_of_node(node));
+        let distance_y = Math.abs(this.shadow_to_base_line_of_node(node));
+        return distance_x + distance_y;
+    }
+
+    calc_point_of_node(node, dir) {
+        let ns = node.get_size();
+        let nl = node.get_location();
+        let node_x = node.isroot
+            ? nl.x + ns.w / 2
+            : nl.x + (ns.w * (1 + dir)) / 2 + this.options.line_width * dir;
+        let node_y = nl.y + ns.h / 2;
+        let shadow_x =
+            this.shadow_p_x + (this.shadow_w * (1 - dir)) / 2 - this.options.line_width * dir;
+        let shadow_y = this.shadow_p_y + this.shadow_h / 2;
+        return {
+            sp: { x: shadow_x, y: shadow_y },
+            np: { x: node_x, y: node_y },
+        };
+    }
+
     move_node(src_node, target_node, target_direct) {
         var shadow_h = this.shadow.offsetTop;
         if (!!target_node && !!src_node && !jsMind.node.inherited(src_node, target_node)) {
