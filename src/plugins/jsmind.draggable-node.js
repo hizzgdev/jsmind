@@ -313,7 +313,6 @@ class DraggableNode {
             return;
         }
         if (this.capture) {
-            console.log('move');
             e.preventDefault();
             this.show_shadow();
             this.moved = true;
