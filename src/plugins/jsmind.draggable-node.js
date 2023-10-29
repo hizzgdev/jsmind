@@ -40,7 +40,7 @@ class DraggableNode {
         jsMind.util.json.merge(opts, DEFAULT_OPTIONS);
         jsMind.util.json.merge(opts, options);
 
-        this.version = '0.3.0';
+        this.version = '0.4.0';
         this.jm = jm;
         this.options = opts;
         this.e_canvas = null;
