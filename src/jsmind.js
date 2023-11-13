@@ -65,6 +65,7 @@ export default class jsMind {
             hide_scrollbars_when_draggable: this.options.view.hide_scrollbars_when_draggable,
             node_overflow: this.options.view.node_overflow,
             zoom: this.options.view.zoom,
+            custom_node_render: this.options.view.custom_node_render,
         };
         // create instance of function provider
         this.data = new DataProvider(this);
