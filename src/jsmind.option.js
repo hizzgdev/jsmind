@@ -31,7 +31,7 @@ const default_options = {
             max: 2.1,
             step: 0.1,
         },
-        custom_node_render: null
+        custom_node_render: null,
     },
     layout: {
         hspace: 30,

@@ -26,7 +26,9 @@ export class ViewProvider {
         this.editing_node = null;
 
         this.graph = null;
-        this.render_node = !!options.custom_node_render ? this._custom_node_render : this._default_node_render;
+        this.render_node = !!options.custom_node_render
+            ? this._custom_node_render
+            : this._default_node_render;
         this._initialized = false;
     }
     init() {
@@ -290,7 +292,7 @@ export class ViewProvider {
             element.style.zIndex = 'auto';
             element.removeChild(this.e_editor);
             if (util.text.is_empty(topic) || node.topic === topic) {
-                this.render_node(element, node)
+                this.render_node(element, node);
             } else {
                 this.jm.update_node(node.id, topic);
             }
