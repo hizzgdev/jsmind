@@ -26,6 +26,9 @@ export class ViewProvider {
         this.editing_node = null;
 
         this.graph = null;
+        this.render_node = !!options.custom_node_render
+            ? this._custom_node_render
+            : this._default_node_render;
         this._initialized = false;
     }
     init() {
@@ -185,11 +188,7 @@ export class ViewProvider {
             view_data.expander = d_e;
         }
         if (!!node.topic) {
-            if (this.opts.support_html) {
-                $.h(d, node.topic);
-            } else {
-                $.t(d, node.topic);
-            }
+            this.render_node(d, node);
         }
         d.setAttribute('nodeid', node.id);
         d.style.visibility = 'hidden';
@@ -224,11 +223,7 @@ export class ViewProvider {
         var view_data = node._data.view;
         var element = view_data.element;
         if (!!node.topic) {
-            if (this.opts.support_html) {
-                $.h(element, node.topic);
-            } else {
-                $.t(element, node.topic);
-            }
+            this.render_node(element, node);
         }
         if (this.layout.is_visible(node)) {
             view_data.width = element.clientWidth;
@@ -297,11 +292,7 @@ export class ViewProvider {
             element.style.zIndex = 'auto';
             element.removeChild(this.e_editor);
             if (util.text.is_empty(topic) || node.topic === topic) {
-                if (this.opts.support_html) {
-                    $.h(element, node.topic);
-                } else {
-                    $.t(element, node.topic);
-                }
+                this.render_node(element, node);
             } else {
                 this.jm.update_node(node.id, topic);
             }
@@ -446,6 +437,19 @@ export class ViewProvider {
                 expander.style.display = 'none';
                 expander.style.visibility = 'hidden';
             }
+        }
+    }
+    _default_node_render(ele, node) {
+        if (this.opts.support_html) {
+            $.h(ele, node.topic);
+        } else {
+            $.t(ele, node.topic);
+        }
+    }
+    _custom_node_render(ele, node) {
+        let rendered = this.opts.custom_node_render(this.jm, ele, node);
+        if (!rendered) {
+            this._default_node_render(ele, node);
         }
     }
     reset_node_custom_style(node) {
