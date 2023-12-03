@@ -10,6 +10,13 @@ beforeAll(() => {
     logger.error = jest.fn();
     logger.warn = jest.fn();
     logger.debug = jest.fn();
+
+    const observe = jest.fn();
+    const unobserve = jest.fn();
+    window.IntersectionObserver = jest.fn(() => ({
+        observe,
+        unobserve,
+    }));
 });
 
 const mockElement = {

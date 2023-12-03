@@ -73,7 +73,7 @@ export class ViewProvider {
             new IntersectionObserver((entities, observer) => {
                 if (entities[0].isIntersecting) {
                     observer.unobserve(this.e_panel);
-                    this.resize()
+                    this.resize();
                 }
             }).observe(this.e_panel);
         }
@@ -187,7 +187,9 @@ export class ViewProvider {
             func();
             return;
         }
-        logger.warn('init nodes in compatibility mode. because the container or its parent has style {display:none}. ')
+        logger.warn(
+            'init nodes in compatibility mode. because the container or its parent has style {display:none}. '
+        );
         this.e_panel.style.position = 'absolute';
         this.e_panel.style.top = '-100000';
         $.d.body.appendChild(this.e_panel);
