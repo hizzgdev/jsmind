@@ -68,7 +68,17 @@ export class ViewProvider {
         });
 
         this.container.appendChild(this.e_panel);
+
+        if (!this.container.offsetParent) {
+            new IntersectionObserver((entities, observer) => {
+                if (entities[0].isIntersecting) {
+                    observer.unobserve(this.e_panel);
+                    this.resize()
+                }
+            }).observe(this.e_panel);
+        }
     }
+
     add_event(obj, event_name, event_handle, capture_by_panel) {
         let target = !!capture_by_panel ? this.e_panel : this.e_nodes;
         $.on(target, event_name, function (e) {
@@ -159,13 +169,32 @@ export class ViewProvider {
             this.create_node_element(nodes[nodeid], doc_frag);
         }
         this.e_nodes.appendChild(doc_frag);
-        for (var nodeid in nodes) {
-            this.init_nodes_size(nodes[nodeid]);
-        }
+
+        this.run_in_c11y_mode_if_needed(() => {
+            for (var nodeid in nodes) {
+                this.init_nodes_size(nodes[nodeid]);
+            }
+        });
     }
     add_node(node) {
         this.create_node_element(node, this.e_nodes);
-        this.init_nodes_size(node);
+        this.run_in_c11y_mode_if_needed(() => {
+            this.init_nodes_size(node);
+        });
+    }
+    run_in_c11y_mode_if_needed(func) {
+        if (!!this.container.offsetParent) {
+            func();
+            return;
+        }
+        logger.warn('init nodes in compatibility mode. because the container or its parent has style {display:none}. ')
+        this.e_panel.style.position = 'absolute';
+        this.e_panel.style.top = '-100000';
+        $.d.body.appendChild(this.e_panel);
+        func();
+        this.container.appendChild(this.e_panel);
+        this.e_panel.style.position = null;
+        this.e_panel.style.top = null;
     }
     create_node_element(node, parent_node) {
         var view_data = null;
