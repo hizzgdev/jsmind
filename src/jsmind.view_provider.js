@@ -430,46 +430,61 @@ export class ViewProvider {
         var nodes = this.jm.mind.nodes;
         var node = null;
         var node_element = null;
-        var expander = null;
         var p = null;
-        var p_expander = null;
-        var expander_text = '-';
         var view_data = null;
-        var _offset = this.get_view_offset();
+        var view_offset = this.get_view_offset();
         for (var nodeid in nodes) {
             node = nodes[nodeid];
             view_data = node._data.view;
             node_element = view_data.element;
-            expander = view_data.expander;
             if (!this.layout.is_visible(node)) {
                 node_element.style.display = 'none';
-                expander.style.display = 'none';
+                view_data.expander.style.display = 'none';
                 continue;
             }
             this.reset_node_custom_style(node);
             p = this.layout.get_node_point(node);
-            view_data.abs_x = _offset.x + p.x;
-            view_data.abs_y = _offset.y + p.y;
-            node_element.style.left = _offset.x + p.x + 'px';
-            node_element.style.top = _offset.y + p.y + 'px';
+            view_data.abs_x = view_offset.x + p.x;
+            view_data.abs_y = view_offset.y + p.y;
+            node_element.style.left = view_offset.x + p.x + 'px';
+            node_element.style.top = view_offset.y + p.y + 'px';
             node_element.style.display = '';
             node_element.style.visibility = 'visible';
-            if (!node.isroot && node.children.length > 0) {
-                expander_text = node.expanded ? '-' : '+';
-                p_expander = this.layout.get_expander_point(node);
-                expander.style.left = _offset.x + p_expander.x + 'px';
-                expander.style.top = _offset.y + p_expander.y + 'px';
-                expander.style.display = '';
-                expander.style.visibility = 'visible';
-                $.t(expander, expander_text);
-            }
-            // hide expander while all children have been removed
-            if (!node.isroot && node.children.length == 0) {
-                expander.style.display = 'none';
-                expander.style.visibility = 'hidden';
-            }
+            this._show_expander(node, view_offset);
         }
     }
+    _show_expander(node, view_offset) {
+        if (node.isroot) {
+            return;
+        }
+
+        var expander = node._data.view.expander;
+        if (node.children.length == 0) {
+            expander.style.display = 'none';
+            expander.style.visibility = 'hidden';
+            return;
+        }
+
+        let expander_text = this._get_expander_text(node);
+        $.t(expander, expander_text);
+
+        let p_expander = this.layout.get_expander_point(node);
+        expander.style.left = view_offset.x + p_expander.x + 'px';
+        expander.style.top = view_offset.y + p_expander.y + 'px';
+        expander.style.display = '';
+        expander.style.visibility = 'visible';
+    }
+
+    _get_expander_text(node) {
+        let style = !!this.opts.expander_style ? this.opts.expander_style.toLowerCase() : 'char';
+        if (style === 'number') {
+            return node.children.length > 99 ? '...' : node.children.length;
+        }
+        if (style === 'char') {
+            return node.expanded ? '-' : '+';
+        }
+    }
+
     _default_node_render(ele, node) {
         if (this.opts.support_html) {
             $.h(ele, node.topic);

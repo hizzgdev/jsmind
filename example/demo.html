@@ -52,6 +52,7 @@
                     container: 'jsmind_container',
                     editable: true,
                     theme: 'primary',
+                    log_level: 'debug',
                     shortcut: {
                         handles: {
                             test: function (j, e) {
@@ -62,6 +63,9 @@
                             test: 89,
                         },
                     },
+                    view:{
+                        expander_style: 'number'
+                    }
                 };
                 _jm = new jsMind(options);
                 _jm.show(mind);
