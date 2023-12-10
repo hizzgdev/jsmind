@@ -66,6 +66,7 @@ export default class jsMind {
             node_overflow: this.options.view.node_overflow,
             zoom: this.options.view.zoom,
             custom_node_render: this.options.view.custom_node_render,
+            expander_style: this.options.view.expander_style,
         };
         // create instance of function provider
         this.data = new DataProvider(this);
