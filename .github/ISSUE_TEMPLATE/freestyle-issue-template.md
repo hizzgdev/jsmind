@@ -1,6 +1,6 @@
 ---
-name: Create an issue only when it is a real issue
-about: If it is not an issue, please create a discussion instead
+name: Bug report
+about: Report any issues that you have found with jsMind
 title: ''
 labels: ''
 assignees: ''
