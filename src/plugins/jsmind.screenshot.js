@@ -53,6 +53,7 @@ class JmScreenshot {
         let c = $.c('canvas');
         c.width = this.jm.view.size.w;
         c.height = this.jm.view.size.h;
+        c.style.visibility = 'hidden';
         this.jm.view.e_panel.appendChild(c);
         return c;
     }
@@ -73,7 +74,7 @@ class JmScreenshot {
 
     draw_nodes(ctx) {
         return domtoimage
-            .toSvg(this.jm.view.e_nodes)
+            .toSvg(this.jm.view.e_nodes, { style: { zoom: 1 } })
             .then(this.load_image)
             .then(function (img) {
                 ctx.drawImage(img, 0, 0);

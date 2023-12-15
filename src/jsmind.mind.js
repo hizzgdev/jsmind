@@ -219,8 +219,9 @@ export class Mind {
         }
         // clean all children
         children.length = 0;
+        var node_parent = node.parent;
         // remove from parent's children
-        var sibling = node.parent.children;
+        var sibling = node_parent.children;
         var si = sibling.length;
         while (si--) {
             if (sibling[si].id == node.id) {
@@ -236,7 +237,7 @@ export class Mind {
         }
         // remove it's self
         node = null;
-        //delete node;
+        this._update_index(node_parent);
         return true;
     }
     _put_node(node) {
