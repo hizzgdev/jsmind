@@ -365,7 +365,8 @@ export class ViewProvider {
         }
         let e_panel_rect = this.e_panel.getBoundingClientRect();
         if (
-            zoom < 1 && zoom < this.zoom_current &&
+            zoom < 1 &&
+            zoom < this.zoom_current &&
             this.size.w * zoom < e_panel_rect.width &&
             this.size.h * zoom < e_panel_rect.height
         ) {
