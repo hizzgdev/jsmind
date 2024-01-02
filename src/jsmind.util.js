@@ -7,59 +7,8 @@
  */
 
 import { $ } from './jsmind.dom.js';
-import { logger } from './jsmind.common.js';
 
 export const util = {
-    ajax: {
-        request: function (url, param, method, callback, fail_callback) {
-            var p = Object.keys(param)
-                .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(param[k]))
-                .join('&');
-            var xhr = new XMLHttpRequest();
-            if (!xhr) {
-                return;
-            }
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState == 4) {
-                    if (xhr.status == 200 || xhr.status == 0) {
-                        if (typeof callback === 'function') {
-                            var data = util.json.string2json(xhr.responseText);
-                            if (data != null) {
-                                callback(data);
-                            } else {
-                                callback(xhr.responseText);
-                            }
-                        }
-                    } else {
-                        if (typeof fail_callback === 'function') {
-                            fail_callback(xhr);
-                        } else {
-                            logger.error('xhr request failed.', xhr);
-                        }
-                    }
-                }
-            };
-            method = method || 'GET';
-            xhr.open(method, url, true);
-            xhr.setRequestHeader('If-Modified-Since', '0');
-            if (method == 'POST') {
-                xhr.setRequestHeader(
-                    'Content-Type',
-                    'application/x-www-form-urlencoded;charset=utf-8'
-                );
-                xhr.send(p);
-            } else {
-                xhr.send();
-            }
-        },
-        get: function (url, callback) {
-            return util.ajax.request(url, {}, 'GET', callback);
-        },
-        post: function (url, param, callback) {
-            return util.ajax.request(url, param, 'POST', callback);
-        },
-    },
-
     file: {
         read: function (file_data, fn_callback) {
             var reader = new FileReader();

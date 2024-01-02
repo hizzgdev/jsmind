@@ -80,11 +80,10 @@ function open_json() {
     _jm.show(mind);
 }
 
-function open_ajax() {
-    var mind_url = 'data_example.json';
-    jsMind.util.ajax.get(mind_url, function (mind) {
-        _jm.show(mind);
-    });
+function open_remote() {
+    fetch('data_example.json')
+        .then(resp => resp.json())
+        .then(mind => _jm.show(mind));
 }
 
 function screen_shot() {
