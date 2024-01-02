@@ -11,16 +11,14 @@ import { Mind } from './jsmind.mind.js';
 import { Node } from './jsmind.node.js';
 import { util } from './jsmind.util.js';
 
+const DEFAULT_META = { name: 'jsMind', author: __author__, version: __version__, };
+
 export const format = {
     node_tree: {
         example: {
-            meta: {
-                name: 'jsMind node_tree simple',
-                author: __author__,
-                version: __version__,
-            },
+            meta: DEFAULT_META,
             format: 'node_tree',
-            data: { id: 'root', topic: 'jsMind Example' },
+            data: { id: 'root', topic: 'jsMind node_tree example' },
         },
         get_mind: function (source) {
             var df = format.node_tree;
@@ -128,13 +126,9 @@ export const format = {
 
     node_array: {
         example: {
-            meta: {
-                name: 'jsMind node_array simple',
-                author: __author__,
-                version: __version__,
-            },
+            meta: DEFAULT_META,
             format: 'node_array',
-            data: [{ id: 'root', topic: 'jsMind Example', isroot: true }],
+            data: [{ id: 'root', topic: 'jsMind node_array example', isroot: true }],
         },
 
         get_mind: function (source) {
@@ -283,13 +277,9 @@ export const format = {
 
     freemind: {
         example: {
-            meta: {
-                name: 'jsMind freemind example',
-                author: __author__,
-                version: __version__,
-            },
+            meta: DEFAULT_META,
             format: 'freemind',
-            data: '<map version="1.0.1"><node ID="root" TEXT="freemind Example"/></map>',
+            data: '<map version="1.0.1"><node ID="root" TEXT="jsMind freemind example"/></map>',
         },
         get_mind: function (source) {
             var df = format.freemind;
@@ -457,13 +447,9 @@ export const format = {
     },
     text: {
         example: {
-            meta: {
-                name: 'jsMind text example',
-                author: __author__,
-                version: __version__,
-            },
+            meta: DEFAULT_META,
             format: 'text',
-            data: 'Text Example\n node1\n  node1-sub\n  node1-sub\n node2',
+            data: 'jsMind text example\n node1\n  node1-sub\n  node1-sub\n node2',
         },
         _line_regex: /\s*/,
         get_mind: function (source) {
