@@ -11,7 +11,7 @@ import { Mind } from './jsmind.mind.js';
 import { Node } from './jsmind.node.js';
 import { util } from './jsmind.util.js';
 
-const DEFAULT_META = { name: 'jsMind', author: __author__, version: __version__, };
+const DEFAULT_META = { name: 'jsMind', author: __author__, version: __version__ };
 
 export const format = {
     node_tree: {
