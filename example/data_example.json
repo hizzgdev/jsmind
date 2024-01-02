@@ -86,7 +86,7 @@
                 "topic": "test node",
                 "direction": "left",
                 "children": [
-                    { "id": "other1", "topic": "I'm from ajax" },
+                    { "id": "other1", "topic": "I'm from remote" },
                     { "id": "other2", "topic": "I can do everything" }
                 ]
             }
