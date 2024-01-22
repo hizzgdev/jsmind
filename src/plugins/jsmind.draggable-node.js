@@ -167,8 +167,9 @@ class DraggableNode {
         this.view_draggable = this.jm.get_view_draggable();
 
         var jview = this.jm.view;
-        var el = e.target;
-        if (el.tagName.toLowerCase() != 'jmnode') {
+        var el = this.find_node_element(e.target);
+        if (!el) {
+            console.log('throw away');
             return;
         }
         if (this.view_draggable) {
@@ -284,6 +285,19 @@ class DraggableNode {
         this.view_panel_rect = null;
         this.moved = false;
         this.capture = false;
+    }
+    find_node_element(el) {
+        if (
+            el === this.jm.view.e_nodes ||
+            el === this.jm.view.e_panel ||
+            el === this.jm.view.container
+        ) {
+            return null;
+        }
+        if (el.tagName.toLowerCase() === 'jmnode') {
+            return el;
+        }
+        return this.find_node_element(el.parentNode);
     }
     lookup_target_node() {
         let sx = this.shadow.offsetLeft;
