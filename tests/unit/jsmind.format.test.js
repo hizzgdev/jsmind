@@ -44,6 +44,7 @@ function checkMindData(mind) {
     expect(node1.id).toBe('easy');
     expect(node1.topic).toBe('Easy');
     expect(node1.direction).toBe(Direction.left);
+    expect(node1.expanded).toBe(false);
     expect(node1.children.length).toBe(1);
 
     const node2 = node1.children[0];
@@ -86,6 +87,7 @@ const fakeMindMaps = {
                     id: 'easy',
                     topic: 'Easy',
                     direction: 'left',
+                    expanded: false,
                     children: [{ id: 'easy1', topic: 'Easy to show', ext: 'addition data' }],
                 },
             ],
@@ -96,14 +98,14 @@ const fakeMindMaps = {
         format: 'node_array',
         data: [
             { id: 'root', topic: 'jsMind', isroot: true },
-            { id: 'easy', topic: 'Easy', parentid: 'root', direction: 'left' },
+            { id: 'easy', topic: 'Easy', parentid: 'root', direction: 'left', expanded: false },
             { id: 'easy1', topic: 'Easy to show', parentid: 'easy', ext: 'addition data' },
         ],
     },
     freemind: {
         meta: { name: 'test jsmind', author: 'hizzgdev', version: 'version' },
         format: 'freemind',
-        data: '<map version="1.0.1"> <node ID="root" TEXT="jsMind"> <attribute NAME="expanded" VALUE="true"/> <node ID="easy" POSITION="left" TEXT="Easy"> <attribute NAME="expanded" VALUE="true"/> <node ID="easy1" TEXT="Easy to show"> <attribute NAME="expanded" VALUE="true"/> <attribute NAME="ext" VALUE="addition data"/> </node> </node> </node> </map>',
+        data: '<map version="1.0.1"><node ID="root" TEXT="jsMind"><node ID="easy" POSITION="left" FOLDED="true" TEXT="Easy"><node ID="easy1" TEXT="Easy to show"><attribute NAME="ext" VALUE="addition data"/></node></node></node></map>',
     },
     text: {
         meta: { name: 'test jsmind', author: 'hizzgdev', version: 'version' },

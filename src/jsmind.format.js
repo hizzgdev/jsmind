@@ -369,7 +369,8 @@ export const format = {
                 }
             }
             var node_data = df._load_attributes(xml_node);
-            var node_expanded = 'expanded' in node_data ? node_data.expanded == 'true' : node_folded != 'true';
+            var node_expanded =
+                'expanded' in node_data ? node_data.expanded == 'true' : node_folded != 'true';
             delete node_data.expanded;
 
             var node_position = xml_node.getAttribute('POSITION');
@@ -447,8 +448,13 @@ export const format = {
         },
 
         _escape: function (text) {
-            return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&apos;').replace(/"/g, '&quot;');
-        }
+            return text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/'/g, '&apos;')
+                .replace(/"/g, '&quot;');
+        },
     },
     text: {
         example: {
