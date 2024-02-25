@@ -307,7 +307,7 @@ export const format = {
             xml_lines.push('<map version="1.0.1">');
             df._build_map(mind.root, xml_lines);
             xml_lines.push('</map>');
-            json.data = xml_lines.join(' ');
+            json.data = xml_lines.join('');
             return json;
         },
 
@@ -355,6 +355,7 @@ export const format = {
             var df = format.freemind;
             var node_id = xml_node.getAttribute('ID');
             var node_topic = xml_node.getAttribute('TEXT');
+            var node_folded = xml_node.getAttribute('FOLDED');
             // look for richcontent
             if (node_topic == null) {
                 var topic_children = xml_node.childNodes;
@@ -368,7 +369,7 @@ export const format = {
                 }
             }
             var node_data = df._load_attributes(xml_node);
-            var node_expanded = 'expanded' in node_data ? node_data.expanded == 'true' : true;
+            var node_expanded = 'expanded' in node_data ? node_data.expanded == 'true' : node_folded != 'true';
             delete node_data.expanded;
 
             var node_position = xml_node.getAttribute('POSITION');
@@ -419,14 +420,14 @@ export const format = {
                 pos = node.direction === Direction.left ? 'left' : 'right';
             }
             xml_lines.push('<node');
-            xml_lines.push('ID="' + node.id + '"');
+            xml_lines.push(' ID="' + node.id + '"');
             if (!!pos) {
-                xml_lines.push('POSITION="' + pos + '"');
+                xml_lines.push(' POSITION="' + pos + '"');
             }
-            xml_lines.push('TEXT="' + node.topic + '">');
-
-            // store expanded status as an attribute
-            xml_lines.push('<attribute NAME="expanded" VALUE="' + node.expanded + '"/>');
+            if (!node.expanded) {
+                xml_lines.push(' FOLDED="true"');
+            }
+            xml_lines.push(' TEXT="' + df._escape(node.topic) + '">');
 
             // for attributes
             var node_data = node.data;
@@ -444,6 +445,10 @@ export const format = {
 
             xml_lines.push('</node>');
         },
+
+        _escape: function (text) {
+            return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&apos;').replace(/"/g, '&quot;');
+        }
     },
     text: {
         example: {
