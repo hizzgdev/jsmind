@@ -25,6 +25,7 @@ const DEFAULT_OPTIONS = {
         left: $.w.location,
         right: 'https://github.com/hizzgdev/jsmind',
     },
+    background: 'transparent',
 };
 
 class JmScreenshot {
@@ -42,6 +43,7 @@ class JmScreenshot {
         let c = this.create_canvas();
         let ctx = c.getContext('2d');
         Promise.resolve(ctx)
+            .then(() => this.draw_background(ctx))
             .then(() => this.draw_lines(ctx))
             .then(() => this.draw_nodes(ctx))
             .then(() => this.draw_watermark(c, ctx))
@@ -60,6 +62,19 @@ class JmScreenshot {
 
     clear(c) {
         c.parentNode.removeChild(c);
+    }
+
+    draw_background(ctx) {
+        return new Promise(
+            function (resolve, _) {
+                const bg = this.options.background;
+                if (!!bg && bg !== 'transparent') {
+                    ctx.fillStyle = this.options.background;
+                    ctx.fillRect(0, 0, this.jm.view.size.w, this.jm.view.size.h);
+                }
+                resolve(ctx);
+            }.bind(this)
+        );
     }
 
     draw_lines(ctx) {
