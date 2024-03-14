@@ -181,8 +181,10 @@ export class Mind {
                         break;
                     }
                 }
+                let origin_parent = node.parent;
                 node.parent = parent_node;
                 parent_node.children.push(node);
+                this._update_index(origin_parent);
             }
 
             if (node.parent.isroot) {
