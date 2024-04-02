@@ -5,7 +5,7 @@
  * Project Home:
  *   https://github.com/hizzgdev/jsmind/
  */
-import { logger, EventType } from './jsmind.common.js';
+import { logger, EventType, then_if_promise, is_promise } from './jsmind.common.js';
 import { $ } from './jsmind.dom.js';
 import { init_graph } from './jsmind.graph.js';
 import { util } from './jsmind.util.js';
@@ -137,10 +137,10 @@ export class ViewProvider {
         }
     }
     load() {
-        logger.debug('view.load');
         this.setup_canvas_draggable(this.opts.draggable);
-        this.init_nodes();
+        const init_res = this.init_nodes();
         this._initialized = true;
+        return init_res;
     }
     expand_size() {
         var min_size = this.layout.get_min_size();
@@ -165,18 +165,38 @@ export class ViewProvider {
     init_nodes() {
         var nodes = this.jm.mind.nodes;
         var doc_frag = $.d.createDocumentFragment();
-        for (var nodeid in nodes) {
-            this.create_node_element(nodes[nodeid], doc_frag);
+        const no_promise_ids = [];
+        const promises = [];
+
+        for (let nodeid in nodes) {
+            const obj = this.create_node_element(nodes[nodeid], doc_frag);
+            if (is_promise(obj)) {
+                // 如果返回是一个 promise，等待 promise 结束后再异步执行后续逻辑
+                promises.push(
+                    obj.then(() => {
+                        //logger.info('[view.init_nodes] promise then. node:', nodes[nodeid]);
+                        this.run_in_c11y_mode_if_needed(() => {
+                            this.init_nodes_size(nodes[nodeid]);
+                        });
+                    })
+                );
+            } else {
+                no_promise_ids.push(nodeid);
+            }
         }
         this.e_nodes.appendChild(doc_frag);
 
         this.run_in_c11y_mode_if_needed(() => {
-            for (var nodeid in nodes) {
+            for (var nodeid of no_promise_ids) {
                 this.init_nodes_size(nodes[nodeid]);
             }
         });
+        if (promises.length > 0) {
+            return Promise.all(promises); //该 Promise 在所有子 Promise 完成后解决
+        }
     }
     add_node(node) {
+        //logger.info('[view.add_node] node:', node);
         this.create_node_element(node, this.e_nodes);
         this.run_in_c11y_mode_if_needed(() => {
             this.init_nodes_size(node);
@@ -218,8 +238,13 @@ export class ViewProvider {
             parent_node.appendChild(d_e);
             view_data.expander = d_e;
         }
+        let render_promise;
         if (!!node.topic) {
-            this.render_node(d, node);
+            //logger.info('[view.create_node_element] node:', node);
+            const obj = this.render_node(d, node);
+            if (is_promise(obj)) {
+                render_promise = obj;
+            }
         }
         d.setAttribute('nodeid', node.id);
         d.style.visibility = 'hidden';
@@ -227,6 +252,9 @@ export class ViewProvider {
 
         parent_node.appendChild(d);
         view_data.element = d;
+        if (!!render_promise) {
+            return render_promise;
+        }
     }
     remove_node(node) {
         if (this.selected_node != null && this.selected_node.id == node.id) {
@@ -252,20 +280,30 @@ export class ViewProvider {
     }
     update_node(node) {
         var view_data = node._data.view;
-        var element = view_data.element;
+        let element = view_data.element;
+        let render_promise;
         if (!!node.topic) {
-            this.render_node(element, node);
+            //logger.info('[view.update_node] node:', node);
+            console.trace('update_node');
+            const obj = this.render_node(element, node);
+            if (is_promise(obj)) {
+                //logger.info('[view.update_node] render_node returns promise. node:', node);
+                render_promise = obj;
+            }
         }
-        if (this.layout.is_visible(node)) {
-            view_data.width = element.clientWidth;
-            view_data.height = element.clientHeight;
-        } else {
-            let origin_style = element.getAttribute('style');
-            element.style = 'visibility: visible; left:0; top:0;';
-            view_data.width = element.clientWidth;
-            view_data.height = element.clientHeight;
-            element.style = origin_style;
-        }
+        const follow_logic = () => {
+            if (this.layout.is_visible(node)) {
+                view_data.width = element.clientWidth;
+                view_data.height = element.clientHeight;
+            } else {
+                let origin_style = element.getAttribute('style');
+                element.style = 'visibility: visible; left:0; top:0;';
+                view_data.width = element.clientWidth;
+                view_data.height = element.clientHeight;
+                element.style = origin_style;
+            }
+        };
+        return then_if_promise(render_promise, follow_logic);
     }
     select_node(node) {
         if (!!this.selected_node) {
@@ -314,6 +352,7 @@ export class ViewProvider {
         this.e_editor.select();
     }
     edit_node_end() {
+        let render_promise;
         if (this.editing_node != null) {
             var node = this.editing_node;
             this.editing_node = null;
@@ -322,13 +361,22 @@ export class ViewProvider {
             var topic = this.e_editor.value;
             element.style.zIndex = 'auto';
             element.removeChild(this.e_editor);
+
+            //logger.info('[view.edit_node_end] node:', node);
+            let obj;
             if (util.text.is_empty(topic) || node.topic === topic) {
-                this.render_node(element, node);
+                obj = this.render_node(element, node);
             } else {
-                this.jm.update_node(node.id, topic);
+                obj = this.jm.update_node(node.id, topic);
+            }
+            if (is_promise(obj)) {
+                render_promise = obj;
             }
         }
-        this.e_panel.focus();
+        const _this = this;
+        then_if_promise(render_promise, () => {
+            _this.e_panel.focus();
+        });
     }
     get_view_offset() {
         var bounds = this.layout.bounds;
@@ -494,8 +542,11 @@ export class ViewProvider {
         }
     }
     _custom_node_render(ele, node) {
-        let rendered = this.opts.custom_node_render(this.jm, ele, node);
-        if (!rendered) {
+        let obj = this.opts.custom_node_render(this.jm, ele, node);
+        if (is_promise(obj)) {
+            return obj;
+        }
+        if (!obj) {
             this._default_node_render(ele, node);
         }
     }

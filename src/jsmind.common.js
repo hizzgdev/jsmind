@@ -84,3 +84,22 @@ function setup_logger_level(log_level) {
         logger.error = console.error;
     }
 }
+
+// 如果 promise 不为空，则认为是 promise，执行 promise.then(follow_logic) 并返回新的 promise
+export function then_if_promise(promise, follow_logic) {
+    if (!!promise) {
+        return promise.then(() => {
+            follow_logic();
+        });
+    } else {
+        follow_logic();
+    }
+}
+
+export function is_promise(obj) {
+    return (
+        !!obj &&
+        (typeof obj === 'object' || typeof obj === 'function') &&
+        typeof obj.then === 'function'
+    );
+}

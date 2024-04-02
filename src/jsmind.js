@@ -7,6 +7,7 @@
  */
 
 import { __version__, logger, EventType, Direction, LogLevel } from './jsmind.common.js';
+import { then_if_promise } from './jsmind.common.js';
 import { merge_option } from './jsmind.option.js';
 import { Mind } from './jsmind.mind.js';
 import { Node } from './jsmind.node.js';
@@ -285,16 +286,21 @@ export default class jsMind {
             logger.debug('data.load ok');
         }
 
-        this.view.load();
+        const view_load_promise = this.view.load();
         logger.debug('view.load ok');
 
-        this.layout.layout();
-        logger.debug('layout.layout ok');
+        const tail_process = () => {
+            this.layout.layout();
+            logger.debug('layout.layout ok');
 
-        this.view.show(true);
-        logger.debug('view.show ok');
+            this.view.show(true);
+            logger.debug('view.show ok');
 
-        this.invoke_event_handle(EventType.show, { data: [mind] });
+            this.invoke_event_handle(EventType.show, { data: [mind] });
+            //logger.info('[jsmind._show] tail_process done.');
+        };
+
+        then_if_promise(view_load_promise, tail_process);
     }
     show(mind) {
         this._reset();
@@ -430,6 +436,7 @@ export default class jsMind {
         }
     }
     update_node(node_id, topic) {
+        //logger.info('[jsmind.update_node] node_id:' + node_id + ', topic:', topic);
         if (this.get_editable()) {
             if (_util.text.is_empty(topic)) {
                 logger.warn('fail, topic can not be empty');
@@ -443,14 +450,19 @@ export default class jsMind {
                     return;
                 }
                 node.topic = topic;
-                this.view.update_node(node);
-                this.layout.layout();
-                this.view.show(false);
-                this.invoke_event_handle(EventType.edit, {
-                    evt: 'update_node',
-                    data: [node_id, topic],
-                    node: node_id,
-                });
+                const promise = this.view.update_node(node);
+                const follow_logic = () => {
+                    this.layout.layout();
+                    this.view.show(false);
+                    this.invoke_event_handle(EventType.edit, {
+                        evt: 'update_node',
+                        data: [node_id, topic],
+                        node: node_id,
+                    });
+                    //logger.info('[jsmind.update_node] follow_logic node_id:' + node_id);
+                };
+                //logger.info('[jsmind.update_node] view.update_node return promise?:', !!promise);
+                return then_if_promise(promise, follow_logic);
             }
         } else {
             logger.error('fail, this mind map is not editable');
