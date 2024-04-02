@@ -444,11 +444,12 @@ export default class jsMind {
             }
             var node = this.get_node(node_id);
             if (!!node) {
-                if (node.topic === topic) {
-                    logger.info('nothing changed');
-                    this.view.update_node(node);
-                    return;
-                }
+                // 为了在 react 场景下，能通过编辑不修改退出这个场景，暂时注释掉下面代码
+                // if (node.topic === topic) {
+                //     logger.info('nothing changed');
+                //     this.view.update_node(node);
+                //     return;
+                // }
                 node.topic = topic;
                 const promise = this.view.update_node(node);
                 const follow_logic = () => {

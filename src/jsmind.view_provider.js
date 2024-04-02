@@ -284,11 +284,30 @@ export class ViewProvider {
         let render_promise;
         if (!!node.topic) {
             //logger.info('[view.update_node] node:', node);
-            console.trace('update_node');
-            const obj = this.render_node(element, node);
+
+            //const obj = this.render_node(element, node);
+            // 这里如果直接复用 element 来渲染， react 会报错： Warning: render(...): It looks like the React-rendered
+            // content of this container was removed without using React. This is not supported and will cause errors.
+            // Instead, call ReactDOM.unmountComponentAtNode to empty a container.
+            // const obj = this.render_node(element, node);
+            // 所以新建一个节点来渲染，并替换掉原来的节点
+            let d = element;
+            if (view_data.promise_rendered) {
+                d = $.c('jmnode');
+            }
+            const obj = this.render_node(d, node);
             if (is_promise(obj)) {
                 //logger.info('[view.update_node] render_node returns promise. node:', node);
-                render_promise = obj;
+                render_promise = obj.then(() => {
+                    if (!!element.parentNode) {
+                        element.parentNode.replaceChild(d, element);
+                    }
+                    view_data.element = d;
+                    element = d;
+                    d.setAttribute('nodeid', node.id);
+                    d.style.visibility = 'hidden';
+                    this._reset_node_custom_style(d, node.data);
+                });
             }
         }
         const follow_logic = () => {
@@ -365,7 +384,24 @@ export class ViewProvider {
             //logger.info('[view.edit_node_end] node:', node);
             let obj;
             if (util.text.is_empty(topic) || node.topic === topic) {
-                obj = this.render_node(element, node);
+                // //obj = this.render_node(element, node);
+                // //obj = this.update_node(node);
+                // let d = element;
+                // if (view_data.promise_rendered) {
+                //     d = $.c('jmnode');
+                // }
+                // obj = this.render_node(d, node);
+                // if (is_promise(obj)) {
+                //     obj = obj.then(() => {
+                //         element.parentNode.replaceChild(d, element);
+                //         view_data.element = d;
+                //         element = d;
+                //         d.setAttribute('nodeid', node.id);
+                //         this._reset_node_custom_style(d, node.data);
+                //     });
+                // }
+                // 上面代码，总是在编辑不改变内容退出时，节点消失。所以暂时和下面代码保持一致
+                obj = this.jm.update_node(node.id, topic);
             } else {
                 obj = this.jm.update_node(node.id, topic);
             }
@@ -544,6 +580,7 @@ export class ViewProvider {
     _custom_node_render(ele, node) {
         let obj = this.opts.custom_node_render(this.jm, ele, node);
         if (is_promise(obj)) {
+            node._data.view.promise_rendered = true;
             return obj;
         }
         if (!obj) {
