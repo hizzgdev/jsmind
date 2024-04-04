@@ -335,22 +335,23 @@ export default class jsMind {
             }
             var node = this.mind.add_node(the_parent_node, node_id, topic, data, dir);
             if (!!node) {
-                this.view.add_node(node);
-                this.layout.layout();
-                this.view.show(false);
-                this.view.reset_node_custom_style(node);
-                this.expand_node(the_parent_node);
-                this.invoke_event_handle(EventType.edit, {
-                    evt: 'add_node',
-                    data: [the_parent_node.id, node_id, topic, data, dir],
-                    node: node_id,
+                return this.view.add_node(node).then(() => {
+                    this.layout.layout();
+                    this.view.show(false);
+                    this.view.reset_node_custom_style(node);
+                    this.expand_node(the_parent_node);
+                    this.invoke_event_handle(EventType.edit, {
+                        evt: 'add_node',
+                        data: [the_parent_node.id, node_id, topic, data, dir],
+                        node: node_id,
+                    });
+                    return node;
                 });
             }
-            return node;
         } else {
             logger.error('fail, this mind map is not editable');
-            return null;
         }
+        return Promise.resolve(null);
     }
     insert_node_before(node_before, node_id, topic, data, direction) {
         if (this.get_editable()) {
@@ -361,13 +362,14 @@ export default class jsMind {
             }
             var node = this.mind.insert_node_before(the_node_before, node_id, topic, data, dir);
             if (!!node) {
-                this.view.add_node(node);
-                this.layout.layout();
-                this.view.show(false);
-                this.invoke_event_handle(EventType.edit, {
-                    evt: 'insert_node_before',
-                    data: [the_node_before.id, node_id, topic, data, dir],
-                    node: node_id,
+                this.view.add_node(node).then(() => {
+                    this.layout.layout();
+                    this.view.show(false);
+                    this.invoke_event_handle(EventType.edit, {
+                        evt: 'insert_node_before',
+                        data: [the_node_before.id, node_id, topic, data, dir],
+                        node: node_id,
+                    });
                 });
             }
             return node;
@@ -385,13 +387,14 @@ export default class jsMind {
             }
             var node = this.mind.insert_node_after(the_node_after, node_id, topic, data, dir);
             if (!!node) {
-                this.view.add_node(node);
-                this.layout.layout();
-                this.view.show(false);
-                this.invoke_event_handle(EventType.edit, {
-                    evt: 'insert_node_after',
-                    data: [the_node_after.id, node_id, topic, data, dir],
-                    node: node_id,
+                this.view.add_node(node).then(() => {
+                    this.layout.layout();
+                    this.view.show(false);
+                    this.invoke_event_handle(EventType.edit, {
+                        evt: 'insert_node_after',
+                        data: [the_node_after.id, node_id, topic, data, dir],
+                        node: node_id,
+                    });
                 });
             }
             return node;

@@ -81,11 +81,12 @@ export class ShortcutProvider {
         var selected_node = _jm.get_selected_node();
         if (!!selected_node) {
             var node_id = this._newid();
-            var node = _jm.add_node(selected_node, node_id, 'New Node');
-            if (!!node) {
-                _jm.select_node(node_id);
-                _jm.begin_edit(node_id);
-            }
+            _jm.add_node(selected_node, node_id, 'New Node').then(node => {
+                if (!!node) {
+                    _jm.select_node(node_id);
+                    _jm.begin_edit(node_id);
+                }
+            });
         }
     }
     handle_addbrother(_jm, e) {

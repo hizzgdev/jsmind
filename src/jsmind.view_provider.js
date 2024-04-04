@@ -165,41 +165,26 @@ export class ViewProvider {
     init_nodes() {
         var nodes = this.jm.mind.nodes;
         var doc_frag = $.d.createDocumentFragment();
-        const no_promise_ids = [];
         const promises = [];
 
         for (let nodeid in nodes) {
-            const obj = this.create_node_element(nodes[nodeid], doc_frag);
-            if (is_promise(obj)) {
-                // 如果返回是一个 promise，等待 promise 结束后再异步执行后续逻辑
-                promises.push(
-                    obj.then(() => {
-                        //logger.info('[view.init_nodes] promise then. node:', nodes[nodeid]);
-                        this.run_in_c11y_mode_if_needed(() => {
-                            this.init_nodes_size(nodes[nodeid]);
-                        });
-                    })
-                );
-            } else {
-                no_promise_ids.push(nodeid);
-            }
+            promises.push(
+                this.create_node_element(nodes[nodeid], doc_frag).then(() => {
+                    this.run_in_c11y_mode_if_needed(() => {
+                        this.init_nodes_size(nodes[nodeid]);
+                    });
+                })
+            );
         }
         this.e_nodes.appendChild(doc_frag);
-
-        this.run_in_c11y_mode_if_needed(() => {
-            for (var nodeid of no_promise_ids) {
-                this.init_nodes_size(nodes[nodeid]);
-            }
-        });
-        if (promises.length > 0) {
-            return Promise.all(promises); //该 Promise 在所有子 Promise 完成后解决
-        }
+        return Promise.all(promises); //该 Promise 在所有子 Promise 完成后解决
     }
     add_node(node) {
         //logger.info('[view.add_node] node:', node);
-        this.create_node_element(node, this.e_nodes);
-        this.run_in_c11y_mode_if_needed(() => {
-            this.init_nodes_size(node);
+        return this.create_node_element(node, this.e_nodes).then(() => {
+            this.run_in_c11y_mode_if_needed(() => {
+                this.init_nodes_size(node);
+            });
         });
     }
     run_in_c11y_mode_if_needed(func) {
@@ -238,13 +223,9 @@ export class ViewProvider {
             parent_node.appendChild(d_e);
             view_data.expander = d_e;
         }
-        let render_promise;
+        let render_promise = Promise.resolve();
         if (!!node.topic) {
-            //logger.info('[view.create_node_element] node:', node);
-            const obj = this.render_node(d, node);
-            if (is_promise(obj)) {
-                render_promise = obj;
-            }
+            render_promise = this.render_node(d, node);
         }
         d.setAttribute('nodeid', node.id);
         d.style.visibility = 'hidden';
@@ -252,9 +233,7 @@ export class ViewProvider {
 
         parent_node.appendChild(d);
         view_data.element = d;
-        if (!!render_promise) {
-            return render_promise;
-        }
+        return render_promise;
     }
     remove_node(node) {
         if (this.selected_node != null && this.selected_node.id == node.id) {
@@ -281,10 +260,8 @@ export class ViewProvider {
     update_node(node) {
         var view_data = node._data.view;
         let element = view_data.element;
-        let render_promise;
+        let render_promise = Promise.resolve();
         if (!!node.topic) {
-            //logger.info('[view.update_node] node:', node);
-
             //const obj = this.render_node(element, node);
             // 这里如果直接复用 element 来渲染， react 会报错： Warning: render(...): It looks like the React-rendered
             // content of this container was removed without using React. This is not supported and will cause errors.
@@ -295,22 +272,19 @@ export class ViewProvider {
             if (view_data.promise_rendered) {
                 d = $.c('jmnode');
             }
-            const obj = this.render_node(d, node);
-            if (is_promise(obj)) {
-                //logger.info('[view.update_node] render_node returns promise. node:', node);
-                render_promise = obj.then(() => {
-                    if (!!element.parentNode) {
-                        element.parentNode.replaceChild(d, element);
-                    }
-                    view_data.element = d;
-                    element = d;
-                    d.setAttribute('nodeid', node.id);
-                    d.style.visibility = 'hidden';
-                    this._reset_node_custom_style(d, node.data);
-                });
-            }
+
+            render_promise = this.render_node(d, node).then(() => {
+                if (!!element.parentNode) {
+                    element.parentNode.replaceChild(d, element);
+                }
+                view_data.element = d;
+                element = d;
+                d.setAttribute('nodeid', node.id);
+                d.style.visibility = 'hidden';
+                this._reset_node_custom_style(d, node.data);
+            });
         }
-        const follow_logic = () => {
+        return render_promise.then(() => {
             if (this.layout.is_visible(node)) {
                 view_data.width = element.clientWidth;
                 view_data.height = element.clientHeight;
@@ -321,8 +295,7 @@ export class ViewProvider {
                 view_data.height = element.clientHeight;
                 element.style = origin_style;
             }
-        };
-        return then_if_promise(render_promise, follow_logic);
+        });
     }
     select_node(node) {
         if (!!this.selected_node) {
@@ -382,29 +355,7 @@ export class ViewProvider {
             element.removeChild(this.e_editor);
 
             //logger.info('[view.edit_node_end] node:', node);
-            let obj;
-            if (util.text.is_empty(topic) || node.topic === topic) {
-                // //obj = this.render_node(element, node);
-                // //obj = this.update_node(node);
-                // let d = element;
-                // if (view_data.promise_rendered) {
-                //     d = $.c('jmnode');
-                // }
-                // obj = this.render_node(d, node);
-                // if (is_promise(obj)) {
-                //     obj = obj.then(() => {
-                //         element.parentNode.replaceChild(d, element);
-                //         view_data.element = d;
-                //         element = d;
-                //         d.setAttribute('nodeid', node.id);
-                //         this._reset_node_custom_style(d, node.data);
-                //     });
-                // }
-                // 上面代码，总是在编辑不改变内容退出时，节点消失。所以暂时和下面代码保持一致
-                obj = this.jm.update_node(node.id, topic);
-            } else {
-                obj = this.jm.update_node(node.id, topic);
-            }
+            let obj = this.jm.update_node(node.id, topic);
             if (is_promise(obj)) {
                 render_promise = obj;
             }
@@ -576,6 +527,7 @@ export class ViewProvider {
         } else {
             $.t(ele, node.topic);
         }
+        return Promise.resolve();
     }
     _custom_node_render(ele, node) {
         let obj = this.opts.custom_node_render(this.jm, ele, node);
@@ -584,8 +536,9 @@ export class ViewProvider {
             return obj;
         }
         if (!obj) {
-            this._default_node_render(ele, node);
+            return this._default_node_render(ele, node);
         }
+        return Promise.resolve();
     }
     reset_node_custom_style(node) {
         this._reset_node_custom_style(node._data.view.element, node.data);
