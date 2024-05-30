@@ -7,7 +7,7 @@
  */
 
 import { $ } from './jsmind.dom.js';
-import {logger} from "./jsmind.common.js";
+import { logger } from './jsmind.common.js';
 
 class SvgGraph {
     constructor(view) {
@@ -21,14 +21,27 @@ class SvgGraph {
             straight: this._line_to,
             curved: this._bezier_to,
         };
-        if (typeof this.opts.line_style === 'function') {
-            this.drawing = this.opts.line_style;
-        } else {
-            this.drawing = this.line_drawing[this.opts.line_style] || this.line_drawing.curved;
-        }
+        this.init_line_style();
     }
     static c(tag) {
         return $.d.createElementNS('http://www.w3.org/2000/svg', tag);
+    }
+    init_line_style() {
+        if (typeof this.opts.custom_line_render === 'function') {
+            this.drawing = (path, x1, y1, x2, y2) => {
+                try {
+                    this.opts.custom_line_render.call(this, {
+                        ctx: path,
+                        start_point: { x: x1, y: y1 },
+                        end_point: { x: x2, y: y2 },
+                    });
+                } catch (e) {
+                    logger.error('custom line renderer error: ', e);
+                }
+            };
+        } else {
+            this.drawing = this.line_drawing[this.opts.line_style] || this.line_drawing.curved;
+        }
     }
     element() {
         return this.e_svg;
@@ -53,18 +66,13 @@ class SvgGraph {
         line.setAttribute('fill', 'transparent');
         this.lines.push(line);
         this.e_svg.appendChild(line);
-        try {
-            this.drawing.call(
-              this,
-              line,
-              pin.x + offset.x,
-              pin.y + offset.y,
-              pout.x + offset.x,
-              pout.y + offset.y
-            );
-        } catch (e) {
-            logger.error('draw_line error: ',e);
-        }
+        this.drawing(
+            line,
+            pin.x + offset.x,
+            pin.y + offset.y,
+            pout.x + offset.x,
+            pout.y + offset.y
+        );
     }
 
     copy_to(dest_canvas_ctx, callback) {
@@ -113,8 +121,22 @@ class CanvasGraph {
             straight: this._line_to,
             curved: this._bezier_to,
         };
-        if (typeof this.opts.line_style === 'function') {
-            this.drawing = this.opts.line_style;
+        this.init_line_style();
+    }
+    init_line_style() {
+        if (typeof this.opts.custom_line_render === 'function') {
+            this.drawing = (ctx, x1, y1, x2, y2) => {
+                try {
+                    this.opts.custom_line_render.call(this, {
+                        ctx,
+                        start_point: { x: x1, y: y1 },
+                        end_point: { x: x2, y: y2 },
+                    });
+                    console.log('custom line render jsmind');
+                } catch (e) {
+                    logger.error('custom line render error: ', e);
+                }
+            };
         } else {
             this.drawing = this.line_drawing[this.opts.line_style] || this.line_drawing.curved;
         }
@@ -136,11 +158,7 @@ class CanvasGraph {
         ctx.strokeStyle = color || this.opts.line_color;
         ctx.lineWidth = this.opts.line_width;
         ctx.lineCap = 'round';
-        try {
-            this.drawing.call(this, ctx, pin.x + offset.x, pin.y + offset.y, pout.x + offset.x, pout.y + offset.y);
-        } catch (e) {
-            logger.error('draw_line error: ', e);
-        }
+        this.drawing(ctx, pin.x + offset.x, pin.y + offset.y, pout.x + offset.x, pout.y + offset.y);
     }
     copy_to(dest_canvas_ctx, callback) {
         dest_canvas_ctx.drawImage(this.e_canvas, 0, 0);
