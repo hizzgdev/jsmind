@@ -20,7 +20,11 @@ class SvgGraph {
             straight: this._line_to,
             curved: this._bezier_to,
         };
-        this.drawing = this.line_drawing[this.opts.line_style] || this.line_drawing.curved;
+        if (typeof this.opts.line_style === 'function') {
+            this.drawing = this.opts.line_style;
+        } else {
+            this.drawing = this.line_drawing[this.opts.line_style] || this.line_drawing.curved;
+        }
     }
     static c(tag) {
         return $.d.createElementNS('http://www.w3.org/2000/svg', tag);
@@ -103,7 +107,11 @@ class CanvasGraph {
             straight: this._line_to,
             curved: this._bezier_to,
         };
-        this.drawing = this.line_drawing[this.opts.line_style] || this.line_drawing.curved;
+        if (typeof this.opts.line_style === 'function') {
+            this.drawing = this.opts.line_style;
+        } else {
+            this.drawing = this.line_drawing[this.opts.line_style] || this.line_drawing.curved;
+        }
     }
     element() {
         return this.e_canvas;
