@@ -7,6 +7,7 @@
  */
 
 import { $ } from './jsmind.dom.js';
+import {logger} from "./jsmind.common.js";
 
 class SvgGraph {
     constructor(view) {
@@ -52,13 +53,18 @@ class SvgGraph {
         line.setAttribute('fill', 'transparent');
         this.lines.push(line);
         this.e_svg.appendChild(line);
-        this.drawing(
-            line,
-            pin.x + offset.x,
-            pin.y + offset.y,
-            pout.x + offset.x,
-            pout.y + offset.y
-        );
+        try {
+            this.drawing.call(
+              this,
+              line,
+              pin.x + offset.x,
+              pin.y + offset.y,
+              pout.x + offset.x,
+              pout.y + offset.y
+            );
+        } catch (e) {
+            logger.error('draw_line error: ',e);
+        }
     }
 
     copy_to(dest_canvas_ctx, callback) {
@@ -130,7 +136,11 @@ class CanvasGraph {
         ctx.strokeStyle = color || this.opts.line_color;
         ctx.lineWidth = this.opts.line_width;
         ctx.lineCap = 'round';
-        this.drawing(ctx, pin.x + offset.x, pin.y + offset.y, pout.x + offset.x, pout.y + offset.y);
+        try {
+            this.drawing.call(this, ctx, pin.x + offset.x, pin.y + offset.y, pout.x + offset.x, pout.y + offset.y);
+        } catch (e) {
+            logger.error('draw_line error: ', e);
+        }
     }
     copy_to(dest_canvas_ctx, callback) {
         dest_canvas_ctx.drawImage(this.e_canvas, 0, 0);
