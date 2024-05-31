@@ -21,12 +21,12 @@ class SvgGraph {
             straight: this._line_to,
             curved: this._bezier_to,
         };
-        this.init_line_style();
+        this.init_line_render();
     }
     static c(tag) {
         return $.d.createElementNS('http://www.w3.org/2000/svg', tag);
     }
-    init_line_style() {
+    init_line_render() {
         if (typeof this.opts.custom_line_render === 'function') {
             this.drawing = (path, x1, y1, x2, y2) => {
                 try {
@@ -121,9 +121,9 @@ class CanvasGraph {
             straight: this._line_to,
             curved: this._bezier_to,
         };
-        this.init_line_style();
+        this.init_line_render();
     }
-    init_line_style() {
+    init_line_render() {
         if (typeof this.opts.custom_line_render === 'function') {
             this.drawing = (ctx, x1, y1, x2, y2) => {
                 try {
