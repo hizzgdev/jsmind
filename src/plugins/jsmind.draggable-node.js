@@ -169,7 +169,6 @@ class DraggableNode {
         var jview = this.jm.view;
         var el = this.find_node_element(e.target);
         if (!el) {
-            console.log('throw away');
             return;
         }
         if (this.view_draggable) {
