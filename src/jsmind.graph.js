@@ -7,6 +7,7 @@
  */
 
 import { $ } from './jsmind.dom.js';
+import { logger } from './jsmind.common.js';
 
 class SvgGraph {
     constructor(view) {
@@ -20,10 +21,27 @@ class SvgGraph {
             straight: this._line_to,
             curved: this._bezier_to,
         };
-        this.drawing = this.line_drawing[this.opts.line_style] || this.line_drawing.curved;
+        this.init_line_render();
     }
     static c(tag) {
         return $.d.createElementNS('http://www.w3.org/2000/svg', tag);
+    }
+    init_line_render() {
+        if (typeof this.opts.custom_line_render === 'function') {
+            this.drawing = (path, x1, y1, x2, y2) => {
+                try {
+                    this.opts.custom_line_render.call(this, {
+                        ctx: path,
+                        start_point: { x: x1, y: y1 },
+                        end_point: { x: x2, y: y2 },
+                    });
+                } catch (e) {
+                    logger.error('custom line renderer error: ', e);
+                }
+            };
+        } else {
+            this.drawing = this.line_drawing[this.opts.line_style] || this.line_drawing.curved;
+        }
     }
     element() {
         return this.e_svg;
@@ -103,7 +121,24 @@ class CanvasGraph {
             straight: this._line_to,
             curved: this._bezier_to,
         };
-        this.drawing = this.line_drawing[this.opts.line_style] || this.line_drawing.curved;
+        this.init_line_render();
+    }
+    init_line_render() {
+        if (typeof this.opts.custom_line_render === 'function') {
+            this.drawing = (ctx, x1, y1, x2, y2) => {
+                try {
+                    this.opts.custom_line_render.call(this, {
+                        ctx,
+                        start_point: { x: x1, y: y1 },
+                        end_point: { x: x2, y: y2 },
+                    });
+                } catch (e) {
+                    logger.error('custom line render error: ', e);
+                }
+            };
+        } else {
+            this.drawing = this.line_drawing[this.opts.line_style] || this.line_drawing.curved;
+        }
     }
     element() {
         return this.e_canvas;

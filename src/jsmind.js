@@ -61,6 +61,7 @@ export default class jsMind {
             line_width: this.options.view.line_width,
             line_color: this.options.view.line_color,
             line_style: this.options.view.line_style,
+            custom_line_render: this.options.view.custom_line_render,
             draggable: this.options.view.draggable,
             hide_scrollbars_when_draggable: this.options.view.hide_scrollbars_when_draggable,
             node_overflow: this.options.view.node_overflow,
