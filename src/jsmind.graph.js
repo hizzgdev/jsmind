@@ -132,7 +132,6 @@ class CanvasGraph {
                         start_point: { x: x1, y: y1 },
                         end_point: { x: x2, y: y2 },
                     });
-                    console.log('custom line render jsmind');
                 } catch (e) {
                     logger.error('custom line render error: ', e);
                 }
