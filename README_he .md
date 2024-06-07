@@ -1,6 +1,6 @@
-## 更改内容 
+## 更改内容
 
- [jsmind.graph.js](src\jsmind.graph.js) 
+[jsmind.graph.js](src\jsmind.graph.js)
 
 ```js
     set_size(w, h) {
@@ -23,4 +23,4 @@
     }
 ```
 
-> 修复高分辨率的设备下，canvas线条模糊的问题
+> 修复高分辨率的设备下，canvas 线条模糊的问题
