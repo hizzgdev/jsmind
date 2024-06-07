@@ -16,9 +16,9 @@
     "scripts": {
         "server": "http-server",
         "build": "rollup -c .config/rollup.config.js",
-        "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+        "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
         "test-legacy": "jest tests/legacy",
-        "test-es6": "NODE_OPTIONS=--experimental-vm-modules jest tests/unit",
+        "test-es6": "cross-env NODE_OPTIONS=--experimental-vm-modules jest tests/unit",
         "format": "prettier --config .config/prettierrc.json --ignore-path .config/prettierignore --write .",
         "format-check": "prettier --config .config/prettierrc.json --ignore-path .config/prettierignore --check ."
     },
@@ -45,6 +45,7 @@
         }
     ],
     "devDependencies": {
+        "cross-env": "^7.0.3",
         "http-server": "^14.1.1",
         "jest": "^28.1.0",
         "jest-environment-jsdom": "^28.1.0",
