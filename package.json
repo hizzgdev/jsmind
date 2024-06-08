@@ -16,7 +16,7 @@
     "scripts": {
         "server": "http-server",
         "build": "rollup -c .config/rollup.config.js",
-        "test": " NODE_OPTIONS=--experimental-vm-modules jest",
+        "test": "NODE_OPTIONS=--experimental-vm-modules jest",
         "test-legacy": "jest tests/legacy",
         "test-es6": "NODE_OPTIONS=--experimental-vm-modules jest tests/unit",
         "format": "prettier --config .config/prettierrc.json --ignore-path .config/prettierignore --write .",

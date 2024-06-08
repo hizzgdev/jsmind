@@ -157,7 +157,6 @@ class CanvasGraph {
 
             this.e_canvas.style.width = w + 'px';
             this.e_canvas.style.height = h + 'px';
-
             this.canvas_ctx.scale(dpr, dpr);
         } else {
             this.e_canvas.width = w;
@@ -176,7 +175,7 @@ class CanvasGraph {
         this.drawing(ctx, pin.x + offset.x, pin.y + offset.y, pout.x + offset.x, pout.y + offset.y);
     }
     copy_to(dest_canvas_ctx, callback) {
-        dest_canvas_ctx.drawImage(this.e_canvas, 0, 0);
+        dest_canvas_ctx.drawImage(this.e_canvas, 0, 0, this.size.w, this.size.h);
         !!callback && callback();
     }
     _bezier_to(ctx, x1, y1, x2, y2) {
