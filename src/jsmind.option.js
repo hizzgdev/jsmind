@@ -18,6 +18,7 @@ const default_options = {
 
     view: {
         engine: 'canvas',
+        enable_device_pixel_ratio: false,
         hmargin: 100,
         vmargin: 50,
         line_width: 2,

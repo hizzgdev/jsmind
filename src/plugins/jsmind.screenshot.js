@@ -37,11 +37,13 @@ class JmScreenshot {
         this.version = '0.2.0';
         this.jm = jm;
         this.options = opts;
+        this.dpr = jm.view.device_pixel_ratio
     }
 
     shoot() {
         let c = this.create_canvas();
         let ctx = c.getContext('2d');
+        ctx.scale(this.dpr, this.dpr);
         Promise.resolve(ctx)
             .then(() => this.draw_background(ctx))
             .then(() => this.draw_lines(ctx))
@@ -53,8 +55,13 @@ class JmScreenshot {
 
     create_canvas() {
         let c = $.c('canvas');
-        c.width = this.jm.view.size.w;
-        c.height = this.jm.view.size.h;
+        const w = this.jm.view.size.w;
+        const h = this.jm.view.size.h;
+        c.width = w * this.dpr;
+        c.height = h * this.dpr;
+        c.style.width = w + 'px';
+        c.style.height = h + 'px';
+
         c.style.visibility = 'hidden';
         this.jm.view.e_panel.appendChild(c);
         return c;
