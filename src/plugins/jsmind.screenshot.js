@@ -37,7 +37,7 @@ class JmScreenshot {
         this.version = '0.2.0';
         this.jm = jm;
         this.options = opts;
-        this.dpr = window.devicePixelRatio || 1;
+        this.dpr = jm.view.device_pixel_ratio
     }
 
     shoot() {
@@ -57,7 +57,6 @@ class JmScreenshot {
         let c = $.c('canvas');
         const w = this.jm.view.size.w;
         const h = this.jm.view.size.h;
-
         c.width = w * this.dpr;
         c.height = h * this.dpr;
         c.style.width = w + 'px';

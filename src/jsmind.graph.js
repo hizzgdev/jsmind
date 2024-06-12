@@ -121,10 +121,8 @@ class CanvasGraph {
             straight: this._line_to,
             curved: this._bezier_to,
         };
+        this.dpr = view.device_pixel_ratio;
         this.init_line_render();
-    }
-    getPixelRatio() {
-        return window.devicePixelRatio || 1;
     }
     init_line_render() {
         if (typeof this.opts.custom_line_render === 'function') {
@@ -147,17 +145,15 @@ class CanvasGraph {
         return this.e_canvas;
     }
     set_size(w, h) {
-        let dpr = this.getPixelRatio();
-
         this.size.w = w;
         this.size.h = h;
         if (this.e_canvas.width && this.e_canvas.height && this.canvas_ctx.scale) {
-            this.e_canvas.width = w * dpr;
-            this.e_canvas.height = h * dpr;
+            this.e_canvas.width = w * this.dpr;
+            this.e_canvas.height = h * this.dpr;
 
             this.e_canvas.style.width = w + 'px';
             this.e_canvas.style.height = h + 'px';
-            this.canvas_ctx.scale(dpr, dpr);
+            this.canvas_ctx.scale(this.dpr, this.dpr);
         } else {
             this.e_canvas.width = w;
             this.e_canvas.height = h;

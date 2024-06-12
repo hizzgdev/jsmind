@@ -56,6 +56,7 @@ export default class jsMind {
             container: this.options.container,
             support_html: this.options.support_html,
             engine: this.options.view.engine,
+            enable_device_pixel_ratio: this.options.view.enable_device_pixel_ratio,
             hmargin: this.options.view.hmargin,
             vmargin: this.options.view.vmargin,
             line_width: this.options.view.line_width,
