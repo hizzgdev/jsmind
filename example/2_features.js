@@ -12,9 +12,9 @@ function open_empty() {
         },
         plugin: {
             screenshot: {
-                background: '#ffffff'
-            }
-        }
+                background: '#ffffff',
+            },
+        },
     };
     _jm = new jsMind(options);
     _jm.show();

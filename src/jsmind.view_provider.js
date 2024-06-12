@@ -30,7 +30,9 @@ export class ViewProvider {
             ? this._custom_node_render
             : this._default_node_render;
         this.zoom_current = 1;
-        this.device_pixel_ratio = this.opts.enable_device_pixel_ratio ? ($.w.devicePixelRatio || 1) : 1
+        this.device_pixel_ratio = this.opts.enable_device_pixel_ratio
+            ? $.w.devicePixelRatio || 1
+            : 1;
         this._initialized = false;
     }
     init() {

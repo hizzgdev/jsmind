@@ -37,7 +37,7 @@ class JmScreenshot {
         this.version = '0.2.0';
         this.jm = jm;
         this.options = opts;
-        this.dpr = jm.view.device_pixel_ratio
+        this.dpr = jm.view.device_pixel_ratio;
     }
 
     shoot() {
