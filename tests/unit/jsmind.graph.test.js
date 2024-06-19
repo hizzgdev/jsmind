@@ -83,7 +83,13 @@ describe('graph over canvas', () => {
         const mockDest = { drawImage: jest.fn() };
         const callback = jest.fn();
         graph.copy_to(mockDest, callback);
-        expect(mockDest.drawImage).toBeCalledWith(mockCanvas, 0, 0);
+        expect(mockDest.drawImage).toBeCalledWith(
+            mockCanvas,
+            0,
+            0,
+            mockCanvas.width,
+            mockCanvas.height
+        );
         expect(callback).toBeCalled();
     });
 });

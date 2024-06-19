@@ -29,6 +29,10 @@ export class ViewProvider {
         this.render_node = !!options.custom_node_render
             ? this._custom_node_render
             : this._default_node_render;
+        this.zoom_current = 1;
+        this.device_pixel_ratio = this.opts.enable_device_pixel_ratio
+            ? $.w.devicePixelRatio || 1
+            : 1;
         this._initialized = false;
     }
     init() {
@@ -52,8 +56,6 @@ export class ViewProvider {
 
         this.e_editor.className = 'jsmind-editor';
         this.e_editor.type = 'text';
-
-        this.zoom_current = 1;
 
         var v = this;
         $.on(this.e_editor, 'keydown', function (e) {
@@ -390,7 +392,7 @@ export class ViewProvider {
         return true;
     }
     show(keep_center) {
-        logger.debug('view.show');
+        logger.debug(`view.show: {keep_center: ${keep_center}}`);
         this.expand_size();
         this._show();
         if (!!keep_center) {

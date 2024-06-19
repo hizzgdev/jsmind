@@ -4,8 +4,16 @@ function open_empty() {
         container: 'jsmind_container',
         theme: 'greensea',
         editable: true,
+        log_level: 'debug',
         view: {
+            engine: 'canvas',
             draggable: true,
+            enable_device_pixel_ratio: false,
+        },
+        plugin: {
+            screenshot: {
+                background: '#ffffff',
+            },
         },
     };
     _jm = new jsMind(options);

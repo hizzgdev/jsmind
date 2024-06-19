@@ -121,6 +121,7 @@ class CanvasGraph {
             straight: this._line_to,
             curved: this._bezier_to,
         };
+        this.dpr = view.device_pixel_ratio;
         this.init_line_render();
     }
     init_line_render() {
@@ -146,9 +147,19 @@ class CanvasGraph {
     set_size(w, h) {
         this.size.w = w;
         this.size.h = h;
-        this.e_canvas.width = w;
-        this.e_canvas.height = h;
+        if (this.e_canvas.width && this.e_canvas.height && this.canvas_ctx.scale) {
+            this.e_canvas.width = w * this.dpr;
+            this.e_canvas.height = h * this.dpr;
+
+            this.e_canvas.style.width = w + 'px';
+            this.e_canvas.style.height = h + 'px';
+            this.canvas_ctx.scale(this.dpr, this.dpr);
+        } else {
+            this.e_canvas.width = w;
+            this.e_canvas.height = h;
+        }
     }
+
     clear() {
         this.canvas_ctx.clearRect(0, 0, this.size.w, this.size.h);
     }
@@ -160,7 +171,7 @@ class CanvasGraph {
         this.drawing(ctx, pin.x + offset.x, pin.y + offset.y, pout.x + offset.x, pout.y + offset.y);
     }
     copy_to(dest_canvas_ctx, callback) {
-        dest_canvas_ctx.drawImage(this.e_canvas, 0, 0);
+        dest_canvas_ctx.drawImage(this.e_canvas, 0, 0, this.size.w, this.size.h);
         !!callback && callback();
     }
     _bezier_to(ctx, x1, y1, x2, y2) {
