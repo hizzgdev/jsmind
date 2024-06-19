@@ -392,7 +392,7 @@ export class ViewProvider {
         return true;
     }
     show(keep_center) {
-        logger.debug('view.show');
+        logger.debug(`view.show: {keep_center: ${keep_center}}`);
         this.expand_size();
         this._show();
         if (!!keep_center) {
