@@ -276,7 +276,7 @@ export default class jsMind {
         this.layout.reset();
         this.data.reset();
     }
-    _show(mind, keepCenter) {
+    _show(mind, skip_centering) {
         var m = mind || format.node_array.example;
         this.mind = this.data.load(m);
         if (!this.mind) {
@@ -292,15 +292,14 @@ export default class jsMind {
         this.layout.layout();
         logger.debug('layout.layout ok');
 
-        this.view.show(keepCenter);
+        this.view.show(!skip_centering);
         logger.debug('view.show ok');
 
         this.invoke_event_handle(EventType.show, { data: [mind] });
     }
-    show(mind, keepCenter) {
-        const _keepCenter = keepCenter == null ? true : keepCenter;
+    show(mind, skip_centering) {
         this._reset();
-        this._show(mind, _keepCenter);
+        this._show(mind, skip_centering);
     }
     get_meta() {
         return {
