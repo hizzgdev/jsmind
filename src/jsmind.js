@@ -276,9 +276,8 @@ export default class jsMind {
         this.layout.reset();
         this.data.reset();
     }
-    _show(mind) {
+    _show(mind, keepCenter) {
         var m = mind || format.node_array.example;
-
         this.mind = this.data.load(m);
         if (!this.mind) {
             logger.error('data.load error');
@@ -293,14 +292,15 @@ export default class jsMind {
         this.layout.layout();
         logger.debug('layout.layout ok');
 
-        this.view.show(true);
+        this.view.show(keepCenter);
         logger.debug('view.show ok');
 
         this.invoke_event_handle(EventType.show, { data: [mind] });
     }
-    show(mind) {
+    show(mind, keepCenter) {
+        const _keepCenter = keepCenter == null ? true : keepCenter;
         this._reset();
-        this._show(mind);
+        this._show(mind, _keepCenter);
     }
     get_meta() {
         return {
