@@ -17,7 +17,7 @@ jsMind provides various options to customize the behavior and appearance of mind
 
 | Option Name                | Data Type | Default Value | Description                                      | Details                                      |
 | -------------------------- | --------- | ------------- | ------------------------------------------------ | -------------------------------------------- |
-| custom_line_render         | function  | null          | Custom line rendering method                     | [Details](option.view.custom_line_render.md) |
+| custom_line_render         | function  | null          | Custom line rendering method (Since 0.8.4)       | [Details](option.view.custom_line_render.md) |
 | custom_node_render         | function  | null          | Custom node rendering method (Since 0.7.6) | [Details](option.view.custom_node_render.md) |
 | draggable                  | bool      | false         | Whether dragging the canvas is allowed           | [Details](option.view.draggable.md)          |
 | enable_device_pixel_ratio  | bool      | false         | Render high-definition mind maps according to device pixel ratio (Since 0.8.5) | [Details](option.view.enable_device_pixel_ratio.md) |

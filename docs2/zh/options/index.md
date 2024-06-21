@@ -17,7 +17,7 @@ jsMind 提供了多种选项来定制思维导图的行为和外观。
 
 | 选项名                    | 数据类型 | 默认值       | 说明                                             | 详情                                      |
 | ------------------------- | -------- | ------------ | ------------------------------------------------ | ----------------------------------------- |
-| custom_line_render        | function | null         | 自定义线条渲染方法                               | [详情](option.view.custom_line_render.md) |
+| custom_line_render        | function | null         | 自定义线条渲染方法（从 0.8.4 版本开始支持）       | [详情](option.view.custom_line_render.md) |
 | custom_node_render        | function | null         | 自定义节点渲染方法（从 0.7.6 版本开始支持）       | [详情](option.view.custom_node_render.md) |
 | draggable                 | bool     | false        | 是否允许拖动画布                                 | [详情](option.view.draggable.md)          |
 | enable_device_pixel_ratio | bool     | false        | 根据设备像素比渲染高清思维导图（从 0.8.5 版本开始支持） | [详情](option.view.enable_device_pixel_ratio.md) |
