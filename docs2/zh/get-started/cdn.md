@@ -1,6 +1,6 @@
 # 引用 CDN 上的 jsMind
 
-以下是三个可用的 CDN。
+以下是常用的 CDN。
 
 ## [jsDelivr](https://www.jsdelivr.com/package/npm/jsmind/)
 
@@ -9,19 +9,18 @@
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jsmind@0.8.5/es6/jsmind.js"></script>
 ```
 
-## [UNKPG](https://unpkg.com/jsmind/)
+## [UNPKG](https://unpkg.com/jsmind/)
 
 ```html
 <link type="text/css" rel="stylesheet" href="https://unpkg.com/jsmind@0.8.5/style/jsmind.css" />
 <script type="text/javascript" src="https://unpkg.com/jsmind@0.8.5/es6/jsmind.js"></script>
 ```
 
-## [jsDelivr 国内镜像](https://jsd.onmicrosoft.cn/npm/jsmind/)
+## 其它的CDN
 
-```html
-<link type="text/css" rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/jsmind@0.8.5/style/jsmind.css" />
-<script type="text/javascript" src="https://jsd.onmicrosoft.cn/npm/jsmind@0.8.5/es6/jsmind.js"></script>
-```
+- https://npm.onmicrosoft.cn/jsmind/
+- https://jsd.onmicrosoft.cn/npm/jsmind/
+
 
 ## 使用注意事项
 

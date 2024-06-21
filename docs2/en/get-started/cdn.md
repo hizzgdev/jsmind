@@ -1,6 +1,6 @@
 # Available CDNs for jsMind
 
-There are 3 different CDNs.
+There are some well known CDNs.
 
 
 ## [jsDelivr](https://www.jsdelivr.com/package/npm/jsmind/)
@@ -17,12 +17,11 @@ There are 3 different CDNs.
 <script type="text/javascript" src="https://unpkg.com/jsmind@0.8.5/es6/jsmind.js"></script>
 ```
 
-## [jsDelivr Mirror in China](https://jsd.onmicrosoft.cn/npm/jsmind/)
+## Other CDNs
 
-```html
-<link type="text/css" rel="stylesheet" href="https://jsd.onmicrosoft.cn/npm/jsmind@0.8.5/style/jsmind.css" />
-<script type="text/javascript" src="https://jsd.onmicrosoft.cn/npm/jsmind@0.8.5/es6/jsmind.js"></script>
-```
+- https://npm.onmicrosoft.cn/jsmind/
+- https://jsd.onmicrosoft.cn/npm/jsmind/
+
 
 ## Usage Considerations
 
