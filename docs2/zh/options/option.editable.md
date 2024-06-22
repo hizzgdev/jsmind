@@ -1,6 +1,8 @@
 # editable 选项
 
-**editable** : (bool) 是否启用编辑
+| 选项名 | 数据类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| editable | bool | false | 是否启用编辑 |
 
 ## 用法
 

@@ -1,6 +1,8 @@
 # theme Option
 
-**theme** : (string) Theme
+| Option Name | Data Type | Default Value | Description |
+| --- | --- | --- | --- |
+| theme | string | null | Theme |
 
 ## Usage
 

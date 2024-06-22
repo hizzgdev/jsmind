@@ -1,6 +1,8 @@
 # support_html Option
 
-**support_html** : (bool) Whether HTML elements in nodes are supported
+| Option Name | Data Type | Default Value | Description |
+| --- | --- | --- | --- |
+| support_html | bool | true | Whether HTML elements in nodes are supported |
 
 ## Usage
 

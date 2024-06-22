@@ -1,6 +1,8 @@
 # draggable Option
 
-**view.draggable** : (bool) Whether to allow dragging the canvas instead of using the mouse scroll when the container cannot fully accommodate the mind map
+| Option Name | Data Type | Default Value | Description |
+| --- | --- | --- | --- |
+| draggable | bool | false | Whether dragging the canvas is allowed |
 
 ## Option Description
 

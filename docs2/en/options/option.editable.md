@@ -1,6 +1,8 @@
 # editable Option
 
-**editable** : (bool) Whether to enable editing
+| Option Name | Data Type | Default Value | Description |
+| --- | --- | --- | --- |
+| editable | bool | false | Whether editing is enabled |
 
 ## Usage
 

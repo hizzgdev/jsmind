@@ -1,6 +1,8 @@
 # log_level 选项
 
-**log_level** : (string) 日志级别
+| 选项名 | 数据类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| log_level | string | 'info' | 日志级别 |
 
 ## 用法
 

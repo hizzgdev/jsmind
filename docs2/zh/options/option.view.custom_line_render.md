@@ -1,6 +1,8 @@
 # view.custom_line_render 选项
 
-**view.custom_line_render** : (function) 自定义线条渲染方法（从 0.8.4 版本开始支持）
+| 选项名 | 数据类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| custom_line_render | function | null | 自定义线条渲染方法（从 0.8.4 版本开始支持） |
 
 ## 选项说明
 

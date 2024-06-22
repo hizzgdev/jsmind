@@ -1,6 +1,8 @@
 # enable_device_pixel_ratio Option
 
-**view.enable_device_pixel_ratio** : (bool) Render high-definition mind maps according to the device pixel ratio. (Since 0.8.5)
+| Option Name | Data Type | Default Value | Description |
+| --- | --- | --- | --- |
+| enable_device_pixel_ratio | bool | false | Render high-definition mind maps according to device pixel ratio (Since 0.8.5) |
 
 ## Option Description
 

@@ -1,6 +1,8 @@
 # view.custom_node_render Option
 
-**view.custom_node_render** : (function) Custom node rendering method for mind map nodes (since 0.7.6)
+| Option Name | Data Type | Default Value | Description |
+| --- | --- | --- | --- |
+| custom_node_render | function | null | Custom node rendering method (Since 0.7.6) |
 
 ## Option Description
 

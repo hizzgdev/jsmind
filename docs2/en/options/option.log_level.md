@@ -1,6 +1,8 @@
 # log_level Option
 
-**log_level** : (string) Log level
+| Option Name | Data Type | Default Value | Description |
+| --- | --- | --- | --- |
+| log_level | string | 'info' | Log level |
 
 ## Usage
 

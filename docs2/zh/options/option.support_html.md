@@ -1,6 +1,8 @@
 # support_html 选项
 
-**support_html** : (bool) 是否支持节点中的 HTML 元素
+| 选项名 | 数据类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| support_html | bool | true | 是否支持节点中的 HTML 元素 |
 
 ## 用法
 `support_html` 选项用于控制节点内容是否支持 HTML 元素。默认情况下，该选项设置为 `true`，即节点内容支持 HTML 标签。如果将其设置为 `false`，则节点内容仅支持纯文本。

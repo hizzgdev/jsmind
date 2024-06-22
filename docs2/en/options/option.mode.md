@@ -1,6 +1,8 @@
 # mode Option
 
-**mode** : (string) Layout mode
+| Option Name | Data Type | Default Value | Description |
+| --- | --- | --- | --- |
+| mode | string | 'full' | Layout mode |
 
 ## Usage
 
