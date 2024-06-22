@@ -26,7 +26,7 @@ jsMind 提供了多种选项来定制思维导图的行为和外观。
 | hide_scrollbars_when_draggable | bool | false        | 当 draggable 为 true 时是否隐藏滚动条            | [详情](option.view.hide_scrollbars_when_draggable.md) |
 | hmargin                   | number   | 容器的宽度     | 思维导图距容器外框的最小水平距离（像素）             | [详情](option.view.hmargin.vmargin.md)            |
 | line_color                | string   | '#555'       | 思维导图线条的颜色（HTML颜色表示方法）              | [详情](option.view.line_color.md)         |
-| line_style                | string   | 'curved'     | 线条样式，直线或曲线                             | [详情](option.view.line_style.md)         |
+| line_style                | string   | 'curved'     | 思维导图线条样式，直线或曲线                     | [详情](option.view.line_style.md)         |
 | line_width                | number   | 2            | 线条宽度                                         | [详情](option.view.line_width.md)         |
 | node_overflow             | string   | 'hidden'     | 节点文本过长时的样式（从 0.5.3 版本开始支持）     | [详情](option.view.node_overflow.md)      |
 | vmargin                   | number   | 容器的高度     | 思维导图距容器外框的最小垂直距离（像素）           | [详情](option.view.hmargin.vmargin.md)            |
