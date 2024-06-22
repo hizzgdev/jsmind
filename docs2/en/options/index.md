@@ -24,12 +24,12 @@ jsMind provides various options to customize the behavior and appearance of mind
 | engine                     | string    | 'canvas'      | Rendering engine for lines between nodes         | [Details](option.view.engine.md)             |
 | expander_style             | string    | 'char'        | Style of the child node expander (Since 0.7.8) | [Details](option.view.expander_style.md)     |
 | hide_scrollbars_when_draggable | bool  | false         | Whether to hide scrollbars when draggable is true | [Details](option.view.hide_scrollbars_when_draggable.md) |
-| hmargin                    | number    | 100           | Minimum horizontal distance from the container   | [Details](option.view.hmargin.md)            |
+| hmargin                    | number    | Container's width | Minimum horizontal distance between the mind map and the container's outer frame (in pixels) | [Details](option.view.hmargin.vmargin.md)            |
 | line_color                 | string    | '#555'        | Color of the lines                               | [Details](option.view.line_color.md)         |
 | line_style                 | string    | 'curved'      | Style of the lines, straight or curved           | [Details](option.view.line_style.md)         |
 | line_width                 | number    | 2             | Width of the lines                               | [Details](option.view.line_width.md)         |
 | node_overflow              | string    | 'hidden'      | Style when node text is too long (Since 0.5.3) | [Details](option.view.node_overflow.md)      |
-| vmargin                    | number    | 50            | Minimum vertical distance from the container     | [Details](option.view.vmargin.md)            |
+| vmargin                    | number    | Container's height | Minimum vertical distance between the mind map and the container's outer frame (in pixels)| [Details](option.view.hmargin.vmargin.md)            |
 | zoom                       | object    | `{min: 0.5, max: 2.1, step: 0.1}` | Zoom configuration (Since 0.6.3) | [Details](option.view.zoom.md)               |
 
 ## Layout Options

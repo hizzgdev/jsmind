@@ -24,12 +24,12 @@ jsMind 提供了多种选项来定制思维导图的行为和外观。
 | engine                    | string   | 'canvas'     | 节点之间线条的渲染引擎                           | [详情](option.view.engine.md)             |
 | expander_style            | string   | 'char'       | 子节点展开器的样式（从 0.7.8 版本开始支持）       | [详情](option.view.expander_style.md)     |
 | hide_scrollbars_when_draggable | bool | false        | 当 draggable 为 true 时是否隐藏滚动条            | [详情](option.view.hide_scrollbars_when_draggable.md) |
-| hmargin                   | number   | 100          | 容器的最小水平距离                               | [详情](option.view.hmargin.md)            |
+| hmargin                   | number   | 容器的宽度     | 思维导图距容器外框的最小水平距离（像素）             | [详情](option.view.hmargin.vmargin.md)            |
 | line_color                | string   | '#555'       | 线条颜色                                         | [详情](option.view.line_color.md)         |
 | line_style                | string   | 'curved'     | 线条样式，直线或曲线                             | [详情](option.view.line_style.md)         |
 | line_width                | number   | 2            | 线条宽度                                         | [详情](option.view.line_width.md)         |
 | node_overflow             | string   | 'hidden'     | 节点文本过长时的样式（从 0.5.3 版本开始支持）     | [详情](option.view.node_overflow.md)      |
-| vmargin                   | number   | 50           | 容器的最小垂直距离                               | [详情](option.view.vmargin.md)            |
+| vmargin                   | number   | 容器的高度     | 思维导图距容器外框的最小垂直距离（像素）           | [详情](option.view.hmargin.vmargin.md)            |
 | zoom                      | object   | `{min: 0.5, max: 2.1, step: 0.1}` | 缩放配置（从 0.6.3 版本开始支持） | [详情](option.view.zoom.md)               |
 
 ## 布局选项
