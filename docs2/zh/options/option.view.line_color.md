@@ -1,8 +1,8 @@
-# line_color 选项
+# view.line_color 选项
 
 | 选项名 | 数据类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| line_color | string | #555 | 思维导图线条的颜色（HTML颜色表示方法） |
+| view.line_color | string | #555 | 思维导图线条的颜色（HTML颜色表示方法） |
 
 ## 选项说明
 

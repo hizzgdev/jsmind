@@ -1,8 +1,8 @@
-# expander_style Option
+# view.expander_style Option
 
 | Option Name | Data Type | Default Value | Description |
 | --- | --- | --- | --- |
-| expander_style | string | 'char' | Style of the child node expander (Since 0.7.8) |
+| view.expander_style | string | 'char' | Style of the child node expander (Since 0.7.8) |
 
 ## Option Description
 

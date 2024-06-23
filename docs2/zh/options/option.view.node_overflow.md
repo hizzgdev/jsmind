@@ -1,8 +1,8 @@
-# node_overflow 选项
+# view.node_overflow 选项
 
 | 选项名 | 数据类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| node_overflow | string | 'hidden' | 节点文本过长时的样式（从 0.5.3 版本开始支持） |
+| view.node_overflow | string | 'hidden' | 节点文本过长时的样式（从 0.5.3 版本开始支持） |
 
 ## 选项说明
 

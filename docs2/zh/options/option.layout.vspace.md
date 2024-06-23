@@ -1,8 +1,8 @@
-# vspace 选项
+# layout.vspace 选项
 
 | 选项名 | 数据类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| vspace | number | 20 | 节点之间的垂直空间 |
+| layout.vspace | number | 20 | 节点之间的垂直空间 |
 
 ## 选项说明
 

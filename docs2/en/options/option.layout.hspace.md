@@ -1,8 +1,8 @@
-# hspace Option
+# layout.hspace Option
 
 | Option Name | Data Type | Default Value | Description |
 | --- | --- | --- | --- |
-| hspace | number | 30 | Horizontal spacing between nodes |
+| layout.hspace | number | 30 | Horizontal spacing between nodes |
 
 ## Option Description
 

@@ -1,8 +1,8 @@
-# engine 选项
+# view.engine 选项
 
 | 选项名 | 数据类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| engine | string | 'canvas' | 节点之间线条的渲染引擎 |
+| view.engine | string | 'canvas' | 节点之间线条的渲染引擎 |
 
 ## 选项说明
 

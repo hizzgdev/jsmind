@@ -1,8 +1,8 @@
-# line_width 选项
+# view.line_width 选项
 
 | 选项名 | 数据类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| line_width | number | 2 | 思维导图线条的粗细（像素） |
+| view.line_width | number | 2 | 思维导图线条的粗细（像素） |
 
 ## 选项说明
 

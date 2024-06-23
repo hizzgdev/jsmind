@@ -1,8 +1,8 @@
-# expander_style 选项
+# view.expander_style 选项
 
 | 选项名 | 数据类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| expander_style | string | 'char' | 子节点展开器的样式（从 0.7.8 版本开始支持） |
+| view.expander_style | string | 'char' | 子节点展开器的样式（从 0.7.8 版本开始支持） |
 
 ## 选项说明
 

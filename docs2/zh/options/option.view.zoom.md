@@ -1,11 +1,11 @@
-# zoom 选项
+# view.zoom 选项
 
 | 选项名 | 数据类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| zoom | object | | （从 0.6.3 版本开始支持） |
-| zoom.min | number | 0.5 | 最小缩放比例 |
-| zoom.max | number | 2.1 | 最大缩放比例 |
-| zoom.step | number | 0.1 | 缩放步长 |
+| view.zoom | object | | （从 0.6.3 版本开始支持） |
+| view.zoom.min | number | 0.5 | 最小缩放比例 |
+| view.zoom.max | number | 2.1 | 最大缩放比例 |
+| view.zoom.step | number | 0.1 | 缩放步长 |
 
 ## 选项说明
 

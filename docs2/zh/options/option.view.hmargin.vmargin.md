@@ -1,9 +1,9 @@
-# hmargin 与 vmargin 选项
+# view.hmargin 与 view.vmargin 选项
 
 | 选项名 | 数据类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| hmargin | number | 容器的宽度 | 思维导图距容器外框的最小水平距离（像素） |
-| vmargin | number | 容器的高度 | 思维导图距容器外框的最小垂直距离（像素） |
+| view.hmargin | number | 容器的宽度 | 思维导图距容器外框的最小水平距离（像素） |
+| view.vmargin | number | 容器的高度 | 思维导图距容器外框的最小垂直距离（像素） |
 
 ## 选项说明
 

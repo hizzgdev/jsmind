@@ -2,7 +2,7 @@
 
 | 选项名 | 数据类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| custom_node_render | function | null | 自定义节点渲染方法（从 0.7.6 版本开始支持） |
+| view.custom_node_render | function | null | 自定义节点渲染方法（从 0.7.6 版本开始支持） |
 
 ## 选项说明
 

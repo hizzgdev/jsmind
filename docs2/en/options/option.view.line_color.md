@@ -1,8 +1,8 @@
-# line_color Option
+# view.line_color Option
 
 | Option Name | Data Type | Default Value | Description |
 | --- | --- | --- | --- |
-| line_color | string | #555 | The color of the mind map lines (HTML color notation) |
+| view.line_color | string | #555 | The color of the mind map lines (HTML color notation) |
 
 ## Option Description
 

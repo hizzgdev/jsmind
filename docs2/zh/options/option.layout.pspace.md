@@ -1,8 +1,8 @@
-# pspace 选项
+# layout.pspace 选项
 
 | 选项名 | 数据类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| pspace | number | 13 | 节点与连接线之间的水平空间 |
+| layout.pspace | number | 13 | 节点与连接线之间的水平空间 |
 
 ## 选项说明
 

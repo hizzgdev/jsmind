@@ -1,8 +1,8 @@
-# draggable 选项
+# view.draggable 选项
 
 | 选项名 | 数据类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| draggable | bool | false | 是否允许拖动画布 |
+| view.draggable | bool | false | 是否允许拖动画布 |
 
 ## 选项说明
 

@@ -1,8 +1,8 @@
-# node_overflow Option
+# view.node_overflow Option
 
 | Option Name | Data Type | Default Value | Description |
 | --- | --- | --- | --- |
-| node_overflow | string | 'hidden' | Style when node text is too long (Since 0.5.3) |
+| view.node_overflow | string | 'hidden' | Style when node text is too long (Since 0.5.3) |
 
 ## Option Description
 

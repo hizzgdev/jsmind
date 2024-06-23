@@ -1,8 +1,8 @@
-# pspace Option
+# layout.pspace Option
 
 | Option Name | Data Type | Default Value | Description |
 | --- | --- | --- | --- |
-| pspace | number | 13 | Horizontal space between nodes and connection lines |
+| layout.pspace | number | 13 | Horizontal space between nodes and connection lines |
 
 ## Option Description
 

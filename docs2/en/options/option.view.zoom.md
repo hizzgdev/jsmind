@@ -1,11 +1,11 @@
-# zoom Option
+# view.zoom Option
 
 | Option Name | Data Type | Default Value | Description |
 | --- | --- | --- | --- |
-| zoom | object | | (Since 0.6.3) |
-| zoom.min | number | 0.5 | Minimum zoom ratio |
-| zoom.max | number | 2.1 | Maximum zoom ratio |
-| zoom.step | number | 0.1 | Zoom step |
+| view.zoom | object | | (Since 0.6.3) |
+| view.zoom.min | number | 0.5 | Minimum zoom ratio |
+| view.zoom.max | number | 2.1 | Maximum zoom ratio |
+| view.zoom.step | number | 0.1 | Zoom step |
 
 ## Option Description
 

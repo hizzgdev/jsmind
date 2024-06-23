@@ -1,9 +1,9 @@
-# hmargin and vmargin Options
+# view.hmargin and view.vmargin Options
 
 | Option Name | Data Type | Default Value | Description |
 | --- | --- | --- | --- |
-| hmargin | number | Container's width | Minimum horizontal distance between the mind map and the container's outer frame (in pixels) |
-| vmargin | number | Container's height | Minimum vertical distance between the mind map and the container's outer frame (in pixels) |
+| view.hmargin | number | Container's width | Minimum horizontal distance between the mind map and the container's outer frame (in pixels) |
+| view.vmargin | number | Container's height | Minimum vertical distance between the mind map and the container's outer frame (in pixels) |
 
 ## Option Description
 

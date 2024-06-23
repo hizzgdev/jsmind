@@ -1,8 +1,8 @@
-# draggable Option
+# view.draggable Option
 
 | Option Name | Data Type | Default Value | Description |
 | --- | --- | --- | --- |
-| draggable | bool | false | Whether dragging the canvas is allowed |
+| view.draggable | bool | false | Whether dragging the canvas is allowed |
 
 ## Option Description
 

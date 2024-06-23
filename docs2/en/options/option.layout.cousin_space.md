@@ -1,8 +1,8 @@
-# cousin_space Option
+# layout.cousin_space Option
 
 | Option Name | Data Type | Default Value | Description |
 | --- | --- | --- | --- |
-| cousin_space | number | 0 | Extra vertical space between adjacent nodes' children (Since 0.5.5) |
+| layout.cousin_space | number | 0 | Extra vertical space between adjacent nodes' children (Since 0.5.5) |
 
 ## Option Description
 

@@ -2,7 +2,7 @@
 
 | Option Name | Data Type | Default Value | Description |
 | --- | --- | --- | --- |
-| custom_node_render | function | null | Custom node rendering method (Since 0.7.6) |
+| view.custom_node_render | function | null | Custom node rendering method (Since 0.7.6) |
 
 ## Option Description
 

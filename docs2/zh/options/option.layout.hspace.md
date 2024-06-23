@@ -1,8 +1,8 @@
-# hspace 选项
+# layout.hspace 选项
 
 | 选项名 | 数据类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| hspace | number | 30 | 节点之间的水平间距 |
+| layout.hspace | number | 30 | 节点之间的水平间距 |
 
 ## 选项说明
 

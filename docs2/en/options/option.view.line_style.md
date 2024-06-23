@@ -1,8 +1,8 @@
-# line_style Option
+# view.line_style Option
 
 | Option Name | Data Type | Default Value | Description |
 | --- | --- | --- | --- |
-| line_style | string | curved | The style of the mind map lines, curved or straight |
+| view.line_style | string | curved | The style of the mind map lines, curved or straight |
 
 ## Option Description
 

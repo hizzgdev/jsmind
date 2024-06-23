@@ -1,8 +1,8 @@
-# engine Option
+# view.engine Option
 
 | Option Name | Data Type | Default Value | Description |
 | --- | --- | --- | --- |
-| engine | string | 'canvas' | Rendering engine for lines between nodes |
+| view.engine | string | 'canvas' | Rendering engine for lines between nodes |
 
 ## Option Description
 

@@ -1,8 +1,8 @@
-# hide_scrollbars_when_draggable Option
+# view.hide_scrollbars_when_draggable Option
 
 | Option Name | Data Type | Default Value | Description |
 | --- | --- | --- | --- |
-| hide_scrollbars_when_draggable | bool | false | Whether to hide scrollbars when draggable is true |
+| view.hide_scrollbars_when_draggable | bool | false | Whether to hide scrollbars when draggable is true |
 
 ## Option Description
 

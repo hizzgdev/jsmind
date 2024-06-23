@@ -1,8 +1,8 @@
-# vspace Option
+# layout.vspace Option
 
 | Option Name | Data Type | Default Value | Description |
 | --- | --- | --- | --- |
-| vspace | number | 20 | Vertical space between nodes |
+| layout.vspace | number | 20 | Vertical space between nodes |
 
 ## Option Description
 

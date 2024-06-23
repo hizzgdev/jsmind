@@ -1,8 +1,8 @@
-# hide_scrollbars_when_draggable 选项
+# view.hide_scrollbars_when_draggable 选项
 
 | 选项名 | 数据类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| hide_scrollbars_when_draggable | bool | false | 当 draggable 为 true 时是否隐藏滚动条 |
+| view.hide_scrollbars_when_draggable | bool | false | 当 draggable 为 true 时是否隐藏滚动条 |
 
 ## 选项说明
 

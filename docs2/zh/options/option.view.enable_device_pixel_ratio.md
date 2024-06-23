@@ -1,8 +1,8 @@
-# enable_device_pixel_ratio 选项
+# view.enable_device_pixel_ratio 选项
 
 | 选项名 | 数据类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| enable_device_pixel_ratio | bool | false | 根据设备像素比渲染高清思维导图（从 0.8.5 版本开始支持） |
+| view.enable_device_pixel_ratio | bool | false | 根据设备像素比渲染高清思维导图（从 0.8.5 版本开始支持） |
 
 ## 选项说明
 

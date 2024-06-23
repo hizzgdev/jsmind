@@ -1,8 +1,8 @@
-# line_style 选项
+# view.line_style 选项
 
 | 选项名 | 数据类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| line_style | string | curved | 思维导图线条的样式，曲线或直线 |
+| view.line_style | string | curved | 思维导图线条的样式，曲线或直线 |
 
 ## 选项说明
 

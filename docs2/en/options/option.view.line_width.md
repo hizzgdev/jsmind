@@ -1,8 +1,8 @@
-# line_width Option
+# view.line_width Option
 
 | Option Name | Data Type | Default Value | Description |
 | --- | --- | --- | --- |
-| line_width | number | 2 | The thickness of the mind map lines (in pixels) |
+| view.line_width | number | 2 | The thickness of the mind map lines (in pixels) |
 
 ## Option Description
 

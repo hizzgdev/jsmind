@@ -2,7 +2,7 @@
 
 | Option Name | Data Type | Default Value | Description |
 | --- | --- | --- | --- |
-| custom_line_render | function | null | Custom line rendering method (Since 0.8.4) |
+| view.custom_line_render | function | null | Custom line rendering method (Since 0.8.4) |
 
 ## Option Description
 

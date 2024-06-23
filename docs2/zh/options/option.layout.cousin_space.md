@@ -1,8 +1,8 @@
-# cousin_space 选项
+# layout.cousin_space 选项
 
 | 选项名 | 数据类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| cousin_space | number | 0 | 相邻节点子节点之间的额外垂直空间（从 0.5.5 版本开始支持） |
+| layout.cousin_space | number | 0 | 相邻节点子节点之间的额外垂直空间（从 0.5.5 版本开始支持） |
 
 ## 选项说明
 
