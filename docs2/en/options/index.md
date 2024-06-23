@@ -27,7 +27,7 @@ jsMind provides various options to customize the behavior and appearance of mind
 | hmargin                    | number    | Container's width | Minimum horizontal distance between the mind map and the container's outer frame (in pixels) | [Details](option.view.hmargin.vmargin.md)            |
 | line_color                 | string    | '#555'        | The color of the mind map lines (HTML color notation) | [Details](option.view.line_color.md)         |
 | line_style                 | string    | 'curved'      | The style of the mind map lines, curved or straight | [Details](option.view.line_style.md)         |
-| line_width                 | number    | 2             | Width of the lines                               | [Details](option.view.line_width.md)         |
+| line_width                 | number    | 2             | The thickness of the mind map lines (in pixels) | [Details](option.view.line_width.md)         |
 | node_overflow              | string    | 'hidden'      | Style when node text is too long (Since 0.5.3) | [Details](option.view.node_overflow.md)      |
 | vmargin                    | number    | Container's height | Minimum vertical distance between the mind map and the container's outer frame (in pixels)| [Details](option.view.hmargin.vmargin.md)            |
 | zoom                       | object    | `{min: 0.5, max: 2.1, step: 0.1}` | Zoom configuration (Since 0.6.3) | [Details](option.view.zoom.md)               |
