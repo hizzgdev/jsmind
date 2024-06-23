@@ -19,7 +19,7 @@ var options = {
     theme: 'primary',
     shortcut: {
         enable: false, // 禁用快捷键
-        handles: {/},
+        handles: {},
         mapping: {}
     }
 };

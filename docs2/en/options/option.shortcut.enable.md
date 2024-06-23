@@ -29,5 +29,5 @@ In the above example, the `enable` option is set to `false`, which means all key
 
 ## Related Options and Settings
 
-- **handles**: Named shortcut event handlers. jsMind provides some common handlers for operating the mind map. Users can define additional handlers. For more informationn: [shortcut.handles Option](option.shortcut.handles.md)
+- **handles**: Named shortcut event handlers. jsMind provides some common handlers for operating the mind map. Users can define additional handlers. For more information: [shortcut.handles Option](option.shortcut.handles.md)
 - **mapping**: Shortcut mapping configuration. Used to configure the correspondence between specific keys and handlers. Supports both single keys and combination keys. For more information: [shortcut.mapping Option](option.shortcut.mapping.md)
