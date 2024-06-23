@@ -1,15 +1,15 @@
 # zoom Option
 
-## Option Description
-
-The `zoom` option is used to configure the zoom functionality of the mind map. By setting the minimum and maximum zoom ratios and the zoom step, users can flexibly adjust the display ratio of the mind map for better viewing and editing.
-
 | Option Name | Data Type | Default Value | Description |
 | --- | --- | --- | --- |
 | zoom | object | | (Since 0.6.3) |
 | zoom.min | number | 0.5 | Minimum zoom ratio |
 | zoom.max | number | 2.1 | Maximum zoom ratio |
 | zoom.step | number | 0.1 | Zoom step |
+
+## Option Description
+
+The `zoom` option is used to configure the zoom functionality of the mind map. By setting the minimum and maximum zoom ratios and the zoom step, users can flexibly adjust the display ratio of the mind map for better viewing and editing.
 
 ## Usage Example
 
