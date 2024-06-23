@@ -36,5 +36,5 @@ In the above example, the `zoom` option is set to `{ min: 0.5, max: 5.0, step: 0
 
 When using jsMind, users can zoom the mind map in the following ways:
 
-1. **Using Keyboard and Mouse**: Hold down the 【Ctrl】 key on the keyboard and scroll the mouse wheel to zoom in or out of the mind map.
+1. **Using Keyboard and Mouse**: Hold down the [Ctrl] key on the keyboard and scroll the mouse wheel to zoom in or out of the mind map.
 2. **Using Touch Screen/Touch panel**: On touch screen devices, users can pinch or spread two fingers to zoom the mind map. This gesture is similar to the zooming method used for viewing images on mobile devices.
