@@ -30,7 +30,6 @@ var options = {
 
 在上述示例中，`view.expander_style` 选项被设置为 `number`，这意味着子节点的展开控制器将显示子节点的数量，当子节点数量超过 99 个时，将显示 `...`。
 
-
 | 'char' | 'number' |
 | --- | --- |
 | <img width="469" alt="image" src="https://github.com/hizzgdev/jsmind/assets/1690290/8462da63-3c1f-4858-9f66-e088670115e2"> | <img width="396" alt="image" src="https://github.com/hizzgdev/jsmind/assets/1690290/e309e397-dbf5-424d-a0be-32ab99a902d2"> |

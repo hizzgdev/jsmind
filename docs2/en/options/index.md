@@ -53,7 +53,7 @@ jsMind provides various options to customize the behavior and appearance of mind
 
 | Option Name   | Data Type | Default Value | Description                                      | Details                                      |
 | ------------- | --------- | ------------- | ------------------------------------------------ | -------------------------------------------- |
-| plugin        | object    | `{}`            | Options for plugins                              | [Details](option.plugin.plugin.md)           |
+| plugin        | object    | `{}`            | Options for plugins                              | [Details](option.plugin.md)           |
 
 
 ## Default Options Code
