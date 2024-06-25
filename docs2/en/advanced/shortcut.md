@@ -19,6 +19,6 @@
 - **Custom Event Handlers**: Users can create custom event handlers to implement specific operational logic. By specifying the handler's name and corresponding function in the configuration, users can extend shortcut functionality for more customized operations.
 
 References:
-- [Option: Enable Shortcuts](../option.shortcut.enable.md)
-- [Option: Shortcut Event Handlers](../option.shortcut.handles.md)
-- [Option: Shortcut Mapping](../option.shortcut.handles.md)
+- [Option: Enable Shortcuts](../options/option.shortcut.enable.md)
+- [Option: Shortcut Event Handlers](../options/option.shortcut.handles.md)
+- [Option: Shortcut Mapping](../options/option.shortcut.handles.md)

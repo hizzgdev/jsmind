@@ -19,6 +19,6 @@
 - **自定义事件处理器**：用户可以自定义事件处理器来实现特定的操作逻辑。通过在配置中指定处理器的名称和对应的处理函数，用户可以扩展快捷键功能，实现更多定制化的操作。
 
 参考文档：
-- [选项：是否启用快捷键](../option.shortcut.enable.md)
-- [选项：快捷键事件处理器](../option.shortcut.handles.md)
-- [选项：快捷键映射](../option.shortcut.handles.md)
+- [选项：是否启用快捷键](../options/option.shortcut.enable.md)
+- [选项：快捷键事件处理器](../options/option.shortcut.handles.md)
+- [选项：快捷键映射](../options/option.shortcut.handles.md)
