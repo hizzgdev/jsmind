@@ -14,10 +14,22 @@ navigation:                # accepts {file, title, url, icon, sidebaricon, level
   - {url: "/docs/zh/get-started/", title: "快速上手", level: 2}
   - {url: "/docs/zh/options/", title: "选项", level: 2}
   - {url: "/docs/zh/index-legacy.html", title: "旧版文档", level: 2}
+  - {url: "/docs/zh/1.usage.html", title: "基本用法", level: 3}
+  - {url: "/docs/zh/2.options.html", title: "选项", level: 3}
+  - {url: "/docs/zh/3.operation.html", title: "界面操控", level: 3}
+  - {url: "/docs/zh/experimental-features.html", title: "实验性功能", level: 3}
+  - {url: "/docs/zh/4.contribution.html", title: "参与贡献", level: 3}
+  - {url: "/docs/zh/5.development.html", title: "贡献代码指南", level: 3}
   - {url: "/docs/en/", title: "Documents", icon: book, level: 1}
   - {url: "/docs/en/get-started/", title: "Get Started", level: 2}
   - {url: "/docs/en/options/", title: "Options", level: 2}
   - {url: "/docs/en/index-legacy.html", title: "Legacy Documents", level: 2}
+  - {url: "/docs/en/1.usage.html", title: "Usage", level: 3}
+  - {url: "/docs/en/2.options.html", title: "Options", level: 3}
+  - {url: "/docs/en/3.operation.html", title: "API / Operation", level: 3}
+  - {url: "/docs/en/experimental-features.html", title: "Experimental Features", level: 3}
+  - {url: "/docs/en/4.contribution.html", title: "Contribution", level: 3}
+  - {url: "/docs/en/5.development.html", title: "Development Guide", level: 3}
   - {url: "https://github.com/hizzgdev/jsmind", title: "GitHub", icon: github, level: 1}
 
 stats:
