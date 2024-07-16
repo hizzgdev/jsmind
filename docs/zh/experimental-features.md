@@ -1,14 +1,3 @@
-
-[目录](index.md)
-
-* [基本用法](1.usage.md)
-* [选项](2.options.md)
-* [界面操控](3.operation.md)
-* [实验性功能 *](experimental-features.md)
-  * [截图 (导出图片)](plugin-screenshot.md)
-* [参与贡献](4.contribution.md)
-* [贡献代码指南](5.development.md)
-
 实验性功能
 ===
 
@@ -16,12 +5,3 @@
 
 目前提供的实验性功能有：
 - [截图 (导出图片)](plugin-screenshot.md) : 可将显示的思维导图导出为一张图片。
-
-
-
-版权声明
-===
-
-禁止转载、禁止演绎。
-
-jsMind 项目仍在不断升级变化，版本更新时会同时更新对应的文档。为避免给使用者带来困惑，在没有得到书面许可前，禁止转载本文档，同时禁止对本文档进行任何形式的更改。

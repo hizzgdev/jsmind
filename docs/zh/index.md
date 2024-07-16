@@ -1,4 +1,4 @@
-# jsMind 简介
+# jsMind
 
 jsMind 是一个用于显示和编辑思维导图的纯 JavaScript 类库。它基于 Canvas 和 SVG 进行设计，能够在现代浏览器中高效地运行。jsMind 以 BSD 协议开源，这意味着可以在遵守该协议的前提下，将其嵌入到任何项目中使用。
 

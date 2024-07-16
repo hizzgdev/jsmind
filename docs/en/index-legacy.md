@@ -23,10 +23,3 @@ Table of Contents
   * [Screenshot (Export as Image)](plugin-screenshot.md)
 * [Contribution](4.contribution.md)
 * [Development Guide](5.development.md)
-
-copyright notice
-======
-
-Reproduction and deduction are prohibited.
-
-The jsMind project is still being updated and the corresponding documentation is updated at the same time as the version is updated. In order to avoid confusion to the user, it is forbidden to reprint this document without written permission and to make changes of any kind to this document.

@@ -1,4 +1,4 @@
-# jsMind Supported Options
+# Options
 
 jsMind provides various options to customize the behavior and appearance of mind maps.
 

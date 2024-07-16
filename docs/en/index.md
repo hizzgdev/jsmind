@@ -1,4 +1,4 @@
-# Introduction to jsMind
+# jsMind
 
 jsMind is a pure JavaScript library for displaying and editing mind maps. It is designed based on Canvas and SVG technologies, allowing it to run efficiently in modern browsers. jsMind is open-sourced under the BSD license, which means it can be embedded in any project as long as the license is followed.
 
