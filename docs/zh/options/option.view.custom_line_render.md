@@ -42,7 +42,3 @@ var options = {
 ```
 
 在上述示例中，自定义的线条渲染方法将节点之间的线条绘制为红色的直线，并且线条宽度为 3 像素。
-
-## 贡献者
-
-该参数是由 [YttriumC](https://github.com/YttriumC) 贡献，[YttriumC](https://github.com/YttriumC) 还提供了[一个不同的线型](https://github.com/hizzgdev/jsmind/discussions/608)。在此表示感谢。

@@ -42,7 +42,3 @@ var options = {
 ```
 
 In the example above, the custom line rendering method draws red straight lines between nodes with a line width of 3 pixels.
-
-## Contributor
-
-This option was contributed by [YttriumC](https://github.com/YttriumC), [YttriumC](https://github.com/YttriumC) also shared a [custom render method](https://github.com/hizzgdev/jsmind/discussions/608). Thanks!
