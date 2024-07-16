@@ -27,7 +27,7 @@ navigation:                # accepts {file, title, url, icon, sidebaricon, level
   - {url: "/docs/en/1.usage.html", title: "Usage", level: 3}
   - {url: "/docs/en/2.options.html", title: "Options", level: 3}
   - {url: "/docs/en/3.operation.html", title: "API / Operation", level: 3}
-  - {url: "/docs/en/experimental-features.html", title: "Experimental Features", level: 3}
+  - {url: "/docs/en/experimental-features.html", title: "Experimental", level: 3}
   - {url: "/docs/en/4.contribution.html", title: "Contribution", level: 3}
   - {url: "/docs/en/5.development.html", title: "Development Guide", level: 3}
   - {url: "https://github.com/hizzgdev/jsmind", title: "GitHub", icon: github, level: 1}
