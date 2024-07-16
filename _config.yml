@@ -8,10 +8,17 @@ description: " "
 
 show_sidebar: true
 
-navigation:                # accepts {file, title, url, icon, sidebaricon}
-  - {url: "/", title: "About jsMind", icon: bolt}
-  - {url: "/docs/", title: "Documents", icon: book}
-  - {url: "https://github.com/hizzgdev/jsmind", title: "GitHub", icon: github}
+navigation:                # accepts {file, title, url, icon, sidebaricon, level}
+  - {url: "/", title: "About jsMind", icon: bolt, level: 1}
+  - {url: "/docs/zh/", title: "文档", icon: book, level: 1}
+  - {url: "/docs/zh/get-started", title: "快速上手", icon: book, level: 2}
+  - {url: "/docs/zh/options", title: "选项", icon: book, level: 2}
+  - {url: "/docs/zh/3.operation.html", title: "API", icon: book, level: 2}
+  - {url: "/docs/en/", title: "Document", icon: book, level: 1}
+  - {url: "/docs/en/get-started", title: "Get Started", icon: book, level: 2}
+  - {url: "/docs/en/options", title: "Options", icon: book, level: 2}
+  - {url: "/docs/en/3.operation.html", title: "API", icon: book, level: 2}
+  - {url: "https://github.com/hizzgdev/jsmind", title: "GitHub", icon: github, level: 1}
 
 stats:
   google: G-JL176YVWE0
