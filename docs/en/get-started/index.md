@@ -106,7 +106,7 @@ var jm = new jsMind(options);
 jm.show(mind);
 ```
 
-For more details on options, please refer to [Options](options.md).
+For more details on options, please refer to [Options](../options/).
 
 
 ## The Complete Code (via CDN)

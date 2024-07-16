@@ -106,7 +106,7 @@ var jm = new jsMind(options);
 jm.show(mind);
 ```
 
-更详细的配置选项，请参考[配置选项](options.md)。
+更详细的配置选项，请参考[配置选项](../options/)。
 
 
 ## 完整代码（CDN方式）
