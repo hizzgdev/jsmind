@@ -505,6 +505,11 @@ export class ViewProvider {
         this._reset_node_custom_style(node._data.view.element, node.data);
     }
     _reset_node_custom_style(node_element, node_data) {
+        if ('classList' in node_data && Array.isArray(node_data['classList'])) {
+            node_data['classList'].forEach((className) => {
+                node_element.classList.add(className);
+            });
+        }
         if ('background-color' in node_data) {
             node_element.style.backgroundColor = node_data['background-color'];
         }
