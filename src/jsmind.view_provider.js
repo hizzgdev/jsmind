@@ -505,8 +505,8 @@ export class ViewProvider {
         this._reset_node_custom_style(node._data.view.element, node.data);
     }
     _reset_node_custom_style(node_element, node_data) {
-        if ('classList' in node_data && Array.isArray(node_data['classList'])) {
-            node_data['classList'].forEach((className) => {
+        if (Array.isArray(node_data['nodeClassList'])) {
+            node_data['nodeClassList'].forEach(className => {
                 node_element.classList.add(className);
             });
         }
@@ -591,6 +591,7 @@ export class ViewProvider {
         var pin = null;
         var pout = null;
         var color = null;
+        var classList = null;
         var _offset = this.get_view_offset();
         for (var nodeid in nodes) {
             node = nodes[nodeid];
@@ -603,7 +604,10 @@ export class ViewProvider {
             pin = this.layout.get_node_point_in(node);
             pout = this.layout.get_node_point_out(node.parent);
             color = node.data['leading-line-color'];
-            this.graph.draw_line(pout, pin, _offset, color);
+            classList = Array.isArray(node.data['lineClassList'])
+                ? node.data['lineClassList']
+                : null;
+            this.graph.draw_line(pout, pin, _offset, color, classList);
         }
     }
     // Drag the whole mind map with your mouse, when it's larger that the container

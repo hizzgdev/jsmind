@@ -59,11 +59,16 @@ class SvgGraph {
         }
         this.lines.length = 0;
     }
-    draw_line(pout, pin, offset, color) {
+    draw_line(pout, pin, offset, color, classList) {
         var line = SvgGraph.c('path');
         line.setAttribute('stroke', color || this.opts.line_color);
         line.setAttribute('stroke-width', this.opts.line_width);
         line.setAttribute('fill', 'transparent');
+        if (classList) {
+            classList.forEach(className => {
+                line.classList.add(className);
+            });
+        }
         this.lines.push(line);
         this.e_svg.appendChild(line);
         this.drawing(
