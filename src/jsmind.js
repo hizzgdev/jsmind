@@ -125,7 +125,7 @@ export default class jsMind {
         this.view.add_event(this, 'mousedown', this.mousedown_handle);
         this.view.add_event(this, 'click', this.click_handle);
         this.view.add_event(this, 'dblclick', this.dblclick_handle);
-        this.view.add_event(this, 'mousewheel', this.mousewheel_handle, true);
+        this.view.add_event(this, 'wheel', this.mousewheel_handle, true);
     }
     mousedown_handle(e) {
         if (!this.options.default_event_handle['enable_mousedown_handle']) {
@@ -172,7 +172,7 @@ export default class jsMind {
     // Use [Ctrl] + Mousewheel, to zoom in/out.
     mousewheel_handle(e) {
         // Test if mousewheel option is enabled and Ctrl key is pressed.
-        if (!this.options.default_event_handle['enable_mousewheel_handle'] || !e.ctrlKey) {
+        if (!this.options.default_event_handle['enable_mousewheel_handle'] || (this.options.view.zoom.ctrlKey && !e.ctrlKey) || (this.options.view.zoom.shiftKey && !e.shiftKey) || (this.options.view.zoom.altKey && !e.altKey) || (this.options.view.zoom.metaKey && !e.metaKey)) {
             return;
         }
         var evt = e || event;
