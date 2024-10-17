@@ -163,10 +163,13 @@ class DraggableNode {
         if (this.capture) {
             return;
         }
+        var jview = this.jm.view;
+        if (jview.is_editing()) {
+            return;
+        }
         this.active_node = null;
         this.view_draggable = this.jm.get_view_draggable();
 
-        var jview = this.jm.view;
         var el = this.find_node_element(e.target);
         if (!el) {
             return;

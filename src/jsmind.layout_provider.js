@@ -147,7 +147,8 @@ export class LayoutProvider {
                 this.set_visible(node.children, false);
             }
             node_outer_height = Math.max(node._data.view.height, node_outer_height);
-            if (node.children.length > 1) {
+
+            if (this._should_reserve_cousin_space(node)) {
                 node_outer_height += this.opts.cousin_space;
             }
 
@@ -196,7 +197,7 @@ export class LayoutProvider {
                 node_outer_height = 0;
             }
             node_outer_height = Math.max(node._data.view.height, node_outer_height);
-            if (node.children.length > 1) {
+            if (this._should_reserve_cousin_space(node)) {
                 node_outer_height += this.opts.cousin_space;
             }
 
@@ -215,6 +216,9 @@ export class LayoutProvider {
             node._data.layout.offset_y += middle_height;
         }
         return total_height;
+    }
+    _should_reserve_cousin_space(node) {
+        return node.children.length > 0 && node.parent.children.length > 1;
     }
     get_node_offset(node) {
         var layout_data = node._data.layout;
