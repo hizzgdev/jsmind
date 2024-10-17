@@ -18,16 +18,16 @@ This feature can support to export mind maps as png images.
 ```html
 
 <!-- style -->
-<link type="text/css" rel="stylesheet" href="https://unpkg.com/jsmind@0.8.5/style/jsmind.css" />
+<link type="text/css" rel="stylesheet" href="https://unpkg.com/jsmind@0.8.6/style/jsmind.css" />
 
 <!-- jsMind -->
-<script type="text/javascript" src="https://unpkg.com/jsmind@0.8.5/es6/jsmind.js"></script>
+<script type="text/javascript" src="https://unpkg.com/jsmind@0.8.6/es6/jsmind.js"></script>
 
 <!-- dependency of screenshot -->
 <script type="text/javascript" src="https://unpkg.com/dom-to-image@2.6.0/dist/dom-to-image.min.js" ></script>
 
 <!-- screenshot plugin -->
-<script type="text/javascript" src="https://unpkg.com/jsmind@0.8.5/es6/jsmind.screenshot.js"></script>
+<script type="text/javascript" src="https://unpkg.com/jsmind@0.8.6/es6/jsmind.screenshot.js"></script>
 
 
 <script>
