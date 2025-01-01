@@ -8,7 +8,7 @@ export default [
             name: 'jsMind',
             file: 'es6/jsmind.js',
             format: 'umd',
-            banner: '/**\n* @license BSD-3-Clause\n* @copyright 2014-2023 hizzgdev@163.com\n*\n* Project Home:\n*   https://github.com/hizzgdev/jsmind/\n*/',
+            banner: '/**\n* @license BSD-3-Clause\n* @copyright 2014-2025 hizzgdev@163.com\n*\n* Project Home:\n*   https://github.com/hizzgdev/jsmind/\n*/',
             sourcemap: true,
         },
         plugins: [
@@ -27,7 +27,7 @@ export default [
         output: {
             file: 'es6/jsmind.draggable-node.js',
             format: 'umd',
-            banner: '/**\n* @license BSD-3-Clause\n* @copyright 2014-2023 hizzgdev@163.com\n*\n* Project Home:\n*   https://github.com/hizzgdev/jsmind/\n*/',
+            banner: '/**\n* @license BSD-3-Clause\n* @copyright 2014-2025 hizzgdev@163.com\n*\n* Project Home:\n*   https://github.com/hizzgdev/jsmind/\n*/',
             sourcemap: true,
             globals: {
                 jsmind: 'jsMind',
@@ -50,7 +50,7 @@ export default [
         output: {
             file: 'es6/jsmind.screenshot.js',
             format: 'umd',
-            banner: '/**\n* @license BSD-3-Clause\n* @copyright 2014-2023 hizzgdev@163.com\n*\n* Project Home:\n*   https://github.com/hizzgdev/jsmind/\n*/',
+            banner: '/**\n* @license BSD-3-Clause\n* @copyright 2014-2025 hizzgdev@163.com\n*\n* Project Home:\n*   https://github.com/hizzgdev/jsmind/\n*/',
             sourcemap: true,
             globals: {
                 'jsmind': 'jsMind',
