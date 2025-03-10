@@ -373,6 +373,16 @@ export const format = {
                 'expanded' in node_data ? node_data.expanded == 'true' : node_folded != 'true';
             delete node_data.expanded;
 
+            var node_foreground_color = xml_node.getAttribute('COLOR');
+            if (!!node_foreground_color) {
+                node_data['foreground-color'] = node_foreground_color;
+            }
+
+            var node_background_color = xml_node.getAttribute('BACKGROUND_COLOR');
+            if (!!node_background_color) {
+                node_data['background-color'] = node_background_color;
+            }
+
             var node_position = xml_node.getAttribute('POSITION');
             var node_direction = null;
             if (!!node_position) {
@@ -417,6 +427,8 @@ export const format = {
         _build_map: function (node, xml_lines) {
             var df = format.freemind;
             var pos = null;
+            var node_data = node.data;
+
             if (!!node.parent && node.parent.isroot) {
                 pos = node.direction === Direction.left ? 'left' : 'right';
             }
@@ -428,12 +440,20 @@ export const format = {
             if (!node.expanded) {
                 xml_lines.push(' FOLDED="true"');
             }
+            if (!!node_data['foreground-color']) {
+                xml_lines.push(' COLOR="' + node_data['foreground-color'] + '"');
+            }
+            if (!!node_data['background-color']) {
+                xml_lines.push(' BACKGROUND_COLOR="' + node_data['background-color'] + '"');
+            }
             xml_lines.push(' TEXT="' + df._escape(node.topic) + '">');
 
             // for attributes
-            var node_data = node.data;
             if (node_data != null) {
                 for (var k in node_data) {
+                    if (k === 'foreground-color' || k === 'background-color') {
+                        continue;
+                    }
                     xml_lines.push('<attribute NAME="' + k + '" VALUE="' + node_data[k] + '"/>');
                 }
             }
