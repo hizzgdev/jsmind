@@ -6,7 +6,7 @@
  *   https://github.com/hizzgdev/jsmind/
  */
 
-export const __version__ = '0.8.6';
+export const __version__ = '0.8.7';
 export const __author__ = 'hizzgdev@163.com';
 
 if (typeof String.prototype.startsWith != 'function') {
