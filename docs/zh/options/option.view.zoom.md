@@ -6,7 +6,7 @@
 | view.zoom.min | number | 0.5 | 最小缩放比例 |
 | view.zoom.max | number | 2.1 | 最大缩放比例 |
 | view.zoom.step | number | 0.1 | 缩放步长 |
-| view.zoom.mask_key | number | 4096 | 启用缩放操作的功能键 |
+| view.zoom.mask_key | number | 4096 | 启用缩放操作的功能键（从 0.8.7 版本开始支持） |
 
 ## 选项说明
 
@@ -33,7 +33,7 @@ var options = {
 ```
 
 在上述示例中，`zoom` 选项被设置为 `{ min: 0.5, max: 5.0, step: 0.1 }`。这个设置将允许用户将思维导图的缩放比例调整到 0.5 到 5.0 之间，每次缩放的步长为 0.1。
-`mask_key` 设置为 4096，意思是我们需要按下 Ctrl 键才能用鼠标滚轮缩放思维导图，`mask_key` 是一个组合键，请参阅[组合按键](option.shortcut.mapping.md)来了解如何配置它。
+`mask_key` 设置为 4096，意思是我们需要按下 Ctrl 键才能用鼠标滚轮缩放思维导图，`mask_key` 是一个组合键。请参阅[组合按键](option.shortcut.mapping.md)来了解如何配置它。
 
 ## 如何进行缩放
 
