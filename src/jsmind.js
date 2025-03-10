@@ -175,7 +175,7 @@ export default class jsMind {
         var kc = (e.metaKey << 13) + (e.ctrlKey << 12) + (e.altKey << 11) + (e.shiftKey << 10);
         if (
             !this.options.default_event_handle['enable_mousewheel_handle'] ||
-            this.options.view.zoom.maskKey !== kc
+            this.options.view.zoom.mask_key !== kc
         ) {
             return;
         }

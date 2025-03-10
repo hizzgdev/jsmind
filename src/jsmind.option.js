@@ -31,7 +31,7 @@ const default_options = {
             min: 0.5,
             max: 2.1,
             step: 0.1,
-            maskKey: 4096,
+            mask_key: 4096,
         },
         custom_node_render: null,
         expander_style: 'char', // [char | number]
