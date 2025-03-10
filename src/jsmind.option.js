@@ -1,6 +1,6 @@
 /**
  * @license BSD
- * @copyright 2014-2023 hizzgdev@163.com
+ * @copyright 2014-2025 hizzgdev@163.com
  *
  * Project Home:
  *   https://github.com/hizzgdev/jsmind/
@@ -31,6 +31,7 @@ const default_options = {
             min: 0.5,
             max: 2.1,
             step: 0.1,
+            mask_key: 4096,
         },
         custom_node_render: null,
         expander_style: 'char', // [char | number]

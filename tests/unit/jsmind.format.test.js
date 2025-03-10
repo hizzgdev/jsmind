@@ -6,21 +6,44 @@ test('node tree', () => {
     const mind = format.node_tree.get_mind(fakeMindMaps.node_tree);
     checkMindData(mind);
     const data = format.node_tree.get_data(mind);
-    expect(data).toMatchObject(fakeMindMaps.node_tree);
+    expect(data).toStrictEqual(fakeMindMaps.node_tree);
 });
 
 test('node array', () => {
     const mind = format.node_array.get_mind(fakeMindMaps.node_array);
     checkMindData(mind);
     const data = format.node_array.get_data(mind);
-    expect(data).toMatchObject(fakeMindMaps.node_array);
+    expect(data).toStrictEqual(fakeMindMaps.node_array);
 });
 
 test('freemind', () => {
     const mind = format.freemind.get_mind(fakeMindMaps.freemind);
     checkMindData(mind);
     const data = format.freemind.get_data(mind);
-    expect(data).toMatchObject(fakeMindMaps.freemind);
+    console.log(data);
+    expect(data).toStrictEqual(fakeMindMaps.freemind);
+});
+
+test('load same', () => {
+    const mind1 = format.node_array.get_mind(fakeMindMaps.node_array);
+    const mind2 = format.node_tree.get_mind(fakeMindMaps.node_tree);
+    const mind3 = format.freemind.get_mind(fakeMindMaps.freemind);
+    expect(mind1).toStrictEqual(mind2);
+    expect(mind2).toStrictEqual(mind3);
+    expect(mind3).toStrictEqual(mind1);
+    expect(mind1).toStrictEqual(mind3);
+    expect(mind3).toStrictEqual(mind2);
+    expect(mind2).toStrictEqual(mind1);
+});
+
+test('get same', () => {
+    const mind = format.node_array.get_mind(fakeMindMaps.node_array);
+    const data_tree = format.node_tree.get_data(mind);
+    expect(data_tree).toStrictEqual(fakeMindMaps.node_tree);
+    const data_array = format.node_array.get_data(mind);
+    expect(data_array).toStrictEqual(fakeMindMaps.node_array);
+    const freemind = format.freemind.get_data(mind);
+    expect(freemind).toStrictEqual(fakeMindMaps.freemind);
 });
 
 test('text', () => {
@@ -46,12 +69,14 @@ function checkMindData(mind) {
     expect(node1.direction).toBe(Direction.left);
     expect(node1.expanded).toBe(false);
     expect(node1.children.length).toBe(1);
+    expect(node1.data['background-color']).toBe('#ffffff');
 
     const node2 = node1.children[0];
     expect(node2.id).toBe('easy1');
     expect(node2.topic).toBe('Easy to show');
     expect(node2.data.ext).toBe('addition data');
     expect(node2.children.length).toBe(0);
+    expect(node2.data['foreground-color']).toBe('#000000');
 }
 
 function checkTextMindData(mind) {
@@ -82,13 +107,23 @@ const fakeMindMaps = {
         data: {
             id: 'root',
             topic: 'jsMind',
+            expanded: true,
             children: [
                 {
-                    id: 'easy',
-                    topic: 'Easy',
-                    direction: 'left',
-                    expanded: false,
-                    children: [{ id: 'easy1', topic: 'Easy to show', ext: 'addition data' }],
+                    'id': 'easy',
+                    'topic': 'Easy',
+                    'direction': 'left',
+                    'expanded': false,
+                    'background-color': '#ffffff',
+                    'children': [
+                        {
+                            'id': 'easy1',
+                            'topic': 'Easy to show',
+                            'expanded': true,
+                            'ext': 'addition data',
+                            'foreground-color': '#000000',
+                        },
+                    ],
                 },
             ],
         },
@@ -97,15 +132,29 @@ const fakeMindMaps = {
         meta: { name: fakeMindName, author: fakeMindAuthor, version: fakeVersion },
         format: 'node_array',
         data: [
-            { id: 'root', topic: 'jsMind', isroot: true },
-            { id: 'easy', topic: 'Easy', parentid: 'root', direction: 'left', expanded: false },
-            { id: 'easy1', topic: 'Easy to show', parentid: 'easy', ext: 'addition data' },
+            { id: 'root', topic: 'jsMind', isroot: true, expanded: true },
+            {
+                'id': 'easy',
+                'topic': 'Easy',
+                'parentid': 'root',
+                'direction': 'left',
+                'expanded': false,
+                'background-color': '#ffffff',
+            },
+            {
+                'id': 'easy1',
+                'topic': 'Easy to show',
+                'parentid': 'easy',
+                'expanded': true,
+                'ext': 'addition data',
+                'foreground-color': '#000000',
+            },
         ],
     },
     freemind: {
         meta: { name: 'test jsmind', author: 'hizzgdev', version: 'version' },
         format: 'freemind',
-        data: '<map version="1.0.1"><node ID="root" TEXT="jsMind"><node ID="easy" POSITION="left" FOLDED="true" TEXT="Easy"><node ID="easy1" TEXT="Easy to show"><attribute NAME="ext" VALUE="addition data"/></node></node></node></map>',
+        data: '<map version="1.0.1"><node ID="root" TEXT="jsMind"><node ID="easy" POSITION="left" FOLDED="true" BACKGROUND_COLOR="#ffffff" TEXT="Easy"><node ID="easy1" COLOR="#000000" TEXT="Easy to show"><attribute NAME="ext" VALUE="addition data"/></node></node></node></map>',
     },
     text: {
         meta: { name: 'test jsmind', author: 'hizzgdev', version: 'version' },
