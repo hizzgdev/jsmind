@@ -31,10 +31,7 @@ const default_options = {
             min: 0.5,
             max: 2.1,
             step: 0.1,
-            ctrlKey:true,
-            shiftKey:true,
-            altKey:false,
-            metaKey:false,
+            maskKey: 4096,
         },
         custom_node_render: null,
         expander_style: 'char', // [char | number]

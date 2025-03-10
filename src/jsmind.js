@@ -172,7 +172,11 @@ export default class jsMind {
     // Use [Ctrl] + Mousewheel, to zoom in/out.
     mousewheel_handle(e) {
         // Test if mousewheel option is enabled and Ctrl key is pressed.
-        if (!this.options.default_event_handle['enable_mousewheel_handle'] || (this.options.view.zoom.ctrlKey && !e.ctrlKey) || (this.options.view.zoom.shiftKey && !e.shiftKey) || (this.options.view.zoom.altKey && !e.altKey) || (this.options.view.zoom.metaKey && !e.metaKey)) {
+        var kc = (evt.metaKey << 13) + (evt.ctrlKey << 12) + (evt.altKey << 11) + (evt.shiftKey << 10);
+        if (
+            !this.options.default_event_handle['enable_mousewheel_handle'] ||
+            (this.options.view.zoom.maskKey !== kc)
+        ) {
             return;
         }
         var evt = e || event;
