@@ -172,10 +172,11 @@ export default class jsMind {
     // Use [Ctrl] + Mousewheel, to zoom in/out.
     mousewheel_handle(e) {
         // Test if mousewheel option is enabled and Ctrl key is pressed.
-        var kc = (evt.metaKey << 13) + (evt.ctrlKey << 12) + (evt.altKey << 11) + (evt.shiftKey << 10);
+        var kc =
+            (evt.metaKey << 13) + (evt.ctrlKey << 12) + (evt.altKey << 11) + (evt.shiftKey << 10);
         if (
             !this.options.default_event_handle['enable_mousewheel_handle'] ||
-            (this.options.view.zoom.maskKey !== kc)
+            this.options.view.zoom.maskKey !== kc
         ) {
             return;
         }
