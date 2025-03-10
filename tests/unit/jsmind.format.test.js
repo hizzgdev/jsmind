@@ -110,12 +110,20 @@ const fakeMindMaps = {
             expanded: true,
             children: [
                 {
-                    id: 'easy',
-                    topic: 'Easy',
-                    direction: 'left',
-                    expanded: false,
+                    'id': 'easy',
+                    'topic': 'Easy',
+                    'direction': 'left',
+                    'expanded': false,
                     'background-color': '#ffffff',
-                    children: [{ id: 'easy1', topic: 'Easy to show', expanded: true, ext: 'addition data', 'foreground-color': '#000000' }],
+                    'children': [
+                        {
+                            'id': 'easy1',
+                            'topic': 'Easy to show',
+                            'expanded': true,
+                            'ext': 'addition data',
+                            'foreground-color': '#000000',
+                        },
+                    ],
                 },
             ],
         },
@@ -125,8 +133,22 @@ const fakeMindMaps = {
         format: 'node_array',
         data: [
             { id: 'root', topic: 'jsMind', isroot: true, expanded: true },
-            { id: 'easy', topic: 'Easy', parentid: 'root', direction: 'left', expanded: false, 'background-color': '#ffffff' },
-            { id: 'easy1', topic: 'Easy to show', parentid: 'easy', expanded: true, ext: 'addition data', 'foreground-color': '#000000' },
+            {
+                'id': 'easy',
+                'topic': 'Easy',
+                'parentid': 'root',
+                'direction': 'left',
+                'expanded': false,
+                'background-color': '#ffffff',
+            },
+            {
+                'id': 'easy1',
+                'topic': 'Easy to show',
+                'parentid': 'easy',
+                'expanded': true,
+                'ext': 'addition data',
+                'foreground-color': '#000000',
+            },
         ],
     },
     freemind: {
