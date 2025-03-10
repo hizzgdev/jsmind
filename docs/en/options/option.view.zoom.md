@@ -6,7 +6,7 @@
 | view.zoom.min | number | 0.5 | Minimum zoom ratio |
 | view.zoom.max | number | 2.1 | Maximum zoom ratio |
 | view.zoom.step | number | 0.1 | Zoom step |
-| view.zoom.mask_key | number | 4096 | Function key to enable this function |
+| view.zoom.mask_key | number | 4096 | Function key to enable this function (Since 0.8.7) |
 
 ## Option Description
 
