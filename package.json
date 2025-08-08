@@ -3,10 +3,23 @@
     "version": "0.8.7",
     "description": "jsMind is a pure javascript library for mindmap, it base on html5 canvas. jsMind was released under BSD license, you can embed it in any project, if only you observe the license.",
     "main": "es6/jsmind.js",
+    "types": "es6/jsmind.d.ts",
     "exports": {
-        ".": "./es6/jsmind.js",
-        "./draggable-node": "./es6/jsmind.draggable-node.js",
-        "./screenshot": "./es6/jsmind.screenshot.js",
+        ".": {
+            "import": "./es6/jsmind.js",
+            "require": "./es6/jsmind.js",
+            "types": "./es6/jsmind.d.ts"
+        },
+        "./draggable-node": {
+            "import": "./es6/jsmind.draggable-node.js",
+            "require": "./es6/jsmind.draggable-node.js",
+            "types": "./es6/jsmind.draggable-node.d.ts"
+        },
+        "./screenshot": {
+            "import": "./es6/jsmind.screenshot.js",
+            "require": "./es6/jsmind.screenshot.js",
+            "types": "./es6/jsmind.screenshot.d.ts"
+        },
         "./style/jsmind.css": "./style/jsmind.css"
     },
     "directories": {
@@ -45,13 +58,14 @@
         }
     ],
     "devDependencies": {
+        "@rollup/plugin-terser": "^0.4.4",
         "http-server": "^14.1.1",
         "jest": "^28.1.0",
         "jest-environment-jsdom": "^28.1.0",
         "prettier": "2.6.2",
         "rollup": "2.79.2",
         "rollup-plugin-cleanup": "^3.2.1",
-        "@rollup/plugin-terser": "^0.4.4"
+        "typescript": "^5.9.2"
     },
     "jest": {
         "verbose": true,
