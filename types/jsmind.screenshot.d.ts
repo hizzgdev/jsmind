@@ -34,7 +34,7 @@ export class JmScreenshot {
     download(c: HTMLCanvasElement): void;
 }
 
-declare module './jsmind' {
+declare module 'jsmind' {
     interface PluginOptions {
         screenshot?: ScreenshotOptions;
     }

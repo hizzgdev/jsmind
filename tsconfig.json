@@ -18,6 +18,9 @@
             "jsmind/screenshot": ["types/jsmind.screenshot.d.ts"]
         }
     },
-    "include": ["example/typescript-test.ts", "example/typescript-example.ts", "types/*.d.ts"],
+    "include": [
+        "types/*.d.ts",
+        "example/typescript-test.ts"
+    ],
     "exclude": ["node_modules", "dist", "tests"]
 }

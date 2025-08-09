@@ -1,19 +1,19 @@
 /**
- * TypeScript 类型定义验证测试文件
- * 用于验证 jsMind 的 TypeScript 类型定义是否正确
+ * TypeScript typings validation example
+ * This file exercises jsMind's public API for type-checking purposes only.
  */
 
-// 导入主库（通过包名解析到 types/）
+// Import core library (resolved via package name to types/)
 import jsMind, { Node, Mind, JsMindOptions, NodeTreeFormat, MindMapData } from 'jsmind';
-// 注意：在实际使用中，插件需要单独导入来注册
+// Note: in real usage, plugins should be imported to register themselves
 // import 'jsmind/draggable-node';
 // import 'jsmind/screenshot';
 
 // ============================================================================
-// 基础配置测试
+// Basic options
 // ============================================================================
 
-// 测试基本配置选项
+// Minimal options
 const basicOptions: JsMindOptions = {
     container: 'jsmind_container',
     editable: true,
@@ -23,7 +23,7 @@ const basicOptions: JsMindOptions = {
     log_level: 'info',
 };
 
-// 测试完整配置选项
+// Full options
 const fullOptions: JsMindOptions = {
     container: 'jsmind_container',
     editable: true,
@@ -100,10 +100,10 @@ const fullOptions: JsMindOptions = {
 };
 
 // ============================================================================
-// 数据格式测试
+// Data formats
 // ============================================================================
 
-// 测试节点树格式数据
+// NodeTreeFormat specimen
 const nodeTreeData: NodeTreeFormat = {
     meta: {
         name: 'Test Mind Map',
@@ -143,13 +143,13 @@ const nodeTreeData: NodeTreeFormat = {
 };
 
 // ============================================================================
-// jsMind 实例测试
+// jsMind instance
 // ============================================================================
 
-// 创建 jsMind 实例
+// Create jsMind instance
 const jm = new jsMind(basicOptions);
 
-// 测试静态属性
+// Static members
 const NodeClass = jsMind.node;
 const MindClass = jsMind.mind;
 const direction = jsMind.direction;
@@ -157,30 +157,30 @@ const eventType = jsMind.event_type;
 const domUtil = jsMind.$;
 const util = jsMind.util;
 
-// 测试方向枚举
+// Direction enum
 const leftDirection: number = direction.left; // -1
 const rightDirection: number = direction.right; // 1
 const centerDirection: number = direction.center; // 0
 const parsedDirection: number | undefined = direction.of('left');
 
-// 测试事件类型
+// Event types
 const showEvent: number = eventType.show;
 const resizeEvent: number = eventType.resize;
 
 // ============================================================================
-// API 方法测试
+// API methods
 // ============================================================================
 
-// 显示思维导图
+// Show mind map
 jm.show(nodeTreeData);
 jm.show(); // 显示空白思维导图
 
-// 获取信息
+// Query state
 const meta = jm.get_meta();
 const data = jm.get_data('node_tree');
 const root = jm.get_root();
 
-// 节点操作
+// Node operations
 if (root) {
     const newNode = jm.add_node(root, 'new_node', 'New Topic', { color: 'blue' }, 1);
     if (newNode) {
@@ -195,92 +195,92 @@ if (root) {
     }
 }
 
-// 编辑操作
+// Edit operations
 jm.enable_edit();
 const isEditable: boolean = jm.get_editable();
 jm.begin_edit();
 jm.end_edit();
 jm.disable_edit();
 
-// 布局操作
+// Layout operations
 jm.expand_all();
 jm.collapse_all();
 jm.expand_to_depth(2);
 
-// 视图操作
+// View operations
 jm.enable_view_draggable();
 const isDraggable: boolean = jm.get_view_draggable();
 jm.disable_view_draggable();
 jm.resize();
 
-// 事件监听
+// Event listener
 jm.add_event_listener((type: number, data: any) => {
     console.log(`Event ${type} triggered with data:`, data);
 });
 
 // ============================================================================
-// Node 类测试
+// Node class
 // ============================================================================
 
-// 创建节点实例（通常不直接创建，而是通过 jsMind API）
+// Create node instance (normally created via API)
 const testNode = new Node('test_id', 1, 'Test Topic', { custom: 'data' }, false, null, 1, true);
 
-// 测试节点属性
+// Node fields
 const nodeId: string = testNode.id;
 const nodeTopic: string = testNode.topic;
 const nodeChildren: Node[] = testNode.children;
 const isRoot: boolean = testNode.isroot;
 
-// 测试节点方法
+// Node methods
 const location = testNode.get_location();
 const size = testNode.get_size();
 
-// 测试静态方法
+// Static helpers
 const isNodeInstance: boolean = Node.is_node(testNode);
 const comparison: number = Node.compare(testNode, testNode);
 
 // ============================================================================
-// 工具类测试
+// Utils
 // ============================================================================
 
-// JSON 工具
+// JSON utils
 const jsonString: string = util.json.json2string({ test: 'data' });
 const jsonObject: any = util.json.string2json('{"test":"data"}');
 const mergedObject: any = util.json.merge({}, { test: 'data' });
 
-// UUID 工具
+// UUID utils
 const newId: string = util.uuid.newid();
 
-// 文本工具
+// Text utils
 const isEmpty: boolean = util.text.is_empty('');
 const isNotEmpty: boolean = util.text.is_empty('hello');
 
-// 文件工具（需要 File 对象）
+// File utils (would require a File object)
 // util.file.read(fileObject, (result, name) => {
 //     console.log(`File ${name} content:`, result);
 // });
 
-// DOM 工具
+// DOM utils
 const element = domUtil.g('some_id');
 const newElement = domUtil.c('div');
 
 // ============================================================================
-// 类型检查验证
+// Type validation
 // ============================================================================
 
-// 这些代码应该通过 TypeScript 编译器的类型检查
+// The code below should pass the TS compiler type-check
 function validateTypes() {
-    // 验证配置选项类型
+    // Validate option types
     const config: JsMindOptions = basicOptions;
 
-    // 验证数据格式类型
+    // Validate data format types
     const mindData: MindMapData = nodeTreeData;
 
-    // 验证方法返回类型
+    // Validate return types
     const rootNode: Node | null = jm.get_root();
     const selectedNode: Node | null = jm.get_selected_node();
 
-    // 验证事件处理器类型
+    // Validate event handler shape
     const eventHandler = (type: number, data: any) => {
         if (type === jsMind.event_type.show) {
             console.log('Mind map shown');
@@ -296,8 +296,8 @@ function validateTypes() {
     };
 }
 
-// 导出验证函数供测试使用
+// Export for the Jest runner to import if needed
 export { validateTypes };
 
-console.log('TypeScript 类型定义验证测试完成！');
-console.log('如果此文件能够成功编译，说明类型定义是正确的。');
+console.log('TypeScript typings validation example done.');
+console.log('If this file compiles, typings are consistent.');

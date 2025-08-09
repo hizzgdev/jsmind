@@ -83,7 +83,7 @@ export class DraggableNode {
     jm_event_handle(type: number, data: any): void;
 }
 
-declare module './jsmind' {
+declare module 'jsmind' {
     interface PluginOptions {
         draggable_node?: DraggableNodeOptions;
     }
