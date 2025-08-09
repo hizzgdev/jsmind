@@ -18,31 +18,31 @@ const options = {
         zoom: {
             min: 0.5,
             max: 2.0,
-            step: 0.1
+            step: 0.1,
         },
         line_color: '#667eea',
-        line_width: 2
+        line_width: 2,
     },
     layout: {
         hspace: 30,
         vspace: 20,
-        pspace: 13
+        pspace: 13,
     },
     plugin: {
         draggable_node: {
             line_width: 5,
             line_color: 'rgba(102, 126, 234, 0.6)',
             line_color_invalid: 'rgba(220, 53, 69, 0.6)',
-            lookup_delay: 200
-        }
-    }
+            lookup_delay: 200,
+        },
+    },
 };
 // TypeScript 数据格式 - 类型安全的数据定义
 const sampleMindData = {
     meta: {
         name: 'TypeScript Demo',
         author: 'jsMind TypeScript',
-        version: '1.0'
+        version: '1.0',
     },
     format: 'node_tree',
     data: {
@@ -60,26 +60,26 @@ const sampleMindData = {
                         topic: '类型安全',
                         data: {
                             note: '编译时类型检查',
-                            background: '#e3f2fd'
-                        }
+                            background: '#e3f2fd',
+                        },
                     },
                     {
                         id: 'intellisense',
                         topic: '智能提示',
                         data: {
                             note: 'IDE 自动完成',
-                            background: '#f3e5f5'
-                        }
+                            background: '#f3e5f5',
+                        },
                     },
                     {
                         id: 'refactoring',
                         topic: '安全重构',
                         data: {
                             note: '重命名和移动',
-                            background: '#e8f5e8'
-                        }
-                    }
-                ]
+                            background: '#e8f5e8',
+                        },
+                    },
+                ],
             },
             {
                 id: 'benefits',
@@ -90,19 +90,19 @@ const sampleMindData = {
                     {
                         id: 'errors',
                         topic: '错误预防',
-                        data: { background: '#ff6b6b' }
+                        data: { background: '#ff6b6b' },
                     },
                     {
                         id: 'docs',
                         topic: '自文档化',
-                        data: { background: '#4ecdc4' }
+                        data: { background: '#4ecdc4' },
                     },
                     {
                         id: 'maintenance',
                         topic: '易维护性',
-                        data: { background: '#45b7d1' }
-                    }
-                ]
+                        data: { background: '#45b7d1' },
+                    },
+                ],
             },
             {
                 id: 'plugins',
@@ -110,11 +110,11 @@ const sampleMindData = {
                 direction: jsMind.direction.right,
                 children: [
                     { id: 'draggable', topic: '拖拽节点' },
-                    { id: 'screenshot', topic: '截图导出' }
-                ]
-            }
-        ]
-    }
+                    { id: 'screenshot', topic: '截图导出' },
+                ],
+            },
+        ],
+    },
 };
 // 初始化函数 - 类型安全的 jsMind 实例创建
 function initJsMind() {
@@ -142,8 +142,7 @@ function initJsMind() {
 }
 // 加载示例数据
 function loadSampleData() {
-    if (!jm)
-        initJsMind();
+    if (!jm) initJsMind();
     jm.show(sampleMindData);
     updateStatus('示例数据已加载 - 使用了 TypeScript NodeTreeFormat 类型');
 }
@@ -162,10 +161,16 @@ function addRandomNode() {
         const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'];
         const color = colors[Math.floor(Math.random() * colors.length)];
         // TypeScript 确保方法调用的类型正确性
-        const newNode = jm.add_node(parentNode, nodeId, topic, {
-            background: color,
-            created: new Date().toISOString()
-        }, Math.random() > 0.5 ? jsMind.direction.right : jsMind.direction.left);
+        const newNode = jm.add_node(
+            parentNode,
+            nodeId,
+            topic,
+            {
+                background: color,
+                created: new Date().toISOString(),
+            },
+            Math.random() > 0.5 ? jsMind.direction.right : jsMind.direction.left
+        );
         if (newNode) {
             jm.set_node_color(newNode.id, color, '#ffffff');
             jm.select_node(newNode);
@@ -183,30 +188,26 @@ function toggleEdit() {
     if (isEditMode) {
         jm.enable_edit();
         updateStatus('编辑模式已启用 - 双击节点可编辑');
-    }
-    else {
+    } else {
         jm.disable_edit();
         updateStatus('编辑模式已禁用');
     }
 }
 // 展开所有节点
 function expandAll() {
-    if (!jm)
-        return;
+    if (!jm) return;
     jm.expand_all();
     updateStatus('所有节点已展开');
 }
 // 收起所有节点
 function collapseAll() {
-    if (!jm)
-        return;
+    if (!jm) return;
     jm.collapse_all();
     updateStatus('所有节点已收起');
 }
 // 清空思维导图
 function clearMindMap() {
-    if (!jm)
-        return;
+    if (!jm) return;
     jm.show();
     updateStatus('思维导图已清空');
 }
