@@ -10,8 +10,14 @@
         "declaration": true,
         "outDir": "./dist",
         "rootDir": "./",
-        "noEmit": true
+        "noEmit": true,
+        "baseUrl": ".",
+        "paths": {
+            "jsmind": ["types/jsmind.d.ts"],
+            "jsmind/draggable-node": ["types/jsmind.draggable-node.d.ts"],
+            "jsmind/screenshot": ["types/jsmind.screenshot.d.ts"]
+        }
     },
-    "include": ["example/typescript-test.ts", "es6/*.d.ts"],
+    "include": ["example/typescript-test.ts", "example/typescript-example.ts", "types/*.d.ts"],
     "exclude": ["node_modules", "dist", "tests"]
 }

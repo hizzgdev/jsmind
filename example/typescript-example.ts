@@ -3,7 +3,7 @@
  * 展示如何在 TypeScript 项目中使用 jsMind
  */
 
-import jsMind, { JsMindOptions, NodeTreeFormat } from '../es6/jsmind';
+import jsMind, { JsMindOptions, NodeTreeFormat } from 'jsmind';
 
 // 创建配置选项
 const options: JsMindOptions = {

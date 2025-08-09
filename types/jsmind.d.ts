@@ -229,8 +229,18 @@ export class Mind {
         expanded?: boolean,
         idx?: number
     ): Node | null;
-    insert_node_before(node_before: Node, node_id: string, topic: string, data?: NodeData): Node | null;
-    insert_node_after(node_after: Node, node_id: string, topic: string, data?: NodeData): Node | null;
+    insert_node_before(
+        node_before: Node,
+        node_id: string,
+        topic: string,
+        data?: NodeData
+    ): Node | null;
+    insert_node_after(
+        node_after: Node,
+        node_id: string,
+        topic: string,
+        data?: NodeData
+    ): Node | null;
     remove_node(node: Node): boolean;
     move_node(node: Node, before_id?: string, parent_id?: string, direction?: number): Node | null;
 }
@@ -327,12 +337,33 @@ export default class jsMind {
     get_data(data_format?: 'node_tree' | 'node_array' | 'freemind' | 'text'): any;
     get_root(): Node | null;
     get_node(node: string | Node): Node | null;
-    add_node(parent_node: Node | string, node_id: string, topic: string, data?: NodeData, direction?: number): Node | null;
-    insert_node_before(node_before: Node | string, node_id: string, topic: string, data?: NodeData): Node | null;
-    insert_node_after(node_after: Node | string, node_id: string, topic: string, data?: NodeData): Node | null;
+    add_node(
+        parent_node: Node | string,
+        node_id: string,
+        topic: string,
+        data?: NodeData,
+        direction?: number
+    ): Node | null;
+    insert_node_before(
+        node_before: Node | string,
+        node_id: string,
+        topic: string,
+        data?: NodeData
+    ): Node | null;
+    insert_node_after(
+        node_after: Node | string,
+        node_id: string,
+        topic: string,
+        data?: NodeData
+    ): Node | null;
     remove_node(node: Node | string): boolean;
     update_node(node_id: string, topic: string): void;
-    move_node(node: Node | string, before_id?: string, parent_id?: string, direction?: number): void;
+    move_node(
+        node: Node | string,
+        before_id?: string,
+        parent_id?: string,
+        direction?: number
+    ): void;
     select_node(node: Node | string): void;
     select_clear(): void;
     get_selected_node(): Node | null;
@@ -341,7 +372,13 @@ export default class jsMind {
     find_node_after(node: Node | string): Node | null;
     set_node_color(node_id: string, bg_color?: string, fg_color?: string): void;
     set_node_font_style(node_id: string, size?: number, weight?: string, style?: string): void;
-    set_node_background_image(node_id: string, image: string, width?: number, height?: number, rotation?: number): void;
+    set_node_background_image(
+        node_id: string,
+        image: string,
+        width?: number,
+        height?: number,
+        rotation?: number
+    ): void;
     set_node_background_rotation(node_id: string, rotation: number): void;
     resize(): void;
     begin_edit(node?: Node | string): void;

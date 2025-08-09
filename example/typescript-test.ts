@@ -3,11 +3,11 @@
  * 用于验证 jsMind 的 TypeScript 类型定义是否正确
  */
 
-// 导入主库和插件
-import jsMind, { Node, Mind, JsMindOptions, NodeTreeFormat, MindMapData } from '../es6/jsmind';
+// 导入主库（通过包名解析到 types/）
+import jsMind, { Node, Mind, JsMindOptions, NodeTreeFormat, MindMapData } from 'jsmind';
 // 注意：在实际使用中，插件需要单独导入来注册
-// import './es6/jsmind.draggable-node';
-// import './es6/jsmind.screenshot';
+// import 'jsmind/draggable-node';
+// import 'jsmind/screenshot';
 
 // ============================================================================
 // 基础配置测试
