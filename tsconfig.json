@@ -20,7 +20,10 @@
     },
     "include": [
         "types/*.d.ts",
-        "example/typescript-test.ts"
+        "tests/fixtures/typescript-test.ts"
     ],
-    "exclude": ["node_modules", "dist", "tests"]
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
 }
