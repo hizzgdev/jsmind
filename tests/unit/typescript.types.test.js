@@ -22,7 +22,7 @@ function formatHost() {
 }
 
 describe('TypeScript typings validation', () => {
-    test('example/typescript-test.ts should pass type-check (no diagnostics)', () => {
+    test('tests/fixtures/typescript-test.ts should pass type-check (no diagnostics)', () => {
         const projectRoot = process.cwd();
         const tsconfigPath = path.join(projectRoot, 'tsconfig.json');
 
