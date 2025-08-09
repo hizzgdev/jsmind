@@ -39,7 +39,7 @@ declare module './jsmind' {
         screenshot?: ScreenshotOptions;
     }
 
-    export default interface jsMind {
+    interface jsMind {
         screenshot?: JmScreenshot;
         shoot?(): void;
     }
