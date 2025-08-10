@@ -12,7 +12,7 @@ import { $ } from './jsmind.dom.js';
  * Misc utility collection.
  * @type {{
  *  file: { read: (file: File, cb:(result:string,name:string)=>void)=>void, save:(data:string,type:string,name:string)=>void},
- *  json: { json2string:(v:any)=>string, string2json:(s:string)=>any, merge:(b:any,a:any)=>any },
+ *  json: { json2string:(v:unknown)=>string, string2json:(s:string)=>unknown, merge:(b:object,a:object)=>object },
  *  uuid: { newid:()=>string },
  *  text: { is_empty:(s?:string)=>boolean }
  * }}

@@ -15,10 +15,10 @@ export class Node {
     static inherited(parent_node: Node, node: Node): boolean;
     /**
      * Runtime check for Node instance.
-     * @param {any} n
+     * @param {unknown} n
      * @returns {n is Node}
      */
-    static is_node(n: any): n is Node;
+    static is_node(n: unknown): n is Node;
     /**
      * Create a Node instance.
      * @param {string} sId - Node id
@@ -39,7 +39,8 @@ export class Node {
     parent: Node;
     direction: number;
     expanded: boolean;
-    children: any[];
+    /** @type {Node[]} */
+    children: Node[];
     _data: {};
     /**
      * Get absolute location of this node in view coordinates.

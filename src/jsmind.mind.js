@@ -14,11 +14,17 @@ export class Mind {
      * Mind model: holds nodes and selection.
      */
     constructor() {
+        /** @type {string | null} */
         this.name = null;
+        /** @type {string | null} */
         this.author = null;
+        /** @type {string | null} */
         this.version = null;
+        /** @type {Node | null} */
         this.root = null;
+        /** @type {Node | null} */
         this.selected = null;
+        /** @type {Record<string, Node>} */
         this.nodes = {};
     }
     /**

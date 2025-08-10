@@ -11,11 +11,6 @@ import { util } from './jsmind.util.js';
 import { Direction } from './jsmind.common.js';
 
 export class ShortcutProvider {
-    /**
-     * Keyboard shortcut handler.
-     * @param {import('./jsmind.js').default} jm - jsMind instance
-     * @param {{enable:boolean, handles:Record<string,Function>, mapping:Record<string, number|number[]>}} options - Shortcut configuration options
-     */
     constructor(jm, options) {
         this.jm = jm;
         this.opts = options;
@@ -24,7 +19,6 @@ export class ShortcutProvider {
         this._newid = null;
         this._mapping = {};
     }
-    /** Initialize keyboard listeners and mapping. */
     init() {
         $.on(this.jm.view.e_panel, 'keydown', this.handler.bind(this));
 
@@ -56,15 +50,12 @@ export class ShortcutProvider {
             this._newid = util.uuid.newid;
         }
     }
-    /** Enable shortcuts. */
     enable_shortcut() {
         this.opts.enable = true;
     }
-    /** Disable shortcuts. */
     disable_shortcut() {
         this.opts.enable = false;
     }
-    /** @param {KeyboardEvent} e */
     handler(e) {
         if (e.which == 9) {
             e.preventDefault();
@@ -86,11 +77,6 @@ export class ShortcutProvider {
             this._mapping[kc].call(this, this.jm, e);
         }
     }
-    /**
-     * Handle add child node shortcut.
-     * @param {import('./jsmind.js').default} _jm - jsMind instance
-     * @param {KeyboardEvent} e - Keyboard event
-     */
     handle_addchild(_jm, e) {
         var selected_node = _jm.get_selected_node();
         if (!!selected_node) {
@@ -102,11 +88,6 @@ export class ShortcutProvider {
             }
         }
     }
-    /**
-     * Handle add brother node shortcut.
-     * @param {import('./jsmind.js').default} _jm - jsMind instance
-     * @param {KeyboardEvent} e - Keyboard event
-     */
     handle_addbrother(_jm, e) {
         var selected_node = _jm.get_selected_node();
         if (!!selected_node && !selected_node.isroot) {
@@ -118,22 +99,12 @@ export class ShortcutProvider {
             }
         }
     }
-    /**
-     * Handle edit node shortcut.
-     * @param {import('./jsmind.js').default} _jm - jsMind instance
-     * @param {KeyboardEvent} e - Keyboard event
-     */
     handle_editnode(_jm, e) {
         var selected_node = _jm.get_selected_node();
         if (!!selected_node) {
             _jm.begin_edit(selected_node);
         }
     }
-    /**
-     * Handle delete node shortcut.
-     * @param {import('./jsmind.js').default} _jm - jsMind instance
-     * @param {KeyboardEvent} e - Keyboard event
-     */
     handle_delnode(_jm, e) {
         var selected_node = _jm.get_selected_node();
         if (!!selected_node && !selected_node.isroot) {
@@ -141,11 +112,6 @@ export class ShortcutProvider {
             _jm.remove_node(selected_node);
         }
     }
-    /**
-     * Handle toggle node shortcut.
-     * @param {import('./jsmind.js').default} _jm - jsMind instance
-     * @param {KeyboardEvent} e - Keyboard event
-     */
     handle_toggle(_jm, e) {
         var evt = e || event;
         var selected_node = _jm.get_selected_node();
@@ -155,11 +121,6 @@ export class ShortcutProvider {
             evt.preventDefault();
         }
     }
-    /**
-     * Handle up arrow key shortcut.
-     * @param {import('./jsmind.js').default} _jm - jsMind instance
-     * @param {KeyboardEvent} e - Keyboard event
-     */
     handle_up(_jm, e) {
         var evt = e || event;
         var selected_node = _jm.get_selected_node();
@@ -178,11 +139,6 @@ export class ShortcutProvider {
             evt.preventDefault();
         }
     }
-    /**
-     * Handle down arrow key shortcut.
-     * @param {import('./jsmind.js').default} _jm - jsMind instance
-     * @param {KeyboardEvent} e - Keyboard event
-     */
     handle_down(_jm, e) {
         var evt = e || event;
         var selected_node = _jm.get_selected_node();
@@ -201,29 +157,12 @@ export class ShortcutProvider {
             evt.preventDefault();
         }
     }
-    /**
-     * Handle left arrow key shortcut.
-     * @param {import('./jsmind.js').default} _jm - jsMind instance
-     * @param {KeyboardEvent} e - Keyboard event
-     */
     handle_left(_jm, e) {
         this._handle_direction(_jm, e, Direction.left);
     }
-    /**
-     * Handle right arrow key shortcut.
-     * @param {import('./jsmind.js').default} _jm - jsMind instance
-     * @param {KeyboardEvent} e - Keyboard event
-     */
     handle_right(_jm, e) {
         this._handle_direction(_jm, e, Direction.right);
     }
-    /**
-     * Handle directional navigation.
-     * @private
-     * @param {import('./jsmind.js').default} _jm - jsMind instance
-     * @param {KeyboardEvent} e - Keyboard event
-     * @param {number} d - Direction constant
-     */
     _handle_direction(_jm, e, d) {
         var evt = e || event;
         var selected_node = _jm.get_selected_node();

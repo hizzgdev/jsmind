@@ -39,6 +39,7 @@ export class Node {
         this.parent = oParent;
         this.direction = eDirection;
         this.expanded = !!bExpanded;
+        /** @type {Node[]} */
         this.children = [];
         this._data = {};
     }
@@ -117,7 +118,7 @@ export class Node {
     }
     /**
      * Runtime check for Node instance.
-     * @param {any} n
+     * @param {unknown} n
      * @returns {n is Node}
      */
     static is_node(n) {

@@ -1,10 +1,16 @@
 export class Mind {
-    name: any;
-    author: any;
-    version: any;
-    root: Node;
-    selected: any;
-    nodes: {};
+    /** @type {string | null} */
+    name: string | null;
+    /** @type {string | null} */
+    author: string | null;
+    /** @type {string | null} */
+    version: string | null;
+    /** @type {Node | null} */
+    root: Node | null;
+    /** @type {Node | null} */
+    selected: Node | null;
+    /** @type {Record<string, Node>} */
+    nodes: Record<string, Node>;
     /**
      * Get a node by id.
      * @param {string} node_id

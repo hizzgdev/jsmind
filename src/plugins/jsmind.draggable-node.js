@@ -602,7 +602,7 @@ export class DraggableNode {
     /**
      * Handle jsMind events.
      * @param {number|string} type - Event type
-     * @param {any} [data] - Event data
+     * @param {object} [data] - Event data
      */
     jm_event_handle(type, data) {
         if (type === jsMind.event_type.resize) {

@@ -10,9 +10,14 @@ export const $: Dom;
  * Lightweight DOM helpers bound to a window.
  */
 declare class Dom {
-    constructor(w: any);
-    w: any;
-    d: any;
+    /**
+     * @param {Window} w
+     */
+    constructor(w: Window);
+    /** @type {Window} */
+    w: Window;
+    /** @type {Document} */
+    d: Document;
     /**
      * Get element by id.
      * @param {string} id
@@ -39,10 +44,10 @@ declare class Dom {
     h: (n: HTMLElement, t: string | HTMLElement) => void;
     /**
      * Runtime check for HTMLElement.
-     * @param {any} el
+     * @param {unknown} el
      * @returns {el is HTMLElement}
      */
-    i: (el: any) => el is HTMLElement;
+    i: (el: unknown) => el is HTMLElement;
     /**
      * Add event listener with legacy fallback.
      * @param {HTMLElement} t

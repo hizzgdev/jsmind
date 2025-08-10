@@ -10,8 +10,13 @@
  * Lightweight DOM helpers bound to a window.
  */
 class Dom {
+    /**
+     * @param {Window} w
+     */
     constructor(w) {
+        /** @type {Window} */
         this.w = w;
+        /** @type {Document} */
         this.d = w.document;
         /**
          * Get element by id.
@@ -58,7 +63,7 @@ class Dom {
         // detect isElement
         /**
          * Runtime check for HTMLElement.
-         * @param {any} el
+         * @param {unknown} el
          * @returns {el is HTMLElement}
          */
         this.i = function (el) {

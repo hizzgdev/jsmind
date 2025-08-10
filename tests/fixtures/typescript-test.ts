@@ -4,7 +4,14 @@
  */
 
 // Import core library (resolved via package name to types/)
-import jsMind, { Node, Mind, JsMindOptions, NodeTreeFormat, MindMapData } from 'jsmind';
+import jsMind, {
+    Node,
+    Mind,
+    JsMindOptions,
+    MindMapMeta,
+    NodeTreeFormat,
+    NodeTreeData,
+} from 'jsmind';
 // Note: in real usage, plugins should be imported to register themselves
 // import 'jsmind/draggable-node';
 // import 'jsmind/screenshot';
@@ -13,7 +20,7 @@ import jsMind, { Node, Mind, JsMindOptions, NodeTreeFormat, MindMapData } from '
 // Basic options
 // ============================================================================
 
-// Minimal options
+// Minimal options (must satisfy JsMindRuntimeOptions strict fields)
 const basicOptions: JsMindOptions = {
     container: 'jsmind_container',
     editable: true,
@@ -21,6 +28,30 @@ const basicOptions: JsMindOptions = {
     mode: 'full',
     support_html: true,
     log_level: 'info',
+    view: {
+        engine: 'canvas',
+        enable_device_pixel_ratio: true,
+        hmargin: 120,
+        vmargin: 60,
+        line_width: 3,
+        line_color: '#333',
+        line_style: 'straight',
+        draggable: true,
+        hide_scrollbars_when_draggable: true,
+        node_overflow: 'wrap',
+        zoom: { min: 0.3, max: 3.0, step: 0.2, mask_key: 4096 },
+        custom_node_render: null,
+        expander_style: 'number',
+    },
+    layout: { hspace: 40, vspace: 25, pspace: 15, cousin_space: 5 },
+    default_event_handle: {
+        enable_mousedown_handle: true,
+        enable_click_handle: true,
+        enable_dblclick_handle: false,
+        enable_mousewheel_handle: true,
+    },
+    shortcut: { enable: true, handles: {}, mapping: {} },
+    plugin: {},
 };
 
 // Full options
@@ -103,21 +134,14 @@ const fullOptions: JsMindOptions = {
 // Data formats
 // ============================================================================
 
-// NodeTreeFormat specimen
+// Strictly typed NodeTree data using generated MindMapMeta
 const nodeTreeData: NodeTreeFormat = {
-    meta: {
-        name: 'Test Mind Map',
-        author: 'TypeScript Tester',
-        version: '1.0',
-    },
+    meta: { name: 'Test Mind Map', author: 'TypeScript Tester', version: '1.0' },
     format: 'node_tree',
     data: {
         id: 'root',
         topic: 'Root Topic',
-        data: {
-            background: '#ff0000',
-            foreground: '#ffffff',
-        },
+        data: { background: '#ff0000', foreground: '#ffffff' },
         children: [
             {
                 id: 'child1',
@@ -125,19 +149,10 @@ const nodeTreeData: NodeTreeFormat = {
                 direction: 1,
                 expanded: true,
                 children: [
-                    {
-                        id: 'grandchild1',
-                        topic: 'Grandchild 1',
-                        data: { note: 'This is a note' },
-                    },
+                    { id: 'grandchild1', topic: 'Grandchild 1', data: { note: 'This is a note' } },
                 ],
             },
-            {
-                id: 'child2',
-                topic: 'Child 2',
-                direction: -1,
-                expanded: false,
-            },
+            { id: 'child2', topic: 'Child 2', direction: -1, expanded: false },
         ],
     },
 };
@@ -173,7 +188,6 @@ const resizeEvent: number = eventType.resize;
 
 // Show mind map
 jm.show(nodeTreeData);
-jm.show(); // Show an empty mind map
 
 // Query state
 const meta = jm.get_meta();
@@ -198,7 +212,7 @@ if (root) {
 // Edit operations
 jm.enable_edit();
 const isEditable: boolean = jm.get_editable();
-jm.begin_edit();
+// begin_edit requires a node id or Node
 jm.end_edit();
 jm.disable_edit();
 
@@ -213,8 +227,10 @@ const isDraggable: boolean = jm.get_view_draggable();
 jm.disable_view_draggable();
 jm.resize();
 
-// Event listener
-jm.add_event_listener((type: number, data: any) => {
+// Event listener with stricter data shape
+
+jm.add_event_listener((type, data) => {
+    // data: { evt?: string; data?: unknown[]; node?: string }
     console.log(`Event ${type} triggered with data:`, data);
 });
 
@@ -245,8 +261,8 @@ const comparison: number = Node.compare(testNode, testNode);
 
 // JSON utils
 const jsonString: string = util.json.json2string({ test: 'data' });
-const jsonObject: any = util.json.string2json('{"test":"data"}');
-const mergedObject: any = util.json.merge({}, { test: 'data' });
+const jsonObject = util.json.string2json('{"test":"data"}') as { test: string };
+const mergedObject = util.json.merge({}, { test: 'data' }) as object;
 
 // UUID utils
 const newId: string = util.uuid.newid();
@@ -274,7 +290,7 @@ function validateTypes() {
     const config: JsMindOptions = basicOptions;
 
     // Validate data format types
-    const mindData: MindMapData = nodeTreeData;
+    const mindData: NodeTreeFormat = nodeTreeData;
 
     // Validate return types
     const rootNode: Node | null = jm.get_root();

@@ -95,7 +95,7 @@ export class ViewProvider {
             custom_node_render?: Function;
             expander_style: "char" | "number";
         };
-        e_svg: any;
+        e_svg: SVGElement;
         size: {
             w: number;
             h: number;
@@ -155,7 +155,7 @@ export class ViewProvider {
             straight: (ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) => void;
             curved: (ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) => void;
         };
-        dpr: any;
+        dpr: number;
         init_line_render(): void;
         drawing: ((ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) => void) | ((ctx: any, x1: any, y1: any, x2: any, y2: any) => void);
         element(): HTMLCanvasElement;
@@ -177,7 +177,7 @@ export class ViewProvider {
     };
     render_node: (ele: HTMLElement, node: import("./jsmind.node.js").Node) => void;
     zoom_current: number;
-    device_pixel_ratio: any;
+    device_pixel_ratio: number;
     _initialized: boolean;
     /** Initialize DOM structure, graph and editor. */
     init(): void;
@@ -190,11 +190,20 @@ export class ViewProvider {
      * @param {boolean=} capture_by_panel
      */
     add_event(obj: any, event_name: string, event_handle: (e: Event) => void, capture_by_panel?: boolean | undefined): void;
-    /** @param {HTMLElement|null} element */
-    get_binded_nodeid(element: HTMLElement | null): any;
-    /** @param {HTMLElement|null} element */
-    is_node(element: HTMLElement | null): any;
-    /** @param {HTMLElement} element */
+    /**
+     * @param {HTMLElement|null} element
+     * @returns {string|null}
+     */
+    get_binded_nodeid(element: HTMLElement | null): string | null;
+    /**
+     * @param {HTMLElement|null} element
+     * @returns {boolean}
+     */
+    is_node(element: HTMLElement | null): boolean;
+    /**
+     * @param {HTMLElement} element
+     * @returns {boolean}
+     */
     is_expander(element: HTMLElement): boolean;
     reset(): void;
     reset_theme(): void;

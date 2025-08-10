@@ -10,7 +10,7 @@ export function init_graph(view: import("./jsmind.view_provider.js").ViewProvide
  */
 declare class SvgGraph {
     /** @param {string} tag */
-    static c(tag: string): any;
+    static c(tag: string): SVGElement;
     /**
      * Create SVG graph renderer.
      * @param {import('./jsmind.view_provider.js').ViewProvider} view - View provider instance
@@ -38,7 +38,7 @@ declare class SvgGraph {
         custom_node_render?: Function;
         expander_style: "char" | "number";
     };
-    e_svg: any;
+    e_svg: SVGElement;
     size: {
         w: number;
         h: number;
@@ -130,7 +130,7 @@ declare class CanvasGraph {
         straight: (ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) => void;
         curved: (ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) => void;
     };
-    dpr: any;
+    dpr: number;
     /** Choose line drawing renderer. */
     init_line_render(): void;
     drawing: ((ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) => void) | ((ctx: any, x1: any, y1: any, x2: any, y2: any) => void);

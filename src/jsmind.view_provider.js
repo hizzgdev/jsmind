@@ -116,7 +116,10 @@ export class ViewProvider {
             event_handle.call(obj, evt);
         });
     }
-    /** @param {HTMLElement|null} element */
+    /**
+     * @param {HTMLElement|null} element
+     * @returns {string|null}
+     */
     get_binded_nodeid(element) {
         if (element == null) {
             return null;
@@ -130,7 +133,10 @@ export class ViewProvider {
             return this.get_binded_nodeid(element.parentElement);
         }
     }
-    /** @param {HTMLElement|null} element */
+    /**
+     * @param {HTMLElement|null} element
+     * @returns {boolean}
+     */
     is_node(element) {
         if (element == null) {
             return false;
@@ -144,7 +150,10 @@ export class ViewProvider {
             return this.is_node(element.parentElement);
         }
     }
-    /** @param {HTMLElement} element */
+    /**
+     * @param {HTMLElement} element
+     * @returns {boolean}
+     */
     is_expander(element) {
         return element.tagName.toLowerCase() == 'jmexpander';
     }

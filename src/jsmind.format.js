@@ -12,14 +12,53 @@ import { Node } from './jsmind.node.js';
 import { util } from './jsmind.util.js';
 
 /** @typedef {{name:string,author:string,version:string}} MindMapMeta */
+/**
+ * Node tree data item
+ * @typedef {{
+ *   id: string,
+ *   topic: string,
+ *   data?: Record<string, any>,
+ *   direction?: (number|string),
+ *   expanded?: boolean,
+ *   children?: NodeTreeData[]
+ * }} NodeTreeData
+ */
+/**
+ * Node tree formatted payload
+ * @typedef {{
+ *   meta?: MindMapMeta,
+ *   format: 'node_tree',
+ *   data: NodeTreeData
+ * }} NodeTreeFormat
+ */
+/**
+ * Node array data item
+ * @typedef {{
+ *   id: string,
+ *   topic: string,
+ *   parentid?: string,
+ *   data?: Record<string, any>,
+ *   direction?: (number|string),
+ *   expanded?: boolean,
+ *   isroot?: boolean
+ * }} NodeArrayItem
+ */
+/**
+ * Node array formatted payload
+ * @typedef {{
+ *   meta?: MindMapMeta,
+ *   format: 'node_array',
+ *   data: NodeArrayItem[]
+ * }} NodeArrayFormat
+ */
 /** @type {MindMapMeta} */
 const DEFAULT_META = { name: 'jsMind', author: __author__, version: __version__ };
 
 /**
  * Mind data format handlers.
  * @type {{
- *  node_tree: { example:{meta:MindMapMeta,format:'node_tree',data:any}, get_mind:(src:any)=>Mind, get_data:(mind:Mind)=>any },
- *  node_array: { example:{meta:MindMapMeta,format:'node_array',data:any[]}, get_mind:(src:any)=>Mind, get_data:(mind:Mind)=>any },
+ *  node_tree: { example:NodeTreeFormat, get_mind:(src:NodeTreeFormat)=>Mind, get_data:(mind:Mind)=>NodeTreeFormat },
+ *  node_array: { example:NodeArrayFormat, get_mind:(src:NodeArrayFormat)=>Mind, get_data:(mind:Mind)=>NodeArrayFormat },
  *  freemind: { example:{meta:MindMapMeta,format:'freemind',data:string}, get_mind:(src:any)=>Mind, get_data:(mind:Mind)=>any },
  *  text: { example:{meta:MindMapMeta,format:'text',data:string}, get_mind:(src:any)=>Mind, get_data:(mind:Mind)=>any }
  * }}
@@ -31,7 +70,7 @@ export const format = {
             format: 'node_tree',
             data: { id: 'root', topic: 'jsMind node_tree example' },
         },
-        /** @param {{meta:MindMapMeta,data:any}} source @returns {Mind} */
+        /** @param {NodeTreeFormat} source @returns {Mind} */
         get_mind: function (source) {
             var df = format.node_tree;
             var mind = new Mind();
@@ -55,7 +94,7 @@ export const format = {
             return json;
         },
 
-        /** @param {Mind} mind @param {{id:string,topic:string,children?:any[]}} node_root */
+        /** @param {Mind} mind @param {NodeTreeData} node_root */
         _parse: function (mind, node_root) {
             var df = format.node_tree;
             var data = df._extract_data(node_root);
@@ -91,7 +130,7 @@ export const format = {
             return data;
         },
 
-        /** @param {Mind} mind @param {Node} node_parent @param {{id:string,topic:string,children?:any[]}} node_json */
+        /** @param {Mind} mind @param {Node} node_parent @param {NodeTreeData} node_json */
         _extract_subnode: function (mind, node_parent, node_json) {
             var df = format.node_tree;
             var data = df._extract_data(node_json);
@@ -121,6 +160,7 @@ export const format = {
          * @param {Node} node - Node to convert
          * @returns {any} JSON representation of node
          */
+        /** @returns {NodeTreeData} */
         _build_node: function (node) {
             var df = format.node_tree;
             if (!(node instanceof Node)) {
@@ -158,7 +198,7 @@ export const format = {
             data: [{ id: 'root', topic: 'jsMind node_array example', isroot: true }],
         },
 
-        /** @param {{meta:MindMapMeta,data:any[]}} source @returns {Mind} */
+        /** @param {NodeArrayFormat} source @returns {Mind} */
         get_mind: function (source) {
             var df = format.node_array;
             var mind = new Mind();
@@ -184,7 +224,7 @@ export const format = {
             return json;
         },
 
-        /** @param {Mind} mind @param {any[]} node_array */
+        /** @param {Mind} mind @param {NodeArrayItem[]} node_array */
         _parse: function (mind, node_array) {
             var df = format.node_array;
             var nodes = node_array.slice(0);
@@ -198,7 +238,7 @@ export const format = {
             }
         },
 
-        /** @param {Mind} mind @param {any[]} node_array */
+        /** @param {Mind} mind @param {NodeArrayItem[]} node_array */
         _extract_root: function (mind, node_array) {
             var df = format.node_array;
             var i = node_array.length;
@@ -214,7 +254,7 @@ export const format = {
             return null;
         },
 
-        /** @param {Mind} mind @param {Node} parent_node @param {any[]} node_array */
+        /** @param {Mind} mind @param {Node} parent_node @param {NodeArrayItem[]} node_array */
         _extract_subnode: function (mind, parent_node, node_array) {
             var df = format.node_array;
             var i = node_array.length;
@@ -269,13 +309,13 @@ export const format = {
             return data;
         },
 
-        /** @param {Mind} mind @param {any[]} node_array */
+        /** @param {Mind} mind @param {NodeArrayItem[]} node_array */
         _array: function (mind, node_array) {
             var df = format.node_array;
             df._array_node(mind.root, node_array);
         },
 
-        /** @param {Node} node @param {any[]} node_array */
+        /** @param {Node} node @param {NodeArrayItem[]} node_array */
         _array_node: function (node, node_array) {
             var df = format.node_array;
             if (!(node instanceof Node)) {

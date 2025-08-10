@@ -1,4 +1,8 @@
 /**
+ * Event callback payload
+ * @typedef {{ evt?: string, data?: unknown[], node?: string }} EventData
+ */
+/**
  * jsMind runtime: orchestrates data/layout/view/shortcut and exposes public API.
  */
 export default class jsMind {
@@ -12,13 +16,13 @@ export default class jsMind {
         select: number;
     };
     static $: {
-        w: any;
-        d: any;
+        w: Window;
+        d: Document;
         g: (id: string) => HTMLElement | null;
         c: (tag: string) => HTMLElement;
         t: (n: HTMLElement, t: string) => void;
         h: (n: HTMLElement, t: string | HTMLElement) => void;
-        i: (el: any) => el is HTMLElement;
+        i: (el: unknown) => el is HTMLElement;
         on: (t: HTMLElement, e: string, h: (ev: Event) => void) => void;
     };
     static plugin: typeof Plugin;
@@ -29,9 +33,9 @@ export default class jsMind {
             save: (data: string, type: string, name: string) => void;
         };
         json: {
-            json2string: (v: any) => string;
-            string2json: (s: string) => any;
-            merge: (b: any, a: any) => any;
+            json2string: (v: unknown) => string;
+            string2json: (s: string) => unknown;
+            merge: (b: object, a: object) => object;
         };
         uuid: {
             newid: () => string;
@@ -43,10 +47,10 @@ export default class jsMind {
     /**
      * Deprecated: static show constructor helper.
      * @param {import('./jsmind.option.js').JsMindRuntimeOptions} options
-     * @param {any} mind
+     * @param {object | null} mind
      * @returns {jsMind}
      */
-    static show(options: import("./jsmind.option.js").JsMindRuntimeOptions, mind: any): jsMind;
+    static show(options: import("./jsmind.option.js").JsMindRuntimeOptions, mind: object | null): jsMind;
     /**
      * Create a jsMind instance.
      * @param {import('./jsmind.option.js').JsMindRuntimeOptions} options
@@ -56,7 +60,8 @@ export default class jsMind {
     version: string;
     initialized: boolean;
     mind: Mind;
-    event_handles: any[];
+    /** @type {Array<(type: number, data: EventData) => void>} */
+    event_handles: Array<(type: number, data: EventData) => void>;
     /** Initialize sub-systems and plugins. */
     init(): void;
     data: DataProvider;
@@ -111,18 +116,21 @@ export default class jsMind {
     /**
      * Toggle a node's expanded state.
      * @param {string | import('./jsmind.node.js').Node} node
+     * @returns {void}
      */
-    toggle_node(node: string | import("./jsmind.node.js").Node): any;
+    toggle_node(node: string | import("./jsmind.node.js").Node): void;
     /**
      * Expand a node.
      * @param {string | import('./jsmind.node.js').Node} node
+     * @returns {void}
      */
-    expand_node(node: string | import("./jsmind.node.js").Node): any;
+    expand_node(node: string | import("./jsmind.node.js").Node): void;
     /**
      * Collapse a node.
      * @param {string | import('./jsmind.node.js').Node} node
+     * @returns {void}
      */
-    collapse_node(node: string | import("./jsmind.node.js").Node): any;
+    collapse_node(node: string | import("./jsmind.node.js").Node): void;
     /** Expand all nodes */
     expand_all(): void;
     /** Collapse all nodes */
@@ -133,16 +141,16 @@ export default class jsMind {
     _reset(): void;
     /**
      * Internal show flow.
-     * @param {any} mind
+     * @param {object | null} mind
      * @param {boolean=} skip_centering
      */
-    _show(mind: any, skip_centering?: boolean | undefined): void;
+    _show(mind: object | null, skip_centering?: boolean | undefined): void;
     /**
      * Show a mind (or example) on the canvas.
-     * @param {any} mind
+     * @param {object | null} mind
      * @param {boolean=} skip_centering
      */
-    show(mind: any, skip_centering?: boolean | undefined): void;
+    show(mind: object | null, skip_centering?: boolean | undefined): void;
     /** @returns {{name:string,author:string,version:string}} */
     get_meta(): {
         name: string;
@@ -152,9 +160,9 @@ export default class jsMind {
     /**
      * Serialize current mind to given format.
      * @param {'node_tree'|'node_array'|'freemind'|'text'} [data_format]
-     * @returns {any}
+     * @returns {object}
      */
-    get_data(data_format?: "node_tree" | "node_array" | "freemind" | "text"): any;
+    get_data(data_format?: "node_tree" | "node_array" | "freemind" | "text"): object;
     /** @returns {import('./jsmind.node.js').Node} */
     get_root(): import("./jsmind.node.js").Node;
     /**
@@ -208,8 +216,11 @@ export default class jsMind {
      * @param {number=} direction
      */
     move_node(node_id: string, before_id?: string | undefined, parent_id?: string | undefined, direction?: number | undefined): void;
-    /** @param {string | import('./jsmind.node.js').Node} node */
-    select_node(node: string | import("./jsmind.node.js").Node): any;
+    /**
+     * @param {string | import('./jsmind.node.js').Node} node
+     * @returns {void}
+     */
+    select_node(node: string | import("./jsmind.node.js").Node): void;
     /** @returns {import('./jsmind.node.js').Node|null} */
     get_selected_node(): import("./jsmind.node.js").Node | null;
     /** clear selection */
@@ -231,33 +242,55 @@ export default class jsMind {
      * @returns {import('./jsmind.node.js').Node | null}
      */
     find_node_after(node: string | import("./jsmind.node.js").Node): import("./jsmind.node.js").Node | null;
-    /** @param {string} node_id @param {string=} bg_color @param {string=} fg_color */
-    set_node_color(node_id: string, bg_color?: string | undefined, fg_color?: string | undefined): any;
-    /** @param {string} node_id @param {number=} size @param {string=} weight @param {string=} style */
-    set_node_font_style(node_id: string, size?: number | undefined, weight?: string | undefined, style?: string | undefined): any;
-    /** @param {string} node_id @param {string} image @param {number=} width @param {number=} height @param {number=} rotation */
-    set_node_background_image(node_id: string, image: string, width?: number | undefined, height?: number | undefined, rotation?: number | undefined): any;
-    /** @param {string} node_id @param {number} rotation */
-    set_node_background_rotation(node_id: string, rotation: number): any;
+    /**
+     * @param {string} node_id
+     * @param {string=} bg_color
+     * @param {string=} fg_color
+     * @returns {void}
+     */
+    set_node_color(node_id: string, bg_color?: string | undefined, fg_color?: string | undefined): void;
+    /**
+     * @param {string} node_id
+     * @param {number=} size
+     * @param {string=} weight
+     * @param {string=} style
+     * @returns {void}
+     */
+    set_node_font_style(node_id: string, size?: number | undefined, weight?: string | undefined, style?: string | undefined): void;
+    /**
+     * @param {string} node_id
+     * @param {string} image
+     * @param {number=} width
+     * @param {number=} height
+     * @param {number=} rotation
+     * @returns {void}
+     */
+    set_node_background_image(node_id: string, image: string, width?: number | undefined, height?: number | undefined, rotation?: number | undefined): void;
+    /**
+     * @param {string} node_id
+     * @param {number} rotation
+     * @returns {void}
+     */
+    set_node_background_rotation(node_id: string, rotation: number): void;
     /** trigger view resize */
     resize(): void;
-    /** @param {(type:number, data:any)=>void} callback */
-    add_event_listener(callback: (type: number, data: any) => void): void;
+    /** @param {(type:number, data: EventData)=>void} callback */
+    add_event_listener(callback: (type: number, data: EventData) => void): void;
     /** clear event listeners */
     clear_event_listener(): void;
-    /** @param {number} type @param {{evt?:string, data?:any[], node?:string}} data */
-    invoke_event_handle(type: number, data: {
-        evt?: string;
-        data?: any[];
-        node?: string;
-    }): void;
-    /** @param {number} type @param {{evt?:string, data?:any[], node?:string}} data */
-    _invoke_event_handle(type: number, data: {
-        evt?: string;
-        data?: any[];
-        node?: string;
-    }): void;
+    /** @param {number} type @param {EventData} data */
+    invoke_event_handle(type: number, data: EventData): void;
+    /** @param {number} type @param {EventData} data */
+    _invoke_event_handle(type: number, data: EventData): void;
 }
+/**
+ * Event callback payload
+ */
+export type EventData = {
+    evt?: string;
+    data?: unknown[];
+    node?: string;
+};
 import { Mind } from './jsmind.mind.js';
 import { DataProvider } from './jsmind.data_provider.js';
 import { LayoutProvider } from './jsmind.layout_provider.js';

@@ -204,9 +204,9 @@ export class DraggableNode {
     /**
      * Handle jsMind events.
      * @param {number|string} type - Event type
-     * @param {any} [data] - Event data
+     * @param {object} [data] - Event data
      */
-    jm_event_handle(type: number | string, data?: any): void;
+    jm_event_handle(type: number | string, data?: object): void;
 }
 /**
  * Draggable node plugin registration.

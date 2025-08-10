@@ -20,6 +20,11 @@ import { $ } from './jsmind.dom.js';
 import { util as _util } from './jsmind.util.js';
 
 /**
+ * Event callback payload
+ * @typedef {{ evt?: string, data?: unknown[], node?: string }} EventData
+ */
+
+/**
  * jsMind runtime: orchestrates data/layout/view/shortcut and exposes public API.
  */
 export default class jsMind {
@@ -43,6 +48,7 @@ export default class jsMind {
         this.version = __version__;
         this.initialized = false;
         this.mind = null;
+        /** @type {Array<(type: number, data: EventData) => void>} */
         this.event_handles = [];
         this.init();
     }
@@ -249,6 +255,7 @@ export default class jsMind {
     /**
      * Toggle a node's expanded state.
      * @param {string | import('./jsmind.node.js').Node} node
+     * @returns {void}
      */
     toggle_node(node) {
         if (!Node.is_node(node)) {
@@ -257,7 +264,8 @@ export default class jsMind {
                 logger.error('the node[id=' + node + '] can not be found.');
                 return;
             } else {
-                return this.toggle_node(the_node);
+                this.toggle_node(the_node);
+                return;
             }
         }
         if (node.isroot) {
@@ -271,6 +279,7 @@ export default class jsMind {
     /**
      * Expand a node.
      * @param {string | import('./jsmind.node.js').Node} node
+     * @returns {void}
      */
     expand_node(node) {
         if (!Node.is_node(node)) {
@@ -279,7 +288,8 @@ export default class jsMind {
                 logger.error('the node[id=' + node + '] can not be found.');
                 return;
             } else {
-                return this.expand_node(the_node);
+                this.expand_node(the_node);
+                return;
             }
         }
         if (node.isroot) {
@@ -293,6 +303,7 @@ export default class jsMind {
     /**
      * Collapse a node.
      * @param {string | import('./jsmind.node.js').Node} node
+     * @returns {void}
      */
     collapse_node(node) {
         if (!Node.is_node(node)) {
@@ -301,7 +312,8 @@ export default class jsMind {
                 logger.error('the node[id=' + node + '] can not be found.');
                 return;
             } else {
-                return this.collapse_node(the_node);
+                this.collapse_node(the_node);
+                return;
             }
         }
         if (node.isroot) {
@@ -335,7 +347,7 @@ export default class jsMind {
     }
     /**
      * Internal show flow.
-     * @param {any} mind
+     * @param {object | null} mind
      * @param {boolean=} skip_centering
      */
     _show(mind, skip_centering) {
@@ -361,7 +373,7 @@ export default class jsMind {
     }
     /**
      * Show a mind (or example) on the canvas.
-     * @param {any} mind
+     * @param {object | null} mind
      * @param {boolean=} skip_centering
      */
     show(mind, skip_centering) {
@@ -379,7 +391,7 @@ export default class jsMind {
     /**
      * Serialize current mind to given format.
      * @param {'node_tree'|'node_array'|'freemind'|'text'} [data_format]
-     * @returns {any}
+     * @returns {object}
      */
     get_data(data_format) {
         var df = data_format || 'node_tree';
@@ -595,7 +607,10 @@ export default class jsMind {
             return;
         }
     }
-    /** @param {string | import('./jsmind.node.js').Node} node */
+    /**
+     * @param {string | import('./jsmind.node.js').Node} node
+     * @returns {void}
+     */
     select_node(node) {
         if (!Node.is_node(node)) {
             var the_node = this.get_node(node);
@@ -603,7 +618,8 @@ export default class jsMind {
                 logger.error('the node[id=' + node + '] can not be found.');
                 return;
             } else {
-                return this.select_node(the_node);
+                this.select_node(the_node);
+                return;
             }
         }
         if (!this.layout.is_visible(node)) {
@@ -723,7 +739,12 @@ export default class jsMind {
         }
         return n;
     }
-    /** @param {string} node_id @param {string=} bg_color @param {string=} fg_color */
+    /**
+     * @param {string} node_id
+     * @param {string=} bg_color
+     * @param {string=} fg_color
+     * @returns {void}
+     */
     set_node_color(node_id, bg_color, fg_color) {
         if (this.get_editable()) {
             var node = this.mind.get_node(node_id);
@@ -741,7 +762,13 @@ export default class jsMind {
             return null;
         }
     }
-    /** @param {string} node_id @param {number=} size @param {string=} weight @param {string=} style */
+    /**
+     * @param {string} node_id
+     * @param {number=} size
+     * @param {string=} weight
+     * @param {string=} style
+     * @returns {void}
+     */
     set_node_font_style(node_id, size, weight, style) {
         if (this.get_editable()) {
             var node = this.mind.get_node(node_id);
@@ -765,7 +792,14 @@ export default class jsMind {
             return null;
         }
     }
-    /** @param {string} node_id @param {string} image @param {number=} width @param {number=} height @param {number=} rotation */
+    /**
+     * @param {string} node_id
+     * @param {string} image
+     * @param {number=} width
+     * @param {number=} height
+     * @param {number=} rotation
+     * @returns {void}
+     */
     set_node_background_image(node_id, image, width, height, rotation) {
         if (this.get_editable()) {
             var node = this.mind.get_node(node_id);
@@ -792,7 +826,11 @@ export default class jsMind {
             return null;
         }
     }
-    /** @param {string} node_id @param {number} rotation */
+    /**
+     * @param {string} node_id
+     * @param {number} rotation
+     * @returns {void}
+     */
     set_node_background_rotation(node_id, rotation) {
         if (this.get_editable()) {
             var node = this.mind.get_node(node_id);
@@ -819,7 +857,7 @@ export default class jsMind {
         this.view.resize();
     }
     // callback(type ,data)
-    /** @param {(type:number, data:any)=>void} callback */
+    /** @param {(type:number, data: EventData)=>void} callback */
     add_event_listener(callback) {
         if (typeof callback === 'function') {
             this.event_handles.push(callback);
@@ -829,14 +867,14 @@ export default class jsMind {
     clear_event_listener() {
         this.event_handles = [];
     }
-    /** @param {number} type @param {{evt?:string, data?:any[], node?:string}} data */
+    /** @param {number} type @param {EventData} data */
     invoke_event_handle(type, data) {
         var j = this;
         $.w.setTimeout(function () {
             j._invoke_event_handle(type, data);
         }, 0);
     }
-    /** @param {number} type @param {{evt?:string, data?:any[], node?:string}} data */
+    /** @param {number} type @param {EventData} data */
     _invoke_event_handle(type, data) {
         var l = this.event_handles.length;
         for (var i = 0; i < l; i++) {
@@ -847,7 +885,7 @@ export default class jsMind {
     /**
      * Deprecated: static show constructor helper.
      * @param {import('./jsmind.option.js').JsMindRuntimeOptions} options
-     * @param {any} mind
+     * @param {object | null} mind
      * @returns {jsMind}
      */
     static show(options, mind) {
