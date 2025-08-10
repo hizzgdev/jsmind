@@ -8,14 +8,14 @@
 
 import { $ } from './jsmind.dom.js';
 
-/** @type {{ plugins: Array<Plugin<any>> }} */
+/** @type {{ plugins: Array<Plugin<object>> }} */
 const plugin_data = {
     plugins: [],
 };
 
 /**
  * Register a plugin instance.
- * @param {Plugin<any>} plugin
+ * @param {Plugin<object>} plugin
  */
 export function register(plugin) {
     if (!(plugin instanceof Plugin)) {
@@ -30,7 +30,7 @@ export function register(plugin) {
 /**
  * Apply registered plugins asynchronously.
  * @param {import('./jsmind.js').default} jm
- * @param {Record<string, any>} options
+ * @param {Record<string, object>} options
  */
 export function apply(jm, options) {
     $.w.setTimeout(function () {
@@ -40,14 +40,14 @@ export function apply(jm, options) {
 
 /** 
  * @param {import('./jsmind.js').default} jm
- * @param {Record<string, any>} options */
+ * @param {Record<string, object>} options */
 function _apply(jm, options) {
     plugin_data.plugins.forEach(p => p.fn_init(jm, options[p.name]));
 }
 
 export class Plugin {
     /**
-     * @template [TOptions=any]
+     * @template [TOptions=object]
      * @param {string} name
      * @param {(jm: import('./jsmind.js').default, options: TOptions)=>void} fn_init
      */

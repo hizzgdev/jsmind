@@ -34,6 +34,7 @@ export class Node {
     id: string;
     index: number;
     topic: string;
+    /** @type {Record<string, any>} */
     data: Record<string, any>;
     isroot: boolean;
     parent: Node;

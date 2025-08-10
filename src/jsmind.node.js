@@ -34,6 +34,7 @@ export class Node {
         this.id = sId;
         this.index = iIndex;
         this.topic = sTopic;
+        /** @type {Record<string, any>} */
         this.data = oData || {};
         this.isroot = bIsRoot;
         this.parent = oParent;

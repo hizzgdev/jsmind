@@ -19,7 +19,17 @@ export type JsMindRuntimeOptions = {
         line_width: number;
         line_color: string;
         line_style: "curved" | "straight";
-        custom_line_render?: Function;
+        custom_line_render?: (this: object, arg: {
+            ctx: CanvasRenderingContext2D | SVGPathElement;
+            start_point: {
+                x: number;
+                y: number;
+            };
+            end_point: {
+                x: number;
+                y: number;
+            };
+        }) => void;
         draggable: boolean;
         hide_scrollbars_when_draggable: boolean;
         node_overflow: "hidden" | "wrap";
@@ -29,7 +39,7 @@ export type JsMindRuntimeOptions = {
             step: number;
             mask_key: number;
         };
-        custom_node_render: (null | ((arg0: any, arg1: HTMLElement, arg2: any) => void));
+        custom_node_render: (null | ((jm: import("./jsmind.js").default, ele: HTMLElement, node: import("./jsmind.node.js").Node) => void));
         expander_style: "char" | "number";
     };
     layout: {
@@ -46,8 +56,9 @@ export type JsMindRuntimeOptions = {
     };
     shortcut: {
         enable: boolean;
-        handles: Record<string, Function>;
+        handles: Record<string, (jm: import("./jsmind.js").default, e: KeyboardEvent) => void>;
         mapping: Record<string, number | number[]>;
+        id_generator?: () => string;
     };
-    plugin: Record<string, any>;
+    plugin: Record<string, object>;
 };

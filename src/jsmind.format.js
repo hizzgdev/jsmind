@@ -59,8 +59,8 @@ const DEFAULT_META = { name: 'jsMind', author: __author__, version: __version__ 
  * @type {{
  *  node_tree: { example:NodeTreeFormat, get_mind:(src:NodeTreeFormat)=>Mind, get_data:(mind:Mind)=>NodeTreeFormat },
  *  node_array: { example:NodeArrayFormat, get_mind:(src:NodeArrayFormat)=>Mind, get_data:(mind:Mind)=>NodeArrayFormat },
- *  freemind: { example:{meta:MindMapMeta,format:'freemind',data:string}, get_mind:(src:any)=>Mind, get_data:(mind:Mind)=>any },
- *  text: { example:{meta:MindMapMeta,format:'text',data:string}, get_mind:(src:any)=>Mind, get_data:(mind:Mind)=>any }
+ *  freemind: { example:{meta:MindMapMeta,format:'freemind',data:string}, get_mind:(src:{meta?:MindMapMeta,format:'freemind',data:string})=>Mind, get_data:(mind:Mind)=>{meta:MindMapMeta,format:'freemind',data:string} },
+ *  text: { example:{meta:MindMapMeta,format:'text',data:string}, get_mind:(src:{meta?:MindMapMeta,format:'text',data:string})=>Mind, get_data:(mind:Mind)=>{meta:MindMapMeta,format:'text',data:string} }
  * }}
  */
 export const format = {
@@ -110,7 +110,7 @@ export const format = {
         /**
          * Extract custom data from node JSON, excluding standard properties.
          * @private
-         * @param {any} node_json - Node JSON object
+         * @param {Record<string, unknown>} node_json - Node JSON object
          * @returns {Record<string,any>} Custom data object
          */
         _extract_data: function (node_json) {
@@ -158,9 +158,8 @@ export const format = {
          * Build JSON object from a node.
          * @private
          * @param {Node} node - Node to convert
-         * @returns {any} JSON representation of node
+         * @returns {NodeTreeData} JSON representation of node
          */
-        /** @returns {NodeTreeData} */
         _build_node: function (node) {
             var df = format.node_tree;
             if (!(node instanceof Node)) {
@@ -291,6 +290,7 @@ export const format = {
             return extract_count;
         },
 
+        /** @param {Record<string, unknown>} node_json */
         _extract_data: function (node_json) {
             var data = {};
             for (var k in node_json) {
@@ -369,6 +369,7 @@ export const format = {
             return mind;
         },
 
+        /** @param {Mind} mind */
         get_data: function (mind) {
             var df = format.freemind;
             var json = {};

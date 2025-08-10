@@ -175,7 +175,7 @@ export default class jsMind {
      * @param {string | import('./jsmind.node.js').Node} parent_node
      * @param {string} node_id
      * @param {string} topic
-     * @param {Record<string,any>=} data
+     * @param {Record<string, any>=} data
      * @param {number=} direction
      * @returns {import('./jsmind.node.js').Node|null}
      */
@@ -185,7 +185,7 @@ export default class jsMind {
      * @param {string | import('./jsmind.node.js').Node} node_before
      * @param {string} node_id
      * @param {string} topic
-     * @param {Record<string,any>=} data
+     * @param {Record<string, any>=} data
      * @param {number=} direction
      * @returns {import('./jsmind.node.js').Node|null}
      */
@@ -195,7 +195,7 @@ export default class jsMind {
      * @param {string | import('./jsmind.node.js').Node} node_after
      * @param {string} node_id
      * @param {string} topic
-     * @param {Record<string,any>=} data
+     * @param {Record<string, any>=} data
      * @param {number=} direction
      * @returns {import('./jsmind.node.js').Node|null}
      */

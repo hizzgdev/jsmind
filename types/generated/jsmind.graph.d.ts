@@ -43,14 +43,16 @@ declare class SvgGraph {
         w: number;
         h: number;
     };
-    lines: any[];
+    /** @type {SVGPathElement[]} */
+    lines: SVGPathElement[];
     line_drawing: {
         straight: (path: SVGPathElement, x1: number, y1: number, x2: number, y2: number) => void;
         curved: (path: SVGPathElement, x1: number, y1: number, x2: number, y2: number) => void;
     };
     /** Choose line drawing renderer. */
     init_line_render(): void;
-    drawing: ((path: SVGPathElement, x1: number, y1: number, x2: number, y2: number) => void) | ((path: any, x1: any, y1: any, x2: any, y2: any) => void);
+    /** @type {(path:SVGPathElement,x1:number,y1:number,x2:number,y2:number)=>void} */
+    drawing: (path: SVGPathElement, x1: number, y1: number, x2: number, y2: number) => void;
     /** @returns {SVGSVGElement} */
     element(): SVGSVGElement;
     /** @param {number} w @param {number} h */
@@ -67,8 +69,8 @@ declare class SvgGraph {
         x: number;
         y: number;
     }, color?: string | undefined): void;
-    /** @param {CanvasRenderingContext2D} dest_canvas_ctx @param {Function=} callback */
-    copy_to(dest_canvas_ctx: CanvasRenderingContext2D, callback?: Function | undefined): void;
+    /** @param {CanvasRenderingContext2D} dest_canvas_ctx @param {(()=>void)=} callback */
+    copy_to(dest_canvas_ctx: CanvasRenderingContext2D, callback?: (() => void) | undefined): void;
     /**
      * Draw bezier curve to SVG path.
      * @internal
@@ -121,7 +123,7 @@ declare class CanvasGraph {
         expander_style: "char" | "number";
     };
     e_canvas: HTMLElement;
-    canvas_ctx: any;
+    canvas_ctx: CanvasRenderingContext2D;
     size: {
         w: number;
         h: number;
@@ -133,7 +135,8 @@ declare class CanvasGraph {
     dpr: number;
     /** Choose line drawing renderer. */
     init_line_render(): void;
-    drawing: ((ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) => void) | ((ctx: any, x1: any, y1: any, x2: any, y2: any) => void);
+    /** @type {(ctx:CanvasRenderingContext2D,x1:number,y1:number,x2:number,y2:number)=>void} */
+    drawing: (ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) => void;
     /** @returns {HTMLCanvasElement} */
     element(): HTMLCanvasElement;
     /** @param {number} w @param {number} h */
@@ -151,8 +154,8 @@ declare class CanvasGraph {
         x: number;
         y: number;
     }, color?: string | undefined): void;
-    /** @param {CanvasRenderingContext2D} dest_canvas_ctx @param {Function=} callback */
-    copy_to(dest_canvas_ctx: CanvasRenderingContext2D, callback?: Function | undefined): void;
+    /** @param {CanvasRenderingContext2D} dest_canvas_ctx @param {(()=>void)=} callback */
+    copy_to(dest_canvas_ctx: CanvasRenderingContext2D, callback?: (() => void) | undefined): void;
     /**
      * Draw bezier curve on canvas.
      * @internal

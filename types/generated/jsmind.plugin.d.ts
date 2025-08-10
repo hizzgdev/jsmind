@@ -1,17 +1,17 @@
 /**
  * Register a plugin instance.
- * @param {Plugin<any>} plugin
+ * @param {Plugin<object>} plugin
  */
-export function register(plugin: Plugin<any>): void;
+export function register(plugin: Plugin<object>): void;
 /**
  * Apply registered plugins asynchronously.
  * @param {import('./jsmind.js').default} jm
- * @param {Record<string, any>} options
+ * @param {Record<string, object>} options
  */
-export function apply(jm: import("./jsmind.js").default, options: Record<string, any>): void;
+export function apply(jm: import("./jsmind.js").default, options: Record<string, object>): void;
 export class Plugin {
     /**
-     * @template [TOptions=any]
+     * @template [TOptions=object]
      * @param {string} name
      * @param {(jm: import('./jsmind.js').default, options: TOptions)=>void} fn_init
      */

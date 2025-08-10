@@ -23,6 +23,7 @@ class SvgGraph {
         this.e_svg = SvgGraph.c('svg');
         this.e_svg.setAttribute('class', 'jsmind');
         this.size = { w: 0, h: 0 };
+        /** @type {SVGPathElement[]} */
         this.lines = [];
         this.line_drawing = {
             straight: this._line_to,
@@ -37,6 +38,7 @@ class SvgGraph {
     /** Choose line drawing renderer. */
     init_line_render() {
         if (typeof this.opts.custom_line_render === 'function') {
+            /** @type {(path:SVGPathElement,x1:number,y1:number,x2:number,y2:number)=>void} */
             this.drawing = (path, x1, y1, x2, y2) => {
                 try {
                     this.opts.custom_line_render.call(this, {
@@ -49,6 +51,7 @@ class SvgGraph {
                 }
             };
         } else {
+            /** @type {(path:SVGPathElement,x1:number,y1:number,x2:number,y2:number)=>void} */
             this.drawing = this.line_drawing[this.opts.line_style] || this.line_drawing.curved;
         }
     }
@@ -87,7 +90,7 @@ class SvgGraph {
         );
     }
 
-    /** @param {CanvasRenderingContext2D} dest_canvas_ctx @param {Function=} callback */
+    /** @param {CanvasRenderingContext2D} dest_canvas_ctx @param {(()=>void)=} callback */
     copy_to(dest_canvas_ctx, callback) {
         var img = new Image();
         img.onload = function () {
@@ -153,7 +156,7 @@ class CanvasGraph {
         this.opts = view.opts;
         this.e_canvas = $.c('canvas');
         this.e_canvas.className = 'jsmind';
-        this.canvas_ctx = this.e_canvas.getContext('2d');
+        this.canvas_ctx = /** @type {CanvasRenderingContext2D} */ (this.e_canvas.getContext('2d'));
         this.size = { w: 0, h: 0 };
         this.line_drawing = {
             straight: this._line_to,
@@ -165,6 +168,7 @@ class CanvasGraph {
     /** Choose line drawing renderer. */
     init_line_render() {
         if (typeof this.opts.custom_line_render === 'function') {
+            /** @type {(ctx:CanvasRenderingContext2D,x1:number,y1:number,x2:number,y2:number)=>void} */
             this.drawing = (ctx, x1, y1, x2, y2) => {
                 try {
                     this.opts.custom_line_render.call(this, {
@@ -177,6 +181,7 @@ class CanvasGraph {
                 }
             };
         } else {
+            /** @type {(ctx:CanvasRenderingContext2D,x1:number,y1:number,x2:number,y2:number)=>void} */
             this.drawing = this.line_drawing[this.opts.line_style] || this.line_drawing.curved;
         }
     }
@@ -213,7 +218,7 @@ class CanvasGraph {
         ctx.lineCap = 'round';
         this.drawing(ctx, pin.x + offset.x, pin.y + offset.y, pout.x + offset.x, pout.y + offset.y);
     }
-    /** @param {CanvasRenderingContext2D} dest_canvas_ctx @param {Function=} callback */
+    /** @param {CanvasRenderingContext2D} dest_canvas_ctx @param {(()=>void)=} callback */
     copy_to(dest_canvas_ctx, callback) {
         dest_canvas_ctx.drawImage(this.e_canvas, 0, 0, this.size.w, this.size.h);
         !!callback && callback();

@@ -3,8 +3,8 @@
  * @type {{
  *  node_tree: { example:NodeTreeFormat, get_mind:(src:NodeTreeFormat)=>Mind, get_data:(mind:Mind)=>NodeTreeFormat },
  *  node_array: { example:NodeArrayFormat, get_mind:(src:NodeArrayFormat)=>Mind, get_data:(mind:Mind)=>NodeArrayFormat },
- *  freemind: { example:{meta:MindMapMeta,format:'freemind',data:string}, get_mind:(src:any)=>Mind, get_data:(mind:Mind)=>any },
- *  text: { example:{meta:MindMapMeta,format:'text',data:string}, get_mind:(src:any)=>Mind, get_data:(mind:Mind)=>any }
+ *  freemind: { example:{meta:MindMapMeta,format:'freemind',data:string}, get_mind:(src:{meta?:MindMapMeta,format:'freemind',data:string})=>Mind, get_data:(mind:Mind)=>{meta:MindMapMeta,format:'freemind',data:string} },
+ *  text: { example:{meta:MindMapMeta,format:'text',data:string}, get_mind:(src:{meta?:MindMapMeta,format:'text',data:string})=>Mind, get_data:(mind:Mind)=>{meta:MindMapMeta,format:'text',data:string} }
  * }}
  */
 export const format: {
@@ -24,8 +24,16 @@ export const format: {
             format: "freemind";
             data: string;
         };
-        get_mind: (src: any) => Mind;
-        get_data: (mind: Mind) => any;
+        get_mind: (src: {
+            meta?: MindMapMeta;
+            format: "freemind";
+            data: string;
+        }) => Mind;
+        get_data: (mind: Mind) => {
+            meta: MindMapMeta;
+            format: "freemind";
+            data: string;
+        };
     };
     text: {
         example: {
@@ -33,8 +41,16 @@ export const format: {
             format: "text";
             data: string;
         };
-        get_mind: (src: any) => Mind;
-        get_data: (mind: Mind) => any;
+        get_mind: (src: {
+            meta?: MindMapMeta;
+            format: "text";
+            data: string;
+        }) => Mind;
+        get_data: (mind: Mind) => {
+            meta: MindMapMeta;
+            format: "text";
+            data: string;
+        };
     };
 };
 export type MindMapMeta = {

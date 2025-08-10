@@ -44,7 +44,7 @@ export class Mind {
      * Set the root node, only once.
      * @param {string} node_id
      * @param {string} topic
-     * @param {Record<string,any>=} data
+     * @param {Record<string, any>=} data
      * @returns {Node | null}
      */
     set_root(node_id, topic, data) {
@@ -62,7 +62,7 @@ export class Mind {
      * @param {Node} parent_node
      * @param {string} node_id
      * @param {string} topic
-     * @param {Record<string,any>=} data
+     * @param {Record<string, any>=} data
      * @param {number=} direction
      * @param {boolean=} expanded
      * @param {number=} idx
@@ -101,7 +101,7 @@ export class Mind {
      * @param {Node} node_before
      * @param {string} node_id
      * @param {string} topic
-     * @param {Record<string,any>=} data
+     * @param {Record<string, any>=} data
      * @param {number=} direction
      * @returns {Node | null}
      */
@@ -143,7 +143,7 @@ export class Mind {
      * @param {Node} node_after
      * @param {string} node_id
      * @param {string} topic
-     * @param {Record<string,any>=} data
+     * @param {Record<string, any>=} data
      * @param {number=} direction
      * @returns {Node | null}
      */

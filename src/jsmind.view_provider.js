@@ -60,7 +60,9 @@ export class ViewProvider {
         logger.debug(this.opts);
         logger.debug('view.init');
 
-        this.container = $.i(this.opts.container) ? this.opts.container : $.g(this.opts.container);
+        this.container = $.i(this.opts.container)
+            ? /** @type {HTMLElement} */ (this.opts.container)
+            : /** @type {HTMLElement} */ ($.g(this.opts.container));
         if (!this.container) {
             logger.error('the options.view.container was not be found in dom');
             return;
@@ -104,7 +106,7 @@ export class ViewProvider {
 
     /**
      * Add a delegated event handler.
-     * @param {any} obj
+     * @param {import('./jsmind.js').default} obj
      * @param {string} event_name
      * @param {(e:Event)=>void} event_handle
      * @param {boolean=} capture_by_panel
@@ -499,6 +501,7 @@ export class ViewProvider {
         this.e_panel.scrollTop = panel_scroll_y;
         return true;
     }
+    /** @param {boolean=} keep_center */
     show(keep_center) {
         logger.debug(`view.show: {keep_center: ${keep_center}}`);
         this.expand_size();
@@ -567,7 +570,7 @@ export class ViewProvider {
             this._show_expander(node, view_offset);
         }
     }
-    /** @param {import('./jsmind.node.js').Node} node */
+    /** @param {import('./jsmind.node.js').Node} node @param {{x:number,y:number}} view_offset */
     _show_expander(node, view_offset) {
         if (node.isroot) {
             return;
@@ -590,6 +593,7 @@ export class ViewProvider {
         expander.style.visibility = 'visible';
     }
 
+    /** @param {import('./jsmind.node.js').Node} node */
     _get_expander_text(node) {
         let style = !!this.opts.expander_style ? this.opts.expander_style.toLowerCase() : 'char';
         if (style === 'number') {
@@ -619,7 +623,7 @@ export class ViewProvider {
     reset_node_custom_style(node) {
         this._reset_node_custom_style(node._data.view.element, node.data);
     }
-    /** @param {HTMLElement} node_element @param {Record<string,any>} node_data */
+    /** @param {HTMLElement} node_element @param {Record<string,string|number>} node_data */
     _reset_node_custom_style(node_element, node_data) {
         if ('background-color' in node_data) {
             node_element.style.backgroundColor = node_data['background-color'];
@@ -778,14 +782,17 @@ export class ViewProvider {
         return true;
     }
 
+    /** @param {MouseEvent=} e */
     zoomIn(e) {
         logger.warn('please use zoom_in instead');
         return this.zoom_in(e);
     }
+    /** @param {MouseEvent=} e */
     zoomOut(e) {
         logger.warn('please use zoom_out instead');
         return this.zoom_out(e);
     }
+    /** @param {number} zoom @param {MouseEvent=} e */
     setZoom(zoom, e) {
         logger.warn('please use set_zoom instead');
         return this.set_zoom(zoom, e);
