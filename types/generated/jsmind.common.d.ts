@@ -5,26 +5,37 @@
  * Project Home:
  *   https://github.com/hizzgdev/jsmind/
  */
-export const __version__: "0.8.7";
-export const __author__: "hizzgdev@163.com";
-export namespace Direction {
-    let left: number;
-    let center: number;
-    let right: number;
-    function of(dir: any): any;
-}
+/**
+ * Library version string.
+ * @type {string}
+ */
+export const __version__: string;
+/**
+ * Library author.
+ * @type {string}
+ */
+export const __author__: string;
+/**
+ * Direction constants and parser.
+ * @typedef {{left:number,center:number,right:number,of:(dir:(string|number))=>number|undefined}} DirectionType
+ */
+/** @type {DirectionType} */
+export const Direction: DirectionType;
+export type EventType = number;
 export namespace EventType {
     let show: number;
     let resize: number;
     let edit: number;
     let select: number;
 }
+export type Key = number;
 export namespace Key {
     let meta: number;
     let ctrl: number;
     let alt: number;
     let shift: number;
 }
+export type LogLevel = number;
 export namespace LogLevel {
     let debug: number;
     let info: number;
@@ -32,32 +43,24 @@ export namespace LogLevel {
     let error: number;
     let disable: number;
 }
-export namespace logger {
-    export { setup_logger_level as level };
-    export let log: {
-        (...data: any[]): void;
-        (message?: any, ...optionalParams: any[]): void;
-    };
-    let debug_1: {
-        (...data: any[]): void;
-        (message?: any, ...optionalParams: any[]): void;
-    };
-    export { debug_1 as debug };
-    let info_1: {
-        (...data: any[]): void;
-        (message?: any, ...optionalParams: any[]): void;
-    };
-    export { info_1 as info };
-    let warn_1: {
-        (...data: any[]): void;
-        (message?: any, ...optionalParams: any[]): void;
-    };
-    export { warn_1 as warn };
-    let error_1: {
-        (...data: any[]): void;
-        (message?: any, ...optionalParams: any[]): void;
-    };
-    export { error_1 as error };
-}
-declare function setup_logger_level(log_level: any): void;
-export {};
+/**
+ * Logger facade with dynamic level.
+ * @type {{level:(lvl:number)=>void,log:Function,debug:Function,info:Function,warn:Function,error:Function}}
+ */
+export let logger: {
+    level: (lvl: number) => void;
+    log: Function;
+    debug: Function;
+    info: Function;
+    warn: Function;
+    error: Function;
+};
+/**
+ * Direction constants and parser.
+ */
+export type DirectionType = {
+    left: number;
+    center: number;
+    right: number;
+    of: (dir: (string | number)) => number | undefined;
+};

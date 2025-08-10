@@ -10,6 +10,9 @@ import { Node } from './jsmind.node.js';
 import { logger, Direction } from './jsmind.common.js';
 
 export class Mind {
+    /**
+     * Mind model: holds nodes and selection.
+     */
     constructor() {
         this.name = null;
         this.author = null;
@@ -18,6 +21,11 @@ export class Mind {
         this.selected = null;
         this.nodes = {};
     }
+    /**
+     * Get a node by id.
+     * @param {string} node_id
+     * @returns {Node | null}
+     */
     get_node(node_id) {
         if (node_id in this.nodes) {
             return this.nodes[node_id];
@@ -26,6 +34,13 @@ export class Mind {
             return null;
         }
     }
+    /**
+     * Set the root node, only once.
+     * @param {string} node_id
+     * @param {string} topic
+     * @param {Record<string,any>=} data
+     * @returns {Node | null}
+     */
     set_root(node_id, topic, data) {
         if (this.root == null) {
             this.root = new Node(node_id, 0, topic, data, true);
@@ -36,6 +51,17 @@ export class Mind {
             return null;
         }
     }
+    /**
+     * Add a child node under parent.
+     * @param {Node} parent_node
+     * @param {string} node_id
+     * @param {string} topic
+     * @param {Record<string,any>=} data
+     * @param {number=} direction
+     * @param {boolean=} expanded
+     * @param {number=} idx
+     * @returns {Node | null}
+     */
     add_node(parent_node, node_id, topic, data, direction, expanded, idx) {
         if (!Node.is_node(parent_node)) {
             logger.error('the parent_node ' + parent_node + ' is not a node.');
@@ -64,6 +90,15 @@ export class Mind {
         }
         return node;
     }
+    /**
+     * Insert a node before target node.
+     * @param {Node} node_before
+     * @param {string} node_id
+     * @param {string} topic
+     * @param {Record<string,any>=} data
+     * @param {number=} direction
+     * @returns {Node | null}
+     */
     insert_node_before(node_before, node_id, topic, data, direction) {
         if (!Node.is_node(node_before)) {
             logger.error('the node_before ' + node_before + ' is not a node.');
@@ -72,6 +107,11 @@ export class Mind {
         var node_index = node_before.index - 0.5;
         return this.add_node(node_before.parent, node_id, topic, data, direction, true, node_index);
     }
+    /**
+     * Get previous sibling of a node or node id.
+     * @param {string | Node} node
+     * @returns {Node | null}
+     */
     get_node_before(node) {
         if (!Node.is_node(node)) {
             var the_node = this.get_node(node);
@@ -92,6 +132,15 @@ export class Mind {
             return null;
         }
     }
+    /**
+     * Insert a node after target node.
+     * @param {Node} node_after
+     * @param {string} node_id
+     * @param {string} topic
+     * @param {Record<string,any>=} data
+     * @param {number=} direction
+     * @returns {Node | null}
+     */
     insert_node_after(node_after, node_id, topic, data, direction) {
         if (!Node.is_node(node_after)) {
             logger.error('the node_after ' + node_after + ' is not a node.');
@@ -100,6 +149,11 @@ export class Mind {
         var node_index = node_after.index + 0.5;
         return this.add_node(node_after.parent, node_id, topic, data, direction, true, node_index);
     }
+    /**
+     * Get next sibling of a node or node id.
+     * @param {string | Node} node
+     * @returns {Node | null}
+     */
     get_node_after(node) {
         if (!Node.is_node(node)) {
             var the_node = this.get_node(node);
@@ -121,6 +175,14 @@ export class Mind {
             return null;
         }
     }
+    /**
+     * Move a node to new parent/position.
+     * @param {Node} node
+     * @param {string=} before_id
+     * @param {string=} parent_id
+     * @param {number=} direction
+     * @returns {Node | null}
+     */
     move_node(node, before_id, parent_id, direction) {
         if (!Node.is_node(node)) {
             logger.error('the parameter node ' + node + ' is not a node.');
@@ -131,6 +193,11 @@ export class Mind {
         }
         return this._move_node(node, before_id, parent_id, direction);
     }
+    /**
+     * Propagate direction to descendants.
+     * @param {Node} node
+     * @param {number=} direction
+     */
     _flow_node_direction(node, direction) {
         if (typeof direction === 'undefined') {
             direction = node.direction;
@@ -142,6 +209,12 @@ export class Mind {
             this._flow_node_direction(node.children[len], direction);
         }
     }
+    /**
+     * Re-index node among siblings based on before_id marker.
+     * @param {Node} node
+     * @param {string} before_id
+     * @returns {Node}
+     */
     _move_node_internal(node, before_id) {
         if (!!node && !!before_id) {
             if (before_id == '_last_') {
@@ -164,6 +237,14 @@ export class Mind {
         }
         return node;
     }
+    /**
+     * Internal move implementation.
+     * @param {Node} node
+     * @param {string} before_id
+     * @param {string} parent_id
+     * @param {number=} direction
+     * @returns {Node | null}
+     */
     _move_node(node, before_id, parent_id, direction) {
         if (!!node && !!parent_id) {
             var parent_node = this.get_node(parent_id);
@@ -201,6 +282,11 @@ export class Mind {
         }
         return node;
     }
+    /**
+     * Remove a node from the mind.
+     * @param {Node} node
+     * @returns {boolean}
+     */
     remove_node(node) {
         if (!Node.is_node(node)) {
             logger.error('the parameter node ' + node + ' is not a node.');
@@ -242,6 +328,11 @@ export class Mind {
         this._update_index(node_parent);
         return true;
     }
+    /**
+     * Put node into the map if id is not taken.
+     * @param {Node} node
+     * @returns {boolean}
+     */
     _put_node(node) {
         if (node.id in this.nodes) {
             logger.warn("the node_id '" + node.id + "' has been already exist.");
@@ -251,6 +342,10 @@ export class Mind {
             return true;
         }
     }
+    /**
+     * Re-index children by Node.compare.
+     * @param {Node} node
+     */
     _update_index(node) {
         if (node instanceof Node) {
             node.children.sort(Node.compare);

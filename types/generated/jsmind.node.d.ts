@@ -1,24 +1,60 @@
 export class Node {
-    static compare(node1: any, node2: any): number;
-    static inherited(parent_node: any, node: any): boolean;
-    static is_node(n: any): boolean;
-    constructor(sId: any, iIndex: any, sTopic: any, oData: any, bIsRoot: any, oParent: any, eDirection: any, bExpanded: any);
-    id: any;
+    /**
+     * Compare two nodes by index for ordering.
+     * @param {Node} node1
+     * @param {Node} node2
+     * @returns {number}
+     */
+    static compare(node1: Node, node2: Node): number;
+    /**
+     * Check if node is the same as or a descendant of parent_node.
+     * @param {Node} parent_node
+     * @param {Node} node
+     * @returns {boolean}
+     */
+    static inherited(parent_node: Node, node: Node): boolean;
+    /**
+     * Runtime check for Node instance.
+     * @param {any} n
+     * @returns {n is Node}
+     */
+    static is_node(n: any): n is Node;
+    /**
+     * Create a Node instance.
+     * @param {string} sId - Node id
+     * @param {number} iIndex - Node index (order among siblings). Use -1 for tail
+     * @param {string} sTopic - Node topic text
+     * @param {Record<string, any>=} oData - Arbitrary node data
+     * @param {boolean=} bIsRoot - Whether it is the root node
+     * @param {Node | null=} oParent - Parent node
+     * @param {number=} eDirection - Direction for children under root (-1 left, 0 center, 1 right)
+     * @param {boolean=} bExpanded - Expanded state
+     */
+    constructor(sId: string, iIndex: number, sTopic: string, oData?: Record<string, any> | undefined, bIsRoot?: boolean | undefined, oParent?: (Node | null) | undefined, eDirection?: number | undefined, bExpanded?: boolean | undefined);
+    id: string;
     index: number;
-    topic: any;
-    data: any;
-    isroot: any;
-    parent: any;
-    direction: any;
+    topic: string;
+    data: Record<string, any>;
+    isroot: boolean;
+    parent: Node;
+    direction: number;
     expanded: boolean;
     children: any[];
     _data: {};
+    /**
+     * Get absolute location of this node in view coordinates.
+     * @returns {{x:number,y:number}}
+     */
     get_location(): {
-        x: any;
-        y: any;
+        x: number;
+        y: number;
     };
+    /**
+     * Get rendered size of this node.
+     * @returns {{w:number,h:number}}
+     */
     get_size(): {
-        w: any;
-        h: any;
+        w: number;
+        h: number;
     };
 }

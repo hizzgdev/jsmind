@@ -19,6 +19,13 @@ if (!domtoimage) {
 
 const $ = jsMind.$;
 
+/**
+ * Default options for screenshot plugin.
+ * @typedef {Object} ScreenshotOptions
+ * @property {string|null} [filename]
+ * @property {{left?:string|Location,right?:string}} [watermark]
+ * @property {string} [background]
+ */
 const DEFAULT_OPTIONS = {
     filename: null,
     watermark: {
@@ -28,18 +35,30 @@ const DEFAULT_OPTIONS = {
     background: 'transparent',
 };
 
-class JmScreenshot {
+/**
+ * Screenshot plugin for jsMind.
+ */
+export class JmScreenshot {
+    /**
+     * Create screenshot plugin instance.
+     * @param {import('../jsmind.js').default} jm - jsMind instance
+     * @param {Partial<ScreenshotOptions>} options - Plugin options
+     */
     constructor(jm, options) {
         var opts = {};
         jsMind.util.json.merge(opts, DEFAULT_OPTIONS);
         jsMind.util.json.merge(opts, options);
 
         this.version = '0.2.0';
+        /** @type {import('../jsmind.js').default} */
         this.jm = jm;
+        /** @type {ScreenshotOptions} */
         this.options = opts;
+        /** @type {number} */
         this.dpr = jm.view.device_pixel_ratio;
     }
 
+    /** Take a screenshot of the mind map. */
     shoot() {
         let c = this.create_canvas();
         let ctx = c.getContext('2d');
@@ -53,6 +72,10 @@ class JmScreenshot {
             .then(() => this.clear(c));
     }
 
+    /**
+     * Create canvas for screenshot.
+     * @returns {HTMLCanvasElement} Canvas element
+     */
     create_canvas() {
         let c = $.c('canvas');
         const w = this.jm.view.size.w;
@@ -67,10 +90,19 @@ class JmScreenshot {
         return c;
     }
 
+    /**
+     * Clean up canvas element.
+     * @param {HTMLCanvasElement} c - Canvas to remove
+     */
     clear(c) {
         c.parentNode.removeChild(c);
     }
 
+    /**
+     * Draw background on canvas.
+     * @param {CanvasRenderingContext2D} ctx - Canvas context
+     * @returns {Promise<CanvasRenderingContext2D>} Promise resolving to context
+     */
     draw_background(ctx) {
         return new Promise(
             function (resolve, _) {
@@ -84,6 +116,11 @@ class JmScreenshot {
         );
     }
 
+    /**
+     * Draw connection lines on canvas by copying from view graph.
+     * @param {CanvasRenderingContext2D} ctx
+     * @returns {Promise<CanvasRenderingContext2D>}
+     */
     draw_lines(ctx) {
         return new Promise(
             function (resolve, _) {
@@ -94,6 +131,11 @@ class JmScreenshot {
         );
     }
 
+    /**
+     * Draw node DOM into canvas via SVG snapshot.
+     * @param {CanvasRenderingContext2D} ctx
+     * @returns {Promise<CanvasRenderingContext2D>}
+     */
     draw_nodes(ctx) {
         return domtoimage
             .toSvg(this.jm.view.e_nodes, { style: { zoom: 1 } })
@@ -104,6 +146,12 @@ class JmScreenshot {
             });
     }
 
+    /**
+     * Draw watermark text on canvas.
+     * @param {HTMLCanvasElement} c
+     * @param {CanvasRenderingContext2D} ctx
+     * @returns {CanvasRenderingContext2D}
+     */
     draw_watermark(c, ctx) {
         ctx.textBaseline = 'bottom';
         ctx.fillStyle = '#000';
@@ -119,6 +167,11 @@ class JmScreenshot {
         return ctx;
     }
 
+    /**
+     * Load image from URL and resolve img element.
+     * @param {string} url
+     * @returns {Promise<HTMLImageElement>}
+     */
     load_image(url) {
         return new Promise(function (resolve, reject) {
             let img = new Image();
@@ -130,6 +183,10 @@ class JmScreenshot {
         });
     }
 
+    /**
+     * Trigger download of canvas content as PNG.
+     * @param {HTMLCanvasElement} c
+     */
     download(c) {
         var name = (this.options.filename || this.jm.mind.name) + '.png';
 
@@ -155,7 +212,11 @@ class JmScreenshot {
     }
 }
 
-let screenshot_plugin = new jsMind.plugin('screenshot', function (jm, options) {
+/**
+ * Screenshot plugin registration.
+ * @type {import('../jsmind.plugin.js').Plugin<Partial<ScreenshotOptions>>}
+ */
+export const screenshot_plugin = new jsMind.plugin('screenshot', function (jm, options) {
     var jmss = new JmScreenshot(jm, options);
     jm.screenshot = jmss;
     jm.shoot = function () {
@@ -164,3 +225,5 @@ let screenshot_plugin = new jsMind.plugin('screenshot', function (jm, options) {
 });
 
 jsMind.register_plugin(screenshot_plugin);
+
+export default JmScreenshot;

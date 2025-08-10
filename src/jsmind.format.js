@@ -11,8 +11,19 @@ import { Mind } from './jsmind.mind.js';
 import { Node } from './jsmind.node.js';
 import { util } from './jsmind.util.js';
 
+/** @typedef {{name:string,author:string,version:string}} MindMapMeta */
+/** @type {MindMapMeta} */
 const DEFAULT_META = { name: 'jsMind', author: __author__, version: __version__ };
 
+/**
+ * Mind data format handlers.
+ * @type {{
+ *  node_tree: { example:{meta:MindMapMeta,format:'node_tree',data:any}, get_mind:(src:any)=>Mind, get_data:(mind:Mind)=>any },
+ *  node_array: { example:{meta:MindMapMeta,format:'node_array',data:any[]}, get_mind:(src:any)=>Mind, get_data:(mind:Mind)=>any },
+ *  freemind: { example:{meta:MindMapMeta,format:'freemind',data:string}, get_mind:(src:any)=>Mind, get_data:(mind:Mind)=>any },
+ *  text: { example:{meta:MindMapMeta,format:'text',data:string}, get_mind:(src:any)=>Mind, get_data:(mind:Mind)=>any }
+ * }}
+ */
 export const format = {
     node_tree: {
         example: {
@@ -20,6 +31,7 @@ export const format = {
             format: 'node_tree',
             data: { id: 'root', topic: 'jsMind node_tree example' },
         },
+        /** @param {{meta:MindMapMeta,data:any}} source @returns {Mind} */
         get_mind: function (source) {
             var df = format.node_tree;
             var mind = new Mind();
@@ -29,6 +41,7 @@ export const format = {
             df._parse(mind, source.data);
             return mind;
         },
+        /** @param {Mind} mind */
         get_data: function (mind) {
             var df = format.node_tree;
             var json = {};
@@ -42,6 +55,7 @@ export const format = {
             return json;
         },
 
+        /** @param {Mind} mind @param {{id:string,topic:string,children?:any[]}} node_root */
         _parse: function (mind, node_root) {
             var df = format.node_tree;
             var data = df._extract_data(node_root);
@@ -54,6 +68,12 @@ export const format = {
             }
         },
 
+        /**
+         * Extract custom data from node JSON, excluding standard properties.
+         * @private
+         * @param {any} node_json - Node JSON object
+         * @returns {Record<string,any>} Custom data object
+         */
         _extract_data: function (node_json) {
             var data = {};
             for (var k in node_json) {
@@ -71,6 +91,7 @@ export const format = {
             return data;
         },
 
+        /** @param {Mind} mind @param {Node} node_parent @param {{id:string,topic:string,children?:any[]}} node_json */
         _extract_subnode: function (mind, node_parent, node_json) {
             var df = format.node_tree;
             var data = df._extract_data(node_json);
@@ -94,6 +115,12 @@ export const format = {
             }
         },
 
+        /**
+         * Build JSON object from a node.
+         * @private
+         * @param {Node} node - Node to convert
+         * @returns {any} JSON representation of node
+         */
         _build_node: function (node) {
             var df = format.node_tree;
             if (!(node instanceof Node)) {
@@ -131,6 +158,7 @@ export const format = {
             data: [{ id: 'root', topic: 'jsMind node_array example', isroot: true }],
         },
 
+        /** @param {{meta:MindMapMeta,data:any[]}} source @returns {Mind} */
         get_mind: function (source) {
             var df = format.node_array;
             var mind = new Mind();
@@ -141,6 +169,7 @@ export const format = {
             return mind;
         },
 
+        /** @param {Mind} mind */
         get_data: function (mind) {
             var df = format.node_array;
             var json = {};
@@ -155,6 +184,7 @@ export const format = {
             return json;
         },
 
+        /** @param {Mind} mind @param {any[]} node_array */
         _parse: function (mind, node_array) {
             var df = format.node_array;
             var nodes = node_array.slice(0);
@@ -168,6 +198,7 @@ export const format = {
             }
         },
 
+        /** @param {Mind} mind @param {any[]} node_array */
         _extract_root: function (mind, node_array) {
             var df = format.node_array;
             var i = node_array.length;
@@ -183,6 +214,7 @@ export const format = {
             return null;
         },
 
+        /** @param {Mind} mind @param {Node} parent_node @param {any[]} node_array */
         _extract_subnode: function (mind, parent_node, node_array) {
             var df = format.node_array;
             var i = node_array.length;
@@ -237,11 +269,13 @@ export const format = {
             return data;
         },
 
+        /** @param {Mind} mind @param {any[]} node_array */
         _array: function (mind, node_array) {
             var df = format.node_array;
             df._array_node(mind.root, node_array);
         },
 
+        /** @param {Node} node @param {any[]} node_array */
         _array_node: function (node, node_array) {
             var df = format.node_array;
             if (!(node instanceof Node)) {
@@ -281,6 +315,7 @@ export const format = {
             format: 'freemind',
             data: '<map version="1.0.1"><node ID="root" TEXT="jsMind freemind example"/></map>',
         },
+        /** @param {{meta:MindMapMeta,data:string}} source @returns {Mind} */
         get_mind: function (source) {
             var df = format.freemind;
             var mind = new Mind();
@@ -311,6 +346,7 @@ export const format = {
             return json;
         },
 
+        /** @param {string} xml */
         _parse_xml: function (xml) {
             var xml_doc = null;
             if (window.DOMParser) {
@@ -325,6 +361,7 @@ export const format = {
             return xml_doc;
         },
 
+        /** @param {Document} xml_doc */
         _find_root: function (xml_doc) {
             var nodes = xml_doc.childNodes;
             var node = null;
@@ -351,6 +388,7 @@ export const format = {
             return node;
         },
 
+        /** @param {Mind} mind @param {Node|null} parent_node @param {Element} xml_node */
         _load_node: function (mind, parent_node, xml_node) {
             var df = format.freemind;
             var node_id = xml_node.getAttribute('ID');
@@ -411,6 +449,7 @@ export const format = {
             }
         },
 
+        /** @param {Element} xml_node */
         _load_attributes: function (xml_node) {
             var children = xml_node.childNodes;
             var attr = null;
@@ -424,6 +463,7 @@ export const format = {
             return attr_data;
         },
 
+        /** @param {Node} node @param {string[]} xml_lines */
         _build_map: function (node, xml_lines) {
             var df = format.freemind;
             var pos = null;
@@ -467,6 +507,7 @@ export const format = {
             xml_lines.push('</node>');
         },
 
+        /** @param {string} text */
         _escape: function (text) {
             return text
                 .replace(/&/g, '&amp;')
@@ -483,6 +524,7 @@ export const format = {
             data: 'jsMind text example\n node1\n  node1-sub\n  node1-sub\n node2',
         },
         _line_regex: /\s*/,
+        /** @param {{meta:MindMapMeta,data:string}} source @returns {Mind} */
         get_mind: function (source) {
             var df = format.text;
             var mind = new Mind();
@@ -494,6 +536,7 @@ export const format = {
             return mind;
         },
 
+        /** @param {Mind} mind @param {string[]} lines */
         _fill_nodes: function (mind, lines) {
             let node_path = [];
             let i = 0;
@@ -533,6 +576,7 @@ export const format = {
             node_path.length = 0;
         },
 
+        /** @param {Mind} mind */
         get_data: function (mind) {
             var df = format.text;
             var json = {};
@@ -548,6 +592,7 @@ export const format = {
             return json;
         },
 
+        /** @param {string[]} lines @param {Node[]} nodes @param {number} level */
         _build_lines: function (lines, nodes, level) {
             let prefix = new Array(level + 1).join(' ');
             for (let node of nodes) {

@@ -10,16 +10,27 @@ import { logger } from './jsmind.common.js';
 import { format } from './jsmind.format.js';
 
 export class DataProvider {
+    /**
+     * Data provider: loads and serializes mind data by format.
+     * @param {import('./jsmind.js').default} jm - jsMind instance
+     */
     constructor(jm) {
         this.jm = jm;
     }
 
+    /** Initialize data provider. */
     init() {
         logger.debug('data.init');
     }
+    /** Reset data provider state. */
     reset() {
         logger.debug('data.reset');
     }
+    /**
+     * Load a Mind from mixed source.
+     * @param {any} mind_data - object with {format,data} or a format-specific payload
+     * @returns {import('./jsmind.mind.js').Mind|null}
+     */
     load(mind_data) {
         var df = null;
         var mind = null;
@@ -46,6 +57,11 @@ export class DataProvider {
         }
         return mind;
     }
+    /**
+     * Serialize current mind to target format.
+     * @param {'node_tree'|'node_array'|'freemind'|'text'} data_format
+     * @returns {any}
+     */
     get_data(data_format) {
         var data = null;
         if (data_format == 'node_array') {

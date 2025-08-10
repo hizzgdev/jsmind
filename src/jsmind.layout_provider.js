@@ -8,6 +8,11 @@
 import { logger, Direction, EventType } from './jsmind.common.js';
 
 export class LayoutProvider {
+    /**
+     * Layout engine for positioning nodes and lines.
+     * @param {import('./jsmind.js').default} jm - jsMind instance
+     * @param {{mode:'full'|'side', hspace:number, vspace:number, pspace:number, cousin_space:number}} options - Layout configuration options
+     */
     constructor(jm, options) {
         this.opts = options;
         this.jm = jm;
@@ -16,13 +21,20 @@ export class LayoutProvider {
 
         this.cache_valid = false;
     }
+    /** Initialize layout provider. */
     init() {
         logger.debug('layout.init');
     }
+    /** Reset layout state and bounds. */
     reset() {
         logger.debug('layout.reset');
         this.bounds = { n: 0, s: 0, w: 0, e: 0 };
     }
+    /**
+     * Decide the next child's direction for a parent node.
+     * @param {import('./jsmind.node.js').Node} node
+     * @returns {number}
+     */
     calculate_next_child_direction(node) {
         if (this.isside) {
             return Direction.right;
@@ -39,14 +51,20 @@ export class LayoutProvider {
         }
         return children_len > 1 && r > 0 ? Direction.left : Direction.right;
     }
+    /** Perform layout and offsets recalculation. */
     layout() {
         logger.debug('layout.layout');
         this.layout_direction();
         this.layout_offset();
     }
+    /** Calculate and set direction for all nodes. */
     layout_direction() {
         this._layout_direction_root();
     }
+    /**
+     * Set direction layout for root node and its children.
+     * @private
+     */
     _layout_direction_root() {
         var node = this.jm.mind.root;
         var layout_data = null;
@@ -78,6 +96,13 @@ export class LayoutProvider {
             }
         }
     }
+    /**
+     * Set direction layout for a node and its descendants.
+     * @private
+     * @param {import('./jsmind.node.js').Node} node - Target node
+     * @param {number} direction - Direction constant (-1, 0, 1)
+     * @param {number} side_index - Index among siblings
+     */
     _layout_direction_side(node, direction, side_index) {
         var layout_data = null;
         if ('layout' in node._data) {
@@ -96,6 +121,7 @@ export class LayoutProvider {
             this._layout_direction_side(children[i], direction, i);
         }
     }
+    /** Calculate and set position offsets for all nodes. */
     layout_offset() {
         var node = this.jm.mind.root;
         var layout_data = node._data.layout;
@@ -124,7 +150,12 @@ export class LayoutProvider {
         this.bounds.n = 0;
         this.bounds.s = Math.max(layout_data.outer_height_left, layout_data.outer_height_right);
     }
-    // layout both the x and y axis
+    /**
+     * Layout both the x and y axis for subnodes.
+     * @private
+     * @param {import('./jsmind.node.js').Node[]} nodes - Array of nodes to layout
+     * @returns {number} Total height of all nodes
+     */
     _layout_offset_subnodes(nodes) {
         var total_height = 0;
         var nodes_count = nodes.length;
@@ -175,7 +206,12 @@ export class LayoutProvider {
         }
         return total_height;
     }
-    // layout the y axis only, for collapse/expand a node
+    /**
+     * Layout the y axis only, for collapse/expand a node.
+     * @private
+     * @param {import('./jsmind.node.js').Node[]} nodes - Array of nodes to layout
+     * @returns {number} Total height of all nodes
+     */
     _layout_offset_subnodes_height(nodes) {
         var total_height = 0;
         var nodes_count = nodes.length;
@@ -217,9 +253,20 @@ export class LayoutProvider {
         }
         return total_height;
     }
+    /**
+     * Check if node should reserve cousin space.
+     * @private
+     * @param {import('./jsmind.node.js').Node} node - Node to check
+     * @returns {boolean} True if cousin space should be reserved
+     */
     _should_reserve_cousin_space(node) {
         return node.children.length > 0 && node.parent.children.length > 1;
     }
+    /**
+     * Get absolute offset for a node.
+     * @param {import('./jsmind.node.js').Node} node - Target node
+     * @returns {{x:number, y:number}} Absolute position offset
+     */
     get_node_offset(node) {
         var layout_data = node._data.layout;
         var offset_cache = null;
@@ -242,6 +289,11 @@ export class LayoutProvider {
         }
         return offset_cache;
     }
+    /**
+     * Get anchor point for lines on a node.
+     * @param {import('./jsmind.node.js').Node} node - Target node
+     * @returns {{x:number, y:number}} Anchor point coordinates
+     */
     get_node_point(node) {
         var view_data = node._data.view;
         var offset_p = this.get_node_offset(node);
@@ -250,10 +302,20 @@ export class LayoutProvider {
         p.y = offset_p.y - view_data.height / 2;
         return p;
     }
+    /**
+     * Get input point for lines on a node.
+     * @param {import('./jsmind.node.js').Node} node - Target node
+     * @returns {{x:number, y:number}} Input point coordinates
+     */
     get_node_point_in(node) {
         var p = this.get_node_offset(node);
         return p;
     }
+    /**
+     * Get output point for lines on a node.
+     * @param {import('./jsmind.node.js').Node} node - Target node
+     * @returns {{x:number, y:number}} Output point coordinates
+     */
     get_node_point_out(node) {
         var layout_data = node._data.layout;
         var pout_cache = null;
@@ -277,6 +339,11 @@ export class LayoutProvider {
         }
         return pout_cache;
     }
+    /**
+     * Get expander point for a node.
+     * @param {import('./jsmind.node.js').Node} node - Target node
+     * @returns {{x:number, y:number}} Expander point coordinates
+     */
     get_expander_point(node) {
         var p = this.get_node_point_out(node);
         var ex_p = {};
@@ -288,6 +355,10 @@ export class LayoutProvider {
         ex_p.y = p.y - Math.ceil(this.opts.pspace / 2);
         return ex_p;
     }
+    /**
+     * Get minimal canvas size to contain all nodes.
+     * @returns {{w:number, h:number}} Minimum size required
+     */
     get_min_size() {
         var nodes = this.jm.mind.nodes;
         var node = null;
@@ -307,6 +378,10 @@ export class LayoutProvider {
             h: this.bounds.s - this.bounds.n,
         };
     }
+    /**
+     * Toggle node expanded/collapsed state.
+     * @param {import('./jsmind.node.js').Node} node - Target node
+     */
     toggle_node(node) {
         if (node.isroot) {
             return;
@@ -317,6 +392,10 @@ export class LayoutProvider {
             this.expand_node(node);
         }
     }
+    /**
+     * Expand a node and show its children.
+     * @param {import('./jsmind.node.js').Node} node - Target node
+     */
     expand_node(node) {
         node.expanded = true;
         this.part_layout(node);
@@ -327,6 +406,10 @@ export class LayoutProvider {
             node: node.id,
         });
     }
+    /**
+     * Collapse a node and hide its children.
+     * @param {import('./jsmind.node.js').Node} node - Target node
+     */
     collapse_node(node) {
         node.expanded = false;
         this.part_layout(node);
@@ -337,6 +420,7 @@ export class LayoutProvider {
             node: node.id,
         });
     }
+    /** Expand all nodes in the mind map. */
     expand_all() {
         var nodes = this.jm.mind.nodes;
         var c = 0;
@@ -354,6 +438,7 @@ export class LayoutProvider {
             this.set_visible(root.children, true);
         }
     }
+    /** Collapse all nodes in the mind map. */
     collapse_all() {
         var nodes = this.jm.mind.nodes;
         var c = 0;
@@ -371,6 +456,12 @@ export class LayoutProvider {
             this.set_visible(root.children, true);
         }
     }
+    /**
+     * Expand nodes to a specific depth level.
+     * @param {number} target_depth - Target depth level
+     * @param {import('./jsmind.node.js').Node[]=} curr_nodes - Current nodes to process
+     * @param {number=} curr_depth - Current depth level
+     */
     expand_to_depth(target_depth, curr_nodes, curr_depth) {
         if (target_depth < 1) {
             return;
@@ -394,6 +485,10 @@ export class LayoutProvider {
             }
         }
     }
+    /**
+     * Perform partial layout for a node and its subtree.
+     * @param {import('./jsmind.node.js').Node} node - Target node
+     */
     part_layout(node) {
         var root = this.jm.mind.root;
         if (!!root) {
@@ -425,6 +520,11 @@ export class LayoutProvider {
             logger.warn('can not found root node');
         }
     }
+    /**
+     * Set visibility for nodes and their children.
+     * @param {import('./jsmind.node.js').Node[]} nodes - Array of nodes
+     * @param {boolean} visible - Visibility state
+     */
     set_visible(nodes, visible) {
         var i = nodes.length;
         var node = null;
@@ -442,9 +542,19 @@ export class LayoutProvider {
             }
         }
     }
+    /**
+     * Check if a node is expanded.
+     * @param {import('./jsmind.node.js').Node} node - Target node
+     * @returns {boolean} True if node is expanded
+     */
     is_expand(node) {
         return node.expanded;
     }
+    /**
+     * Check if a node is visible.
+     * @param {import('./jsmind.node.js').Node} node - Target node
+     * @returns {boolean} True if node is visible
+     */
     is_visible(node) {
         var layout_data = node._data.layout;
         if ('visible' in layout_data && !layout_data.visible) {

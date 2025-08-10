@@ -8,6 +8,7 @@
         "esModuleInterop": true,
         "declaration": true,
         "emitDeclarationOnly": true,
+        "stripInternal": true,
         "allowJs": true,
         "checkJs": false,
         "outDir": "types/generated",

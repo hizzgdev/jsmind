@@ -1,17 +1,26 @@
-export namespace util {
-    namespace file {
-        function read(file_data: any, fn_callback: any): void;
-        function save(file_data: any, type: any, name: any): void;
-    }
-    namespace json {
-        function json2string(json: any): string;
-        function string2json(json_str: any): any;
-        function merge(b: any, a: any): any;
-    }
-    namespace uuid {
-        function newid(): string;
-    }
-    namespace text {
-        function is_empty(s: any): boolean;
-    }
-}
+/**
+ * Misc utility collection.
+ * @type {{
+ *  file: { read: (file: File, cb:(result:string,name:string)=>void)=>void, save:(data:string,type:string,name:string)=>void},
+ *  json: { json2string:(v:any)=>string, string2json:(s:string)=>any, merge:(b:any,a:any)=>any },
+ *  uuid: { newid:()=>string },
+ *  text: { is_empty:(s?:string)=>boolean }
+ * }}
+ */
+export const util: {
+    file: {
+        read: (file: File, cb: (result: string, name: string) => void) => void;
+        save: (data: string, type: string, name: string) => void;
+    };
+    json: {
+        json2string: (v: any) => string;
+        string2json: (s: string) => any;
+        merge: (b: any, a: any) => any;
+    };
+    uuid: {
+        newid: () => string;
+    };
+    text: {
+        is_empty: (s?: string) => boolean;
+    };
+};
