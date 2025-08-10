@@ -13,7 +13,7 @@
         "noEmit": true,
         "baseUrl": ".",
         "paths": {
-            "jsmind": ["types/index.d.ts"],
+            "jsmind": ["types/generated/types-index.d.ts"],
             "jsmind/draggable-node": ["types/generated/plugins/jsmind.draggable-node.d.ts"],
             "jsmind/screenshot": ["types/generated/plugins/jsmind.screenshot.d.ts"]
         }

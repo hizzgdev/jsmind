@@ -15,6 +15,6 @@
         "rootDir": "src",
         "baseUrl": "."
     },
-    "include": ["src/**/*.js"],
+    "include": ["src/**/*.js", "src/**/*.ts"],
     "exclude": ["node_modules", "dist", "tests", "example", "es6", "js-legacy", "js-legacy/**/*.js"]
 }

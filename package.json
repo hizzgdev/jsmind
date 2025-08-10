@@ -3,12 +3,12 @@
     "version": "0.8.7",
     "description": "jsMind is a pure javascript library for mindmap, it base on html5 canvas. jsMind was released under BSD license, you can embed it in any project, if only you observe the license.",
     "main": "es6/jsmind.js",
-    "types": "types/index.d.ts",
+    "types": "types/generated/types-index.d.ts",
     "exports": {
         ".": {
             "import": "./es6/jsmind.js",
             "require": "./es6/jsmind.js",
-            "types": "./types/index.d.ts"
+            "types": "./types/generated/types-index.d.ts"
         },
         "./draggable-node": {
             "import": "./es6/jsmind.draggable-node.js",
