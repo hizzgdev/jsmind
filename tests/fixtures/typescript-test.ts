@@ -173,7 +173,7 @@ const resizeEvent: number = eventType.resize;
 
 // Show mind map
 jm.show(nodeTreeData);
-jm.show(); // 显示空白思维导图
+jm.show(); // Show an empty mind map
 
 // Query state
 const meta = jm.get_meta();
