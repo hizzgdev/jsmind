@@ -1,30 +1,19 @@
 {
-  "compilerOptions": {
-    "target": "ES2020",
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "strict": false,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "declaration": true,
-    "emitDeclarationOnly": true,
-    "allowJs": true,
-    "checkJs": false,
-    "outDir": "types/generated",
-    "rootDir": "src",
-    "baseUrl": "."
-  },
-  "include": [
-    "src/**/*.js"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "tests",
-    "example",
-    "es6",
-    "js-legacy"
-  ]
+    "compilerOptions": {
+        "target": "ES2020",
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "strict": false,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "allowJs": true,
+        "checkJs": false,
+        "outDir": "types/generated",
+        "rootDir": "src",
+        "baseUrl": "."
+    },
+    "include": ["src/**/*.js"],
+    "exclude": ["node_modules", "dist", "tests", "example", "es6", "js-legacy", "js-legacy/**/*.js"]
 }
-
-
