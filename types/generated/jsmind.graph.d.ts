@@ -4,7 +4,10 @@
  * @param {'canvas'|'svg'} engine - Rendering engine type
  * @returns {SvgGraph|CanvasGraph} Graph renderer instance
  */
-export function init_graph(view: import("./jsmind.view_provider.js").ViewProvider, engine: "canvas" | "svg"): SvgGraph | CanvasGraph;
+export function init_graph(
+    view: import('./jsmind.view_provider.js').ViewProvider,
+    engine: 'canvas' | 'svg'
+): SvgGraph | CanvasGraph;
 /**
  * SVG-based graph renderer.
  */
@@ -15,20 +18,20 @@ declare class SvgGraph {
      * Create SVG graph renderer.
      * @param {import('./jsmind.view_provider.js').ViewProvider} view - View provider instance
      */
-    constructor(view: import("./jsmind.view_provider.js").ViewProvider);
-    view: import("./jsmind.view_provider.js").ViewProvider;
+    constructor(view: import('./jsmind.view_provider.js').ViewProvider);
+    view: import('./jsmind.view_provider.js').ViewProvider;
     opts: {
-        engine: "canvas" | "svg";
+        engine: 'canvas' | 'svg';
         enable_device_pixel_ratio: boolean;
         hmargin: number;
         vmargin: number;
         line_width: number;
         line_color: string;
-        line_style: "curved" | "straight";
+        line_style: 'curved' | 'straight';
         custom_line_render?: Function;
         draggable: boolean;
         hide_scrollbars_when_draggable: boolean;
-        node_overflow: "hidden" | "wrap";
+        node_overflow: 'hidden' | 'wrap';
         zoom: {
             min: number;
             max: number;
@@ -36,7 +39,7 @@ declare class SvgGraph {
             mask_key: number;
         };
         custom_node_render?: Function;
-        expander_style: "char" | "number";
+        expander_style: 'char' | 'number';
     };
     e_svg: SVGElement;
     size: {
@@ -59,16 +62,21 @@ declare class SvgGraph {
     set_size(w: number, h: number): void;
     clear(): void;
     /** @param {{x:number,y:number}} pout @param {{x:number,y:number}} pin @param {{x:number,y:number}} offset @param {string=} color */
-    draw_line(pout: {
-        x: number;
-        y: number;
-    }, pin: {
-        x: number;
-        y: number;
-    }, offset: {
-        x: number;
-        y: number;
-    }, color?: string | undefined): void;
+    draw_line(
+        pout: {
+            x: number;
+            y: number;
+        },
+        pin: {
+            x: number;
+            y: number;
+        },
+        offset: {
+            x: number;
+            y: number;
+        },
+        color?: string | undefined
+    ): void;
     /** @param {CanvasRenderingContext2D} dest_canvas_ctx @param {(()=>void)=} callback */
     copy_to(dest_canvas_ctx: CanvasRenderingContext2D, callback?: (() => void) | undefined): void;
     /**
@@ -100,19 +108,19 @@ declare class CanvasGraph {
      * Create canvas graph renderer.
      * @param {import('./jsmind.view_provider.js').ViewProvider} view - View provider instance
      */
-    constructor(view: import("./jsmind.view_provider.js").ViewProvider);
+    constructor(view: import('./jsmind.view_provider.js').ViewProvider);
     opts: {
-        engine: "canvas" | "svg";
+        engine: 'canvas' | 'svg';
         enable_device_pixel_ratio: boolean;
         hmargin: number;
         vmargin: number;
         line_width: number;
         line_color: string;
-        line_style: "curved" | "straight";
+        line_style: 'curved' | 'straight';
         custom_line_render?: Function;
         draggable: boolean;
         hide_scrollbars_when_draggable: boolean;
-        node_overflow: "hidden" | "wrap";
+        node_overflow: 'hidden' | 'wrap';
         zoom: {
             min: number;
             max: number;
@@ -120,7 +128,7 @@ declare class CanvasGraph {
             mask_key: number;
         };
         custom_node_render?: Function;
-        expander_style: "char" | "number";
+        expander_style: 'char' | 'number';
     };
     e_canvas: HTMLElement;
     canvas_ctx: CanvasRenderingContext2D;
@@ -129,14 +137,32 @@ declare class CanvasGraph {
         h: number;
     };
     line_drawing: {
-        straight: (ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) => void;
-        curved: (ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) => void;
+        straight: (
+            ctx: CanvasRenderingContext2D,
+            x1: number,
+            y1: number,
+            x2: number,
+            y2: number
+        ) => void;
+        curved: (
+            ctx: CanvasRenderingContext2D,
+            x1: number,
+            y1: number,
+            x2: number,
+            y2: number
+        ) => void;
     };
     dpr: number;
     /** Choose line drawing renderer. */
     init_line_render(): void;
     /** @type {(ctx:CanvasRenderingContext2D,x1:number,y1:number,x2:number,y2:number)=>void} */
-    drawing: (ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) => void;
+    drawing: (
+        ctx: CanvasRenderingContext2D,
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number
+    ) => void;
     /** @returns {HTMLCanvasElement} */
     element(): HTMLCanvasElement;
     /** @param {number} w @param {number} h */
@@ -144,16 +170,21 @@ declare class CanvasGraph {
     /** Clear the canvas. */
     clear(): void;
     /** @param {{x:number,y:number}} pout @param {{x:number,y:number}} pin @param {{x:number,y:number}} offset @param {string=} color */
-    draw_line(pout: {
-        x: number;
-        y: number;
-    }, pin: {
-        x: number;
-        y: number;
-    }, offset: {
-        x: number;
-        y: number;
-    }, color?: string | undefined): void;
+    draw_line(
+        pout: {
+            x: number;
+            y: number;
+        },
+        pin: {
+            x: number;
+            y: number;
+        },
+        offset: {
+            x: number;
+            y: number;
+        },
+        color?: string | undefined
+    ): void;
     /** @param {CanvasRenderingContext2D} dest_canvas_ctx @param {(()=>void)=} callback */
     copy_to(dest_canvas_ctx: CanvasRenderingContext2D, callback?: (() => void) | undefined): void;
     /**

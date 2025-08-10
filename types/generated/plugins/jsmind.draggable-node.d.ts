@@ -7,10 +7,10 @@ export class DraggableNode {
      * @param {import('../jsmind.js').default} jm - jsMind instance
      * @param {Partial<DraggableNodeOptions>} options - Plugin options
      */
-    constructor(jm: import("../jsmind.js").default, options: Partial<DraggableNodeOptions>);
+    constructor(jm: import('../jsmind.js').default, options: Partial<DraggableNodeOptions>);
     version: string;
     /** @type {import('../jsmind.js').default} */
-    jm: import("../jsmind.js").default;
+    jm: import('../jsmind.js').default;
     /** @type {DraggableNodeOptions} */
     options: DraggableNodeOptions;
     /** @type {HTMLCanvasElement|null} */
@@ -28,9 +28,9 @@ export class DraggableNode {
     /** @type {number} */
     shadow_h: number;
     /** @type {import('../jsmind.node.js').Node|null} */
-    active_node: import("../jsmind.node.js").Node | null;
+    active_node: import('../jsmind.node.js').Node | null;
     /** @type {import('../jsmind.node.js').Node|null} */
-    target_node: import("../jsmind.node.js").Node | null;
+    target_node: import('../jsmind.node.js').Node | null;
     /** @type {number|null} */
     target_direct: number | null;
     /** @type {number} */
@@ -77,13 +77,17 @@ export class DraggableNode {
      * @param {{x:number,y:number}} node_p - Target node anchor point
      * @param {boolean} invalid - Whether current target is invalid
      */
-    magnet_shadow(shadow_p: {
-        x: number;
-        y: number;
-    }, node_p: {
-        x: number;
-        y: number;
-    }, invalid: boolean): void;
+    magnet_shadow(
+        shadow_p: {
+            x: number;
+            y: number;
+        },
+        node_p: {
+            x: number;
+            y: number;
+        },
+        invalid: boolean
+    ): void;
     /** Clear helper lines from canvas. */
     clear_lines(): void;
     /**
@@ -132,59 +136,62 @@ export class DraggableNode {
      * @param {number} direction - Direction constant
      * @returns {import('../jsmind.node.js').Node|null}
      */
-    lookup_overlapping_node_parent(direction: number): import("../jsmind.node.js").Node | null;
+    lookup_overlapping_node_parent(direction: number): import('../jsmind.node.js').Node | null;
     /**
      * Find node's parent by a screen location.
      * @param {number} x - Client X
      * @param {number} y - Client Y
      * @returns {import('../jsmind.node.js').Node|null}
      */
-    lookup_node_parent_by_location(x: number, y: number): import("../jsmind.node.js").Node | null;
+    lookup_node_parent_by_location(x: number, y: number): import('../jsmind.node.js').Node | null;
     /**
      * Lookup the closest node along a direction.
      * @param {number} direction
      * @returns {import('../jsmind.node.js').Node}
      */
-    lookup_close_node(direction: number): import("../jsmind.node.js").Node;
+    lookup_close_node(direction: number): import('../jsmind.node.js').Node;
     /**
      * Check if shadow is on the target side of a node.
      * @param {import('../jsmind.node.js').Node} node
      * @param {number} dir
      * @returns {boolean}
      */
-    shadow_on_target_side(node: import("../jsmind.node.js").Node, dir: number): boolean;
+    shadow_on_target_side(node: import('../jsmind.node.js').Node, dir: number): boolean;
     /**
      * Distance from shadow to the right side of a node.
      * @param {import('../jsmind.node.js').Node} node
      * @returns {number}
      */
-    shadow_to_right_of_node(node: import("../jsmind.node.js").Node): number;
+    shadow_to_right_of_node(node: import('../jsmind.node.js').Node): number;
     /**
      * Distance from shadow to the left side of a node.
      * @param {import('../jsmind.node.js').Node} node
      * @returns {number}
      */
-    shadow_to_left_of_node(node: import("../jsmind.node.js").Node): number;
+    shadow_to_left_of_node(node: import('../jsmind.node.js').Node): number;
     /**
      * Vertical distance between shadow centerline and node centerline.
      * @param {import('../jsmind.node.js').Node} node
      * @returns {number}
      */
-    shadow_to_base_line_of_node(node: import("../jsmind.node.js").Node): number;
+    shadow_to_base_line_of_node(node: import('../jsmind.node.js').Node): number;
     /**
      * Manhattan distance to a node along a direction.
      * @param {import('../jsmind.node.js').Node} node
      * @param {number} dir
      * @returns {number}
      */
-    shadow_to_node(node: import("../jsmind.node.js").Node, dir: number): number;
+    shadow_to_node(node: import('../jsmind.node.js').Node, dir: number): number;
     /**
      * Calculate connection points of a node and the shadow.
      * @param {import('../jsmind.node.js').Node} node
      * @param {number} dir
      * @returns {{sp:{x:number,y:number}, np:{x:number,y:number}}}
      */
-    calc_point_of_node(node: import("../jsmind.node.js").Node, dir: number): {
+    calc_point_of_node(
+        node: import('../jsmind.node.js').Node,
+        dir: number
+    ): {
         sp: {
             x: number;
             y: number;
@@ -200,7 +207,11 @@ export class DraggableNode {
      * @param {import('../jsmind.node.js').Node|null} target_node
      * @param {number|null} target_direct
      */
-    move_node(src_node: import("../jsmind.node.js").Node, target_node: import("../jsmind.node.js").Node | null, target_direct: number | null): void;
+    move_node(
+        src_node: import('../jsmind.node.js').Node,
+        target_node: import('../jsmind.node.js').Node | null,
+        target_direct: number | null
+    ): void;
     /**
      * Handle jsMind events.
      * @param {number|string} type - Event type
@@ -212,7 +223,7 @@ export class DraggableNode {
  * Draggable node plugin registration.
  * @type {import('../jsmind.plugin.js').Plugin<Partial<DraggableNodeOptions>>}
  */
-export const draggable_plugin: import("../jsmind.plugin.js").Plugin<Partial<DraggableNodeOptions>>;
+export const draggable_plugin: import('../jsmind.plugin.js').Plugin<Partial<DraggableNodeOptions>>;
 export default DraggableNode;
 /**
  * Default options for draggable node plugin.

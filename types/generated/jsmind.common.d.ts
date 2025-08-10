@@ -62,5 +62,5 @@ export type DirectionType = {
     left: number;
     center: number;
     right: number;
-    of: (dir: (string | number)) => number | undefined;
+    of: (dir: string | number) => number | undefined;
 };

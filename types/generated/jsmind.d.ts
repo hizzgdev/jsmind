@@ -8,7 +8,7 @@
 export default class jsMind {
     static mind: typeof Mind;
     static node: typeof Node;
-    static direction: import("./jsmind.common.js").DirectionType;
+    static direction: import('./jsmind.common.js').DirectionType;
     static event_type: {
         show: number;
         resize: number;
@@ -50,13 +50,16 @@ export default class jsMind {
      * @param {object | null} mind
      * @returns {jsMind}
      */
-    static show(options: import("./jsmind.option.js").JsMindRuntimeOptions, mind: object | null): jsMind;
+    static show(
+        options: import('./jsmind.option.js').JsMindRuntimeOptions,
+        mind: object | null
+    ): jsMind;
     /**
      * Create a jsMind instance.
      * @param {import('./jsmind.option.js').JsMindRuntimeOptions} options
      */
-    constructor(options: import("./jsmind.option.js").JsMindRuntimeOptions);
-    options: import("./jsmind.option.js").JsMindRuntimeOptions;
+    constructor(options: import('./jsmind.option.js').JsMindRuntimeOptions);
+    options: import('./jsmind.option.js').JsMindRuntimeOptions;
     version: string;
     initialized: boolean;
     mind: Mind;
@@ -84,12 +87,12 @@ export default class jsMind {
      * Enable default event handle.
      * @param {'mousedown'|'click'|'dblclick'|'mousewheel'} event_handle
      */
-    enable_event_handle(event_handle: "mousedown" | "click" | "dblclick" | "mousewheel"): void;
+    enable_event_handle(event_handle: 'mousedown' | 'click' | 'dblclick' | 'mousewheel'): void;
     /**
      * Disable default event handle.
      * @param {'mousedown'|'click'|'dblclick'|'mousewheel'} event_handle
      */
-    disable_event_handle(event_handle: "mousedown" | "click" | "dblclick" | "mousewheel"): void;
+    disable_event_handle(event_handle: 'mousedown' | 'click' | 'dblclick' | 'mousewheel'): void;
     /**
      * Set theme name.
      * @param {string|null} theme
@@ -110,7 +113,7 @@ export default class jsMind {
      * @param {string | import('./jsmind.node.js').Node} node
      * @returns {boolean|void}
      */
-    begin_edit(node: string | import("./jsmind.node.js").Node): boolean | void;
+    begin_edit(node: string | import('./jsmind.node.js').Node): boolean | void;
     /** End editing */
     end_edit(): void;
     /**
@@ -118,19 +121,19 @@ export default class jsMind {
      * @param {string | import('./jsmind.node.js').Node} node
      * @returns {void}
      */
-    toggle_node(node: string | import("./jsmind.node.js").Node): void;
+    toggle_node(node: string | import('./jsmind.node.js').Node): void;
     /**
      * Expand a node.
      * @param {string | import('./jsmind.node.js').Node} node
      * @returns {void}
      */
-    expand_node(node: string | import("./jsmind.node.js").Node): void;
+    expand_node(node: string | import('./jsmind.node.js').Node): void;
     /**
      * Collapse a node.
      * @param {string | import('./jsmind.node.js').Node} node
      * @returns {void}
      */
-    collapse_node(node: string | import("./jsmind.node.js").Node): void;
+    collapse_node(node: string | import('./jsmind.node.js').Node): void;
     /** Expand all nodes */
     expand_all(): void;
     /** Collapse all nodes */
@@ -162,14 +165,14 @@ export default class jsMind {
      * @param {'node_tree'|'node_array'|'freemind'|'text'} [data_format]
      * @returns {object}
      */
-    get_data(data_format?: "node_tree" | "node_array" | "freemind" | "text"): object;
+    get_data(data_format?: 'node_tree' | 'node_array' | 'freemind' | 'text'): object;
     /** @returns {import('./jsmind.node.js').Node} */
-    get_root(): import("./jsmind.node.js").Node;
+    get_root(): import('./jsmind.node.js').Node;
     /**
      * @param {string | import('./jsmind.node.js').Node} node
      * @returns {import('./jsmind.node.js').Node}
      */
-    get_node(node: string | import("./jsmind.node.js").Node): import("./jsmind.node.js").Node;
+    get_node(node: string | import('./jsmind.node.js').Node): import('./jsmind.node.js').Node;
     /**
      * Add a node under parent.
      * @param {string | import('./jsmind.node.js').Node} parent_node
@@ -179,7 +182,13 @@ export default class jsMind {
      * @param {number=} direction
      * @returns {import('./jsmind.node.js').Node|null}
      */
-    add_node(parent_node: string | import("./jsmind.node.js").Node, node_id: string, topic: string, data?: Record<string, any> | undefined, direction?: number | undefined): import("./jsmind.node.js").Node | null;
+    add_node(
+        parent_node: string | import('./jsmind.node.js').Node,
+        node_id: string,
+        topic: string,
+        data?: Record<string, any> | undefined,
+        direction?: number | undefined
+    ): import('./jsmind.node.js').Node | null;
     /**
      * Insert a node before target node.
      * @param {string | import('./jsmind.node.js').Node} node_before
@@ -189,7 +198,13 @@ export default class jsMind {
      * @param {number=} direction
      * @returns {import('./jsmind.node.js').Node|null}
      */
-    insert_node_before(node_before: string | import("./jsmind.node.js").Node, node_id: string, topic: string, data?: Record<string, any> | undefined, direction?: number | undefined): import("./jsmind.node.js").Node | null;
+    insert_node_before(
+        node_before: string | import('./jsmind.node.js').Node,
+        node_id: string,
+        topic: string,
+        data?: Record<string, any> | undefined,
+        direction?: number | undefined
+    ): import('./jsmind.node.js').Node | null;
     /**
      * Insert a node after target node.
      * @param {string | import('./jsmind.node.js').Node} node_after
@@ -199,13 +214,19 @@ export default class jsMind {
      * @param {number=} direction
      * @returns {import('./jsmind.node.js').Node|null}
      */
-    insert_node_after(node_after: string | import("./jsmind.node.js").Node, node_id: string, topic: string, data?: Record<string, any> | undefined, direction?: number | undefined): import("./jsmind.node.js").Node | null;
+    insert_node_after(
+        node_after: string | import('./jsmind.node.js').Node,
+        node_id: string,
+        topic: string,
+        data?: Record<string, any> | undefined,
+        direction?: number | undefined
+    ): import('./jsmind.node.js').Node | null;
     /**
      * Remove a node.
      * @param {string | import('./jsmind.node.js').Node} node
      * @returns {boolean}
      */
-    remove_node(node: string | import("./jsmind.node.js").Node): boolean;
+    remove_node(node: string | import('./jsmind.node.js').Node): boolean;
     /** @param {string} node_id @param {string} topic */
     update_node(node_id: string, topic: string): void;
     /**
@@ -215,40 +236,53 @@ export default class jsMind {
      * @param {string=} parent_id
      * @param {number=} direction
      */
-    move_node(node_id: string, before_id?: string | undefined, parent_id?: string | undefined, direction?: number | undefined): void;
+    move_node(
+        node_id: string,
+        before_id?: string | undefined,
+        parent_id?: string | undefined,
+        direction?: number | undefined
+    ): void;
     /**
      * @param {string | import('./jsmind.node.js').Node} node
      * @returns {void}
      */
-    select_node(node: string | import("./jsmind.node.js").Node): void;
+    select_node(node: string | import('./jsmind.node.js').Node): void;
     /** @returns {import('./jsmind.node.js').Node|null} */
-    get_selected_node(): import("./jsmind.node.js").Node | null;
+    get_selected_node(): import('./jsmind.node.js').Node | null;
     /** clear selection */
     select_clear(): void;
     /** @param {string | import('./jsmind.node.js').Node} node */
-    is_node_visible(node: string | import("./jsmind.node.js").Node): boolean;
+    is_node_visible(node: string | import('./jsmind.node.js').Node): boolean;
     /** @param {string | import('./jsmind.node.js').Node} node */
-    scroll_node_to_center(node: string | import("./jsmind.node.js").Node): void;
+    scroll_node_to_center(node: string | import('./jsmind.node.js').Node): void;
     /**
      * Find the previous sibling node of the given node.
      *
      * @param {string | import('./jsmind.node.js').Node} node - Node id or Node instance
      * @returns {import('./jsmind.node.js').Node | null}
      */
-    find_node_before(node: string | import("./jsmind.node.js").Node): import("./jsmind.node.js").Node | null;
+    find_node_before(
+        node: string | import('./jsmind.node.js').Node
+    ): import('./jsmind.node.js').Node | null;
     /**
      * Find the next sibling node of the given node.
      * @param {string | import('./jsmind.node.js').Node} node
      * @returns {import('./jsmind.node.js').Node | null}
      */
-    find_node_after(node: string | import("./jsmind.node.js").Node): import("./jsmind.node.js").Node | null;
+    find_node_after(
+        node: string | import('./jsmind.node.js').Node
+    ): import('./jsmind.node.js').Node | null;
     /**
      * @param {string} node_id
      * @param {string=} bg_color
      * @param {string=} fg_color
      * @returns {void}
      */
-    set_node_color(node_id: string, bg_color?: string | undefined, fg_color?: string | undefined): void;
+    set_node_color(
+        node_id: string,
+        bg_color?: string | undefined,
+        fg_color?: string | undefined
+    ): void;
     /**
      * @param {string} node_id
      * @param {number=} size
@@ -256,7 +290,12 @@ export default class jsMind {
      * @param {string=} style
      * @returns {void}
      */
-    set_node_font_style(node_id: string, size?: number | undefined, weight?: string | undefined, style?: string | undefined): void;
+    set_node_font_style(
+        node_id: string,
+        size?: number | undefined,
+        weight?: string | undefined,
+        style?: string | undefined
+    ): void;
     /**
      * @param {string} node_id
      * @param {string} image
@@ -265,7 +304,13 @@ export default class jsMind {
      * @param {number=} rotation
      * @returns {void}
      */
-    set_node_background_image(node_id: string, image: string, width?: number | undefined, height?: number | undefined, rotation?: number | undefined): void;
+    set_node_background_image(
+        node_id: string,
+        image: string,
+        width?: number | undefined,
+        height?: number | undefined,
+        rotation?: number | undefined
+    ): void;
     /**
      * @param {string} node_id
      * @param {number} rotation

@@ -36,7 +36,15 @@ export class Mind {
      * @param {number=} idx
      * @returns {Node | null}
      */
-    add_node(parent_node: Node, node_id: string, topic: string, data?: Record<string, any> | undefined, direction?: number | undefined, expanded?: boolean | undefined, idx?: number | undefined): Node | null;
+    add_node(
+        parent_node: Node,
+        node_id: string,
+        topic: string,
+        data?: Record<string, any> | undefined,
+        direction?: number | undefined,
+        expanded?: boolean | undefined,
+        idx?: number | undefined
+    ): Node | null;
     /**
      * Insert a node before target node.
      * @param {Node} node_before
@@ -46,7 +54,13 @@ export class Mind {
      * @param {number=} direction
      * @returns {Node | null}
      */
-    insert_node_before(node_before: Node, node_id: string, topic: string, data?: Record<string, any> | undefined, direction?: number | undefined): Node | null;
+    insert_node_before(
+        node_before: Node,
+        node_id: string,
+        topic: string,
+        data?: Record<string, any> | undefined,
+        direction?: number | undefined
+    ): Node | null;
     /**
      * Get previous sibling of a node or node id.
      * @param {string | Node} node
@@ -62,7 +76,13 @@ export class Mind {
      * @param {number=} direction
      * @returns {Node | null}
      */
-    insert_node_after(node_after: Node, node_id: string, topic: string, data?: Record<string, any> | undefined, direction?: number | undefined): Node | null;
+    insert_node_after(
+        node_after: Node,
+        node_id: string,
+        topic: string,
+        data?: Record<string, any> | undefined,
+        direction?: number | undefined
+    ): Node | null;
     /**
      * Get next sibling of a node or node id.
      * @param {string | Node} node
@@ -77,7 +97,12 @@ export class Mind {
      * @param {number=} direction
      * @returns {Node | null}
      */
-    move_node(node: Node, before_id?: string | undefined, parent_id?: string | undefined, direction?: number | undefined): Node | null;
+    move_node(
+        node: Node,
+        before_id?: string | undefined,
+        parent_id?: string | undefined,
+        direction?: number | undefined
+    ): Node | null;
     /**
      * Propagate direction to descendants.
      * @param {Node} node
@@ -99,7 +124,12 @@ export class Mind {
      * @param {number=} direction
      * @returns {Node | null}
      */
-    _move_node(node: Node, before_id: string, parent_id: string, direction?: number | undefined): Node | null;
+    _move_node(
+        node: Node,
+        before_id: string,
+        parent_id: string,
+        direction?: number | undefined
+    ): Node | null;
     /**
      * Remove a node from the mind.
      * @param {Node} node

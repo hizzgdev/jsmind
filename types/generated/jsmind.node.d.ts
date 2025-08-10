@@ -30,7 +30,16 @@ export class Node {
      * @param {number=} eDirection - Direction for children under root (-1 left, 0 center, 1 right)
      * @param {boolean=} bExpanded - Expanded state
      */
-    constructor(sId: string, iIndex: number, sTopic: string, oData?: Record<string, any> | undefined, bIsRoot?: boolean | undefined, oParent?: (Node | null) | undefined, eDirection?: number | undefined, bExpanded?: boolean | undefined);
+    constructor(
+        sId: string,
+        iIndex: number,
+        sTopic: string,
+        oData?: Record<string, any> | undefined,
+        bIsRoot?: boolean | undefined,
+        oParent?: (Node | null) | undefined,
+        eDirection?: number | undefined,
+        bExpanded?: boolean | undefined
+    );
     id: string;
     index: number;
     topic: string;

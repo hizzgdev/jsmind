@@ -7,10 +7,10 @@ export class JmScreenshot {
      * @param {import('../jsmind.js').default} jm - jsMind instance
      * @param {Partial<ScreenshotOptions>} options - Plugin options
      */
-    constructor(jm: import("../jsmind.js").default, options: Partial<ScreenshotOptions>);
+    constructor(jm: import('../jsmind.js').default, options: Partial<ScreenshotOptions>);
     version: string;
     /** @type {import('../jsmind.js').default} */
-    jm: import("../jsmind.js").default;
+    jm: import('../jsmind.js').default;
     /** @type {ScreenshotOptions} */
     options: ScreenshotOptions;
     /** @type {number} */
@@ -68,7 +68,7 @@ export class JmScreenshot {
  * Screenshot plugin registration.
  * @type {import('../jsmind.plugin.js').Plugin<Partial<ScreenshotOptions>>}
  */
-export const screenshot_plugin: import("../jsmind.plugin.js").Plugin<Partial<ScreenshotOptions>>;
+export const screenshot_plugin: import('../jsmind.plugin.js').Plugin<Partial<ScreenshotOptions>>;
 export default JmScreenshot;
 /**
  * Default options for screenshot plugin.

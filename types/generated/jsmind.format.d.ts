@@ -21,34 +21,26 @@ export const format: {
     freemind: {
         example: {
             meta: MindMapMeta;
-            format: "freemind";
+            format: 'freemind';
             data: string;
         };
-        get_mind: (src: {
-            meta?: MindMapMeta;
-            format: "freemind";
-            data: string;
-        }) => Mind;
+        get_mind: (src: { meta?: MindMapMeta; format: 'freemind'; data: string }) => Mind;
         get_data: (mind: Mind) => {
             meta: MindMapMeta;
-            format: "freemind";
+            format: 'freemind';
             data: string;
         };
     };
     text: {
         example: {
             meta: MindMapMeta;
-            format: "text";
+            format: 'text';
             data: string;
         };
-        get_mind: (src: {
-            meta?: MindMapMeta;
-            format: "text";
-            data: string;
-        }) => Mind;
+        get_mind: (src: { meta?: MindMapMeta; format: 'text'; data: string }) => Mind;
         get_data: (mind: Mind) => {
             meta: MindMapMeta;
-            format: "text";
+            format: 'text';
             data: string;
         };
     };
@@ -65,7 +57,7 @@ export type NodeTreeData = {
     id: string;
     topic: string;
     data?: Record<string, any>;
-    direction?: (number | string);
+    direction?: number | string;
     expanded?: boolean;
     children?: NodeTreeData[];
 };
@@ -74,7 +66,7 @@ export type NodeTreeData = {
  */
 export type NodeTreeFormat = {
     meta?: MindMapMeta;
-    format: "node_tree";
+    format: 'node_tree';
     data: NodeTreeData;
 };
 /**
@@ -85,7 +77,7 @@ export type NodeArrayItem = {
     topic: string;
     parentid?: string;
     data?: Record<string, any>;
-    direction?: (number | string);
+    direction?: number | string;
     expanded?: boolean;
     isroot?: boolean;
 };
@@ -94,7 +86,7 @@ export type NodeArrayItem = {
  */
 export type NodeArrayFormat = {
     meta?: MindMapMeta;
-    format: "node_array";
+    format: 'node_array';
     data: NodeArrayItem[];
 };
 import { Mind } from './jsmind.mind.js';

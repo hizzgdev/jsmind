@@ -38,7 +38,7 @@ export function apply(jm, options) {
     }, 0);
 }
 
-/** 
+/**
  * @param {import('./jsmind.js').default} jm
  * @param {Record<string, object>} options */
 function _apply(jm, options) {

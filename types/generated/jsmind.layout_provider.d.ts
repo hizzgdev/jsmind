@@ -4,21 +4,24 @@ export class LayoutProvider {
      * @param {import('./jsmind.js').default} jm - jsMind instance
      * @param {{mode:'full'|'side', hspace:number, vspace:number, pspace:number, cousin_space:number}} options - Layout configuration options
      */
-    constructor(jm: import("./jsmind.js").default, options: {
-        mode: "full" | "side";
-        hspace: number;
-        vspace: number;
-        pspace: number;
-        cousin_space: number;
-    });
+    constructor(
+        jm: import('./jsmind.js').default,
+        options: {
+            mode: 'full' | 'side';
+            hspace: number;
+            vspace: number;
+            pspace: number;
+            cousin_space: number;
+        }
+    );
     opts: {
-        mode: "full" | "side";
+        mode: 'full' | 'side';
         hspace: number;
         vspace: number;
         pspace: number;
         cousin_space: number;
     };
-    jm: import("./jsmind.js").default;
+    jm: import('./jsmind.js').default;
     isside: boolean;
     bounds: {
         n: number;
@@ -36,7 +39,7 @@ export class LayoutProvider {
      * @param {import('./jsmind.node.js').Node} node
      * @returns {number}
      */
-    calculate_next_child_direction(node: import("./jsmind.node.js").Node): number;
+    calculate_next_child_direction(node: import('./jsmind.node.js').Node): number;
     /** Perform layout and offsets recalculation. */
     layout(): void;
     /** Calculate and set direction for all nodes. */
@@ -82,7 +85,7 @@ export class LayoutProvider {
      * @param {import('./jsmind.node.js').Node} node - Target node
      * @returns {{x:number, y:number}} Absolute position offset
      */
-    get_node_offset(node: import("./jsmind.node.js").Node): {
+    get_node_offset(node: import('./jsmind.node.js').Node): {
         x: number;
         y: number;
     };
@@ -91,7 +94,7 @@ export class LayoutProvider {
      * @param {import('./jsmind.node.js').Node} node - Target node
      * @returns {{x:number, y:number}} Anchor point coordinates
      */
-    get_node_point(node: import("./jsmind.node.js").Node): {
+    get_node_point(node: import('./jsmind.node.js').Node): {
         x: number;
         y: number;
     };
@@ -100,7 +103,7 @@ export class LayoutProvider {
      * @param {import('./jsmind.node.js').Node} node - Target node
      * @returns {{x:number, y:number}} Input point coordinates
      */
-    get_node_point_in(node: import("./jsmind.node.js").Node): {
+    get_node_point_in(node: import('./jsmind.node.js').Node): {
         x: number;
         y: number;
     };
@@ -109,7 +112,7 @@ export class LayoutProvider {
      * @param {import('./jsmind.node.js').Node} node - Target node
      * @returns {{x:number, y:number}} Output point coordinates
      */
-    get_node_point_out(node: import("./jsmind.node.js").Node): {
+    get_node_point_out(node: import('./jsmind.node.js').Node): {
         x: number;
         y: number;
     };
@@ -118,7 +121,7 @@ export class LayoutProvider {
      * @param {import('./jsmind.node.js').Node} node - Target node
      * @returns {{x:number, y:number}} Expander point coordinates
      */
-    get_expander_point(node: import("./jsmind.node.js").Node): {
+    get_expander_point(node: import('./jsmind.node.js').Node): {
         x: number;
         y: number;
     };
@@ -134,17 +137,17 @@ export class LayoutProvider {
      * Toggle node expanded/collapsed state.
      * @param {import('./jsmind.node.js').Node} node - Target node
      */
-    toggle_node(node: import("./jsmind.node.js").Node): void;
+    toggle_node(node: import('./jsmind.node.js').Node): void;
     /**
      * Expand a node and show its children.
      * @param {import('./jsmind.node.js').Node} node - Target node
      */
-    expand_node(node: import("./jsmind.node.js").Node): void;
+    expand_node(node: import('./jsmind.node.js').Node): void;
     /**
      * Collapse a node and hide its children.
      * @param {import('./jsmind.node.js').Node} node - Target node
      */
-    collapse_node(node: import("./jsmind.node.js").Node): void;
+    collapse_node(node: import('./jsmind.node.js').Node): void;
     /** Expand all nodes in the mind map. */
     expand_all(): void;
     /** Collapse all nodes in the mind map. */
@@ -155,28 +158,32 @@ export class LayoutProvider {
      * @param {import('./jsmind.node.js').Node[]=} curr_nodes - Current nodes to process
      * @param {number=} curr_depth - Current depth level
      */
-    expand_to_depth(target_depth: number, curr_nodes?: import("./jsmind.node.js").Node[] | undefined, curr_depth?: number | undefined): void;
+    expand_to_depth(
+        target_depth: number,
+        curr_nodes?: import('./jsmind.node.js').Node[] | undefined,
+        curr_depth?: number | undefined
+    ): void;
     /**
      * Perform partial layout for a node and its subtree.
      * @param {import('./jsmind.node.js').Node} node - Target node
      */
-    part_layout(node: import("./jsmind.node.js").Node): void;
+    part_layout(node: import('./jsmind.node.js').Node): void;
     /**
      * Set visibility for nodes and their children.
      * @param {import('./jsmind.node.js').Node[]} nodes - Array of nodes
      * @param {boolean} visible - Visibility state
      */
-    set_visible(nodes: import("./jsmind.node.js").Node[], visible: boolean): void;
+    set_visible(nodes: import('./jsmind.node.js').Node[], visible: boolean): void;
     /**
      * Check if a node is expanded.
      * @param {import('./jsmind.node.js').Node} node - Target node
      * @returns {boolean} True if node is expanded
      */
-    is_expand(node: import("./jsmind.node.js").Node): boolean;
+    is_expand(node: import('./jsmind.node.js').Node): boolean;
     /**
      * Check if a node is visible.
      * @param {import('./jsmind.node.js').Node} node - Target node
      * @returns {boolean} True if node is visible
      */
-    is_visible(node: import("./jsmind.node.js").Node): boolean;
+    is_visible(node: import('./jsmind.node.js').Node): boolean;
 }
