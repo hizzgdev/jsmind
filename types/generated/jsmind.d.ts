@@ -126,7 +126,13 @@ export default class jsMind {
     select_clear(): void;
     is_node_visible(node: any): boolean;
     scroll_node_to_center(node: any): void;
-    find_node_before(node: any): any;
+    /**
+     * Find the previous sibling node of the given node.
+     *
+     * @param {string | import('./jsmind.node.js').Node} node - Node id or Node instance
+     * @returns {import('./jsmind.node.js').Node | null}
+     */
+    find_node_before(node: string | import("./jsmind.node.js").Node): import("./jsmind.node.js").Node | null;
     find_node_after(node: any): any;
     set_node_color(node_id: any, bg_color: any, fg_color: any): any;
     set_node_font_style(node_id: any, size: any, weight: any, style: any): any;

@@ -526,6 +526,12 @@ export default class jsMind {
         }
         this.view.center_node(node);
     }
+    /**
+     * Find the previous sibling node of the given node.
+     *
+     * @param {string | import('./jsmind.node.js').Node} node - Node id or Node instance
+     * @returns {import('./jsmind.node.js').Node | null}
+     */
     find_node_before(node) {
         if (!Node.is_node(node)) {
             var the_node = this.get_node(node);
