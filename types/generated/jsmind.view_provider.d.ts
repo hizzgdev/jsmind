@@ -1,0 +1,118 @@
+export class ViewProvider {
+    constructor(jm: any, options: any);
+    opts: any;
+    jm: any;
+    layout: any;
+    container: any;
+    e_panel: any;
+    e_nodes: any;
+    size: {
+        w: number;
+        h: number;
+    };
+    selected_node: any;
+    editing_node: any;
+    graph: {
+        view: any;
+        opts: any;
+        e_svg: any;
+        size: {
+            w: number;
+            h: number;
+        };
+        lines: any[];
+        line_drawing: {
+            straight: (path: any, x1: any, y1: any, x2: any, y2: any) => void;
+            curved: (path: any, x1: any, y1: any, x2: any, y2: any) => void;
+        };
+        init_line_render(): void;
+        drawing: any;
+        element(): any;
+        set_size(w: any, h: any): void;
+        clear(): void;
+        draw_line(pout: any, pin: any, offset: any, color: any): void;
+        copy_to(dest_canvas_ctx: any, callback: any): void;
+        _bezier_to(path: any, x1: any, y1: any, x2: any, y2: any): void;
+        _line_to(path: any, x1: any, y1: any, x2: any, y2: any): void;
+    } | {
+        opts: any;
+        e_canvas: any;
+        canvas_ctx: any;
+        size: {
+            w: number;
+            h: number;
+        };
+        line_drawing: {
+            straight: (ctx: any, x1: any, y1: any, x2: any, y2: any) => void;
+            curved: (ctx: any, x1: any, y1: any, x2: any, y2: any) => void;
+        };
+        dpr: any;
+        init_line_render(): void;
+        drawing: any;
+        element(): any;
+        set_size(w: any, h: any): void;
+        clear(): void;
+        draw_line(pout: any, pin: any, offset: any, color: any): void;
+        copy_to(dest_canvas_ctx: any, callback: any): void;
+        _bezier_to(ctx: any, x1: any, y1: any, x2: any, y2: any): void;
+        _line_to(ctx: any, x1: any, y1: any, x2: any, y2: any): void;
+    };
+    render_node: (ele: any, node: any) => void;
+    zoom_current: number;
+    device_pixel_ratio: any;
+    _initialized: boolean;
+    init(): void;
+    e_editor: any;
+    add_event(obj: any, event_name: any, event_handle: any, capture_by_panel: any): void;
+    get_binded_nodeid(element: any): any;
+    is_node(element: any): any;
+    is_expander(element: any): boolean;
+    reset(): void;
+    reset_theme(): void;
+    reset_custom_style(): void;
+    load(): void;
+    expand_size(): void;
+    init_nodes_size(node: any): void;
+    init_nodes(): void;
+    add_node(node: any): void;
+    run_in_c11y_mode_if_needed(func: any): void;
+    create_node_element(node: any, parent_node: any): void;
+    remove_node(node: any): void;
+    update_node(node: any): void;
+    select_node(node: any): void;
+    select_clear(): void;
+    get_editing_node(): any;
+    is_editing(): boolean;
+    edit_node_begin(node: any): void;
+    edit_node_end(): void;
+    get_view_offset(): {
+        x: number;
+        y: number;
+    };
+    resize(): void;
+    _show(): void;
+    zoom_in(e: any): boolean;
+    zoom_out(e: any): boolean;
+    set_zoom(zoom: any, e: any): boolean;
+    show(keep_center: any): void;
+    relayout(): void;
+    save_location(node: any): void;
+    restore_location(node: any): void;
+    clear_nodes(): void;
+    show_nodes(): void;
+    _show_expander(node: any, view_offset: any): void;
+    _get_expander_text(node: any): any;
+    _default_node_render(ele: any, node: any): void;
+    _custom_node_render(ele: any, node: any): void;
+    reset_node_custom_style(node: any): void;
+    _reset_node_custom_style(node_element: any, node_data: any): void;
+    restore_selected_node_custom_style(node: any): void;
+    clear_selected_node_custom_style(node: any): void;
+    clear_lines(): void;
+    show_lines(): void;
+    setup_canvas_draggable(enabled: any): void;
+    center_node(node: any): boolean;
+    zoomIn(e: any): boolean;
+    zoomOut(e: any): boolean;
+    setZoom(zoom: any, e: any): boolean;
+}

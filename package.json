@@ -32,6 +32,8 @@
         "test": "NODE_OPTIONS=--experimental-vm-modules jest",
         "test-legacy": "jest tests/legacy",
         "test-es6": "NODE_OPTIONS=--experimental-vm-modules jest tests/unit",
+    "gen:dts": "tsc -p tsconfig.decls.json",
+    "gen:dts:check": "npm run gen:dts && test -d types/generated && ls types/generated >/dev/null",
         "format": "prettier --config .config/prettierrc.json --ignore-path .config/prettierignore --write .",
         "format-check": "prettier --config .config/prettierrc.json --ignore-path .config/prettierignore --check ."
     },
@@ -65,6 +67,7 @@
         "prettier": "2.6.2",
         "rollup": "2.79.2",
         "rollup-plugin-cleanup": "^3.2.1",
+        "tsd-jsdoc": "^2.5.0",
         "typescript": "^5.9.2"
     },
     "jest": {
