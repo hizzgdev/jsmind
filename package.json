@@ -26,13 +26,13 @@
         "doc": "docs",
         "example": "example"
     },
-  "files": [
-    "es6",
-    "style",
-    "types",
-    "LICENSE",
-    "README.md"
-  ],
+    "files": [
+        "es6",
+        "style",
+        "types",
+        "LICENSE",
+        "README.md"
+    ],
     "scripts": {
         "server": "http-server",
         "build": "rollup -c .config/rollup.config.js",
@@ -43,9 +43,9 @@
         "gen:dts:check": "npm run gen:dts && test -d types/generated && ls types/generated >/dev/null",
         "format": "prettier --config .config/prettierrc.json --ignore-path .config/prettierignore --write .",
         "format-check": "prettier --config .config/prettierrc.json --ignore-path .config/prettierignore --check .",
-    "pretest": "npm run gen:dts",
-    "prepare": "npm run gen:dts",
-    "prepublishOnly": "npm run build && npm run gen:dts"
+        "pretest": "npm run gen:dts",
+        "prepare": "npm run gen:dts",
+        "prepublishOnly": "npm run build && npm run gen:dts"
     },
     "repository": {
         "type": "git",
