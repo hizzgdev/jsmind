@@ -22,5 +22,3 @@ export { util } from './jsmind.util';
 
 // Plugin export paths remain under subpath exports
 // typings for subpath are referenced from package.json exports.types
-
-
