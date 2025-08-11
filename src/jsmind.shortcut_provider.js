@@ -11,12 +11,20 @@ import { util } from './jsmind.util.js';
 import { Direction } from './jsmind.common.js';
 
 export class ShortcutProvider {
+    /**
+     * @param {import('./jsmind.js').default} jm
+     * @param {{ enable:boolean, handles: Record<string,(jm: import('./jsmind.js').default, e: KeyboardEvent)=>void>, mapping: Record<string, number|number[]>, id_generator?: ()=>string }} options
+     */
     constructor(jm, options) {
         this.jm = jm;
         this.opts = options;
+        /** @type {Record<string, number|number[]>} */
         this.mapping = options.mapping;
+        /** @type {Record<string,(jm: import('./jsmind.js').default, e: KeyboardEvent)=>void>} */
         this.handles = options.handles;
+        /** @type {()=>string|null} */
         this._newid = null;
+        /** @type {Record<number,(jm: import('./jsmind.js').default, e: KeyboardEvent)=>void>} */
         this._mapping = {};
     }
     init() {
@@ -56,6 +64,7 @@ export class ShortcutProvider {
     disable_shortcut() {
         this.opts.enable = false;
     }
+    /** @param {KeyboardEvent} e */
     handler(e) {
         if (e.which == 9) {
             e.preventDefault();
@@ -77,6 +86,7 @@ export class ShortcutProvider {
             this._mapping[kc].call(this, this.jm, e);
         }
     }
+    /** @param {import('./jsmind.js').default} _jm @param {KeyboardEvent} e */
     handle_addchild(_jm, e) {
         var selected_node = _jm.get_selected_node();
         if (!!selected_node) {
@@ -88,6 +98,7 @@ export class ShortcutProvider {
             }
         }
     }
+    /** @param {import('./jsmind.js').default} _jm @param {KeyboardEvent} e */
     handle_addbrother(_jm, e) {
         var selected_node = _jm.get_selected_node();
         if (!!selected_node && !selected_node.isroot) {
@@ -99,12 +110,14 @@ export class ShortcutProvider {
             }
         }
     }
+    /** @param {import('./jsmind.js').default} _jm @param {KeyboardEvent} e */
     handle_editnode(_jm, e) {
         var selected_node = _jm.get_selected_node();
         if (!!selected_node) {
             _jm.begin_edit(selected_node);
         }
     }
+    /** @param {import('./jsmind.js').default} _jm @param {KeyboardEvent} e */
     handle_delnode(_jm, e) {
         var selected_node = _jm.get_selected_node();
         if (!!selected_node && !selected_node.isroot) {
@@ -112,6 +125,7 @@ export class ShortcutProvider {
             _jm.remove_node(selected_node);
         }
     }
+    /** @param {import('./jsmind.js').default} _jm @param {KeyboardEvent} e */
     handle_toggle(_jm, e) {
         var evt = e || event;
         var selected_node = _jm.get_selected_node();
@@ -121,6 +135,7 @@ export class ShortcutProvider {
             evt.preventDefault();
         }
     }
+    /** @param {import('./jsmind.js').default} _jm @param {KeyboardEvent} e */
     handle_up(_jm, e) {
         var evt = e || event;
         var selected_node = _jm.get_selected_node();
@@ -139,6 +154,7 @@ export class ShortcutProvider {
             evt.preventDefault();
         }
     }
+    /** @param {import('./jsmind.js').default} _jm @param {KeyboardEvent} e */
     handle_down(_jm, e) {
         var evt = e || event;
         var selected_node = _jm.get_selected_node();
@@ -157,12 +173,15 @@ export class ShortcutProvider {
             evt.preventDefault();
         }
     }
+    /** @param {import('./jsmind.js').default} _jm @param {KeyboardEvent} e */
     handle_left(_jm, e) {
         this._handle_direction(_jm, e, Direction.left);
     }
+    /** @param {import('./jsmind.js').default} _jm @param {KeyboardEvent} e */
     handle_right(_jm, e) {
         this._handle_direction(_jm, e, Direction.right);
     }
+    /** @param {import('./jsmind.js').default} _jm @param {KeyboardEvent} e @param {number} d */
     _handle_direction(_jm, e, d) {
         var evt = e || event;
         var selected_node = _jm.get_selected_node();

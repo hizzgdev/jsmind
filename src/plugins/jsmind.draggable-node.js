@@ -23,6 +23,18 @@ const clear_selection =
               $.d.selection.empty();
           };
 
+/**
+ * Default options for draggable node plugin.
+ * @typedef {Object} DraggableNodeOptions
+ * @property {number} [line_width]
+ * @property {string} [line_color]
+ * @property {string} [line_color_invalid]
+ * @property {number} [lookup_delay]
+ * @property {number} [lookup_interval]
+ * @property {number} [scrolling_trigger_width]
+ * @property {number} [scrolling_step_length]
+ * @property {string} [shadow_node_class_name]
+ */
 const DEFAULT_OPTIONS = {
     line_width: 5,
     line_color: 'rgba(0,0,0,0.3)',
@@ -34,47 +46,81 @@ const DEFAULT_OPTIONS = {
     shadow_node_class_name: 'jsmind-draggable-shadow-node',
 };
 
-class DraggableNode {
+/**
+ * Draggable node plugin for jsMind.
+ */
+export class DraggableNode {
+    /**
+     * Create draggable node plugin instance.
+     * @param {import('../jsmind.js').default} jm - jsMind instance
+     * @param {Partial<DraggableNodeOptions>} options - Plugin options
+     */
     constructor(jm, options) {
         var opts = {};
         jsMind.util.json.merge(opts, DEFAULT_OPTIONS);
         jsMind.util.json.merge(opts, options);
 
         this.version = '0.4.0';
+        /** @type {import('../jsmind.js').default} */
         this.jm = jm;
+        /** @type {DraggableNodeOptions} */
         this.options = opts;
+        /** @type {HTMLCanvasElement|null} */
         this.e_canvas = null;
+        /** @type {CanvasRenderingContext2D|null} */
         this.canvas_ctx = null;
+        /** @type {HTMLElement|null} */
         this.shadow = null;
+        /** @type {number} */
         this.shadow_p_x = 0;
+        /** @type {number} */
         this.shadow_p_y = 0;
+        /** @type {number} */
         this.shadow_w = 0;
+        /** @type {number} */
         this.shadow_h = 0;
+        /** @type {import('../jsmind.node.js').Node|null} */
         this.active_node = null;
+        /** @type {import('../jsmind.node.js').Node|null} */
         this.target_node = null;
+        /** @type {number|null} */
         this.target_direct = null;
+        /** @type {number} */
         this.client_w = 0;
+        /** @type {number} */
         this.client_h = 0;
+        /** @type {number} */
         this.offset_x = 0;
+        /** @type {number} */
         this.offset_y = 0;
+        /** @type {number} */
         this.hlookup_delay = 0;
+        /** @type {number} */
         this.hlookup_timer = 0;
+        /** @type {boolean} */
         this.capture = false;
+        /** @type {boolean} */
         this.moved = false;
+        /** @type {boolean} */
         this.canvas_draggable = jm.get_view_draggable();
+        /** @type {HTMLElement} */
         this.view_panel = jm.view.e_panel;
+        /** @type {DOMRect|null} */
         this.view_panel_rect = null;
     }
+    /** Initialize the draggable node plugin. */
     init() {
         this.create_canvas();
         this.create_shadow();
         this.event_bind();
     }
+    /** Resize canvas and shadow elements. */
     resize() {
         this.jm.view.e_nodes.appendChild(this.shadow);
         this.e_canvas.width = this.jm.view.size.w;
         this.e_canvas.height = this.jm.view.size.h;
     }
+    /** Create canvas for drawing drag lines. */
     create_canvas() {
         var c = $.c('canvas');
         this.jm.view.e_panel.appendChild(c);
@@ -91,6 +137,10 @@ class DraggableNode {
         s.className = this.options.shadow_node_class_name;
         this.shadow = s;
     }
+    /**
+     * Reset shadow element style and cache its size.
+     * @param {HTMLElement} el - The node element to mirror as shadow
+     */
     reset_shadow(el) {
         var s = this.shadow.style;
         this.shadow.innerHTML = el.innerHTML;
@@ -104,14 +154,22 @@ class DraggableNode {
         this.shadow_w = this.shadow.clientWidth;
         this.shadow_h = this.shadow.clientHeight;
     }
+    /** Show the shadow element. */
     show_shadow() {
         if (!this.moved) {
             this.shadow.style.visibility = 'visible';
         }
     }
+    /** Hide the shadow element. */
     hide_shadow() {
         this.shadow.style.visibility = 'hidden';
     }
+    /**
+     * Draw a helper line between the shadow and target node.
+     * @param {{x:number,y:number}} shadow_p - Shadow anchor point
+     * @param {{x:number,y:number}} node_p - Target node anchor point
+     * @param {boolean} invalid - Whether current target is invalid
+     */
     magnet_shadow(shadow_p, node_p, invalid) {
         this.canvas_ctx.lineWidth = this.options.line_width;
         this.canvas_ctx.strokeStyle = invalid
@@ -121,15 +179,24 @@ class DraggableNode {
         this.clear_lines();
         this.canvas_lineto(shadow_p.x, shadow_p.y, node_p.x, node_p.y);
     }
+    /** Clear helper lines from canvas. */
     clear_lines() {
         this.canvas_ctx.clearRect(0, 0, this.jm.view.size.w, this.jm.view.size.h);
     }
+    /**
+     * Draw a straight helper line.
+     * @param {number} x1
+     * @param {number} y1
+     * @param {number} x2
+     * @param {number} y2
+     */
     canvas_lineto(x1, y1, x2, y2) {
         this.canvas_ctx.beginPath();
         this.canvas_ctx.moveTo(x1, y1);
         this.canvas_ctx.lineTo(x2, y2);
         this.canvas_ctx.stroke();
     }
+    /** Bind mouse/touch events for dragging. */
     event_bind() {
         var jd = this;
         var container = this.jm.view.container;
@@ -156,6 +223,10 @@ class DraggableNode {
             jd.dragend.call(jd, e);
         });
     }
+    /**
+     * Begin dragging interaction.
+     * @param {MouseEvent|TouchEvent} e - Pointer down event
+     */
     dragstart(e) {
         if (!this.jm.get_editable()) {
             return;
@@ -207,6 +278,10 @@ class DraggableNode {
             }
         }
     }
+    /**
+     * Drag handler to move shadow and auto-scroll container.
+     * @param {MouseEvent|TouchEvent} e - Pointer move event
+     */
     drag(e) {
         if (!this.jm.get_editable()) {
             return;
@@ -258,6 +333,10 @@ class DraggableNode {
             clear_selection();
         }
     }
+    /**
+     * Finish dragging, move the node if applicable.
+     * @param {MouseEvent|TouchEvent} e - Pointer up event
+     */
     dragend(e) {
         if (!this.jm.get_editable()) {
             return;
@@ -288,6 +367,11 @@ class DraggableNode {
         this.moved = false;
         this.capture = false;
     }
+    /**
+     * Find the closest node element from an event target.
+     * @param {HTMLElement} el - Current DOM element
+     * @returns {HTMLElement|null} Matched node element or null
+     */
     find_node_element(el) {
         if (
             el === this.jm.view.e_nodes ||
@@ -301,6 +385,7 @@ class DraggableNode {
         }
         return this.find_node_element(el.parentNode);
     }
+    /** Recompute target node under the shadow and draw helper. */
     lookup_target_node() {
         let sx = this.shadow.offsetLeft;
         let sy = this.shadow.offsetTop;
@@ -324,6 +409,10 @@ class DraggableNode {
             this.target_direct = target_direction;
         }
     }
+    /**
+     * Get X coordinate of root node center.
+     * @returns {number}
+     */
     get_root_x() {
         let root = this.jm.get_root();
         let root_location = root.get_location();
@@ -331,6 +420,11 @@ class DraggableNode {
         return root_location.x + root_size.w / 2;
     }
 
+    /**
+     * Lookup overlapping node's parent near the shadow position.
+     * @param {number} direction - Direction constant
+     * @returns {import('../jsmind.node.js').Node|null}
+     */
     lookup_overlapping_node_parent(direction) {
         let shadowRect = this.shadow.getBoundingClientRect();
         let x = shadowRect.x + (shadowRect.width * (1 - direction)) / 2;
@@ -355,6 +449,12 @@ class DraggableNode {
         }
     }
 
+    /**
+     * Find node's parent by a screen location.
+     * @param {number} x - Client X
+     * @param {number} y - Client Y
+     * @returns {import('../jsmind.node.js').Node|null}
+     */
     lookup_node_parent_by_location(x, y) {
         return $.d
             .elementsFromPoint(x, y)
@@ -367,6 +467,11 @@ class DraggableNode {
             .find(n => n);
     }
 
+    /**
+     * Lookup the closest node along a direction.
+     * @param {number} direction
+     * @returns {import('../jsmind.node.js').Node}
+     */
     lookup_close_node(direction) {
         return Object.values(this.jm.mind.nodes)
             .filter(n => n.direction == direction || n.isroot)
@@ -381,6 +486,12 @@ class DraggableNode {
             ).node;
     }
 
+    /**
+     * Check if shadow is on the target side of a node.
+     * @param {import('../jsmind.node.js').Node} node
+     * @param {number} dir
+     * @returns {boolean}
+     */
     shadow_on_target_side(node, dir) {
         return (
             (dir == jsMind.direction.right && this.shadow_to_right_of_node(node) > 0) ||
@@ -388,18 +499,39 @@ class DraggableNode {
         );
     }
 
+    /**
+     * Distance from shadow to the right side of a node.
+     * @param {import('../jsmind.node.js').Node} node
+     * @returns {number}
+     */
     shadow_to_right_of_node(node) {
         return this.shadow_p_x - node.get_location().x - node.get_size().w;
     }
 
+    /**
+     * Distance from shadow to the left side of a node.
+     * @param {import('../jsmind.node.js').Node} node
+     * @returns {number}
+     */
     shadow_to_left_of_node(node) {
         return node.get_location().x - this.shadow_p_x - this.shadow_w;
     }
 
+    /**
+     * Vertical distance between shadow centerline and node centerline.
+     * @param {import('../jsmind.node.js').Node} node
+     * @returns {number}
+     */
     shadow_to_base_line_of_node(node) {
         return this.shadow_p_y + this.shadow_h / 2 - node.get_location().y - node.get_size().h / 2;
     }
 
+    /**
+     * Manhattan distance to a node along a direction.
+     * @param {import('../jsmind.node.js').Node} node
+     * @param {number} dir
+     * @returns {number}
+     */
     shadow_to_node(node, dir) {
         let distance_x =
             dir === jsMind.direction.right
@@ -409,6 +541,12 @@ class DraggableNode {
         return distance_x + distance_y;
     }
 
+    /**
+     * Calculate connection points of a node and the shadow.
+     * @param {import('../jsmind.node.js').Node} node
+     * @param {number} dir
+     * @returns {{sp:{x:number,y:number}, np:{x:number,y:number}}}
+     */
     calc_point_of_node(node, dir) {
         let ns = node.get_size();
         let nl = node.get_location();
@@ -425,6 +563,12 @@ class DraggableNode {
         };
     }
 
+    /**
+     * Move a node to a new parent/position.
+     * @param {import('../jsmind.node.js').Node} src_node
+     * @param {import('../jsmind.node.js').Node|null} target_node
+     * @param {number|null} target_direct
+     */
     move_node(src_node, target_node, target_direct) {
         var shadow_h = this.shadow.offsetTop;
         if (!!target_node && !!src_node && !jsMind.node.inherited(src_node, target_node)) {
@@ -455,6 +599,11 @@ class DraggableNode {
         this.target_node = null;
         this.target_direct = null;
     }
+    /**
+     * Handle jsMind events.
+     * @param {number|string} type - Event type
+     * @param {object} [data] - Event data
+     */
     jm_event_handle(type, data) {
         if (type === jsMind.event_type.resize) {
             this.resize();
@@ -462,7 +611,11 @@ class DraggableNode {
     }
 }
 
-var draggable_plugin = new jsMind.plugin('draggable_node', function (jm, options) {
+/**
+ * Draggable node plugin registration.
+ * @type {import('../jsmind.plugin.js').Plugin<Partial<DraggableNodeOptions>>}
+ */
+export const draggable_plugin = new jsMind.plugin('draggable_node', function (jm, options) {
     var jd = new DraggableNode(jm, options);
     jd.init();
     jm.add_event_listener(function (type, data) {
@@ -471,3 +624,5 @@ var draggable_plugin = new jsMind.plugin('draggable_node', function (jm, options
 });
 
 jsMind.register_plugin(draggable_plugin);
+
+export default DraggableNode;

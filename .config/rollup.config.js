@@ -25,6 +25,7 @@ export default [
     {
         input: 'src/plugins/jsmind.draggable-node.js',
         output: {
+            name: 'jsMindDraggableNode',
             file: 'es6/jsmind.draggable-node.js',
             format: 'umd',
             banner: '/**\n* @license BSD-3-Clause\n* @copyright 2014-2025 hizzgdev@163.com\n*\n* Project Home:\n*   https://github.com/hizzgdev/jsmind/\n*/',
@@ -32,6 +33,7 @@ export default [
             globals: {
                 jsmind: 'jsMind',
             },
+            exports: 'named',
         },
         external: ['jsmind'],
         plugins: [
@@ -48,6 +50,7 @@ export default [
     {
         input: 'src/plugins/jsmind.screenshot.js',
         output: {
+            name: 'jsMindScreenshot',
             file: 'es6/jsmind.screenshot.js',
             format: 'umd',
             banner: '/**\n* @license BSD-3-Clause\n* @copyright 2014-2025 hizzgdev@163.com\n*\n* Project Home:\n*   https://github.com/hizzgdev/jsmind/\n*/',
@@ -56,6 +59,7 @@ export default [
                 'jsmind': 'jsMind',
                 'dom-to-image': 'domtoimage',
             },
+            exports: 'named',
         },
         external: ['jsmind', 'dom-to-image'],
         plugins: [

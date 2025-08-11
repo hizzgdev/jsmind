@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "target": "ES2020",
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "declaration": true,
+        "outDir": "./dist",
+        "rootDir": "./",
+        "noEmit": true,
+        "baseUrl": ".",
+        "paths": {
+            "jsmind": ["types/generated/types-index.d.ts"],
+            "jsmind/draggable-node": ["types/generated/plugins/jsmind.draggable-node.d.ts"],
+            "jsmind/screenshot": ["types/generated/plugins/jsmind.screenshot.d.ts"]
+        }
+    },
+    "include": ["types/**/*.d.ts", "tests/fixtures/typescript-test.ts"],
+    "exclude": ["node_modules", "dist"]
+}

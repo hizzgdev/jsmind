@@ -2,3 +2,4 @@
 node_modules/
 es6/*.js
 es6/*.js.map
+types/generated/

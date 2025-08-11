@@ -3,24 +3,49 @@
     "version": "0.8.7",
     "description": "jsMind is a pure javascript library for mindmap, it base on html5 canvas. jsMind was released under BSD license, you can embed it in any project, if only you observe the license.",
     "main": "es6/jsmind.js",
+    "types": "types/generated/types-index.d.ts",
     "exports": {
-        ".": "./es6/jsmind.js",
-        "./draggable-node": "./es6/jsmind.draggable-node.js",
-        "./screenshot": "./es6/jsmind.screenshot.js",
+        ".": {
+            "import": "./es6/jsmind.js",
+            "require": "./es6/jsmind.js",
+            "types": "./types/generated/types-index.d.ts"
+        },
+        "./draggable-node": {
+            "import": "./es6/jsmind.draggable-node.js",
+            "require": "./es6/jsmind.draggable-node.js",
+            "types": "./types/generated/plugins/jsmind.draggable-node.d.ts"
+        },
+        "./screenshot": {
+            "import": "./es6/jsmind.screenshot.js",
+            "require": "./es6/jsmind.screenshot.js",
+            "types": "./types/generated/plugins/jsmind.screenshot.d.ts"
+        },
         "./style/jsmind.css": "./style/jsmind.css"
     },
     "directories": {
         "doc": "docs",
         "example": "example"
     },
+    "files": [
+        "es6",
+        "style",
+        "types",
+        "LICENSE",
+        "README.md"
+    ],
     "scripts": {
         "server": "http-server",
         "build": "rollup -c .config/rollup.config.js",
         "test": "NODE_OPTIONS=--experimental-vm-modules jest",
         "test-legacy": "jest tests/legacy",
         "test-es6": "NODE_OPTIONS=--experimental-vm-modules jest tests/unit",
+        "gen:dts": "tsc -p tsconfig.decls.json",
+        "gen:dts:check": "npm run gen:dts && test -d types/generated && ls types/generated >/dev/null",
         "format": "prettier --config .config/prettierrc.json --ignore-path .config/prettierignore --write .",
-        "format-check": "prettier --config .config/prettierrc.json --ignore-path .config/prettierignore --check ."
+        "format-check": "prettier --config .config/prettierrc.json --ignore-path .config/prettierignore --check .",
+        "pretest": "npm run gen:dts",
+        "prepare": "npm run gen:dts",
+        "prepublishOnly": "npm run build && npm run gen:dts"
     },
     "repository": {
         "type": "git",
@@ -45,13 +70,15 @@
         }
     ],
     "devDependencies": {
+        "@rollup/plugin-terser": "^0.4.4",
         "http-server": "^14.1.1",
         "jest": "^28.1.0",
         "jest-environment-jsdom": "^28.1.0",
         "prettier": "2.6.2",
         "rollup": "2.79.2",
         "rollup-plugin-cleanup": "^3.2.1",
-        "@rollup/plugin-terser": "^0.4.4"
+        "tsd-jsdoc": "^2.5.0",
+        "typescript": "^5.9.2"
     },
     "jest": {
         "verbose": true,
