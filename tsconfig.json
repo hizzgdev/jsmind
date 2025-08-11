@@ -13,11 +13,11 @@
         "noEmit": true,
         "baseUrl": ".",
         "paths": {
-            "jsmind": ["types/generated/types-index.d.ts"],
+            "jsmind": ["types/generated/index.d.ts"],
             "jsmind/draggable-node": ["types/generated/plugins/jsmind.draggable-node.d.ts"],
             "jsmind/screenshot": ["types/generated/plugins/jsmind.screenshot.d.ts"]
         }
     },
-    "include": ["types/**/*.d.ts", "tests/fixtures/typescript-test.ts"],
+    "include": ["types/**/*.d.ts", "tests/types/fixtures/typescript-test.ts"],
     "exclude": ["node_modules", "dist"]
 }
