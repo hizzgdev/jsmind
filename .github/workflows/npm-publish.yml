@@ -17,7 +17,7 @@ jobs:
           node-version: 18.x
       - run: npm ci
       - run: npm test
-      - run: npm build-test-types
+      - run: npm run build-test-types
 
   publish-npm:
     needs: build
