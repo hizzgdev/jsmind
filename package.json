@@ -3,12 +3,12 @@
     "version": "0.8.7",
     "description": "jsMind is a pure javascript library for mindmap, it base on html5 canvas. jsMind was released under BSD license, you can embed it in any project, if only you observe the license.",
     "main": "es6/jsmind.js",
-    "types": "types/generated/types-index.d.ts",
+    "types": "types/types-index.d.ts",
     "exports": {
         ".": {
             "import": "./es6/jsmind.js",
             "require": "./es6/jsmind.js",
-            "types": "./types/generated/types-index.d.ts"
+            "types": "./types/generated/index.d.ts"
         },
         "./draggable-node": {
             "import": "./es6/jsmind.draggable-node.js",
@@ -36,16 +36,14 @@
     "scripts": {
         "server": "http-server",
         "build": "rollup -c .config/rollup.config.js",
-        "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-        "test-legacy": "jest tests/legacy",
+        "build-types": "npx -p typescript tsc -p types/tsconfig.declaration.json",
+        "test": "NODE_OPTIONS=--experimental-vm-modules jest tests/unit",
         "test-es6": "NODE_OPTIONS=--experimental-vm-modules jest tests/unit",
-        "gen:dts": "tsc -p tsconfig.decls.json",
-        "gen:dts:check": "npm run gen:dts && test -d types/generated && ls types/generated >/dev/null",
+        "test-types": "NODE_OPTIONS=--experimental-vm-modules jest tests/types",
+        "build-test-types": "npm run build-types && npm run test-types",
+        "test-legacy": "jest tests/legacy",
         "format": "prettier --config .config/prettierrc.json --ignore-path .config/prettierignore --write .",
-        "format-check": "prettier --config .config/prettierrc.json --ignore-path .config/prettierignore --check .",
-        "pretest": "npm run gen:dts",
-        "prepare": "npm run gen:dts",
-        "prepublishOnly": "npm run build && npm run gen:dts"
+        "format-check": "prettier --config .config/prettierrc.json --ignore-path .config/prettierignore --check ."
     },
     "repository": {
         "type": "git",

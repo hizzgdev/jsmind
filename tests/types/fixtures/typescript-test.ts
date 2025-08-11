@@ -12,6 +12,7 @@ import jsMind, {
     NodeTreeFormat,
     NodeTreeData,
 } from 'jsmind';
+import { EventData } from 'types/generated/jsmind';
 // Note: in real usage, plugins should be imported to register themselves
 // import 'jsmind/draggable-node';
 // import 'jsmind/screenshot';
@@ -79,7 +80,7 @@ const fullOptions: JsMindOptions = {
             step: 0.2,
             mask_key: 4096,
         },
-        custom_node_render: (jm, element, node) => {
+        custom_node_render: (jm: jsMind, element: HTMLElement, node: Node) => {
             element.innerHTML = `<strong>${node.topic}</strong>`;
         },
         expander_style: 'number',
@@ -229,7 +230,7 @@ jm.resize();
 
 // Event listener with stricter data shape
 
-jm.add_event_listener((type, data) => {
+jm.add_event_listener((type: number, data: EventData) => {
     // data: { evt?: string; data?: unknown[]; node?: string }
     console.log(`Event ${type} triggered with data:`, data);
 });
