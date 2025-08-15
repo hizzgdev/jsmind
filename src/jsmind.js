@@ -415,12 +415,12 @@ export default class jsMind {
         return this.mind.get_node(node);
     }
     /**
-     * Add a node under parent.
+     * Add a new node to the mind map.
      * @param {string | import('./jsmind.node.js').Node} parent_node
      * @param {string} node_id
      * @param {string} topic
      * @param {Record<string, any>=} data
-     * @param {'left'|'center'|'right'=} direction
+     * @param {('left'|'center'|'right'|'-1'|'0'|'1'|number)=} direction - Direction for node placement. Supports string values ('left', 'center', 'right'), numeric strings ('-1', '0', '1'), and numbers (-1, 0, 1)
      * @returns {import('./jsmind.node.js').Node|null}
      */
     add_node(parent_node, node_id, topic, data, direction) {
@@ -455,7 +455,7 @@ export default class jsMind {
      * @param {string} node_id
      * @param {string} topic
      * @param {Record<string, any>=} data
-     * @param {'left'|'center'|'right'=} direction
+     * @param {('left'|'center'|'right'|'-1'|'0'|'1'|number)=} direction - Direction for node placement. Supports string values ('left', 'center', 'right'), numeric strings ('-1', '0', '1'), and numbers (-1, 0, 1)
      * @returns {import('./jsmind.node.js').Node|null}
      */
     insert_node_before(node_before, node_id, topic, data, direction) {
@@ -488,7 +488,7 @@ export default class jsMind {
      * @param {string} node_id
      * @param {string} topic
      * @param {Record<string, any>=} data
-     * @param {'left'|'center'|'right'=} direction
+     * @param {('left'|'center'|'right'|'-1'|'0'|'1'|number)=} direction - Direction for node placement. Supports string values ('left', 'center', 'right'), numeric strings ('-1', '0', '1'), and numbers (-1, 0, 1)
      * @returns {import('./jsmind.node.js').Node|null}
      */
     insert_node_after(node_after, node_id, topic, data, direction) {
@@ -593,7 +593,7 @@ export default class jsMind {
      * @param {string} node_id
      * @param {string=} before_id - The ID of the node before which to place the moved node. Special values: "_first_", "_last_"
      * @param {string=} parent_id
-     * @param {'left'|'right'=} direction - Only effective for second-level nodes (children of root). If not provided, direction will be determined automatically.
+     * @param {('left'|'center'|'right'|'-1'|'0'|'1'|number)=} direction - Direction for node placement. Supports string values ('left', 'center', 'right'), numeric strings ('-1', '0', '1'), and numbers (-1, 0, 1). Only effective for second-level nodes (children of root). If not provided, direction will be determined automatically.
      */
     move_node(node_id, before_id, parent_id, direction) {
         if (this.get_editable()) {
