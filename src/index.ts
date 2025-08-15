@@ -5,7 +5,7 @@ export { default } from './jsmind';
 export { Node } from './jsmind.node';
 export { Mind } from './jsmind.mind';
 
-// Export strict options and meta types from generated
+// Export user-facing options type - now with proper optional fields
 export type { JsMindRuntimeOptions as JsMindOptions } from './jsmind.option';
 export type {
     MindMapMeta,

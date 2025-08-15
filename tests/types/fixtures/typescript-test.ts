@@ -21,7 +21,19 @@ import { EventData } from 'types/generated/jsmind';
 // Basic options
 // ============================================================================
 
-// Minimal options (must satisfy JsMindRuntimeOptions strict fields)
+// Minimal options (only required container field - matches official docs)
+const minimalOptions: JsMindOptions = {
+    container: 'jsmind_container'
+};
+
+// Simple options (common usage - matches official docs examples)
+const simpleOptions: JsMindOptions = {
+    container: 'jsmind_container',
+    editable: true,
+    theme: 'orange'
+};
+
+// Full options (comprehensive configuration)
 const basicOptions: JsMindOptions = {
     container: 'jsmind_container',
     editable: true,
@@ -197,7 +209,7 @@ const root = jm.get_root();
 
 // Node operations
 if (root) {
-    const newNode = jm.add_node(root, 'new_node', 'New Topic', { color: 'blue' }, 1);
+    const newNode = jm.add_node(root, 'new_node', 'New Topic', { color: 'blue' }, 'right');
     if (newNode) {
         jm.update_node(newNode.id, 'Updated Topic');
         jm.select_node(newNode);
@@ -315,6 +327,79 @@ function validateTypes() {
 
 // Export for the Jest runner to import if needed
 export { validateTypes };
+
+// ============================================================================
+// Test new API improvements based on documentation
+// ============================================================================
+
+// Test direction parameter types (should be string, not number)
+function testDirectionTypes() {
+    const testOptions: JsMindOptions = {
+        container: 'test_container'
+    };
+    const testJm = new jsMind(testOptions);
+
+    const testData: NodeTreeFormat = {
+        meta: { name: 'test', author: 'test', version: '1.0' },
+        format: 'node_tree',
+        data: { id: 'root', topic: 'Test Root' }
+    };
+
+    testJm.show(testData);
+    const testRoot = testJm.get_root();
+
+    if (testRoot) {
+        // Test all valid direction values
+        const leftNode = testJm.add_node(testRoot, 'left_node', 'Left Node', {}, 'left');
+        const centerNode = testJm.add_node(testRoot, 'center_node', 'Center Node', {}, 'center');
+        const rightNode = testJm.add_node(testRoot, 'right_node', 'Right Node', {}, 'right');
+
+        // Test insert methods with direction
+        if (leftNode) {
+            testJm.insert_node_before(leftNode, 'before_left', 'Before Left', {}, 'left');
+            testJm.insert_node_after(leftNode, 'after_left', 'After Left', {}, 'left');
+        }
+
+        // Test move_node with special before_id values
+        if (rightNode) {
+            testJm.move_node(rightNode.id, '_first_', testRoot.id, 'left');
+            testJm.move_node(rightNode.id, '_last_', testRoot.id, 'right');
+        }
+    }
+}
+
+// Test node_overflow option with new 'visible' value
+function testNodeOverflowOptions() {
+    const optionsWithVisible: JsMindOptions = {
+        container: 'test_container',
+        view: {
+            node_overflow: 'visible'  // This should now be valid
+        }
+    };
+
+    const optionsWithHidden: JsMindOptions = {
+        container: 'test_container',
+        view: {
+            node_overflow: 'hidden'
+        }
+    };
+
+    const optionsWithWrap: JsMindOptions = {
+        container: 'test_container',
+        view: {
+            node_overflow: 'wrap'
+        }
+    };
+
+    // All these should compile without errors
+    const jm1 = new jsMind(optionsWithVisible);
+    const jm2 = new jsMind(optionsWithHidden);
+    const jm3 = new jsMind(optionsWithWrap);
+}
+
+// Run the tests
+testDirectionTypes();
+testNodeOverflowOptions();
 
 console.log('TypeScript typings validation example done.');
 console.log('If this file compiles, typings are consistent.');

@@ -63,7 +63,7 @@ export class Mind {
      * @param {string} node_id
      * @param {string} topic
      * @param {Record<string, any>=} data
-     * @param {number=} direction
+     * @param {'left'|'center'|'right'=} direction
      * @param {boolean=} expanded
      * @param {number=} idx
      * @returns {Node | null}
@@ -102,7 +102,7 @@ export class Mind {
      * @param {string} node_id
      * @param {string} topic
      * @param {Record<string, any>=} data
-     * @param {number=} direction
+     * @param {'left'|'center'|'right'=} direction
      * @returns {Node | null}
      */
     insert_node_before(node_before, node_id, topic, data, direction) {
@@ -144,7 +144,7 @@ export class Mind {
      * @param {string} node_id
      * @param {string} topic
      * @param {Record<string, any>=} data
-     * @param {number=} direction
+     * @param {'left'|'center'|'right'=} direction
      * @returns {Node | null}
      */
     insert_node_after(node_after, node_id, topic, data, direction) {
@@ -184,9 +184,9 @@ export class Mind {
     /**
      * Move a node to new parent/position.
      * @param {Node} node
-     * @param {string=} before_id
+     * @param {string=} before_id - The ID of the node before which to place the moved node. Special values: "_first_", "_last_"
      * @param {string=} parent_id
-     * @param {number=} direction
+     * @param {'left'|'center'|'right'=} direction
      * @returns {Node | null}
      */
     move_node(node, before_id, parent_id, direction) {
@@ -202,7 +202,7 @@ export class Mind {
     /**
      * Propagate direction to descendants.
      * @param {Node} node
-     * @param {number=} direction
+     * @param {'left'|'center'|'right'=} direction
      */
     _flow_node_direction(node, direction) {
         if (typeof direction === 'undefined') {
@@ -248,7 +248,7 @@ export class Mind {
      * @param {Node} node
      * @param {string} before_id
      * @param {string} parent_id
-     * @param {number=} direction
+     * @param {'left'|'center'|'right'=} direction
      * @returns {Node | null}
      */
     _move_node(node, before_id, parent_id, direction) {

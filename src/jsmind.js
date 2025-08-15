@@ -143,7 +143,7 @@ export default class jsMind {
     }
     /**
      * Set theme name.
-     * @param {string|null} theme
+     * @param {string|null=} theme
      */
     set_theme(theme) {
         var theme_old = this.options.theme;
@@ -334,7 +334,10 @@ export default class jsMind {
         this.layout.collapse_all();
         this.view.relayout();
     }
-    /** @param {number} depth */
+    /**
+     * Expand nodes up to a specified depth level.
+     * @param {number} depth
+     */
     expand_to_depth(depth) {
         this.layout.expand_to_depth(depth);
         this.view.relayout();
@@ -417,7 +420,7 @@ export default class jsMind {
      * @param {string} node_id
      * @param {string} topic
      * @param {Record<string, any>=} data
-     * @param {number=} direction
+     * @param {'left'|'center'|'right'=} direction
      * @returns {import('./jsmind.node.js').Node|null}
      */
     add_node(parent_node, node_id, topic, data, direction) {
@@ -452,7 +455,7 @@ export default class jsMind {
      * @param {string} node_id
      * @param {string} topic
      * @param {Record<string, any>=} data
-     * @param {number=} direction
+     * @param {'left'|'center'|'right'=} direction
      * @returns {import('./jsmind.node.js').Node|null}
      */
     insert_node_before(node_before, node_id, topic, data, direction) {
@@ -485,7 +488,7 @@ export default class jsMind {
      * @param {string} node_id
      * @param {string} topic
      * @param {Record<string, any>=} data
-     * @param {number=} direction
+     * @param {'left'|'center'|'right'=} direction
      * @returns {import('./jsmind.node.js').Node|null}
      */
     insert_node_after(node_after, node_id, topic, data, direction) {
@@ -552,7 +555,11 @@ export default class jsMind {
             return false;
         }
     }
-    /** @param {string} node_id @param {string} topic */
+    /**
+     * Update the topic (text content) of a node.
+     * @param {string} node_id
+     * @param {string} topic
+     */
     update_node(node_id, topic) {
         if (this.get_editable()) {
             if (_util.text.is_empty(topic)) {
@@ -584,9 +591,9 @@ export default class jsMind {
     /**
      * Move a node and optionally change direction.
      * @param {string} node_id
-     * @param {string=} before_id
+     * @param {string=} before_id - The ID of the node before which to place the moved node. Special values: "_first_", "_last_"
      * @param {string=} parent_id
-     * @param {number=} direction
+     * @param {'left'|'right'=} direction - Only effective for second-level nodes (children of root). If not provided, direction will be determined automatically.
      */
     move_node(node_id, before_id, parent_id, direction) {
         if (this.get_editable()) {
@@ -648,7 +655,10 @@ export default class jsMind {
     is_node_visible(node) {
         return this.layout.is_visible(node);
     }
-    /** @param {string | import('./jsmind.node.js').Node} node */
+    /**
+     * Scroll the mind map to center the specified node.
+     * @param {string | import('./jsmind.node.js').Node} node
+     */
     scroll_node_to_center(node) {
         if (!Node.is_node(node)) {
             var the_node = this.get_node(node);
@@ -740,6 +750,7 @@ export default class jsMind {
         return n;
     }
     /**
+     * Set background and foreground colors for a node.
      * @param {string} node_id
      * @param {string=} bg_color
      * @param {string=} fg_color
@@ -763,6 +774,7 @@ export default class jsMind {
         }
     }
     /**
+     * Set font style for a node.
      * @param {string} node_id
      * @param {number=} size
      * @param {string=} weight
@@ -793,8 +805,9 @@ export default class jsMind {
         }
     }
     /**
+     * Set background image for a node.
      * @param {string} node_id
-     * @param {string} image
+     * @param {string=} image
      * @param {number=} width
      * @param {number=} height
      * @param {number=} rotation
