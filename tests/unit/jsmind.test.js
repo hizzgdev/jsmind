@@ -545,6 +545,7 @@ test('event listener', () => {
 });
 
 describe('add_nodes', () => {
+    // Error handling tests
     test('should return empty array when not editable', () => {
         const jsmind = new jm({ container: 'container', editable: false });
         const result = jsmind.add_nodes('root', []);
@@ -573,10 +574,117 @@ describe('add_nodes', () => {
         const jsmind = create_fake_mind();
         expect(typeof jsmind.add_nodes).toBe('function');
     });
+
+    // Core functionality tests - simplified to avoid DOM issues in test environment
+    test('should call _add_node_data for each node', () => {
+        const jsmind = create_fake_mind();
+        jsmind._add_node_data = jest.fn().mockReturnValue({ id: 'test', topic: 'test' });
+        jsmind._refresh_node_ui = jest.fn();
+        jsmind.invoke_event_handle = jest.fn();
+
+        const nodes_data = [
+            { node_id: 'test1', topic: 'Test Node 1' },
+            { node_id: 'test2', topic: 'Test Node 2' },
+        ];
+
+        const result = jsmind.add_nodes('root', nodes_data);
+
+        expect(jsmind._add_node_data).toHaveBeenCalledTimes(2);
+        expect(result).toHaveLength(2);
+    });
+
+    test('should call _refresh_node_ui once after all nodes added', () => {
+        const jsmind = create_fake_mind();
+        jsmind._add_node_data = jest.fn().mockReturnValue({ id: 'test', topic: 'test' });
+        jsmind._refresh_node_ui = jest.fn();
+        jsmind.invoke_event_handle = jest.fn();
+
+        const nodes_data = [
+            { node_id: 'test1', topic: 'Test Node 1' },
+            { node_id: 'test2', topic: 'Test Node 2' },
+            { node_id: 'test3', topic: 'Test Node 3' },
+        ];
+
+        jsmind.add_nodes('root', nodes_data);
+
+        expect(jsmind._refresh_node_ui).toHaveBeenCalledTimes(1);
+        expect(jsmind._refresh_node_ui).toHaveBeenCalledWith(jsmind.mind.root);
+    });
+
+    test('should trigger add_nodes event with correct data', () => {
+        const jsmind = create_fake_mind();
+        jsmind._add_node_data = jest.fn().mockReturnValue({ id: 'test', topic: 'test' });
+        jsmind._refresh_node_ui = jest.fn();
+        const eventHandler = jest.fn();
+        jsmind.invoke_event_handle = eventHandler;
+
+        const nodes_data = [
+            { node_id: 'test1', topic: 'Test Node 1' },
+            { node_id: 'test2', topic: 'Test Node 2' },
+        ];
+
+        jsmind.add_nodes('root', nodes_data);
+
+        expect(eventHandler).toHaveBeenCalledWith(EventType.edit, {
+            evt: 'add_nodes',
+            data: ['root', nodes_data],
+            nodes: ['test', 'test'], // Mock returns same object
+        });
+    });
+
+    test('should handle failed node creation', () => {
+        const jsmind = create_fake_mind();
+        jsmind._add_node_data = jest
+            .fn()
+            .mockReturnValueOnce({ id: 'test1', topic: 'Test Node 1' })
+            .mockReturnValueOnce(null) // Second node fails
+            .mockReturnValueOnce({ id: 'test3', topic: 'Test Node 3' });
+        jsmind._refresh_node_ui = jest.fn();
+        jsmind.invoke_event_handle = jest.fn();
+
+        const nodes_data = [
+            { node_id: 'test1', topic: 'Test Node 1' },
+            { node_id: 'test2', topic: 'Test Node 2' },
+            { node_id: 'test3', topic: 'Test Node 3' },
+        ];
+
+        const result = jsmind.add_nodes('root', nodes_data);
+
+        expect(result).toHaveLength(3);
+        expect(result[0]).not.toBeNull();
+        expect(result[1]).toBeNull();
+        expect(result[2]).not.toBeNull();
+    });
+
+    test('should pass correct parameters to _add_node_data', () => {
+        const jsmind = create_fake_mind();
+        jsmind._add_node_data = jest.fn().mockReturnValue({ id: 'test', topic: 'test' });
+        jsmind._refresh_node_ui = jest.fn();
+        jsmind.invoke_event_handle = jest.fn();
+
+        const nodes_data = [
+            {
+                node_id: 'test1',
+                topic: 'Test Node 1',
+                data: { color: 'red' },
+                direction: 'right',
+            },
+        ];
+
+        jsmind.add_nodes('root', nodes_data);
+
+        expect(jsmind._add_node_data).toHaveBeenCalledWith(
+            jsmind.mind.root,
+            'test1',
+            'Test Node 1',
+            { color: 'red' },
+            'right'
+        );
+    });
 });
 
 function create_fake_mind() {
-    const jsmind = new jm({ container: 'container' });
+    const jsmind = new jm({ container: 'container', editable: true });
     const mind = new jm.mind();
     const root_node = mind.set_root('root', 'root');
     mind.add_node(root_node, 'node1', 'node1');
