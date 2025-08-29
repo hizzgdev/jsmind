@@ -415,6 +415,40 @@ export default class jsMind {
         return this.mind.get_node(node);
     }
     /**
+     * Add node data to the mind map without triggering UI refresh.
+     * @private
+     * @param {import('./jsmind.node.js').Node} parent_node
+     * @param {string} node_id
+     * @param {string} topic
+     * @param {Record<string, any>=} data
+     * @param {('left'|'center'|'right'|'-1'|'0'|'1'|number)=} direction
+     * @returns {import('./jsmind.node.js').Node|null}
+     */
+    _add_node_data(parent_node, node_id, topic, data, direction) {
+        var dir = Direction.of(direction);
+        if (dir === undefined) {
+            dir = this.layout.calculate_next_child_direction(parent_node);
+        }
+        var node = this.mind.add_node(parent_node, node_id, topic, data, dir);
+        if (!!node) {
+            this.view.add_node(node);
+            this.view.reset_node_custom_style(node);
+        }
+        return node;
+    }
+
+    /**
+     * Refresh UI after node changes.
+     * @private
+     * @param {import('./jsmind.node.js').Node} parent_node
+     */
+    _refresh_node_ui(parent_node) {
+        this.layout.layout();
+        this.view.show(false);
+        this.expand_node(parent_node);
+    }
+
+    /**
      * Add a new node to the mind map.
      * @param {string | import('./jsmind.node.js').Node} parent_node
      * @param {string} node_id
@@ -424,30 +458,27 @@ export default class jsMind {
      * @returns {import('./jsmind.node.js').Node|null}
      */
     add_node(parent_node, node_id, topic, data, direction) {
-        if (this.get_editable()) {
-            var the_parent_node = this.get_node(parent_node);
-            var dir = Direction.of(direction);
-            if (dir === undefined) {
-                dir = this.layout.calculate_next_child_direction(the_parent_node);
-            }
-            var node = this.mind.add_node(the_parent_node, node_id, topic, data, dir);
-            if (!!node) {
-                this.view.add_node(node);
-                this.layout.layout();
-                this.view.show(false);
-                this.view.reset_node_custom_style(node);
-                this.expand_node(the_parent_node);
-                this.invoke_event_handle(EventType.edit, {
-                    evt: 'add_node',
-                    data: [the_parent_node.id, node_id, topic, data, dir],
-                    node: node_id,
-                });
-            }
-            return node;
-        } else {
+        if (!this.get_editable()) {
             logger.error('fail, this mind map is not editable');
             return null;
         }
+
+        var the_parent_node = this.get_node(parent_node);
+        if (!the_parent_node) {
+            logger.error('parent node not found');
+            return null;
+        }
+
+        var node = this._add_node_data(the_parent_node, node_id, topic, data, direction);
+        if (!!node) {
+            this._refresh_node_ui(the_parent_node);
+            this.invoke_event_handle(EventType.edit, {
+                evt: 'add_node',
+                data: [the_parent_node.id, node_id, topic, data, Direction.of(direction)],
+                node: node_id,
+            });
+        }
+        return node;
     }
 
     /**
@@ -475,42 +506,22 @@ export default class jsMind {
 
         var created_nodes = [];
 
-        // Phase 1: Batch create node data without triggering redraw
+        // Batch create node data without triggering UI refresh
         for (var i = 0; i < nodes_data.length; i++) {
             var node_data = nodes_data[i];
-
-            var dir = Direction.of(node_data.direction);
-            if (dir === undefined) {
-                dir = this.layout.calculate_next_child_direction(the_parent_node);
-            }
-
-            var node = this.mind.add_node(
+            var node = this._add_node_data(
                 the_parent_node,
                 node_data.node_id,
                 node_data.topic,
                 node_data.data,
-                dir
+                node_data.direction
             );
-
-            if (!!node) {
-                created_nodes.push(node);
-                // Only add view elements, don't trigger layout and redraw
-                this.view.add_node(node);
-                this.view.reset_node_custom_style(node);
-            } else {
-                created_nodes.push(null);
-            }
+            created_nodes.push(node);
         }
 
-        // Phase 2: Unified layout calculation and redraw (execute only once)
-        if (created_nodes.some(node => node !== null)) {
-            this.layout.layout();
-            this.view.show(false);
-
-            // Expand the parent node
-            this.expand_node(the_parent_node);
-
-            // Trigger add nodes event
+        // Refresh UI once after all nodes are added
+        if (!!created_nodes.length) {
+            this._refresh_node_ui(the_parent_node);
             this.invoke_event_handle(EventType.edit, {
                 evt: 'add_nodes',
                 data: [the_parent_node.id, nodes_data],

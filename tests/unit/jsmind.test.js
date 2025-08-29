@@ -544,6 +544,37 @@ test('event listener', () => {
     expect(callback3).toBeCalledWith('a', 'b');
 });
 
+describe('add_nodes', () => {
+    test('should return empty array when not editable', () => {
+        const jsmind = new jm({ container: 'container', editable: false });
+        const result = jsmind.add_nodes('root', []);
+        expect(result).toEqual([]);
+    });
+
+    test('should return empty array when parent node not found', () => {
+        const jsmind = create_fake_mind();
+        const result = jsmind.add_nodes('nonexistent', []);
+        expect(result).toEqual([]);
+    });
+
+    test('should return empty array when nodes_data is not array', () => {
+        const jsmind = create_fake_mind();
+        const result = jsmind.add_nodes('root', null);
+        expect(result).toEqual([]);
+    });
+
+    test('should return empty array when nodes_data is empty', () => {
+        const jsmind = create_fake_mind();
+        const result = jsmind.add_nodes('root', []);
+        expect(result).toEqual([]);
+    });
+
+    test('should have add_nodes method', () => {
+        const jsmind = create_fake_mind();
+        expect(typeof jsmind.add_nodes).toBe('function');
+    });
+});
+
 function create_fake_mind() {
     const jsmind = new jm({ container: 'container' });
     const mind = new jm.mind();
