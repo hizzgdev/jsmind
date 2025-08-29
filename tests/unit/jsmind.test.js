@@ -553,31 +553,31 @@ describe('add_nodes', () => {
     });
 
     test('should return empty array when parent node not found', () => {
-        const jsmind = create_fake_mind();
+        const jsmind = create_fake_mind({ editable: true });
         const result = jsmind.add_nodes('nonexistent', []);
         expect(result).toEqual([]);
     });
 
     test('should return empty array when nodes_data is not array', () => {
-        const jsmind = create_fake_mind();
+        const jsmind = create_fake_mind({ editable: true });
         const result = jsmind.add_nodes('root', null);
         expect(result).toEqual([]);
     });
 
     test('should return empty array when nodes_data is empty', () => {
-        const jsmind = create_fake_mind();
+        const jsmind = create_fake_mind({ editable: true });
         const result = jsmind.add_nodes('root', []);
         expect(result).toEqual([]);
     });
 
     test('should have add_nodes method', () => {
-        const jsmind = create_fake_mind();
+        const jsmind = create_fake_mind({ editable: true });
         expect(typeof jsmind.add_nodes).toBe('function');
     });
 
     // Core functionality tests - simplified to avoid DOM issues in test environment
     test('should call _add_node_data for each node', () => {
-        const jsmind = create_fake_mind();
+        const jsmind = create_fake_mind({ editable: true });
         jsmind._add_node_data = jest.fn().mockReturnValue({ id: 'test', topic: 'test' });
         jsmind._refresh_node_ui = jest.fn();
         jsmind.invoke_event_handle = jest.fn();
@@ -594,7 +594,7 @@ describe('add_nodes', () => {
     });
 
     test('should call _refresh_node_ui once after all nodes added', () => {
-        const jsmind = create_fake_mind();
+        const jsmind = create_fake_mind({ editable: true });
         jsmind._add_node_data = jest.fn().mockReturnValue({ id: 'test', topic: 'test' });
         jsmind._refresh_node_ui = jest.fn();
         jsmind.invoke_event_handle = jest.fn();
@@ -612,7 +612,7 @@ describe('add_nodes', () => {
     });
 
     test('should trigger add_nodes event with correct data', () => {
-        const jsmind = create_fake_mind();
+        const jsmind = create_fake_mind({ editable: true });
         jsmind._add_node_data = jest.fn().mockReturnValue({ id: 'test', topic: 'test' });
         jsmind._refresh_node_ui = jest.fn();
         const eventHandler = jest.fn();
@@ -633,7 +633,7 @@ describe('add_nodes', () => {
     });
 
     test('should handle failed node creation', () => {
-        const jsmind = create_fake_mind();
+        const jsmind = create_fake_mind({ editable: true });
         jsmind._add_node_data = jest
             .fn()
             .mockReturnValueOnce({ id: 'test1', topic: 'Test Node 1' })
@@ -657,7 +657,7 @@ describe('add_nodes', () => {
     });
 
     test('should pass correct parameters to _add_node_data', () => {
-        const jsmind = create_fake_mind();
+        const jsmind = create_fake_mind({ editable: true });
         jsmind._add_node_data = jest.fn().mockReturnValue({ id: 'test', topic: 'test' });
         jsmind._refresh_node_ui = jest.fn();
         jsmind.invoke_event_handle = jest.fn();
@@ -681,10 +681,243 @@ describe('add_nodes', () => {
             'right'
         );
     });
+
+    // Performance and scalability tests
+    test('should handle large number of nodes efficiently', () => {
+        const jsmind = create_fake_mind({ editable: true });
+        jsmind._add_node_data = jest.fn().mockReturnValue({ id: 'test', topic: 'test' });
+        jsmind._refresh_node_ui = jest.fn();
+        jsmind.invoke_event_handle = jest.fn();
+
+        // Generate 1000 nodes
+        const nodes_data = [];
+        for (let i = 0; i < 1000; i++) {
+            nodes_data.push({
+                node_id: `bulk_node_${i}`,
+                topic: `Bulk Node ${i}`,
+                data: { index: i },
+                direction: i % 2 === 0 ? 'right' : 'left',
+            });
+        }
+
+        const start = performance.now();
+        const result = jsmind.add_nodes('root', nodes_data);
+        const end = performance.now();
+
+        expect(result).toHaveLength(1000);
+        expect(jsmind._add_node_data).toHaveBeenCalledTimes(1000);
+        expect(jsmind._refresh_node_ui).toHaveBeenCalledTimes(1); // Key performance benefit
+        expect(end - start).toBeLessThan(100); // Should complete within 100ms
+    });
+
+    test('should handle complex node data structures', () => {
+        const jsmind = create_fake_mind({ editable: true });
+        jsmind._add_node_data = jest.fn().mockReturnValue({ id: 'test', topic: 'test' });
+        jsmind._refresh_node_ui = jest.fn();
+        jsmind.invoke_event_handle = jest.fn();
+
+        const complexData = {
+            'background-color': '#ff6b6b',
+            'font-size': '14px',
+            'font-weight': 'bold',
+            'border-radius': '8px',
+            'padding': '10px',
+            'custom-attribute': 'value',
+            'nested-object': {
+                level1: {
+                    level2: 'deep-value',
+                },
+            },
+            'array-data': [1, 2, 3, 'string', { key: 'value' }],
+            'boolean-flag': true,
+            'numeric-value': 42.5,
+            'null-value': null,
+            'undefined-value': undefined,
+        };
+
+        const nodes_data = [
+            {
+                node_id: 'complex1',
+                topic: 'Complex Node with Rich Data',
+                data: complexData,
+                direction: 'right',
+            },
+            {
+                node_id: 'complex2',
+                topic: 'Node with Unicode: 🌟 测试 العربية',
+                data: {
+                    'unicode-support': '🎉🚀💡',
+                    'multilingual': {
+                        chinese: '你好世界',
+                        arabic: 'مرحبا بالعالم',
+                        emoji: '😀🎈🌈',
+                    },
+                },
+                direction: 'left',
+            },
+        ];
+
+        const result = jsmind.add_nodes('root', nodes_data);
+
+        expect(result).toHaveLength(2);
+        expect(jsmind._add_node_data).toHaveBeenCalledWith(
+            jsmind.mind.root,
+            'complex1',
+            'Complex Node with Rich Data',
+            complexData,
+            'right'
+        );
+        expect(jsmind._add_node_data).toHaveBeenCalledWith(
+            jsmind.mind.root,
+            'complex2',
+            'Node with Unicode: 🌟 测试 العربية',
+            expect.objectContaining({
+                'unicode-support': '🎉🚀💡',
+                'multilingual': expect.any(Object),
+            }),
+            'left'
+        );
+    });
+
+    test('should handle all direction types correctly', () => {
+        const jsmind = create_fake_mind({ editable: true });
+        jsmind._add_node_data = jest.fn().mockReturnValue({ id: 'test', topic: 'test' });
+        jsmind._refresh_node_ui = jest.fn();
+        jsmind.invoke_event_handle = jest.fn();
+
+        const nodes_data = [
+            { node_id: 'dir1', topic: 'Left String', direction: 'left' },
+            { node_id: 'dir2', topic: 'Right String', direction: 'right' },
+            { node_id: 'dir3', topic: 'Center String', direction: 'center' },
+            { node_id: 'dir4', topic: 'Left Numeric', direction: -1 },
+            { node_id: 'dir5', topic: 'Right Numeric', direction: 1 },
+            { node_id: 'dir6', topic: 'Center Numeric', direction: 0 },
+            { node_id: 'dir7', topic: 'Auto Direction' }, // No direction specified
+            { node_id: 'dir8', topic: 'Null Direction', direction: null },
+            { node_id: 'dir9', topic: 'Undefined Direction', direction: undefined },
+            { node_id: 'dir10', topic: 'Invalid String', direction: 'invalid' },
+            { node_id: 'dir11', topic: 'Invalid Number', direction: 999 },
+            { node_id: 'dir12', topic: 'Boolean Direction', direction: true },
+            { node_id: 'dir13', topic: 'Object Direction', direction: { side: 'right' } },
+        ];
+
+        const result = jsmind.add_nodes('root', nodes_data);
+
+        expect(result).toHaveLength(13);
+        expect(jsmind._add_node_data).toHaveBeenCalledTimes(13);
+
+        // Verify each direction type is passed correctly
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            1,
+            jsmind.mind.root,
+            'dir1',
+            'Left String',
+            undefined,
+            'left'
+        );
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            2,
+            jsmind.mind.root,
+            'dir2',
+            'Right String',
+            undefined,
+            'right'
+        );
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            3,
+            jsmind.mind.root,
+            'dir3',
+            'Center String',
+            undefined,
+            'center'
+        );
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            4,
+            jsmind.mind.root,
+            'dir4',
+            'Left Numeric',
+            undefined,
+            -1
+        );
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            5,
+            jsmind.mind.root,
+            'dir5',
+            'Right Numeric',
+            undefined,
+            1
+        );
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            6,
+            jsmind.mind.root,
+            'dir6',
+            'Center Numeric',
+            undefined,
+            0
+        );
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            7,
+            jsmind.mind.root,
+            'dir7',
+            'Auto Direction',
+            undefined,
+            undefined
+        );
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            8,
+            jsmind.mind.root,
+            'dir8',
+            'Null Direction',
+            undefined,
+            null
+        );
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            9,
+            jsmind.mind.root,
+            'dir9',
+            'Undefined Direction',
+            undefined,
+            undefined
+        );
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            10,
+            jsmind.mind.root,
+            'dir10',
+            'Invalid String',
+            undefined,
+            'invalid'
+        );
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            11,
+            jsmind.mind.root,
+            'dir11',
+            'Invalid Number',
+            undefined,
+            999
+        );
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            12,
+            jsmind.mind.root,
+            'dir12',
+            'Boolean Direction',
+            undefined,
+            true
+        );
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            13,
+            jsmind.mind.root,
+            'dir13',
+            'Object Direction',
+            undefined,
+            { side: 'right' }
+        );
+    });
 });
 
-function create_fake_mind() {
-    const jsmind = new jm({ container: 'container', editable: true });
+function create_fake_mind(options = {}) {
+    const defaultOptions = { container: 'container' };
+    const mergedOptions = { ...defaultOptions, ...options };
+    const jsmind = new jm(mergedOptions);
     const mind = new jm.mind();
     const root_node = mind.set_root('root', 'root');
     mind.add_node(root_node, 'node1', 'node1');
