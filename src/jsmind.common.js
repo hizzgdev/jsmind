@@ -10,7 +10,7 @@
  * Library version string.
  * @type {string}
  */
-export const __version__ = '0.8.8';
+export const __version__ = '0.9.0';
 /**
  * Library author.
  * @type {string}
