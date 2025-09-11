@@ -583,8 +583,8 @@ describe('add_nodes', () => {
         jsmind.invoke_event_handle = jest.fn();
 
         const nodes_data = [
-            { node_id: 'test1', topic: 'Test Node 1' },
-            { node_id: 'test2', topic: 'Test Node 2' },
+            { id: 'test1', topic: 'Test Node 1' },
+            { id: 'test2', topic: 'Test Node 2' },
         ];
 
         const result = jsmind.add_nodes('root', nodes_data);
@@ -600,9 +600,9 @@ describe('add_nodes', () => {
         jsmind.invoke_event_handle = jest.fn();
 
         const nodes_data = [
-            { node_id: 'test1', topic: 'Test Node 1' },
-            { node_id: 'test2', topic: 'Test Node 2' },
-            { node_id: 'test3', topic: 'Test Node 3' },
+            { id: 'test1', topic: 'Test Node 1' },
+            { id: 'test2', topic: 'Test Node 2' },
+            { id: 'test3', topic: 'Test Node 3' },
         ];
 
         jsmind.add_nodes('root', nodes_data);
@@ -619,8 +619,8 @@ describe('add_nodes', () => {
         jsmind.invoke_event_handle = eventHandler;
 
         const nodes_data = [
-            { node_id: 'test1', topic: 'Test Node 1' },
-            { node_id: 'test2', topic: 'Test Node 2' },
+            { id: 'test1', topic: 'Test Node 1' },
+            { id: 'test2', topic: 'Test Node 2' },
         ];
 
         jsmind.add_nodes('root', nodes_data);
@@ -643,9 +643,9 @@ describe('add_nodes', () => {
         jsmind.invoke_event_handle = jest.fn();
 
         const nodes_data = [
-            { node_id: 'test1', topic: 'Test Node 1' },
-            { node_id: 'test2', topic: 'Test Node 2' },
-            { node_id: 'test3', topic: 'Test Node 3' },
+            { id: 'test1', topic: 'Test Node 1' },
+            { id: 'test2', topic: 'Test Node 2' },
+            { id: 'test3', topic: 'Test Node 3' },
         ];
 
         const result = jsmind.add_nodes('root', nodes_data);
@@ -664,7 +664,7 @@ describe('add_nodes', () => {
 
         const nodes_data = [
             {
-                node_id: 'test1',
+                id: 'test1',
                 topic: 'Test Node 1',
                 data: { color: 'red' },
                 direction: 'right',
@@ -693,7 +693,7 @@ describe('add_nodes', () => {
         const nodes_data = [];
         for (let i = 0; i < 1000; i++) {
             nodes_data.push({
-                node_id: `bulk_node_${i}`,
+                id: `bulk_node_${i}`,
                 topic: `Bulk Node ${i}`,
                 data: { index: i },
                 direction: i % 2 === 0 ? 'right' : 'left',
@@ -737,13 +737,13 @@ describe('add_nodes', () => {
 
         const nodes_data = [
             {
-                node_id: 'complex1',
+                id: 'complex1',
                 topic: 'Complex Node with Rich Data',
                 data: complexData,
                 direction: 'right',
             },
             {
-                node_id: 'complex2',
+                id: 'complex2',
                 topic: 'Node with Unicode: 🌟 测试 العربية',
                 data: {
                     'unicode-support': '🎉🚀💡',
@@ -786,19 +786,19 @@ describe('add_nodes', () => {
         jsmind.invoke_event_handle = jest.fn();
 
         const nodes_data = [
-            { node_id: 'dir1', topic: 'Left String', direction: 'left' },
-            { node_id: 'dir2', topic: 'Right String', direction: 'right' },
-            { node_id: 'dir3', topic: 'Center String', direction: 'center' },
-            { node_id: 'dir4', topic: 'Left Numeric', direction: -1 },
-            { node_id: 'dir5', topic: 'Right Numeric', direction: 1 },
-            { node_id: 'dir6', topic: 'Center Numeric', direction: 0 },
-            { node_id: 'dir7', topic: 'Auto Direction' }, // No direction specified
-            { node_id: 'dir8', topic: 'Null Direction', direction: null },
-            { node_id: 'dir9', topic: 'Undefined Direction', direction: undefined },
-            { node_id: 'dir10', topic: 'Invalid String', direction: 'invalid' },
-            { node_id: 'dir11', topic: 'Invalid Number', direction: 999 },
-            { node_id: 'dir12', topic: 'Boolean Direction', direction: true },
-            { node_id: 'dir13', topic: 'Object Direction', direction: { side: 'right' } },
+            { id: 'dir1', topic: 'Left String', direction: 'left' },
+            { id: 'dir2', topic: 'Right String', direction: 'right' },
+            { id: 'dir3', topic: 'Center String', direction: 'center' },
+            { id: 'dir4', topic: 'Left Numeric', direction: -1 },
+            { id: 'dir5', topic: 'Right Numeric', direction: 1 },
+            { id: 'dir6', topic: 'Center Numeric', direction: 0 },
+            { id: 'dir7', topic: 'Auto Direction' }, // No direction specified
+            { id: 'dir8', topic: 'Null Direction', direction: null },
+            { id: 'dir9', topic: 'Undefined Direction', direction: undefined },
+            { id: 'dir10', topic: 'Invalid String', direction: 'invalid' },
+            { id: 'dir11', topic: 'Invalid Number', direction: 999 },
+            { id: 'dir12', topic: 'Boolean Direction', direction: true },
+            { id: 'dir13', topic: 'Object Direction', direction: { side: 'right' } },
         ];
 
         const result = jsmind.add_nodes('root', nodes_data);
@@ -812,7 +812,7 @@ describe('add_nodes', () => {
             jsmind.mind.root,
             'dir1',
             'Left String',
-            undefined,
+            {},
             'left'
         );
         expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
@@ -820,7 +820,7 @@ describe('add_nodes', () => {
             jsmind.mind.root,
             'dir2',
             'Right String',
-            undefined,
+            {},
             'right'
         );
         expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
@@ -828,7 +828,7 @@ describe('add_nodes', () => {
             jsmind.mind.root,
             'dir3',
             'Center String',
-            undefined,
+            {},
             'center'
         );
         expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
@@ -836,7 +836,7 @@ describe('add_nodes', () => {
             jsmind.mind.root,
             'dir4',
             'Left Numeric',
-            undefined,
+            {},
             -1
         );
         expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
@@ -844,7 +844,7 @@ describe('add_nodes', () => {
             jsmind.mind.root,
             'dir5',
             'Right Numeric',
-            undefined,
+            {},
             1
         );
         expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
@@ -852,7 +852,7 @@ describe('add_nodes', () => {
             jsmind.mind.root,
             'dir6',
             'Center Numeric',
-            undefined,
+            {},
             0
         );
         expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
@@ -860,7 +860,7 @@ describe('add_nodes', () => {
             jsmind.mind.root,
             'dir7',
             'Auto Direction',
-            undefined,
+            {},
             undefined
         );
         expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
@@ -868,7 +868,7 @@ describe('add_nodes', () => {
             jsmind.mind.root,
             'dir8',
             'Null Direction',
-            undefined,
+            {},
             null
         );
         expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
@@ -876,7 +876,7 @@ describe('add_nodes', () => {
             jsmind.mind.root,
             'dir9',
             'Undefined Direction',
-            undefined,
+            {},
             undefined
         );
         expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
@@ -884,7 +884,7 @@ describe('add_nodes', () => {
             jsmind.mind.root,
             'dir10',
             'Invalid String',
-            undefined,
+            {},
             'invalid'
         );
         expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
@@ -892,7 +892,7 @@ describe('add_nodes', () => {
             jsmind.mind.root,
             'dir11',
             'Invalid Number',
-            undefined,
+            {},
             999
         );
         expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
@@ -900,7 +900,7 @@ describe('add_nodes', () => {
             jsmind.mind.root,
             'dir12',
             'Boolean Direction',
-            undefined,
+            {},
             true
         );
         expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
@@ -908,9 +908,273 @@ describe('add_nodes', () => {
             jsmind.mind.root,
             'dir13',
             'Object Direction',
-            undefined,
+            {},
             { side: 'right' }
         );
+    });
+
+    // New tests for nested children structure support
+    test('should support node_tree format with nested children', () => {
+        const jsmind = create_fake_mind({ editable: true });
+        jsmind._add_node_data = jest.fn().mockImplementation((parent, id, topic) => {
+            return { id, topic, parent, children: [] };
+        });
+        jsmind._refresh_node_ui = jest.fn();
+        jsmind.invoke_event_handle = jest.fn();
+
+        const nodes_data = [
+            {
+                id: 'easy',
+                topic: 'Easy',
+                direction: 'left',
+                expanded: false,
+                children: [
+                    { id: 'easy1', topic: 'Easy to show' },
+                    { id: 'easy2', topic: 'Easy to edit' },
+                    {
+                        id: 'easy3',
+                        topic: 'Easy to store',
+                        children: [
+                            { id: 'easy31', topic: 'JSON format' },
+                            { id: 'easy32', topic: 'XML format' },
+                        ],
+                    },
+                ],
+            },
+        ];
+
+        const result = jsmind.add_nodes('root', nodes_data);
+
+        // Should create 6 nodes total (1 parent + 2 children + 1 grandparent + 2 grandchildren)
+        expect(result).toHaveLength(6);
+        expect(jsmind._add_node_data).toHaveBeenCalledTimes(6);
+
+        // Verify the hierarchy calls
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            1,
+            jsmind.mind.root,
+            'easy',
+            'Easy',
+            {},
+            'left'
+        );
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            2,
+            result[0],
+            'easy1',
+            'Easy to show',
+            {},
+            undefined
+        );
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            3,
+            result[0],
+            'easy2',
+            'Easy to edit',
+            {},
+            undefined
+        );
+    });
+
+    test('should support node_array format data in nested structure', () => {
+        const jsmind = create_fake_mind({ editable: true });
+        jsmind._add_node_data = jest.fn().mockImplementation((parent, id, topic) => {
+            return { id, topic, parent, children: [] };
+        });
+        jsmind._refresh_node_ui = jest.fn();
+        jsmind.invoke_event_handle = jest.fn();
+
+        const nodes_data = [
+            {
+                'id': 'category1',
+                'topic': 'Category 1',
+                'direction': 'right',
+                'expanded': true,
+                'background-color': '#ff6b6b',
+                'children': [
+                    {
+                        id: 'item1',
+                        topic: 'Item 1',
+                        priority: 'high',
+                        children: [{ id: 'detail1', topic: 'Detail 1', note: 'Important detail' }],
+                    },
+                ],
+            },
+        ];
+
+        const result = jsmind.add_nodes('root', nodes_data);
+
+        expect(result).toHaveLength(3);
+
+        // Check that custom data is extracted properly
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            1,
+            jsmind.mind.root,
+            'category1',
+            'Category 1',
+            { 'background-color': '#ff6b6b' },
+            'right'
+        );
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            2,
+            result[0],
+            'item1',
+            'Item 1',
+            { priority: 'high' },
+            undefined
+        );
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            3,
+            result[1],
+            'detail1',
+            'Detail 1',
+            { note: 'Important detail' },
+            undefined
+        );
+    });
+
+    test('should support legacy format alongside new nested format', () => {
+        const jsmind = create_fake_mind({ editable: true });
+        jsmind._add_node_data = jest.fn().mockImplementation((parent, id, topic) => {
+            return { id, topic, parent, children: [] };
+        });
+        jsmind._refresh_node_ui = jest.fn();
+        jsmind.invoke_event_handle = jest.fn();
+
+        const nodes_data = [
+            // Legacy format
+            {
+                id: 'legacy1',
+                topic: 'Legacy Node',
+                data: { color: 'blue' },
+                direction: 'left',
+            },
+            // New nested format
+            {
+                id: 'nested1',
+                topic: 'Nested Node',
+                direction: 'right',
+                children: [{ id: 'child1', topic: 'Child Node' }],
+            },
+        ];
+
+        const result = jsmind.add_nodes('root', nodes_data);
+
+        expect(result).toHaveLength(3);
+
+        // Legacy format call
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            1,
+            jsmind.mind.root,
+            'legacy1',
+            'Legacy Node',
+            { color: 'blue' },
+            'left'
+        );
+
+        // New nested format calls
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            2,
+            jsmind.mind.root,
+            'nested1',
+            'Nested Node',
+            {},
+            'right'
+        );
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            3,
+            result[1],
+            'child1',
+            'Child Node',
+            {},
+            undefined
+        );
+    });
+
+    test('should handle mixed data format with freemind-like attributes', () => {
+        const jsmind = create_fake_mind({ editable: true });
+        jsmind._add_node_data = jest.fn().mockImplementation((parent, id, topic) => {
+            return { id, topic, parent, children: [] };
+        });
+        jsmind._refresh_node_ui = jest.fn();
+        jsmind.invoke_event_handle = jest.fn();
+
+        const nodes_data = [
+            {
+                id: 'freemind-like',
+                topic: 'FreeMind Style Node',
+                direction: 'left',
+                expanded: false,
+                COLOR: '#FF0000',
+                BACKGROUND_COLOR: '#FFFF00',
+                STYLE: 'bubble',
+                children: [
+                    {
+                        id: 'attribute-node',
+                        topic: 'Node with Attributes',
+                        FOLDED: true,
+                        POSITION: 'left',
+                        custom_attribute: 'custom_value',
+                    },
+                ],
+            },
+        ];
+
+        const result = jsmind.add_nodes('root', nodes_data);
+
+        expect(result).toHaveLength(2);
+
+        // Check FreeMind-like attributes are preserved as custom data
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            1,
+            jsmind.mind.root,
+            'freemind-like',
+            'FreeMind Style Node',
+            { COLOR: '#FF0000', BACKGROUND_COLOR: '#FFFF00', STYLE: 'bubble' },
+            'left'
+        );
+        expect(jsmind._add_node_data).toHaveBeenNthCalledWith(
+            2,
+            result[0],
+            'attribute-node',
+            'Node with Attributes',
+            { FOLDED: true, POSITION: 'left', custom_attribute: 'custom_value' },
+            undefined
+        );
+    });
+
+    test('should handle error cases in nested structure', () => {
+        const jsmind = create_fake_mind({ editable: true });
+        jsmind._add_node_data = jest.fn().mockReturnValue({ id: 'test', topic: 'test' });
+        jsmind._refresh_node_ui = jest.fn();
+        jsmind.invoke_event_handle = jest.fn();
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+        const nodes_data = [
+            {
+                // Missing required id
+                topic: 'Node without ID',
+                children: [{ id: 'child1', topic: 'Child' }],
+            },
+            {
+                id: 'node2',
+                // Missing required topic
+                children: [{ id: 'child2', topic: 'Child 2' }],
+            },
+            {
+                id: 'valid_node',
+                topic: 'Valid Node',
+                children: [{ id: 'valid_child', topic: 'Valid Child' }],
+            },
+        ];
+
+        const result = jsmind.add_nodes('root', nodes_data);
+
+        // Should only create the valid node and its child
+        expect(result).toHaveLength(2);
+        expect(jsmind._add_node_data).toHaveBeenCalledTimes(2);
+
+        consoleSpy.mockRestore();
     });
 });
 
