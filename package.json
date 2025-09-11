@@ -43,7 +43,12 @@
         "build-test-types": "npm run build-types && npm run test-types",
         "test-legacy": "jest tests/legacy",
         "format": "prettier --config .config/prettierrc.json --ignore-path .config/prettierignore --write .",
-        "format-check": "prettier --config .config/prettierrc.json --ignore-path .config/prettierignore --check ."
+        "format-check": "prettier --config .config/prettierrc.json --ignore-path .config/prettierignore --check .",
+        "dev": "npm run build && npm run server",
+        "dev:watch": "rollup -c .config/rollup.config.js --watch",
+        "dev:server": "npm run build && node example/build-examples.js dev && npm run server",
+        "prod-examples": "node example/build-examples.js prod",
+        "start": "npm run dev"
     },
     "repository": {
         "type": "git",

@@ -1,23 +1,29 @@
 var _jm = null;
 function open_empty() {
-    var options = {
-        container: 'jsmind_container',
-        theme: 'greensea',
-        editable: true,
-        log_level: 'debug',
-        view: {
-            engine: 'canvas',
-            draggable: true,
-            enable_device_pixel_ratio: false,
-        },
-        plugin: {
-            screenshot: {
-                background: '#ffffff',
+    // jsMind实例已在HTML中初始化，这里只需要确保存在
+    if (!window._jm) {
+        var options = {
+            container: 'jsmind_container',
+            theme: 'greensea',
+            editable: true,
+            enable_multiline: true, // 默认关闭多行编辑以保持兼容性
+            log_level: 'debug',
+            view: {
+                engine: 'canvas',
+                draggable: true,
+                enable_device_pixel_ratio: false,
             },
-        },
-    };
-    _jm = new jsMind(options);
-    _jm.show();
+            plugin: {
+                screenshot: {
+                    background: '#ffffff',
+                },
+            },
+        };
+        _jm = new jsMind(options);
+        _jm.show();
+    } else {
+        _jm = window._jm;
+    }
 }
 
 function open_json() {
@@ -459,4 +465,64 @@ function prompt_info(msg) {
     alert(msg);
 }
 
-open_empty();
+// 多行编辑控制函数
+function toggle_multiline(btn) {
+    var current_multiline = _jm.options.enable_multiline;
+    
+    if (current_multiline) {
+        // 当前已启用多行，切换为禁用
+        _jm.options.enable_multiline = false;
+        btn.innerHTML = '启用多行编辑';
+        
+        // 重新渲染节点以应用新的渲染模式
+        refresh_all_nodes();
+        
+        prompt_info('已禁用多行编辑，当前为普通单行编辑模式（使用input元素）\n\n注意：新的编辑模式将在下次编辑节点时生效');
+    } else {
+        // 当前未启用多行，切换为启用
+        _jm.options.enable_multiline = true;
+        btn.innerHTML = '禁用多行编辑';
+        
+        // 重新渲染节点以应用新的渲染模式
+        refresh_all_nodes();
+        
+        prompt_info('已启用多行编辑（使用contenteditable div，Ctrl+Enter完成编辑）\n\n注意：新的编辑模式将在下次编辑节点时生效');
+    }
+}
+
+// 刷新所有节点的显示以应用新的渲染模式
+function refresh_all_nodes() {
+    if (!_jm || !_jm.mind || !_jm.mind.nodes) {
+        return;
+    }
+    
+    // 遍历所有节点并重新渲染
+    var nodes = _jm.mind.nodes;
+    for (var nodeid in nodes) {
+        var node = nodes[nodeid];
+        if (node && node._data && node._data.view && node._data.view.element && node.topic) {
+            // 重新渲染节点内容
+            _jm.view.render_node(node._data.view.element, node);
+        }
+    }
+    
+    // 重新计算布局和显示
+    _jm.layout.layout();
+    _jm.view.show(false);
+}
+
+function show_current_mode() {
+    var is_multiline = _jm.options.enable_multiline;
+    
+    var mode_description = is_multiline 
+        ? '多行编辑模式（contenteditable div，支持换行）'
+        : '普通编辑模式（input元素，单行文本）';
+    
+    var status_msg = `当前文本编辑模式：${is_multiline ? '多行编辑' : '单行编辑'}\n` +
+                    `模式描述：${mode_description}\n\n` +
+                    `提示：双击节点即可体验当前编辑模式\n` +
+                    `快捷键：多行模式下，Ctrl+Enter完成编辑`;
+    
+    prompt_info(status_msg);
+}
+

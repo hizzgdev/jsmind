@@ -15,6 +15,7 @@ import { util } from './jsmind.util.js';
  *  theme?: (string|null),
  *  mode?: ('full'|'side'),
  *  support_html?: boolean,
+ *  enable_multiline?: boolean,
  *  log_level?: 'debug'|'info'|'warn'|'error'|'disable',
  *  view?: {
  *    engine?: 'canvas'|'svg',
@@ -45,6 +46,7 @@ const default_options = {
     theme: null,
     mode: 'full', // full or side
     support_html: true,
+    enable_multiline: false, // true: use contenteditable div for multiline editing, false: use input for single line
     log_level: 'info',
 
     view: {

@@ -107,5 +107,15 @@ export const util = {
             }
             return s.replace(/\s*/, '').length == 0;
         },
+        
+        html_escape: function (text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#x27;');
+        },
     },
 };

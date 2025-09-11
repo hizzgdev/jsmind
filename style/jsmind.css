@@ -73,6 +73,96 @@ jmexpander {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+/* Rich text and multiline support - unified div approach */
+.jsmind-editor {
+    border: 2px solid #4CAF50;
+    border-radius: 4px;
+    padding: 4px;
+    margin: 0;
+    outline: none;
+    background: #fff;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    color: #000 !important; /* 确保编辑器内字体始终为黑色 */
+}
+
+.jsmind-rich-editor {
+    min-height: 20px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Multiline editor using contenteditable div */
+.jsmind-multiline-editor {
+    min-height: 20px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Input editor for single line text */
+.jsmind-input-editor {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 20px;
+    border: none;
+    outline: none;
+}
+
+/* Legacy textarea support (deprecated - will be removed in future versions) */
+.jsmind-textarea-editor {
+    resize: vertical;
+    min-height: 40px;
+    font-family: inherit;
+}
+
+/* Multiline node styles */
+jmnode.multiline {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 300px;
+}
+
+/* Rich text node styles */
+jmnode.rich-text {
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 300px;
+}
+
+jmnode.rich-text b, 
+jmnode.rich-text strong {
+    font-weight: bold;
+}
+
+jmnode.rich-text i, 
+jmnode.rich-text em {
+    font-style: italic;
+}
+
+jmnode.rich-text u {
+    text-decoration: underline;
+}
+
+jmnode.rich-text ul, 
+jmnode.rich-text ol {
+    margin: 4px 0;
+    padding-left: 20px;
+}
+
+jmnode.rich-text li {
+    margin: 2px 0;
+}
 /* default theme */
 jmnode {
     padding: 10px;

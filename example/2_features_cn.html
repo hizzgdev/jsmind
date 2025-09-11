@@ -4,11 +4,23 @@
         <meta charset="utf-8" />
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <title>jsMind</title>
-        <link
-            type="text/css"
-            rel="stylesheet"
-            href="//jsd.onmicrosoft.cn/npm/jsmind@0.9.0/style/jsmind.css"
-        />
+        
+        <!-- 智能环境检测：开发环境使用本地文件，生产环境使用CDN -->
+        <script>
+            // 检测是否为开发环境（通过URL参数或localhost判断）
+            window.isDev = location.hostname === 'localhost' || 
+                          location.hostname === '127.0.0.1' || 
+                          location.search.includes('dev=true') ||
+                          location.protocol === 'file:';
+            
+            if (window.isDev) {
+                console.log('🔧 开发环境：使用本地构建文件');
+                document.write('<link type="text/css" rel="stylesheet" href="../style/jsmind.css" />');
+            } else {
+                console.log('🚀 生产环境：使用CDN资源');
+                document.write('<link type="text/css" rel="stylesheet" href="../style/jsmind.css" />');
+            }
+        </script>
         <style type="text/css">
             li {
                 margin-top: 2px;
@@ -105,7 +117,12 @@
                     <li><button onclick="change_background_color();">change bg-color</button></li>
                     <li><button onclick="change_background_image();">change background</button></li>
                 </ol>
-                <div>5. Theme</div>
+                <div>5. 文本编辑模式</div>
+                <ol type="A">
+                    <li><button onclick="toggle_multiline(this);">启用多行编辑</button></li>
+                    <li><button onclick="show_current_mode();">显示当前模式</button></li>
+                </ol>
+                <div>6. Theme</div>
                 <ol type="A">
                     <li>
                         <select onchange="set_theme(this.value);">
@@ -128,7 +145,7 @@
                         </select>
                     </li>
                 </ol>
-                <div>6. Adjusting</div>
+                <div>7. Adjusting</div>
                 <ol type="A">
                     <li>
                         <button onclick="change_container();">resize container</button>
@@ -159,7 +176,7 @@
                     </button>
                 </ol>
 
-                <div>7. Multi Format</div>
+                <div>8. Multi Format</div>
                 <ol type="A">
                     <li>node_tree(default)</li>
                     <ol>
@@ -197,22 +214,168 @@
                 <input class="file" type="file" id="image-chooser" accept="image/*" />
             </div>
         </div>
-        <script
-            type="text/javascript"
-            src="//jsd.onmicrosoft.cn/npm/jsmind@0.9.0/es6/jsmind.js"
-        ></script>
-        <script
-            type="text/javascript"
-            src="//jsd.onmicrosoft.cn/npm/jsmind@0.9.0/es6/jsmind.draggable-node.js"
-        ></script>
-        <script
-            type="text/javascript"
-            src="//jsd.onmicrosoft.cn/npm/dom-to-image@2.6.0/dist/dom-to-image.min.js"
-        ></script>
-        <script
-            type="text/javascript"
-            src="//jsd.onmicrosoft.cn/npm/jsmind@0.9.0/es6/jsmind.screenshot.js"
-        ></script>
-        <script type="text/javascript" src="2_features.js"></script>
+        
+        <!-- 智能环境检测：开发环境使用本地构建文件，生产环境使用CDN -->
+        <script>
+            // 使用之前已经定义的 window.isDev 变量
+            if (window.isDev) {
+                console.log('🔧 开发环境：使用本地构建文件');
+                
+                // 开发环境：使用本地构建的UMD模块
+                const script = document.createElement('script');
+                script.src = '../es6/jsmind.js';
+                script.onload = () => {
+                    console.log('✅ 本地jsMind加载成功');
+                    
+                    // 加载2_features.js
+                    const featuresScript = document.createElement('script');
+                    featuresScript.src = '2_features.js';
+                    featuresScript.onload = () => {
+                        console.log('✅ 功能脚本加载完成');
+                        // 初始化jsMind实例
+                        open_empty();
+                        // 更新按钮状态
+                        setTimeout(() => {
+                            if (typeof update_multiline_button === 'function') {
+                                update_multiline_button();
+                            }
+                        }, 100);
+                        // 加载示例数据
+                        loadExampleData();
+                        console.log('✅ 开发环境初始化完成');
+                    };
+                    document.head.appendChild(featuresScript);
+                };
+                document.head.appendChild(script);
+                
+            } else {
+                console.log('🚀 生产环境：加载CDN资源');
+                loadCDNResources();
+            }
+            
+            // 示例数据
+            function loadExampleData() {
+                const mind = {
+                    meta: {
+                        name: 'jsMind Rich Text Demo',
+                        author: 'hizzgdev@163.com',
+                        version: '0.9.0',
+                    },
+                    format: 'node_tree',
+                    data: {
+                        id: 'root',
+                        topic: 'jsMind 富文本演示',
+                        children: [
+                            {
+                                id: 'easy',
+                                topic: '简单易用\n双击编辑节点',
+                                direction: 'left',
+                                children: [
+                                    { id: 'easy1', topic: 'Easy to show' },
+                                    { id: 'easy2', topic: '支持多行文本\n第二行内容\n第三行内容' },
+                                    { id: 'easy3', topic: 'Easy to store' },
+                                ],
+                            },
+                            {
+                                id: 'rich',
+                                topic: '<b>富文本支持</b>',
+                                direction: 'right',
+                                children: [
+                                    {
+                                        id: 'rich1',
+                                        topic: '<b>粗体</b> <i>斜体</i> <u>下划线</u>',
+                                    },
+                                    { id: 'rich2', topic: '普通文本节点' },
+                                ],
+                            },
+                            {
+                                id: 'features',
+                                topic: '功能特性',
+                                direction: 'right',
+                                children: [
+                                    { id: 'f1', topic: 'HTML内容支持' },
+                                    { id: 'f2', topic: '多行文本编辑' },
+                                    { id: 'f3', topic: 'Ctrl+Enter完成编辑' },
+                                ],
+                            },
+                        ],
+                    },
+                };
+                
+                // 等待jsMind全局可用
+                if (window.jsMind && window._jm) {
+                    window._jm.show(mind);
+                } else {
+                    // 延迟执行，等待jsMind初始化
+                    setTimeout(() => {
+                        if (window._jm) {
+                            window._jm.show(mind);
+                        }
+                    }, 100);
+                }
+            }
+            
+            function loadCDNResources() {
+                // 加载CDN资源
+                const scripts = [
+                    '//jsd.onmicrosoft.cn/npm/jsmind@0.9.0/es6/jsmind.js',
+                    '../src/plugins/jsmind.draggable-node.js',
+                    '//jsd.onmicrosoft.cn/npm/dom-to-image@2.6.0/dist/dom-to-image.min.js',
+                    '../src/plugins/jsmind.screenshot.js'
+                ];
+                
+                let loadedCount = 0;
+                scripts.forEach((src, index) => {
+                    const script = document.createElement('script');
+                    script.src = src;
+                    script.type = 'text/javascript';
+                    script.onload = () => {
+                        loadedCount++;
+                        if (loadedCount === scripts.length) {
+                            // 所有CDN脚本加载完成，加载2_features.js
+                            const featuresScript = document.createElement('script');
+                            featuresScript.src = '2_features.js';
+                            featuresScript.onload = () => {
+                                // 初始化jsMind实例
+                                const options = {
+                                    container: 'jsmind_container',
+                                    theme: 'greensea',
+                                    editable: true,
+                                    enable_multiline: false, // 默认为单行模式
+                                    log_level: 'debug',
+                                    view: {
+                                        engine: 'canvas',
+                                        draggable: true,
+                                        enable_device_pixel_ratio: false,
+                                    },
+                                    plugin: {
+                                        screenshot: {
+                                            background: '#ffffff',
+                                        },
+                                    },
+                                };
+                                window._jm = new jsMind(options);
+                                
+                                // 更新按钮状态
+                                setTimeout(() => {
+                                    if (typeof update_multiline_button === 'function') {
+                                        update_multiline_button();
+                                    }
+                                }, 100);
+                                
+                                // 显示默认数据
+                                if (typeof open_json === 'function') {
+                                    open_json();
+                                }
+                                
+                                console.log('✅ 生产环境初始化完成');
+                            };
+                            document.head.appendChild(featuresScript);
+                        }
+                    };
+                    document.head.appendChild(script);
+                });
+            }
+        </script>
     </body>
 </html>
