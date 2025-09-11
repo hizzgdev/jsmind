@@ -483,9 +483,10 @@ export default class jsMind {
 
     /**
      * Add multiple nodes to the mind map with optimized performance.
+     * Supports standard jsMind formats: node_tree, node_array, and freemind with nested children structure.
      * @param {string | import('./jsmind.node.js').Node} parent_node - Parent node for all new nodes
-     * @param {Array<{node_id: string, topic: string, data?: Record<string, any>, direction?: ('left'|'center'|'right'|'-1'|'0'|'1'|number)}>} nodes_data - Array of node data objects
-     * @returns {Array<import('./jsmind.node.js').Node|null>} Array of created nodes
+     * @param {Array<{id: string, topic: string, direction?: ('left'|'center'|'right'|'-1'|'0'|'1'|number), expanded?: boolean, children?: Array}>} nodes_data - Array of node data objects in standard format
+     * @returns {Array<import('./jsmind.node.js').Node|null>} Array of created nodes (flattened from all levels)
      */
     add_nodes(parent_node, nodes_data) {
         if (!this.get_editable()) {
@@ -504,33 +505,115 @@ export default class jsMind {
             return [];
         }
 
-        var created_nodes = [];
+        var all_created_nodes = [];
+        var any_success = false;
 
-        // Batch create node data without triggering UI refresh
+        // Process each node data using unified recursive processing
         for (var i = 0; i < nodes_data.length; i++) {
             var node_data = nodes_data[i];
-            var node = this._add_node_data(
-                the_parent_node,
-                node_data.node_id,
-                node_data.topic,
-                node_data.data,
-                node_data.direction
-            );
-            created_nodes.push(node);
+
+            // Use unified recursive processing for all formats
+            var created_nodes = this._add_nodes_recursive(the_parent_node, node_data);
+            all_created_nodes = all_created_nodes.concat(created_nodes);
+            if (created_nodes.length > 0) {
+                any_success = true;
+            }
         }
 
         // Refresh UI once after all nodes are added
-        if (!!created_nodes.length) {
+        if (any_success) {
             this._refresh_node_ui(the_parent_node);
             this.invoke_event_handle(EventType.edit, {
                 evt: 'add_nodes',
                 data: [the_parent_node.id, nodes_data],
-                nodes: created_nodes.filter(node => node !== null).map(node => node.id),
+                nodes: all_created_nodes.filter(node => node !== null).map(node => node.id),
             });
         }
 
-        return created_nodes;
+        return all_created_nodes;
     }
+
+    /**
+     * Recursively add nodes using existing format processors.
+     * @private
+     * @param {import('./jsmind.node.js').Node} parent_node
+     * @param {object} node_data
+     * @returns {Array<import('./jsmind.node.js').Node|null>}
+     */
+    _add_nodes_recursive(parent_node, node_data) {
+        var all_nodes = [];
+
+        try {
+            if (!node_data.id || !node_data.topic) {
+                logger.warn('invalid node data:', node_data);
+                return [];
+            }
+
+            // Extract custom data - handle both direct properties and data object
+            var custom_data;
+            if (node_data.data && typeof node_data.data === 'object') {
+                // If there's a 'data' property, use it directly as custom data
+                custom_data = node_data.data;
+            } else {
+                // Otherwise, use existing format.node_tree._extract_data to extract custom data
+                custom_data = format.node_tree._extract_data(node_data);
+                // Return empty object if no custom data found
+                if (Object.keys(custom_data).length === 0) {
+                    custom_data = {};
+                }
+            }
+
+            // Create the node
+            var new_node = this._add_node_data(
+                parent_node,
+                node_data.id,
+                node_data.topic,
+                custom_data,
+                node_data.direction
+            );
+
+            // Always add the result (including null for failed creations)
+            all_nodes.push(new_node);
+
+            if (new_node) {
+                // Process children recursively only if parent node was created successfully
+                var children = this._extract_node_tree_subnode(node_data);
+                if (children && children.length > 0) {
+                    for (var i = 0; i < children.length; i++) {
+                        var child_nodes = this._add_nodes_recursive(new_node, children[i]);
+                        all_nodes = all_nodes.concat(child_nodes);
+                    }
+                }
+            }
+        } catch (e) {
+            logger.error('Error processing node data:', e);
+        }
+
+        return all_nodes;
+    }
+
+    /**
+     * Extract children from node data (unified handling for all formats).
+     * @private
+     * @param {object} node_data
+     * @returns {Array|null}
+     */
+    _extract_node_tree_subnode(node_data) {
+        if (!node_data) return null;
+
+        // Standard children property
+        if (node_data.children && Array.isArray(node_data.children)) {
+            return node_data.children;
+        }
+
+        // FreeMind format support
+        if (node_data.node && Array.isArray(node_data.node)) {
+            return node_data.node;
+        }
+
+        return null;
+    }
+
     /**
      * Insert a node before target node.
      * @param {string | import('./jsmind.node.js').Node} node_before
