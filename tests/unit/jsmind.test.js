@@ -589,12 +589,14 @@ describe('add_nodes', () => {
         jsmind._refresh_node_ui = jest.fn();
         jsmind.invoke_event_handle = jest.fn();
 
-        const nodes_data = [{
-            id: 'test1',
-            topic: 'Test Node 1',
-            data: { color: 'red' },
-            direction: 'right',
-        }];
+        const nodes_data = [
+            {
+                id: 'test1',
+                topic: 'Test Node 1',
+                data: { color: 'red' },
+                direction: 'right',
+            },
+        ];
 
         jsmind.add_nodes('root', nodes_data);
 
@@ -657,14 +659,16 @@ describe('add_nodes', () => {
         jsmind._refresh_node_ui = jest.fn();
         jsmind.invoke_event_handle = jest.fn();
 
-        const nodes_data = [{
-            id: 'parent1',
-            topic: 'Parent Node',
-            children: [
-                { id: 'child1', topic: 'Child Node 1' },
-                { id: 'child2', topic: 'Child Node 2' },
-            ],
-        }];
+        const nodes_data = [
+            {
+                id: 'parent1',
+                topic: 'Parent Node',
+                children: [
+                    { id: 'child1', topic: 'Child Node 1' },
+                    { id: 'child2', topic: 'Child Node 2' },
+                ],
+            },
+        ];
 
         const result = jsmind.add_nodes('root', nodes_data);
 
@@ -688,7 +692,6 @@ describe('add_nodes', () => {
         expect(jsmind.mind.remove_node).toHaveBeenCalledTimes(2);
     });
 });
-
 
 function create_mock_node(id, topic, additionalProps = {}) {
     return {

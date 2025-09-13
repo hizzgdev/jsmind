@@ -507,12 +507,12 @@ export default class jsMind {
 
         let all_created_nodes = [];
         try {
-           // Process nodes and flatten results 
+            // Process nodes and flatten results
             for (const node_data of nodes_data) {
                 const created_nodes = this._add_nodes_recursive(the_parent_node, node_data);
                 all_created_nodes = all_created_nodes.concat(created_nodes);
             }
-            
+
             // filter null values
             all_created_nodes = all_created_nodes.filter(node => node !== null);
 
