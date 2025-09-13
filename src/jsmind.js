@@ -485,7 +485,7 @@ export default class jsMind {
      * Add multiple nodes to the mind map with optimized performance.
      * Supports standard jsMind formats: node_tree, node_array, and freemind with nested children structure.
      * @param {string | import('./jsmind.node.js').Node} parent_node - Parent node for all new nodes
-     * @param {Array<{id: string, topic: string, direction?: ('left'|'center'|'right'|'-1'|'0'|'1'|number), expanded?: boolean, children?: Array}>} nodes_data - Array of node data objects in standard format
+     * @param {Array<{id: string, topic: string, data?: Record<string, any>, direction?: ('left'|'center'|'right'|'-1'|'0'|'1'|number), children?: Array}>} nodes_data - Array of node data objects with same format as add_node
      * @returns {Array<import('./jsmind.node.js').Node|null>} Array of created nodes (flattened from all levels)
      */
     add_nodes(parent_node, nodes_data) {
@@ -505,32 +505,52 @@ export default class jsMind {
             return [];
         }
 
-        var all_created_nodes = [];
-        var any_success = false;
-
-        // Process each node data using unified recursive processing
-        for (var i = 0; i < nodes_data.length; i++) {
-            var node_data = nodes_data[i];
-
-            // Use unified recursive processing for all formats
-            var created_nodes = this._add_nodes_recursive(the_parent_node, node_data);
-            all_created_nodes = all_created_nodes.concat(created_nodes);
-            if (created_nodes.length > 0) {
-                any_success = true;
+        let all_created_nodes = [];
+        try {
+           // Process nodes and flatten results 
+            for (const node_data of nodes_data) {
+                const created_nodes = this._add_nodes_recursive(the_parent_node, node_data);
+                all_created_nodes = all_created_nodes.concat(created_nodes);
             }
-        }
+            
+            // filter null values
+            all_created_nodes = all_created_nodes.filter(node => node !== null);
 
-        // Refresh UI once after all nodes are added
-        if (any_success) {
-            this._refresh_node_ui(the_parent_node);
-            this.invoke_event_handle(EventType.edit, {
-                evt: 'add_nodes',
-                data: [the_parent_node.id, nodes_data],
-                nodes: all_created_nodes.filter(node => node !== null).map(node => node.id),
-            });
-        }
+            const expected_count = this._count_expected_nodes(nodes_data);
+            const actual_count = all_created_nodes.length;
 
-        return all_created_nodes;
+            // Validate node creation success and handle cleanup if needed
+            if (actual_count > 0) {
+                if (actual_count === expected_count) {
+                    // All nodes created successfully, refresh UI
+                    this._refresh_node_ui(the_parent_node);
+                    this.invoke_event_handle(EventType.edit, {
+                        evt: 'add_nodes',
+                        data: [the_parent_node.id, nodes_data],
+                        nodes: all_created_nodes.map(node => node.id),
+                    });
+                } else {
+                    // Some nodes failed, clean up partially created nodes
+                    logger.warn(
+                        `Expected ${expected_count} nodes, but only created ${actual_count}. Cleaning up...`
+                    );
+                    this._cleanup_partial_nodes(all_created_nodes);
+                    return [];
+                }
+            }
+
+            return all_created_nodes;
+        } catch (e) {
+            logger.error('Failed to add nodes:', e);
+            // Clean up all nodes that were successfully created before the exception
+            if (all_created_nodes.length > 0) {
+                logger.warn(
+                    `Cleaning up ${all_created_nodes.length} partially created nodes due to exception`
+                );
+                this._cleanup_partial_nodes(all_created_nodes);
+            }
+            return [];
+        }
     }
 
     /**
@@ -549,47 +569,86 @@ export default class jsMind {
                 return [];
             }
 
-            // Extract custom data - handle both direct properties and data object
-            var custom_data;
-            if (node_data.data && typeof node_data.data === 'object') {
-                // If there's a 'data' property, use it directly as custom data
-                custom_data = node_data.data;
-            } else {
-                // Otherwise, use existing format.node_tree._extract_data to extract custom data
-                custom_data = format.node_tree._extract_data(node_data);
-                // Return empty object if no custom data found
-                if (Object.keys(custom_data).length === 0) {
-                    custom_data = {};
-                }
-            }
-
             // Create the node
             var new_node = this._add_node_data(
                 parent_node,
                 node_data.id,
                 node_data.topic,
-                custom_data,
+                node_data.data || {},
                 node_data.direction
             );
 
-            // Always add the result (including null for failed creations)
-            all_nodes.push(new_node);
-
             if (new_node) {
+                // Add the result only if node creation was successful
+                all_nodes.push(new_node);
+
                 // Process children recursively only if parent node was created successfully
-                var children = this._extract_node_tree_subnode(node_data);
+                const children = this._extract_node_tree_subnode(node_data);
                 if (children && children.length > 0) {
-                    for (var i = 0; i < children.length; i++) {
-                        var child_nodes = this._add_nodes_recursive(new_node, children[i]);
-                        all_nodes = all_nodes.concat(child_nodes);
-                    }
+                    // Use lambda to process children and flatten results
+                    const child_nodes = children
+                        .map(child => this._add_nodes_recursive(new_node, child))
+                        .flat();
+                    all_nodes = all_nodes.concat(child_nodes);
                 }
             }
+
+            return all_nodes;
         } catch (e) {
             logger.error('Error processing node data:', e);
+            // Clean up any nodes that were successfully created before the exception
+            if (all_nodes.length > 0) {
+                this._cleanup_partial_nodes(all_nodes);
+            }
+            // Re-throw the exception to ensure all-or-nothing behavior
+            throw e;
         }
+    }
 
-        return all_nodes;
+    /**
+     * Count expected nodes recursively.
+     * @private
+     * @param {Array} nodes_data
+     * @returns {number}
+     */
+    _count_expected_nodes(nodes_data) {
+        return nodes_data.reduce((count, node_data) => {
+            count++; // Count current node
+            const children = this._extract_node_tree_subnode(node_data);
+            if (children && children.length > 0) {
+                count += this._count_expected_nodes(children);
+            }
+            return count;
+        }, 0);
+    }
+
+    /**
+     * Clean up partially created nodes without triggering UI refresh for each node.
+     * @private
+     * @param {Array<import('./jsmind.node.js').Node>} created_nodes
+     */
+    _cleanup_partial_nodes(created_nodes) {
+        if (created_nodes.length === 0) return;
+
+        // Get the parent node for final UI refresh
+        const parent_node = created_nodes[0].parent;
+
+        // Remove all created nodes in reverse order to avoid parent-child issues
+        // Use direct view and mind operations without triggering layout/show
+        [...created_nodes].reverse().forEach(node => {
+            if (node && !node.isroot) {
+                // Remove from view without triggering layout
+                this.view.remove_node(node);
+                // Remove from mind model without triggering layout
+                this.mind.remove_node(node);
+            }
+        });
+
+        // Trigger layout and UI refresh only once at the end
+        if (parent_node) {
+            this.layout.layout();
+            this.view.show(false);
+        }
     }
 
     /**
@@ -604,11 +663,6 @@ export default class jsMind {
         // Standard children property
         if (node_data.children && Array.isArray(node_data.children)) {
             return node_data.children;
-        }
-
-        // FreeMind format support
-        if (node_data.node && Array.isArray(node_data.node)) {
-            return node_data.node;
         }
 
         return null;
