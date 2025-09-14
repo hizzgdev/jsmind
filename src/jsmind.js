@@ -506,6 +506,8 @@ export default class jsMind {
         }
 
         let all_created_nodes = [];
+        let cleanup_needed = false;
+        
         try {
             // Process nodes and flatten results
             for (const node_data of nodes_data) {
@@ -519,7 +521,7 @@ export default class jsMind {
             const expected_count = this._count_expected_nodes(nodes_data);
             const actual_count = all_created_nodes.length;
 
-            // Validate node creation success and handle cleanup if needed
+            // Validate node creation success
             if (actual_count > 0) {
                 if (actual_count === expected_count) {
                     // All nodes created successfully, refresh UI
@@ -529,28 +531,29 @@ export default class jsMind {
                         data: [the_parent_node.id, nodes_data],
                         nodes: all_created_nodes.map(node => node.id),
                     });
+                    return all_created_nodes;
                 } else {
-                    // Some nodes failed, clean up partially created nodes
+                    // Some nodes failed, mark for cleanup
                     logger.warn(
                         `Expected ${expected_count} nodes, but only created ${actual_count}. Cleaning up...`
                     );
-                    this._cleanup_partial_nodes(all_created_nodes);
-                    return [];
+                    cleanup_needed = true;
                 }
             }
-
-            return all_created_nodes;
         } catch (e) {
             logger.error('Failed to add nodes:', e);
-            // Clean up all nodes that were successfully created before the exception
-            if (all_created_nodes.length > 0) {
-                logger.warn(
-                    `Cleaning up ${all_created_nodes.length} partially created nodes due to exception`
-                );
-                this._cleanup_partial_nodes(all_created_nodes);
-            }
-            return [];
+            cleanup_needed = true;
         }
+        
+        // Unified cleanup logic - only called once
+        if (cleanup_needed && all_created_nodes.length > 0) {
+            logger.warn(
+                `Cleaning up ${all_created_nodes.length} partially created nodes`
+            );
+            this._cleanup_partial_nodes(all_created_nodes);
+        }
+        
+        return [];
     }
 
     /**
@@ -563,46 +566,36 @@ export default class jsMind {
     _add_nodes_recursive(parent_node, node_data) {
         var all_nodes = [];
 
-        try {
-            if (!node_data.id || !node_data.topic) {
-                logger.warn('invalid node data:', node_data);
-                return [];
-            }
-
-            // Create the node
-            var new_node = this._add_node_data(
-                parent_node,
-                node_data.id,
-                node_data.topic,
-                node_data.data || {},
-                node_data.direction
-            );
-
-            if (new_node) {
-                // Add the result only if node creation was successful
-                all_nodes.push(new_node);
-
-                // Process children recursively only if parent node was created successfully
-                const children = this._extract_node_tree_subnode(node_data);
-                if (children && children.length > 0) {
-                    // Use lambda to process children and flatten results
-                    const child_nodes = children
-                        .map(child => this._add_nodes_recursive(new_node, child))
-                        .flat();
-                    all_nodes = all_nodes.concat(child_nodes);
-                }
-            }
-
-            return all_nodes;
-        } catch (e) {
-            logger.error('Error processing node data:', e);
-            // Clean up any nodes that were successfully created before the exception
-            if (all_nodes.length > 0) {
-                this._cleanup_partial_nodes(all_nodes);
-            }
-            // Re-throw the exception to ensure all-or-nothing behavior
-            throw e;
+        if (!node_data.id || !node_data.topic) {
+            logger.warn('invalid node data:', node_data);
+            return [];
         }
+
+        // Create the node
+        var new_node = this._add_node_data(
+            parent_node,
+            node_data.id,
+            node_data.topic,
+            node_data.data || {},
+            node_data.direction
+        );
+
+        if (new_node) {
+            // Add the result only if node creation was successful
+            all_nodes.push(new_node);
+
+            // Process children recursively only if parent node was created successfully
+            const children = this._extract_node_tree_subnode(node_data);
+            if (children && children.length > 0) {
+                // Use lambda to process children and flatten results
+                const child_nodes = children
+                    .map(child => this._add_nodes_recursive(new_node, child))
+                    .flat();
+                all_nodes = all_nodes.concat(child_nodes);
+            }
+        }
+
+        return all_nodes;
     }
 
     /**
@@ -643,12 +636,6 @@ export default class jsMind {
                 this.mind.remove_node(node);
             }
         });
-
-        // Trigger layout and UI refresh only once at the end
-        if (parent_node) {
-            this.layout.layout();
-            this.view.show(false);
-        }
     }
 
     /**
