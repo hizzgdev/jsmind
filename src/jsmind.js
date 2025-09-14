@@ -507,7 +507,7 @@ export default class jsMind {
 
         let all_created_nodes = [];
         let cleanup_needed = false;
-        
+
         try {
             // Process nodes and flatten results
             for (const node_data of nodes_data) {
@@ -544,15 +544,13 @@ export default class jsMind {
             logger.error('Failed to add nodes:', e);
             cleanup_needed = true;
         }
-        
+
         // Unified cleanup logic - only called once
         if (cleanup_needed && all_created_nodes.length > 0) {
-            logger.warn(
-                `Cleaning up ${all_created_nodes.length} partially created nodes`
-            );
+            logger.warn(`Cleaning up ${all_created_nodes.length} partially created nodes`);
             this._cleanup_partial_nodes(all_created_nodes);
         }
-        
+
         return [];
     }
 
