@@ -722,21 +722,5 @@ function create_fake_mind(options = {}) {
     mind.add_node(root_node, 'node1', 'node1');
     jsmind.mind = mind;
 
-    // Mock view and layout methods for testing
-    jsmind.view = {
-        ...jsmind.view,
-        remove_node: jest.fn(),
-        add_node: jest.fn(),
-        reset_node_custom_style: jest.fn(),
-        e_nodes: { removeChild: jest.fn() },
-        show: jest.fn(),
-    };
-
-    jsmind.layout = {
-        ...jsmind.layout,
-        layout: jest.fn(),
-        calculate_next_child_direction: jest.fn().mockReturnValue(1),
-    };
-
     return jsmind;
 }

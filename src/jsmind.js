@@ -615,10 +615,6 @@ export default class jsMind {
      */
     _cleanup_partial_nodes(created_nodes) {
         if (created_nodes.length === 0) return;
-
-        // Get the parent node for final UI refresh
-        const parent_node = created_nodes[0].parent;
-
         // Remove all created nodes in reverse order to avoid parent-child issues
         // Use direct view and mind operations without triggering layout/show
         [...created_nodes].reverse().forEach(node => {
