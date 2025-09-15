@@ -506,7 +506,7 @@ export default class jsMind {
         }
 
         let all_created_nodes = [];
-        let cleanup_needed = false;
+        const expected_count = this._count_expected_nodes(nodes_data);
 
         try {
             // Process nodes and flatten results
@@ -518,35 +518,29 @@ export default class jsMind {
             // filter null values
             all_created_nodes = all_created_nodes.filter(node => node !== null);
 
-            const expected_count = this._count_expected_nodes(nodes_data);
             const actual_count = all_created_nodes.length;
 
             // Validate node creation success
-            if (actual_count > 0) {
-                if (actual_count === expected_count) {
-                    // All nodes created successfully, refresh UI
-                    this._refresh_node_ui(the_parent_node);
-                    this.invoke_event_handle(EventType.edit, {
-                        evt: 'add_nodes',
-                        data: [the_parent_node.id, nodes_data],
-                        nodes: all_created_nodes.map(node => node.id),
-                    });
-                    return all_created_nodes;
-                } else {
-                    // Some nodes failed, mark for cleanup
-                    logger.warn(
-                        `Expected ${expected_count} nodes, but only created ${actual_count}. Cleaning up...`
-                    );
-                    cleanup_needed = true;
-                }
+            if (actual_count === expected_count) {
+                // All nodes created successfully, refresh UI
+                this._refresh_node_ui(the_parent_node);
+                this.invoke_event_handle(EventType.edit, {
+                    evt: 'add_nodes',
+                    data: [the_parent_node.id, nodes_data],
+                    nodes: all_created_nodes.map(node => node.id),
+                });
+                return all_created_nodes;
             }
         } catch (e) {
             logger.error('Failed to add nodes:', e);
-            cleanup_needed = true;
         }
 
-        // Unified cleanup logic - only called once
-        if (cleanup_needed && all_created_nodes.length > 0) {
+        // Unified cleanup logic - only called once when mismatch or exception
+        if (all_created_nodes.length > 0 && all_created_nodes.length !== expected_count) {
+            const actual_count = all_created_nodes.length;
+            logger.warn(
+                `Expected ${expected_count} nodes, but only created ${actual_count}. Cleaning up...`
+            );
             logger.warn(`Cleaning up ${all_created_nodes.length} partially created nodes`);
             this._cleanup_partial_nodes(all_created_nodes);
         }
@@ -583,7 +577,8 @@ export default class jsMind {
             all_nodes.push(new_node);
 
             // Process children recursively only if parent node was created successfully
-            const children = this._extract_node_tree_subnode(node_data);
+            const children =
+                node_data && Array.isArray(node_data.children) ? node_data.children : null;
             if (children && children.length > 0) {
                 // Use lambda to process children and flatten results
                 const child_nodes = children
@@ -603,12 +598,12 @@ export default class jsMind {
      * @returns {number}
      */
     _count_expected_nodes(nodes_data) {
+        if (!Array.isArray(nodes_data)) {
+            return 0;
+        }
         return nodes_data.reduce((count, node_data) => {
             count++; // Count current node
-            const children = this._extract_node_tree_subnode(node_data);
-            if (children && children.length > 0) {
-                count += this._count_expected_nodes(children);
-            }
+            count += this._count_expected_nodes(node_data && node_data.children);
             return count;
         }, 0);
     }
@@ -634,23 +629,6 @@ export default class jsMind {
                 this.mind.remove_node(node);
             }
         });
-    }
-
-    /**
-     * Extract children from node data (unified handling for all formats).
-     * @private
-     * @param {object} node_data
-     * @returns {Array|null}
-     */
-    _extract_node_tree_subnode(node_data) {
-        if (!node_data) return null;
-
-        // Standard children property
-        if (node_data.children && Array.isArray(node_data.children)) {
-            return node_data.children;
-        }
-
-        return null;
     }
 
     /**
