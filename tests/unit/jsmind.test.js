@@ -703,12 +703,6 @@ function create_mock_node(id, topic, additionalProps = {}) {
         direction: 1,
         expanded: true,
         data: {},
-        _data: {
-            view: {
-                element: null,
-                expander: null,
-            },
-        },
         ...additionalProps,
     };
 }
