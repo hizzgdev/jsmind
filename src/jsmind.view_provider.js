@@ -10,7 +10,6 @@ import { $ } from './jsmind.dom.js';
 import { init_graph } from './jsmind.graph.js';
 import { util } from './jsmind.util.js';
 
-
 export class ViewProvider {
     /**
      * View layer: DOM nodes, editor, graph and zoom.

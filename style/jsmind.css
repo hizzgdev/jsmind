@@ -76,7 +76,7 @@ jmexpander {
 
 /* Rich text and multiline support - unified div approach */
 .jsmind-editor {
-    border: 2px solid #4CAF50;
+    border: 2px solid #4caf50;
     border-radius: 4px;
     padding: 4px;
     margin: 0;
@@ -140,12 +140,12 @@ jmnode.rich-text {
     max-width: 300px;
 }
 
-jmnode.rich-text b, 
+jmnode.rich-text b,
 jmnode.rich-text strong {
     font-weight: bold;
 }
 
-jmnode.rich-text i, 
+jmnode.rich-text i,
 jmnode.rich-text em {
     font-style: italic;
 }
@@ -154,7 +154,7 @@ jmnode.rich-text u {
     text-decoration: underline;
 }
 
-jmnode.rich-text ul, 
+jmnode.rich-text ul,
 jmnode.rich-text ol {
     margin: 4px 0;
     padding-left: 20px;
