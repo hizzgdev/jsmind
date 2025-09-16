@@ -34,18 +34,26 @@
                     },
                     format: 'node_array',
                     data: [
-                        { id: 'root', isroot: true, topic: 'jsMind' },
+                        { id: 'root', isroot: true, topic: 'jsMind\nMultiline Support Test' },
 
-                        { id: 'sub1', parentid: 'root', topic: 'sub1' },
+                        { id: 'sub1', parentid: 'root', topic: 'sub1\nThis is a\nmultiline node' },
                         { id: 'sub11', parentid: 'sub1', topic: 'sub11' },
-                        { id: 'sub12', parentid: 'sub1', topic: 'sub12' },
-                        { id: 'sub13', parentid: 'sub1', topic: 'sub13' },
+                        { id: 'sub12', parentid: 'sub1', topic: 'sub12\nSupport line breaks' },
+                        {
+                            id: 'sub13',
+                            parentid: 'sub1',
+                            topic: 'Long text test: This is a very long text used to test whether the automatic line wrapping function works properly, including mixed content test',
+                        },
 
-                        { id: 'sub2', parentid: 'root', topic: 'sub2' },
-                        { id: 'sub21', parentid: 'sub2', topic: 'sub21' },
+                        { id: 'sub2', parentid: 'root', topic: 'sub2\nFunction Test' },
+                        {
+                            id: 'sub21',
+                            parentid: 'sub2',
+                            topic: 'sub21\nEdit Test\nMultiline Editing',
+                        },
                         { id: 'sub22', parentid: 'sub2', topic: 'sub22' },
 
-                        { id: 'sub3', parentid: 'root', topic: 'sub3' },
+                        { id: 'sub3', parentid: 'root', topic: 'sub3\nSize Adaptive Test' },
                     ],
                 };
                 var options = {
@@ -66,6 +74,8 @@
                     view: {
                         expander_style: 'char',
                     },
+                    enable_multiline: true,
+                    textAutoWrapWidth: 500,
                 };
                 _jm = new jsMind(options);
                 _jm.show(mind);

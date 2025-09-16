@@ -10,6 +10,7 @@ import { $ } from './jsmind.dom.js';
 import { init_graph } from './jsmind.graph.js';
 import { util } from './jsmind.util.js';
 
+
 export class ViewProvider {
     /**
      * View layer: DOM nodes, editor, graph and zoom.
@@ -68,6 +69,10 @@ export class ViewProvider {
             logger.error('the options.view.container was not be found in dom');
             return;
         }
+
+        // Dynamically update CSS styles for multiline nodes
+        this._update_multiline_css();
+
         this.graph = init_graph(this, this.opts.engine);
 
         this.e_panel = $.c('div');
@@ -222,6 +227,26 @@ export class ViewProvider {
         logger.debug('view.load');
         this.setup_canvas_draggable(this.opts.draggable);
         this.init_nodes();
+
+        // For multiline mode, force re-layout after initialization
+        if (this.jm.options.enable_multiline) {
+            // Delay execution to ensure all nodes are fully rendered
+            setTimeout(() => {
+                // Recalculate sizes for all multiline nodes
+                var nodes = this.jm.mind.nodes;
+                for (var nodeid in nodes) {
+                    var node = nodes[nodeid];
+                    if (node._data.view.element.classList.contains('multiline')) {
+                        this._force_recalc_node_size(node);
+                    }
+                }
+
+                // Force re-layout and display
+                this.jm.layout.layout();
+                this.show(false);
+            }, 0);
+        }
+
         this._initialized = true;
     }
     /** Calculate and set the expanded canvas size. */
@@ -246,8 +271,48 @@ export class ViewProvider {
      */
     init_nodes_size(node) {
         var view_data = node._data.view;
-        view_data.width = view_data.element.clientWidth;
-        view_data.height = view_data.element.clientHeight;
+        var element = view_data.element;
+
+        // Special handling for multiline node size calculation
+        if (this.jm.options.enable_multiline && element.classList.contains('multiline')) {
+            // Ensure element is fully rendered before calculating size
+            this._ensure_multiline_node_size(element);
+        }
+
+        view_data.width = element.clientWidth;
+        view_data.height = element.clientHeight;
+    }
+
+    /**
+     * Ensure correct size calculation for multiline nodes
+     * @param {HTMLElement} element - Node element
+     */
+    _ensure_multiline_node_size(element) {
+        // Method 1: Temporarily remove max-width limit to let content expand naturally
+        var originalMaxWidth = element.style.maxWidth;
+        var originalWidth = element.style.width;
+
+        // Clear width restrictions to let content expand naturally
+        element.style.maxWidth = 'none';
+        element.style.width = 'auto';
+
+        // Force redraw
+        element.offsetHeight;
+
+        // Get natural width
+        var naturalWidth = element.clientWidth;
+        var maxAllowedWidth = this.jm.options.textAutoWrapWidth || 300;
+
+        // Restore styles
+        element.style.maxWidth = originalMaxWidth;
+        element.style.width = originalWidth;
+
+        // If natural width exceeds limit, ensure max-width is applied
+        if (naturalWidth > maxAllowedWidth) {
+            element.style.maxWidth = maxAllowedWidth + 'px';
+            // Force redraw again
+            element.offsetHeight;
+        }
     }
     /** Initialize DOM elements for all nodes. */
     init_nodes() {
@@ -259,6 +324,12 @@ export class ViewProvider {
         this.e_nodes.appendChild(doc_frag);
 
         this.run_in_c11y_mode_if_needed(() => {
+            // Ensure dynamic CSS has been applied
+            if (this.jm.options.enable_multiline) {
+                // Force redraw to ensure CSS styles are fully applied
+                this.e_nodes.offsetHeight;
+            }
+
             for (var nodeid in nodes) {
                 this.init_nodes_size(nodes[nodeid]);
             }
@@ -371,12 +442,50 @@ export class ViewProvider {
         if (!!node.topic) {
             this.render_node(element, node);
         }
-        if (this.layout.is_visible(node)) {
+
+        // Force recalculation of node size to ensure correct multiline node dimensions
+        this._force_recalc_node_size(node);
+    }
+
+    /**
+     * Force recalculation of node size
+     * @param {import('./jsmind.node.js').Node} node - Node to recalculate
+     */
+    _force_recalc_node_size(node) {
+        var view_data = node._data.view;
+        var element = view_data.element;
+
+        // Check if layout system is initialized to avoid errors when calling is_visible
+        var isVisible = this.layout && this.layout.is_visible ? this.layout.is_visible(node) : true;
+
+        if (isVisible) {
+            // For multiline nodes, ensure content is fully rendered before getting dimensions
+            if (this.jm.options.enable_multiline && element.classList.contains('multiline')) {
+                // Temporarily remove max-width limit to let content expand naturally
+                var originalMaxWidth = element.style.maxWidth;
+                element.style.maxWidth = 'none';
+
+                // Force redraw
+                element.offsetHeight;
+
+                // Restore max-width limit
+                element.style.maxWidth = originalMaxWidth;
+            }
+
             view_data.width = element.clientWidth;
             view_data.height = element.clientHeight;
         } else {
             let origin_style = element.getAttribute('style');
             element.style = 'visibility: visible; left:0; top:0;';
+
+            if (this.jm.options.enable_multiline && element.classList.contains('multiline')) {
+                // Apply same handling for invisible nodes
+                var originalMaxWidth = element.style.maxWidth;
+                element.style.maxWidth = 'none';
+                element.offsetHeight;
+                element.style.maxWidth = originalMaxWidth;
+            }
+
             view_data.width = element.clientWidth;
             view_data.height = element.clientHeight;
             element.style = origin_style;
@@ -453,14 +562,37 @@ export class ViewProvider {
         }
 
         // Set editor dimensions and styles
-        this.e_editor.style.width = element.clientWidth - padding_left - padding_right + 'px';
-        if (this.jm.options.enable_multiline) {
-            this.e_editor.style.minHeight =
-                element.clientHeight - padding_top - padding_bottom + 'px';
-        }
+        // First set basic styles, then get actual editor padding
         this.e_editor.style.fontSize = ncs.fontSize;
         this.e_editor.style.fontFamily = ncs.fontFamily;
         this.e_editor.style.lineHeight = ncs.lineHeight;
+
+        // Temporarily add to DOM to get computed styles
+        element.appendChild(this.e_editor);
+        var editorStyles = getComputedStyle(this.e_editor);
+        var editor_padding_left = parseInt(editorStyles.paddingLeft) || 0;
+        var editor_padding_right = parseInt(editorStyles.paddingRight) || 0;
+        var editor_padding_top = parseInt(editorStyles.paddingTop) || 0;
+        var editor_padding_bottom = parseInt(editorStyles.paddingBottom) || 0;
+        element.removeChild(this.e_editor);
+
+        // Calculate correct editor dimensions
+        var nodeContentWidth = element.clientWidth - padding_left - padding_right;
+        var editorWidth = Math.max(
+            nodeContentWidth - editor_padding_left - editor_padding_right,
+            100
+        );
+        this.e_editor.style.width = editorWidth + 'px';
+
+        if (this.jm.options.enable_multiline) {
+            var nodeContentHeight = element.clientHeight - padding_top - padding_bottom;
+            var editorHeight = Math.max(
+                nodeContentHeight - editor_padding_top - editor_padding_bottom,
+                20
+            );
+            this.e_editor.style.minHeight = editorHeight + 'px';
+            this.e_editor.style.maxHeight = '300px';
+        }
 
         element.innerHTML = '';
         element.appendChild(this.e_editor);
@@ -475,6 +607,9 @@ export class ViewProvider {
             var selection = window.getSelection();
             selection.removeAllRanges();
             selection.addRange(range);
+
+            // Add input listener for dynamic resize
+            this._setup_editor_resize_listener();
         } else {
             // Single line mode: select all content in input
             this.e_editor.select();
@@ -512,6 +647,12 @@ export class ViewProvider {
             element.style.zIndex = 'auto';
             element.removeChild(this.e_editor);
 
+            // Clean up event listeners
+            if (this._editor_input_handler) {
+                this.e_editor.removeEventListener('input', this._editor_input_handler);
+                this._editor_input_handler = null;
+            }
+
             if (util.text.is_empty(topic) || node.topic === topic) {
                 this.render_node(element, node);
             } else {
@@ -520,6 +661,56 @@ export class ViewProvider {
         }
         this.e_panel.focus();
     }
+
+    /**
+     * Setup editor resize listener for multiline editing
+     * Reference TextEdit.js updateTextEditNode logic
+     */
+    _setup_editor_resize_listener() {
+        if (this._editor_input_handler) {
+            this.e_editor.removeEventListener('input', this._editor_input_handler);
+        }
+
+        this._editor_input_handler = () => {
+            if (!this.jm.options.enable_multiline || !this.editing_node) return;
+
+            // Dynamically adjust editor height based on content
+            var scrollHeight = this.e_editor.scrollHeight;
+            var currentHeight = parseInt(this.e_editor.style.minHeight);
+            var maxHeight = parseInt(this.e_editor.style.maxHeight) || 300;
+
+            if (scrollHeight > currentHeight && scrollHeight <= maxHeight) {
+                this.e_editor.style.minHeight = scrollHeight + 'px';
+            }
+        };
+
+        this.e_editor.addEventListener('input', this._editor_input_handler);
+    }
+
+    /**
+     * Dynamically update CSS styles for multiline nodes to sync max-width with textAutoWrapWidth
+     */
+    _update_multiline_css() {
+        if (!this.jm.options.enable_multiline) return;
+
+        var textAutoWrapWidth = this.jm.options.textAutoWrapWidth || 300;
+        var styleId = 'jsmind-multiline-dynamic-style';
+        var existingStyle = document.getElementById(styleId);
+
+        if (existingStyle) {
+            existingStyle.remove();
+        }
+
+        var style = document.createElement('style');
+        style.id = styleId;
+        style.textContent = `
+            jmnode.multiline {
+                max-width: ${textAutoWrapWidth}px !important;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
     /** @returns {{x:number,y:number}} */
     get_view_offset() {
         var bounds = this.layout.bounds;
@@ -546,6 +737,7 @@ export class ViewProvider {
         this.e_nodes.style.height = this.size.h + 'px';
         this.show_nodes();
         this.show_lines();
+
         //this.layout.cache_valid = true;
         this.jm.invoke_event_handle(EventType.resize, { data: [] });
     }

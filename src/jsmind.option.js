@@ -16,6 +16,7 @@ import { util } from './jsmind.util.js';
  *  mode?: ('full'|'side'),
  *  support_html?: boolean,
  *  enable_multiline?: boolean,
+ *  textAutoWrapWidth?: number,
  *  log_level?: 'debug'|'info'|'warn'|'error'|'disable',
  *  view?: {
  *    engine?: 'canvas'|'svg',
@@ -47,6 +48,7 @@ const default_options = {
     mode: 'full', // full or side
     support_html: true,
     enable_multiline: false, // true: use contenteditable div for multiline editing, false: use input for single line
+    textAutoWrapWidth: 300, // Maximum width for text auto-wrapping in multiline mode
     log_level: 'info',
 
     view: {

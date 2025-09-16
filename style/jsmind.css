@@ -129,7 +129,7 @@ jmnode.multiline {
     white-space: pre-wrap;
     word-wrap: break-word;
     overflow-wrap: break-word;
-    max-width: 300px;
+    max-width: 300px; /* This value should be consistent with textAutoWrapWidth config */
 }
 
 /* Rich text node styles */
