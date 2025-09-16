@@ -29,7 +29,6 @@ export class ViewProvider {
      *   zoom: {min:number, max:number, step:number, mask_key:number},
      *   custom_node_render?: Function,
      *   expander_style: 'char'|'number',
-     *   enable_rich_text?: boolean,
      *   enable_multiline?: boolean
      * }} options - View configuration options
      */
@@ -73,7 +72,7 @@ export class ViewProvider {
 
         this.e_panel = $.c('div');
         this.e_nodes = $.c('jmnodes');
-        
+
         // Create editor based on multiline setting
         if (this.jm.options.enable_multiline) {
             // Multiline mode: use contenteditable div
@@ -86,7 +85,7 @@ export class ViewProvider {
             this.e_editor.type = 'text';
             this.e_editor.className = 'jsmind-editor jsmind-input-editor';
         }
-        
+
         this.e_panel.className = 'jsmind-inner jmnode-overflow-' + this.opts.node_overflow;
         this.e_panel.tabIndex = 1;
         this.e_panel.appendChild(this.graph.element());
@@ -124,7 +123,7 @@ export class ViewProvider {
                 }
             });
         }
-        
+
         $.on(this.e_editor, 'blur', function (e) {
             v.edit_node_end();
         });
@@ -320,12 +319,12 @@ export class ViewProvider {
             parent_node.appendChild(d_e);
             view_data.expander = d_e;
         }
-        
+
         // Add CSS classes based on multiline setting
         if (this.jm.options.enable_multiline) {
             d.className += ' multiline';
         }
-        
+
         if (!!node.topic) {
             this.render_node(d, node);
         }
@@ -434,13 +433,13 @@ export class ViewProvider {
         var element = view_data.element;
         var topic = node.topic;
         var ncs = getComputedStyle(element);
-        
+
         // Calculate editor dimensions
         var padding_left = parseInt(ncs.getPropertyValue('padding-left'));
         var padding_right = parseInt(ncs.getPropertyValue('padding-right'));
         var padding_top = parseInt(ncs.getPropertyValue('padding-top'));
         var padding_bottom = parseInt(ncs.getPropertyValue('padding-bottom'));
-        
+
         // Configure editor based on multiline setting
         if (this.jm.options.enable_multiline) {
             // Multiline editing: convert line breaks from text to <br> for contenteditable
@@ -452,21 +451,22 @@ export class ViewProvider {
             this.e_editor.value = topic;
             this.e_editor.className = 'jsmind-editor jsmind-input-editor';
         }
-        
+
         // Set editor dimensions and styles
-        this.e_editor.style.width = (element.clientWidth - padding_left - padding_right) + 'px';
+        this.e_editor.style.width = element.clientWidth - padding_left - padding_right + 'px';
         if (this.jm.options.enable_multiline) {
-            this.e_editor.style.minHeight = (element.clientHeight - padding_top - padding_bottom) + 'px';
+            this.e_editor.style.minHeight =
+                element.clientHeight - padding_top - padding_bottom + 'px';
         }
         this.e_editor.style.fontSize = ncs.fontSize;
         this.e_editor.style.fontFamily = ncs.fontFamily;
         this.e_editor.style.lineHeight = ncs.lineHeight;
-        
+
         element.innerHTML = '';
         element.appendChild(this.e_editor);
         element.style.zIndex = 5;
         this.e_editor.focus();
-        
+
         // Select content based on editor type
         if (this.jm.options.enable_multiline) {
             // Multiline mode: select all content in contenteditable div
@@ -488,29 +488,30 @@ export class ViewProvider {
             var view_data = node._data.view;
             var element = view_data.element;
             var topic;
-            
+
             // Get content based on editor type
             if (this.jm.options.enable_multiline) {
                 // Multiline mode: convert <br> tags back to line breaks and decode HTML entities
                 var htmlContent = this.e_editor.innerHTML;
                 // Convert <br> tags to line breaks
-                topic = htmlContent.replace(/<br\s*\/?>/gi, '\n')
-                                 .replace(/<div>/gi, '\n')  // Handle div elements that browsers might add
-                                 .replace(/<\/div>/gi, '')  // Remove closing div tags
-                                 .replace(/<[^>]*>/g, '') // Remove other HTML tags
-                                 .replace(/&nbsp;/g, ' ') // Convert non-breaking spaces
-                                 .replace(/&lt;/g, '<')   // Decode HTML entities
-                                 .replace(/&gt;/g, '>')   // Decode HTML entities
-                                 .replace(/&amp;/g, '&')  // Decode HTML entities (must be last)
-                                 .trim();
+                topic = htmlContent
+                    .replace(/<br\s*\/?>/gi, '\n')
+                    .replace(/<div>/gi, '\n') // Handle div elements that browsers might add
+                    .replace(/<\/div>/gi, '') // Remove closing div tags
+                    .replace(/<[^>]*>/g, '') // Remove other HTML tags
+                    .replace(/&nbsp;/g, ' ') // Convert non-breaking spaces
+                    .replace(/&lt;/g, '<') // Decode HTML entities
+                    .replace(/&gt;/g, '>') // Decode HTML entities
+                    .replace(/&amp;/g, '&') // Decode HTML entities (must be last)
+                    .trim();
             } else {
                 // Single line mode: get value from input
                 topic = this.e_editor.value;
             }
-            
+
             element.style.zIndex = 'auto';
             element.removeChild(this.e_editor);
-            
+
             if (util.text.is_empty(topic) || node.topic === topic) {
                 this.render_node(element, node);
             } else {
@@ -706,7 +707,9 @@ export class ViewProvider {
     _default_node_render(ele, node) {
         if (this.jm.options.enable_multiline) {
             // Multiline mode: convert line breaks to <br> tags
-            var content = this.jm.options.support_html ? node.topic : util.text.html_escape(node.topic);
+            var content = this.jm.options.support_html
+                ? node.topic
+                : util.text.html_escape(node.topic);
             content = content.replace(/\n/g, '<br>');
             $.h(ele, content);
         } else if (this.jm.options.support_html) {
