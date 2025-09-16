@@ -429,12 +429,22 @@ export default class jsMind {
         if (dir === undefined) {
             dir = this.layout.calculate_next_child_direction(parent_node);
         }
+
         var node = this.mind.add_node(parent_node, node_id, topic, data, dir);
-        if (!!node) {
+        if (!node) {
+            return null; // Mind-level failure
+        }
+
+        try {
             this.view.add_node(node);
             this.view.reset_node_custom_style(node);
+            return node; // Success
+        } catch (e) {
+            // View operations failed, rollback mind changes
+            logger.error('View operation failed, rolling back node:', e);
+            this.mind.remove_node(node);
+            return null;
         }
-        return node;
     }
 
     /**
@@ -515,37 +525,34 @@ export default class jsMind {
                 all_created_nodes = all_created_nodes.concat(created_nodes);
             }
 
-            // filter null values
+            // Filter null values
             all_created_nodes = all_created_nodes.filter(node => node !== null);
-
-            const actual_count = all_created_nodes.length;
-
-            // Validate node creation success
-            if (actual_count === expected_count) {
-                // All nodes created successfully, refresh UI
-                this._refresh_node_ui(the_parent_node);
-                this.invoke_event_handle(EventType.edit, {
-                    evt: 'add_nodes',
-                    data: [the_parent_node.id, nodes_data],
-                    nodes: all_created_nodes.map(node => node.id),
-                });
-                return all_created_nodes;
-            }
         } catch (e) {
             logger.error('Failed to add nodes:', e);
         }
 
-        // Unified cleanup logic - only called once when mismatch or exception
-        if (all_created_nodes.length > 0 && all_created_nodes.length !== expected_count) {
-            const actual_count = all_created_nodes.length;
-            logger.warn(
-                `Expected ${expected_count} nodes, but only created ${actual_count}. Cleaning up...`
-            );
-            logger.warn(`Cleaning up ${all_created_nodes.length} partially created nodes`);
-            this._cleanup_partial_nodes(all_created_nodes);
-        }
+        const actual_count = all_created_nodes.length;
 
-        return [];
+        // Atomic operation: either all nodes succeed or cleanup all partial nodes
+        if (actual_count === expected_count) {
+            // All nodes created successfully, refresh UI
+            this._refresh_node_ui(the_parent_node);
+            this.invoke_event_handle(EventType.edit, {
+                evt: 'add_nodes',
+                data: [the_parent_node.id, nodes_data],
+                nodes: all_created_nodes.map(node => node.id),
+            });
+            return all_created_nodes;
+        } else {
+            // Cleanup partially created nodes to ensure atomicity
+            if (all_created_nodes.length > 0) {
+                logger.warn(
+                    `Expected ${expected_count} nodes, but only created ${actual_count}. Cleaning up...`
+                );
+                this._cleanup_partial_nodes(all_created_nodes);
+            }
+            return [];
+        }
     }
 
     /**
