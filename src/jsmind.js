@@ -431,20 +431,11 @@ export default class jsMind {
         }
 
         var node = this.mind.add_node(parent_node, node_id, topic, data, dir);
-        if (!node) {
-            return null; // Mind-level failure
-        }
-
-        try {
+        if (!!node) {
             this.view.add_node(node);
             this.view.reset_node_custom_style(node);
-            return node; // Success
-        } catch (e) {
-            // View operations failed, rollback mind changes
-            logger.error('View operation failed, rolling back node:', e);
-            this.mind.remove_node(node);
-            return null;
         }
+        return node;
     }
 
     /**
@@ -515,23 +506,13 @@ export default class jsMind {
             return [];
         }
 
-        let all_created_nodes = [];
         const expected_count = this._count_expected_nodes(nodes_data);
+        let created_nodes = nodes_data
+            .map(node_data => this._add_nodes_recursive(the_parent_node, node_data))
+            .flat()
+            .filter(n => n !== null);
 
-        try {
-            // Process nodes and flatten results
-            for (const node_data of nodes_data) {
-                const created_nodes = this._add_nodes_recursive(the_parent_node, node_data);
-                all_created_nodes = all_created_nodes.concat(created_nodes);
-            }
-
-            // Filter null values
-            all_created_nodes = all_created_nodes.filter(node => node !== null);
-        } catch (e) {
-            logger.error('Failed to add nodes:', e);
-        }
-
-        const actual_count = all_created_nodes.length;
+        const actual_count = created_nodes.length;
 
         // Atomic operation: either all nodes succeed or cleanup all partial nodes
         if (actual_count === expected_count) {
@@ -540,17 +521,15 @@ export default class jsMind {
             this.invoke_event_handle(EventType.edit, {
                 evt: 'add_nodes',
                 data: [the_parent_node.id, nodes_data],
-                nodes: all_created_nodes.map(node => node.id),
+                nodes: created_nodes.map(node => node.id),
             });
-            return all_created_nodes;
+            return created_nodes;
         } else {
             // Cleanup partially created nodes to ensure atomicity
-            if (all_created_nodes.length > 0) {
-                logger.warn(
-                    `Expected ${expected_count} nodes, but only created ${actual_count}. Cleaning up...`
-                );
-                this._cleanup_partial_nodes(all_created_nodes);
-            }
+            logger.warn(
+                `Expected ${expected_count} nodes, but only created ${actual_count}. Cleaning up...`
+            );
+            this._cleanup_partial_nodes(created_nodes);
             return [];
         }
     }
@@ -563,7 +542,7 @@ export default class jsMind {
      * @returns {Array<import('./jsmind.node.js').Node|null>}
      */
     _add_nodes_recursive(parent_node, node_data) {
-        var all_nodes = [];
+        var created_nodes = [];
 
         if (!node_data.id || !node_data.topic) {
             logger.warn('invalid node data:', node_data);
@@ -580,22 +559,16 @@ export default class jsMind {
         );
 
         if (new_node) {
-            // Add the result only if node creation was successful
-            all_nodes.push(new_node);
-
-            // Process children recursively only if parent node was created successfully
-            const children =
-                node_data && Array.isArray(node_data.children) ? node_data.children : null;
-            if (children && children.length > 0) {
-                // Use lambda to process children and flatten results
-                const child_nodes = children
+            created_nodes.push(new_node);
+            if (Array.isArray(node_data.children)) {
+                const sub_nodes = node_data.children
                     .map(child => this._add_nodes_recursive(new_node, child))
                     .flat();
-                all_nodes = all_nodes.concat(child_nodes);
+                created_nodes = created_nodes.concat(sub_nodes);
             }
         }
 
-        return all_nodes;
+        return created_nodes;
     }
 
     /**
