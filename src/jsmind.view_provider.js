@@ -28,8 +28,7 @@ export class ViewProvider {
      *   node_overflow: 'hidden'|'wrap',
      *   zoom: {min:number, max:number, step:number, mask_key:number},
      *   custom_node_render?: Function,
-     *   expander_style: 'char'|'number',
-     *   enable_multiline?: boolean
+     *   expander_style: 'char'|'number'
      * }} options - View configuration options
      */
     constructor(jm, options) {
@@ -68,66 +67,27 @@ export class ViewProvider {
             logger.error('the options.view.container was not be found in dom');
             return;
         }
-
-        // Dynamically update CSS styles for multiline nodes
-        this._update_multiline_css();
-
         this.graph = init_graph(this, this.opts.engine);
 
         this.e_panel = $.c('div');
         this.e_nodes = $.c('jmnodes');
-
-        // Create editor based on multiline setting
-        if (this.jm.options.enable_multiline) {
-            // Multiline mode: use contenteditable div
-            this.e_editor = $.c('div');
-            this.e_editor.contentEditable = true;
-            this.e_editor.className = 'jsmind-editor jsmind-multiline-editor';
-        } else {
-            // Single line mode: use input
-            this.e_editor = $.c('input');
-            this.e_editor.type = 'text';
-            this.e_editor.className = 'jsmind-editor jsmind-input-editor';
-        }
-
+        this.e_editor = $.c('input');
         this.e_panel.className = 'jsmind-inner jmnode-overflow-' + this.opts.node_overflow;
         this.e_panel.tabIndex = 1;
         this.e_panel.appendChild(this.graph.element());
         this.e_panel.appendChild(this.e_nodes);
 
-        var v = this;
-        // Handle editor events based on editor type
-        if (this.jm.options.enable_multiline) {
-            // Multiline mode: contenteditable div
-            $.on(this.e_editor, 'keydown', function (e) {
-                var evt = e || event;
-                if (evt.keyCode == 13 && (evt.ctrlKey || evt.metaKey)) {
-                    // Ctrl+Enter to finish editing
-                    v.edit_node_end();
-                    evt.stopPropagation();
-                    evt.preventDefault();
-                } else if (evt.keyCode == 27) {
-                    // Escape to cancel editing
-                    v.edit_node_end();
-                    evt.stopPropagation();
-                }
-            });
-        } else {
-            // Single line mode: input
-            $.on(this.e_editor, 'keydown', function (e) {
-                var evt = e || event;
-                if (evt.keyCode == 13) {
-                    // Enter to finish editing
-                    v.edit_node_end();
-                    evt.stopPropagation();
-                } else if (evt.keyCode == 27) {
-                    // Escape to cancel editing
-                    v.edit_node_end();
-                    evt.stopPropagation();
-                }
-            });
-        }
+        this.e_editor.className = 'jsmind-editor';
+        this.e_editor.type = 'text';
 
+        var v = this;
+        $.on(this.e_editor, 'keydown', function (e) {
+            var evt = e || event;
+            if (evt.keyCode == 13) {
+                v.edit_node_end();
+                evt.stopPropagation();
+            }
+        });
         $.on(this.e_editor, 'blur', function (e) {
             v.edit_node_end();
         });
@@ -226,26 +186,6 @@ export class ViewProvider {
         logger.debug('view.load');
         this.setup_canvas_draggable(this.opts.draggable);
         this.init_nodes();
-
-        // For multiline mode, force re-layout after initialization
-        if (this.jm.options.enable_multiline) {
-            // Delay execution to ensure all nodes are fully rendered
-            setTimeout(() => {
-                // Recalculate sizes for all multiline nodes
-                var nodes = this.jm.mind.nodes;
-                for (var nodeid in nodes) {
-                    var node = nodes[nodeid];
-                    if (node._data.view.element.classList.contains('multiline')) {
-                        this._force_recalc_node_size(node);
-                    }
-                }
-
-                // Force re-layout and display
-                this.jm.layout.layout();
-                this.show(false);
-            }, 0);
-        }
-
         this._initialized = true;
     }
     /** Calculate and set the expanded canvas size. */
@@ -270,48 +210,8 @@ export class ViewProvider {
      */
     init_nodes_size(node) {
         var view_data = node._data.view;
-        var element = view_data.element;
-
-        // Special handling for multiline node size calculation
-        if (this.jm.options.enable_multiline && element.classList.contains('multiline')) {
-            // Ensure element is fully rendered before calculating size
-            this._ensure_multiline_node_size(element);
-        }
-
-        view_data.width = element.clientWidth;
-        view_data.height = element.clientHeight;
-    }
-
-    /**
-     * Ensure correct size calculation for multiline nodes
-     * @param {HTMLElement} element - Node element
-     */
-    _ensure_multiline_node_size(element) {
-        // Method 1: Temporarily remove max-width limit to let content expand naturally
-        var originalMaxWidth = element.style.maxWidth;
-        var originalWidth = element.style.width;
-
-        // Clear width restrictions to let content expand naturally
-        element.style.maxWidth = 'none';
-        element.style.width = 'auto';
-
-        // Force redraw
-        element.offsetHeight;
-
-        // Get natural width
-        var naturalWidth = element.clientWidth;
-        var maxAllowedWidth = this.jm.options.textAutoWrapWidth || 300;
-
-        // Restore styles
-        element.style.maxWidth = originalMaxWidth;
-        element.style.width = originalWidth;
-
-        // If natural width exceeds limit, ensure max-width is applied
-        if (naturalWidth > maxAllowedWidth) {
-            element.style.maxWidth = maxAllowedWidth + 'px';
-            // Force redraw again
-            element.offsetHeight;
-        }
+        view_data.width = view_data.element.clientWidth;
+        view_data.height = view_data.element.clientHeight;
     }
     /** Initialize DOM elements for all nodes. */
     init_nodes() {
@@ -323,12 +223,6 @@ export class ViewProvider {
         this.e_nodes.appendChild(doc_frag);
 
         this.run_in_c11y_mode_if_needed(() => {
-            // Ensure dynamic CSS has been applied
-            if (this.jm.options.enable_multiline) {
-                // Force redraw to ensure CSS styles are fully applied
-                this.e_nodes.offsetHeight;
-            }
-
             for (var nodeid in nodes) {
                 this.init_nodes_size(nodes[nodeid]);
             }
@@ -389,12 +283,6 @@ export class ViewProvider {
             parent_node.appendChild(d_e);
             view_data.expander = d_e;
         }
-
-        // Add CSS classes based on multiline setting
-        if (this.jm.options.enable_multiline) {
-            d.className += ' multiline';
-        }
-
         if (!!node.topic) {
             this.render_node(d, node);
         }
@@ -441,50 +329,12 @@ export class ViewProvider {
         if (!!node.topic) {
             this.render_node(element, node);
         }
-
-        // Force recalculation of node size to ensure correct multiline node dimensions
-        this._force_recalc_node_size(node);
-    }
-
-    /**
-     * Force recalculation of node size
-     * @param {import('./jsmind.node.js').Node} node - Node to recalculate
-     */
-    _force_recalc_node_size(node) {
-        var view_data = node._data.view;
-        var element = view_data.element;
-
-        // Check if layout system is initialized to avoid errors when calling is_visible
-        var isVisible = this.layout && this.layout.is_visible ? this.layout.is_visible(node) : true;
-
-        if (isVisible) {
-            // For multiline nodes, ensure content is fully rendered before getting dimensions
-            if (this.jm.options.enable_multiline && element.classList.contains('multiline')) {
-                // Temporarily remove max-width limit to let content expand naturally
-                var originalMaxWidth = element.style.maxWidth;
-                element.style.maxWidth = 'none';
-
-                // Force redraw
-                element.offsetHeight;
-
-                // Restore max-width limit
-                element.style.maxWidth = originalMaxWidth;
-            }
-
+        if (this.layout.is_visible(node)) {
             view_data.width = element.clientWidth;
             view_data.height = element.clientHeight;
         } else {
             let origin_style = element.getAttribute('style');
             element.style = 'visibility: visible; left:0; top:0;';
-
-            if (this.jm.options.enable_multiline && element.classList.contains('multiline')) {
-                // Apply same handling for invisible nodes
-                var originalMaxWidth = element.style.maxWidth;
-                element.style.maxWidth = 'none';
-                element.offsetHeight;
-                element.style.maxWidth = originalMaxWidth;
-            }
-
             view_data.width = element.clientWidth;
             view_data.height = element.clientHeight;
             element.style = origin_style;
@@ -541,78 +391,17 @@ export class ViewProvider {
         var element = view_data.element;
         var topic = node.topic;
         var ncs = getComputedStyle(element);
-
-        // Calculate editor dimensions
-        var padding_left = parseInt(ncs.getPropertyValue('padding-left'));
-        var padding_right = parseInt(ncs.getPropertyValue('padding-right'));
-        var padding_top = parseInt(ncs.getPropertyValue('padding-top'));
-        var padding_bottom = parseInt(ncs.getPropertyValue('padding-bottom'));
-
-        // Configure editor based on multiline setting
-        if (this.jm.options.enable_multiline) {
-            // Multiline editing: convert line breaks from text to <br> for contenteditable
-            var content = util.text.html_escape(topic).replace(/\n/g, '<br>');
-            this.e_editor.innerHTML = content;
-            this.e_editor.className = 'jsmind-editor jsmind-multiline-editor';
-        } else {
-            // Single line editing: use input
-            this.e_editor.value = topic;
-            this.e_editor.className = 'jsmind-editor jsmind-input-editor';
-        }
-
-        // Set editor dimensions and styles
-        // First set basic styles, then get actual editor padding
-        this.e_editor.style.fontSize = ncs.fontSize;
-        this.e_editor.style.fontFamily = ncs.fontFamily;
-        this.e_editor.style.lineHeight = ncs.lineHeight;
-
-        // Temporarily add to DOM to get computed styles
-        element.appendChild(this.e_editor);
-        var editorStyles = getComputedStyle(this.e_editor);
-        var editor_padding_left = parseInt(editorStyles.paddingLeft) || 0;
-        var editor_padding_right = parseInt(editorStyles.paddingRight) || 0;
-        var editor_padding_top = parseInt(editorStyles.paddingTop) || 0;
-        var editor_padding_bottom = parseInt(editorStyles.paddingBottom) || 0;
-        element.removeChild(this.e_editor);
-
-        // Calculate correct editor dimensions
-        var nodeContentWidth = element.clientWidth - padding_left - padding_right;
-        var editorWidth = Math.max(
-            nodeContentWidth - editor_padding_left - editor_padding_right,
-            100
-        );
-        this.e_editor.style.width = editorWidth + 'px';
-
-        if (this.jm.options.enable_multiline) {
-            var nodeContentHeight = element.clientHeight - padding_top - padding_bottom;
-            var editorHeight = Math.max(
-                nodeContentHeight - editor_padding_top - editor_padding_bottom,
-                20
-            );
-            this.e_editor.style.minHeight = editorHeight + 'px';
-            this.e_editor.style.maxHeight = '300px';
-        }
-
+        this.e_editor.value = topic;
+        this.e_editor.style.width =
+            element.clientWidth -
+            parseInt(ncs.getPropertyValue('padding-left')) -
+            parseInt(ncs.getPropertyValue('padding-right')) +
+            'px';
         element.innerHTML = '';
         element.appendChild(this.e_editor);
         element.style.zIndex = 5;
         this.e_editor.focus();
-
-        // Select content based on editor type
-        if (this.jm.options.enable_multiline) {
-            // Multiline mode: select all content in contenteditable div
-            var range = document.createRange();
-            range.selectNodeContents(this.e_editor);
-            var selection = window.getSelection();
-            selection.removeAllRanges();
-            selection.addRange(range);
-
-            // Add input listener for dynamic resize
-            this._setup_editor_resize_listener();
-        } else {
-            // Single line mode: select all content in input
-            this.e_editor.select();
-        }
+        this.e_editor.select();
     }
     /** End editing current node. */
     edit_node_end() {
@@ -621,37 +410,9 @@ export class ViewProvider {
             this.editing_node = null;
             var view_data = node._data.view;
             var element = view_data.element;
-            var topic;
-
-            // Get content based on editor type
-            if (this.jm.options.enable_multiline) {
-                // Multiline mode: convert <br> tags back to line breaks and decode HTML entities
-                var htmlContent = this.e_editor.innerHTML;
-                // Convert <br> tags to line breaks
-                topic = htmlContent
-                    .replace(/<br\s*\/?>/gi, '\n')
-                    .replace(/<div>/gi, '\n') // Handle div elements that browsers might add
-                    .replace(/<\/div>/gi, '') // Remove closing div tags
-                    .replace(/<[^>]*>/g, '') // Remove other HTML tags
-                    .replace(/&nbsp;/g, ' ') // Convert non-breaking spaces
-                    .replace(/&lt;/g, '<') // Decode HTML entities
-                    .replace(/&gt;/g, '>') // Decode HTML entities
-                    .replace(/&amp;/g, '&') // Decode HTML entities (must be last)
-                    .trim();
-            } else {
-                // Single line mode: get value from input
-                topic = this.e_editor.value;
-            }
-
+            var topic = this.e_editor.value;
             element.style.zIndex = 'auto';
             element.removeChild(this.e_editor);
-
-            // Clean up event listeners
-            if (this._editor_input_handler) {
-                this.e_editor.removeEventListener('input', this._editor_input_handler);
-                this._editor_input_handler = null;
-            }
-
             if (util.text.is_empty(topic) || node.topic === topic) {
                 this.render_node(element, node);
             } else {
@@ -660,56 +421,6 @@ export class ViewProvider {
         }
         this.e_panel.focus();
     }
-
-    /**
-     * Setup editor resize listener for multiline editing
-     * Reference TextEdit.js updateTextEditNode logic
-     */
-    _setup_editor_resize_listener() {
-        if (this._editor_input_handler) {
-            this.e_editor.removeEventListener('input', this._editor_input_handler);
-        }
-
-        this._editor_input_handler = () => {
-            if (!this.jm.options.enable_multiline || !this.editing_node) return;
-
-            // Dynamically adjust editor height based on content
-            var scrollHeight = this.e_editor.scrollHeight;
-            var currentHeight = parseInt(this.e_editor.style.minHeight);
-            var maxHeight = parseInt(this.e_editor.style.maxHeight) || 300;
-
-            if (scrollHeight > currentHeight && scrollHeight <= maxHeight) {
-                this.e_editor.style.minHeight = scrollHeight + 'px';
-            }
-        };
-
-        this.e_editor.addEventListener('input', this._editor_input_handler);
-    }
-
-    /**
-     * Dynamically update CSS styles for multiline nodes to sync max-width with textAutoWrapWidth
-     */
-    _update_multiline_css() {
-        if (!this.jm.options.enable_multiline) return;
-
-        var textAutoWrapWidth = this.jm.options.textAutoWrapWidth || 300;
-        var styleId = 'jsmind-multiline-dynamic-style';
-        var existingStyle = document.getElementById(styleId);
-
-        if (existingStyle) {
-            existingStyle.remove();
-        }
-
-        var style = document.createElement('style');
-        style.id = styleId;
-        style.textContent = `
-            jmnode.multiline {
-                max-width: ${textAutoWrapWidth}px !important;
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
     /** @returns {{x:number,y:number}} */
     get_view_offset() {
         var bounds = this.layout.bounds;
@@ -736,7 +447,6 @@ export class ViewProvider {
         this.e_nodes.style.height = this.size.h + 'px';
         this.show_nodes();
         this.show_lines();
-
         //this.layout.cache_valid = true;
         this.jm.invoke_event_handle(EventType.resize, { data: [] });
     }
@@ -896,18 +606,9 @@ export class ViewProvider {
 
     /** @param {HTMLElement} ele @param {import('./jsmind.node.js').Node} node */
     _default_node_render(ele, node) {
-        if (this.jm.options.enable_multiline) {
-            // Multiline mode: convert line breaks to <br> tags
-            var content = this.jm.options.support_html
-                ? node.topic
-                : util.text.html_escape(node.topic);
-            content = content.replace(/\n/g, '<br>');
-            $.h(ele, content);
-        } else if (this.jm.options.support_html) {
-            // Standard HTML mode
+        if (this.opts.support_html) {
             $.h(ele, node.topic);
         } else {
-            // Plain text mode
             $.t(ele, node.topic);
         }
     }

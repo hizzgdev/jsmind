@@ -5,6 +5,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <title>jsMind</title>
         <link type="text/css" rel="stylesheet" href="../style/jsmind.css" />
+        <!-- Multiline text plugin CSS will be automatically injected by the plugin -->
         <style type="text/css">
             #jsmind_container {
                 width: 800px;
@@ -19,9 +20,12 @@
         <input type="file" onchange="load_file(this);" />
         <button onclick="save_nodetree();">nodetree</button>
         <button onclick="replay();">replay</button>
+        <button onclick="add_multiline_node();">Add Multiline Node</button>
+        <button onclick="add_long_text_node();">Add Long Text Node</button>
         <div id="jsmind_container"></div>
         <script type="text/javascript" src="../es6/jsmind.js"></script>
         <script type="text/javascript" src="../es6/jsmind.draggable-node.js"></script>
+        <script type="text/javascript" src="../es6/jsmind.multiline-text.js"></script>
         <script type="text/javascript" src="../features/jsmind.shell.js"></script>
         <script type="text/javascript">
             var _jm = null;
@@ -74,10 +78,23 @@
                     view: {
                         expander_style: 'char',
                     },
-                    enable_multiline: true,
-                    textAutoWrapWidth: 500,
                 };
                 _jm = new jsMind(options);
+
+                // Load multiline text plugin
+                // The plugin is automatically registered when the script is loaded
+                // We just need to initialize it manually
+                if (typeof jsMindMultilineText !== 'undefined') {
+                    var multilinePlugin = new jsMindMultilineText.MultilineText(_jm, {
+                        enable_multiline: true,
+                        textAutoWrapWidth: 500,
+                        support_html: true
+                    });
+                    multilinePlugin.init();
+                } else {
+                    console.error('Multiline text plugin not loaded');
+                }
+
                 _jm.show(mind);
                 // jm.set_readonly(true);
                 // var mind_data = jm.get_data();
@@ -109,6 +126,18 @@
                 if (!!shell) {
                     shell.replay();
                 }
+            }
+
+            function add_multiline_node() {
+                var nodeId = 'node_' + Date.now();
+                var topic = 'New Multiline Node\nSecond line\nThird line\nFourth line with more content';
+                _jm.add_node('root', nodeId, topic);
+            }
+
+            function add_long_text_node() {
+                var nodeId = 'node_' + Date.now();
+                var topic = 'This is a very long text node that demonstrates the automatic text wrapping feature of the multiline text plugin. It should wrap nicely within the specified width and show how the plugin handles long content automatically.';
+                _jm.add_node('root', nodeId, topic);
             }
 
             load_jsmind();
