@@ -40,6 +40,211 @@ const DEFAULT_OPTIONS = {
 };
 
 /**
+ * Default options for text rendering functions.
+ * @typedef {Object} TextRenderOptions
+ * @property {string} [tagName='span'] - HTML tag name for created elements
+ * @property {boolean} [clearElement=true] - Whether to clear existing element content
+ * @property {boolean} [applyStyles=true] - Whether to apply multiline CSS styles
+ * @property {string[]} [customClasses=[]] - Array of CSS class names to add
+ * @property {Object} [customAttributes={}] - Object of HTML attributes to set
+ * @property {Object} [customStyles={}] - Object of inline styles to apply
+ * @property {boolean} [supportHtml=false] - Whether to support HTML content
+ * @property {boolean} [preserveWhitespace=true] - Whether to preserve whitespace in multiline text
+ */
+const DEFAULT_RENDER_OPTIONS = {
+    tagName: 'span',
+    clearElement: true,
+    applyStyles: true,
+    customClasses: [],
+    customAttributes: {},
+    customStyles: {},
+    supportHtml: false,
+    preserveWhitespace: true
+};
+
+/**
+ * Static utility function to render text content into an existing DOM element.
+ *
+ * This function handles both single-line and multiline text rendering with proper CSS styling.
+ * For multiline text (containing \n), it applies 'white-space: pre-wrap' and 'word-break: break-word'.
+ * For single-line text, it uses standard text or HTML rendering based on supportHtml option.
+ *
+ * @param {HTMLElement} element - Target DOM element to render text into
+ * @param {string} text - Text content to render (supports \n for line breaks)
+ * @param {Partial<TextRenderOptions>} [options={}] - Rendering options
+ * @param {string} [options.tagName='span'] - HTML tag name (only used when creating new elements)
+ * @param {boolean} [options.clearElement=true] - Whether to clear existing element content
+ * @param {boolean} [options.applyStyles=true] - Whether to apply multiline CSS styles
+ * @param {string[]} [options.customClasses=[]] - Array of CSS class names to add
+ * @param {Object} [options.customAttributes={}] - Object of HTML attributes to set
+ * @param {Object} [options.customStyles={}] - Object of inline styles to apply
+ * @param {boolean} [options.supportHtml=false] - Whether to support HTML content in single-line text
+ * @param {boolean} [options.preserveWhitespace=true] - Whether to preserve whitespace in multiline text
+ * @returns {HTMLElement} The element with rendered text content
+ * @throws {Error} If element is not a valid DOM element
+ *
+ * @example
+ * // Basic multiline text rendering
+ * const element = document.createElement('div');
+ * renderTextToElement(element, 'Line 1\nLine 2\nLine 3');
+ *
+ * @example
+ * // Custom styling and attributes
+ * renderTextToElement(element, 'Custom text', {
+ *   customClasses: ['highlight', 'bold'],
+ *   customAttributes: { 'data-id': '123' },
+ *   customStyles: { color: 'red', fontSize: '14px' }
+ * });
+ *
+ * @example
+ * // HTML support for single-line text
+ * renderTextToElement(element, '<strong>Bold text</strong>', {
+ *   supportHtml: true
+ * });
+ */
+export function renderTextToElement(element, text, options = {}) {
+    // Validate parameters
+    if (!element || !(element instanceof HTMLElement)) {
+        throw new Error('renderTextToElement: element must be a valid DOM element');
+    }
+
+    if (text == null) {
+        console.warn('renderTextToElement: text is null or undefined, skipping render');
+        return element;
+    }
+
+    // Merge options with defaults
+    const opts = {};
+    jsMind.util.json.merge(opts, DEFAULT_RENDER_OPTIONS);
+    jsMind.util.json.merge(opts, options);
+
+    // Clear element content if requested
+    if (opts.clearElement) {
+        element.innerHTML = '';
+    }
+
+    // Convert text to string
+    const textContent = String(text);
+
+    // Apply custom attributes
+    if (opts.customAttributes && typeof opts.customAttributes === 'object') {
+        for (const [key, value] of Object.entries(opts.customAttributes)) {
+            try {
+                element.setAttribute(key, String(value));
+            } catch (error) {
+                console.warn(`renderTextToElement: Failed to set attribute ${key}:`, error);
+            }
+        }
+    }
+
+    // Apply custom classes
+    if (opts.customClasses && Array.isArray(opts.customClasses)) {
+        for (const className of opts.customClasses) {
+            if (typeof className === 'string' && className.trim()) {
+                element.classList.add(className.trim());
+            }
+        }
+    }
+
+    // Render text content
+    if (textContent.includes('\n')) {
+        // Handle multiline text
+        element.textContent = textContent;
+
+        if (opts.applyStyles) {
+            // Apply multiline styles (these take precedence over custom styles)
+            element.style.whiteSpace = 'pre-wrap';
+            element.style.wordBreak = 'break-word';
+        }
+    } else {
+        // Handle single-line text
+        if (opts.applyStyles) {
+            // Reset multiline styles for single-line text
+            element.style.whiteSpace = '';
+            element.style.wordBreak = '';
+        }
+
+        // Render based on HTML support
+        if (opts.supportHtml) {
+            $.h(element, textContent);
+        } else {
+            $.t(element, textContent);
+        }
+    }
+
+    // Apply custom styles (after multiline styles to allow overrides where appropriate)
+    if (opts.customStyles && typeof opts.customStyles === 'object') {
+        for (const [property, value] of Object.entries(opts.customStyles)) {
+            try {
+                // Don't override critical multiline styles if text is multiline
+                if (textContent.includes('\n') && opts.applyStyles) {
+                    if (property === 'whiteSpace' || property === 'white-space') {
+                        console.warn('renderTextToElement: Ignoring whiteSpace override for multiline text');
+                        continue;
+                    }
+                    if (property === 'wordBreak' || property === 'word-break') {
+                        console.warn('renderTextToElement: Ignoring wordBreak override for multiline text');
+                        continue;
+                    }
+                }
+                element.style[property] = String(value);
+            } catch (error) {
+                console.warn(`renderTextToElement: Failed to set style ${property}:`, error);
+            }
+        }
+    }
+
+    return element;
+}
+
+/**
+ * Static utility function to create a new DOM element with rendered text content.
+ *
+ * This function creates a new DOM element and renders text content into it using the same
+ * logic as renderTextToElement. It's useful when you need a new element rather than
+ * modifying an existing one.
+ *
+ * @param {string} text - Text content to render (supports \n for line breaks)
+ * @param {Partial<TextRenderOptions>} [options={}] - Rendering options
+ * @param {string} [options.tagName='span'] - HTML tag name for the created element
+ * @param {boolean} [options.applyStyles=true] - Whether to apply multiline CSS styles
+ * @param {string[]} [options.customClasses=[]] - Array of CSS class names to add
+ * @param {Object} [options.customAttributes={}] - Object of HTML attributes to set
+ * @param {Object} [options.customStyles={}] - Object of inline styles to apply
+ * @param {boolean} [options.supportHtml=false] - Whether to support HTML content in single-line text
+ * @returns {HTMLElement} New DOM element with rendered text content
+ *
+ * @example
+ * // Create a div with multiline text
+ * const textDiv = createTextElement('Line 1\nLine 2', {
+ *   tagName: 'div',
+ *   customClasses: ['multiline-text']
+ * });
+ *
+ * @example
+ * // Create a span with custom styling
+ * const styledSpan = createTextElement('Styled text', {
+ *   customStyles: {
+ *     backgroundColor: '#f0f0f0',
+ *     padding: '4px',
+ *     borderRadius: '4px'
+ *   }
+ * });
+ */
+export function createTextElement(text, options = {}) {
+    // Merge options with defaults
+    const opts = {};
+    jsMind.util.json.merge(opts, DEFAULT_RENDER_OPTIONS);
+    jsMind.util.json.merge(opts, options);
+
+    // Create new element
+    const element = $.c(opts.tagName || 'span');
+
+    // Use renderTextToElement to handle the rendering
+    return renderTextToElement(element, text, { ...opts, clearElement: false });
+}
+
+/**
  * Multiline text plugin for jsMind.
  */
 export class MultilineText {
@@ -87,6 +292,14 @@ export class MultilineText {
         this.original_methods.render_node = view.render_node.bind(view);
         this.original_methods.show = view.show.bind(view);
 
+        // Store original custom render methods if they exist
+        this.original_methods._custom_node_render = view._custom_node_render
+            ? view._custom_node_render.bind(view)
+            : null;
+        this.original_methods._default_node_render = view._default_node_render
+            ? view._default_node_render.bind(view)
+            : null;
+
         // Override methods with error handling
         try {
             view.edit_node_begin = this.edit_node_begin.bind(this);
@@ -117,6 +330,12 @@ export class MultilineText {
         }
         if (this.original_methods.show) {
             view.show = this.original_methods.show;
+        }
+        if (this.original_methods._custom_node_render) {
+            view._custom_node_render = this.original_methods._custom_node_render;
+        }
+        if (this.original_methods._default_node_render) {
+            view._default_node_render = this.original_methods._default_node_render;
         }
     }
 
@@ -165,7 +384,7 @@ export class MultilineText {
     }
 
     /**
-     * Render multiline text in node display.
+     * Render multiline text in node display with custom_node_render support.
      * @param {HTMLElement} element - Node element
      * @param {import('../jsmind.node.js').Node} node - Node data
      */
@@ -174,29 +393,15 @@ export class MultilineText {
             return;
         }
 
-        // Store original dimensions
+        // Store original dimensions for layout recalculation
         const originalHeight = element.clientHeight;
 
-        // Process multiline text for display
-        const text = node.topic;
-        if (text.includes('\n')) {
-            // Handle multiline text - use textContent with CSS white-space
-            element.innerHTML = '';
-            element.textContent = text;
-
-            // Apply CSS to handle line breaks properly
-            element.style.whiteSpace = 'pre-wrap';
-            element.style.wordBreak = 'break-word';
-        } else {
-            // Use original rendering for single-line text
-            element.style.whiteSpace = '';
-            element.style.wordBreak = '';
-            if (this.jm.view.opts.support_html) {
-                $.h(element, text);
-            } else {
-                $.t(element, text);
-            }
-        }
+        // Use the new static rendering function with plugin configuration
+        renderTextToElement(element, node.topic, {
+            clearElement: true,
+            applyStyles: true,
+            supportHtml: this.jm.view.opts.support_html || false
+        });
 
         // Check if height changed and trigger layout update if needed
         const newHeight = element.clientHeight;
@@ -206,6 +411,98 @@ export class MultilineText {
                 this.recalculate_layout(node);
             }, 0);
         }
+    }
+
+    /**
+     * Plugin instance method to render text content into an existing DOM element.
+     *
+     * This method automatically uses jsMind configuration settings (like support_html)
+     * and provides a convenient way to render multiline text within custom node renderers.
+     *
+     * @param {HTMLElement} element - Target DOM element to render text into
+     * @param {string} text - Text content to render (supports \n for line breaks)
+     * @param {Partial<TextRenderOptions>} [options={}] - Additional rendering options
+     * @returns {HTMLElement} The element with rendered text content
+     *
+     * @example
+     * // In a custom node render function
+     * customNodeRender(jm, element, node) {
+     *   const wrapper = document.createElement('div');
+     *   wrapper.style.backgroundColor = '#f0f0f0';
+     *   wrapper.style.padding = '4px';
+     *
+     *   const textElement = document.createElement('span');
+     *   jm.multiline_text.renderMultilineText(textElement, node.topic);
+     *
+     *   wrapper.appendChild(textElement);
+     *   element.appendChild(wrapper);
+     *   return true;
+     * }
+     */
+    renderMultilineText(element, text, options = {}) {
+        // Prepare options with jsMind configuration
+        const defaultOptions = {
+            supportHtml: this.jm.view.opts.support_html || false
+        };
+
+        // Merge with provided options
+        const mergedOptions = {};
+        jsMind.util.json.merge(mergedOptions, defaultOptions);
+        jsMind.util.json.merge(mergedOptions, options);
+
+        // Use static function with merged options
+        return renderTextToElement(element, text, mergedOptions);
+    }
+
+    /**
+     * Plugin instance method to create a new DOM element with rendered text content.
+     *
+     * This method automatically uses jsMind configuration settings and creates a new
+     * element with properly rendered multiline text. Useful for building complex
+     * custom node structures.
+     *
+     * @param {string} text - Text content to render (supports \n for line breaks)
+     * @param {Partial<TextRenderOptions>} [options={}] - Additional rendering options
+     * @returns {HTMLElement} New DOM element with rendered text content
+     *
+     * @example
+     * // Create a text element for insertion into custom structure
+     * customNodeRender(jm, element, node) {
+     *   const container = document.createElement('div');
+     *   container.className = 'custom-node';
+     *
+     *   // Add priority indicator
+     *   if (node.data?.priority) {
+     *     const priority = document.createElement('span');
+     *     priority.className = 'priority-badge';
+     *     priority.textContent = node.data.priority;
+     *     container.appendChild(priority);
+     *   }
+     *
+     *   // Add multiline text content
+     *   const textElement = jm.multiline_text.createMultilineElement(node.topic, {
+     *     tagName: 'div',
+     *     customClasses: ['node-text']
+     *   });
+     *   container.appendChild(textElement);
+     *
+     *   element.appendChild(container);
+     *   return true;
+     * }
+     */
+    createMultilineElement(text, options = {}) {
+        // Prepare options with jsMind configuration
+        const defaultOptions = {
+            supportHtml: this.jm.view.opts.support_html || false
+        };
+
+        // Merge with provided options
+        const mergedOptions = {};
+        jsMind.util.json.merge(mergedOptions, defaultOptions);
+        jsMind.util.json.merge(mergedOptions, options);
+
+        // Use static function with merged options
+        return createTextElement(text, mergedOptions);
     }
 
     /**
@@ -223,6 +520,9 @@ export class MultilineText {
         }
 
         this.editing_node = node;
+
+        this.jm.view.editing_node = node;
+
         const view_data = node._data.view;
         const element = view_data.element;
         const topic = node.topic;
@@ -288,7 +588,7 @@ export class MultilineText {
         editor.style.resize = 'none';
         editor.style.overflow = 'hidden';
         editor.style.whiteSpace = 'pre-wrap';
-        editor.style.wordWrap = 'break-word';
+        editor.style.wordBreak = 'break-word';
     }
 
     /**
@@ -301,7 +601,7 @@ export class MultilineText {
             this.handle_editor_keydown(e);
         });
 
-        $.on(editor, 'blur', e => {
+        $.on(editor, 'blur', () => {
             // Delay to allow other events to process first
             setTimeout(() => {
                 if (this.editing_node) {
@@ -311,7 +611,7 @@ export class MultilineText {
         });
 
         // Auto-resize editor as user types
-        $.on(editor, 'input', e => {
+        $.on(editor, 'input', () => {
             this.auto_resize_editor();
         });
     }
@@ -323,7 +623,6 @@ export class MultilineText {
     handle_editor_keydown(e) {
         const key = e.key;
         const shiftKey = e.shiftKey;
-        const ctrlKey = e.ctrlKey || e.metaKey;
 
         if (key === 'Enter') {
             if (shiftKey) {
@@ -412,6 +711,8 @@ export class MultilineText {
 
         // Reset editing state
         this.editing_node = null;
+
+        this.jm.view.editing_node = null;
         this.multiline_editor = null;
 
         // Return focus to panel
@@ -438,6 +739,8 @@ export class MultilineText {
 
         // Reset editing state
         this.editing_node = null;
+
+        this.jm.view.editing_node = null;
         this.multiline_editor = null;
 
         // Return focus to panel
