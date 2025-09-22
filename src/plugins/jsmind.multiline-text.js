@@ -59,7 +59,7 @@ const DEFAULT_RENDER_OPTIONS = {
     customAttributes: {},
     customStyles: {},
     supportHtml: false,
-    preserveWhitespace: true
+    preserveWhitespace: true,
 };
 
 /**
@@ -179,11 +179,15 @@ export function renderTextToElement(element, text, options = {}) {
                 // Don't override critical multiline styles if text is multiline
                 if (textContent.includes('\n') && opts.applyStyles) {
                     if (property === 'whiteSpace' || property === 'white-space') {
-                        console.warn('renderTextToElement: Ignoring whiteSpace override for multiline text');
+                        console.warn(
+                            'renderTextToElement: Ignoring whiteSpace override for multiline text'
+                        );
                         continue;
                     }
                     if (property === 'wordBreak' || property === 'word-break') {
-                        console.warn('renderTextToElement: Ignoring wordBreak override for multiline text');
+                        console.warn(
+                            'renderTextToElement: Ignoring wordBreak override for multiline text'
+                        );
                         continue;
                     }
                 }
@@ -396,12 +400,32 @@ export class MultilineText {
         // Store original dimensions for layout recalculation
         const originalHeight = element.clientHeight;
 
-        // Use the new static rendering function with plugin configuration
-        renderTextToElement(element, node.topic, {
-            clearElement: true,
-            applyStyles: true,
-            supportHtml: this.jm.view.opts.support_html || false
-        });
+        // Check if we have custom node render function
+        const hasCustomRender =
+            this.jm.view.opts.custom_node_render &&
+            typeof this.jm.view.opts.custom_node_render === 'function';
+
+        let customRendered = false;
+
+        if (hasCustomRender) {
+            // Try custom render first
+            try {
+                customRendered = this.jm.view.opts.custom_node_render(this.jm, element, node);
+            } catch (error) {
+                console.error('Multiline text plugin: Error in custom_node_render', error);
+                customRendered = false;
+            }
+        }
+
+        // If custom render didn't handle it, use our multiline logic
+        if (!customRendered) {
+            // Use the new static rendering function with plugin configuration
+            renderTextToElement(element, node.topic, {
+                clearElement: true,
+                applyStyles: true,
+                supportHtml: this.jm.view.opts.support_html || false,
+            });
+        }
 
         // Check if height changed and trigger layout update if needed
         const newHeight = element.clientHeight;
@@ -442,7 +466,7 @@ export class MultilineText {
     renderMultilineText(element, text, options = {}) {
         // Prepare options with jsMind configuration
         const defaultOptions = {
-            supportHtml: this.jm.view.opts.support_html || false
+            supportHtml: this.jm.view.opts.support_html || false,
         };
 
         // Merge with provided options
@@ -493,7 +517,7 @@ export class MultilineText {
     createMultilineElement(text, options = {}) {
         // Prepare options with jsMind configuration
         const defaultOptions = {
-            supportHtml: this.jm.view.opts.support_html || false
+            supportHtml: this.jm.view.opts.support_html || false,
         };
 
         // Merge with provided options
