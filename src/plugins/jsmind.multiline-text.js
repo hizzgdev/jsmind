@@ -323,7 +323,14 @@ export class MultilineText {
      */
     restore_original_methods() {
         const view = this.jm.view;
-        const methods = ['edit_node_begin', 'edit_node_end', 'render_node', 'show', '_custom_node_render', '_default_node_render'];
+        const methods = [
+            'edit_node_begin',
+            'edit_node_end',
+            'render_node',
+            'show',
+            '_custom_node_render',
+            '_default_node_render',
+        ];
 
         methods.forEach(method => {
             if (this.original_methods[method]) {
