@@ -280,8 +280,8 @@ export class MultilineText {
     init() {
         this.override_view_methods();
         this.setup_event_listeners();
-        // Re-render all existing nodes to apply multiline formatting
-        this.rerender_existing_nodes();
+        this.initialized = true;
+        console.log('Multiline text plugin initialized - ready for first render');
     }
 
     /**
@@ -323,31 +323,19 @@ export class MultilineText {
      */
     restore_original_methods() {
         const view = this.jm.view;
-        if (this.original_methods.edit_node_begin) {
-            view.edit_node_begin = this.original_methods.edit_node_begin;
-        }
-        if (this.original_methods.edit_node_end) {
-            view.edit_node_end = this.original_methods.edit_node_end;
-        }
-        if (this.original_methods.render_node) {
-            view.render_node = this.original_methods.render_node;
-        }
-        if (this.original_methods.show) {
-            view.show = this.original_methods.show;
-        }
-        if (this.original_methods._custom_node_render) {
-            view._custom_node_render = this.original_methods._custom_node_render;
-        }
-        if (this.original_methods._default_node_render) {
-            view._default_node_render = this.original_methods._default_node_render;
-        }
+        const methods = ['edit_node_begin', 'edit_node_end', 'render_node', 'show', '_custom_node_render', '_default_node_render'];
+
+        methods.forEach(method => {
+            if (this.original_methods[method]) {
+                view[method] = this.original_methods[method];
+            }
+        });
     }
 
     /**
      * Set up event listeners for the plugin.
      */
     setup_event_listeners() {
-        // Listen for jsMind events if needed
         this.jm.add_event_listener((type, data) => {
             this.jm_event_handle(type, data);
         });
@@ -397,8 +385,8 @@ export class MultilineText {
             return;
         }
 
-        // Store original dimensions for layout recalculation
-        const originalHeight = element.clientHeight;
+        const hasMultilineText = node.topic.includes('\n');
+        const originalHeight = hasMultilineText ? element.clientHeight : 0;
 
         // Check if we have custom node render function
         const hasCustomRender =
@@ -408,7 +396,6 @@ export class MultilineText {
         let customRendered = false;
 
         if (hasCustomRender) {
-            // Try custom render first
             try {
                 customRendered = this.jm.view.opts.custom_node_render(this.jm, element, node);
             } catch (error) {
@@ -417,23 +404,36 @@ export class MultilineText {
             }
         }
 
-        // If custom render didn't handle it, use our multiline logic
+        // If custom render didn't handle it, use appropriate rendering strategy
         if (!customRendered) {
-            // Use the new static rendering function with plugin configuration
-            renderTextToElement(element, node.topic, {
-                clearElement: true,
-                applyStyles: true,
-                supportHtml: this.jm.view.opts.support_html || false,
-            });
+            if (hasMultilineText) {
+                renderTextToElement(element, node.topic, {
+                    clearElement: true,
+                    applyStyles: true,
+                    supportHtml: this.jm.view.opts.support_html || false,
+                });
+            } else {
+                if (this.original_methods.render_node) {
+                    this.original_methods.render_node(element, node);
+                    return;
+                } else {
+                    renderTextToElement(element, node.topic, {
+                        clearElement: true,
+                        applyStyles: false,
+                        supportHtml: this.jm.view.opts.support_html || false,
+                    });
+                }
+            }
         }
 
-        // Check if height changed and trigger layout update if needed
-        const newHeight = element.clientHeight;
-        if (originalHeight !== newHeight && originalHeight > 0) {
-            // Use setTimeout to ensure DOM has updated before recalculating
-            setTimeout(() => {
-                this.recalculate_layout(node);
-            }, 0);
+        // Recalculate layout only if multiline text height changed
+        if (hasMultilineText && originalHeight > 0) {
+            const newHeight = element.clientHeight;
+            if (originalHeight !== newHeight) {
+                setTimeout(() => {
+                    this.recalculate_layout(node);
+                }, 0);
+            }
         }
     }
 
@@ -544,15 +544,9 @@ export class MultilineText {
         }
 
         this.editing_node = node;
-
         this.jm.view.editing_node = node;
 
-        const view_data = node._data.view;
-        const element = view_data.element;
-        const topic = node.topic;
-
-        // Create multiline editor
-        this.create_multiline_editor(element, topic);
+        this.create_multiline_editor(node._data.view.element, node.topic);
     }
 
     /**
@@ -703,6 +697,16 @@ export class MultilineText {
     }
 
     /**
+     * Reset editing state and return focus to panel.
+     */
+    _reset_editing_state() {
+        this.editing_node = null;
+        this.jm.view.editing_node = null;
+        this.multiline_editor = null;
+        this.jm.view.e_panel.focus();
+    }
+
+    /**
      * End editing and save changes.
      */
     edit_node_end() {
@@ -711,36 +715,21 @@ export class MultilineText {
         }
 
         const node = this.editing_node;
-        const view_data = node._data.view;
-        const element = view_data.element;
+        const element = node._data.view.element;
         const topic = this.multiline_editor.textContent || '';
 
-        // Clean up editor
         this.cleanup_editor(element);
 
-        // Process and validate text
         const processed_topic = this.process_multiline_text(topic);
 
-        // Update node if text changed
         if (jsMind.util.text.is_empty(processed_topic) || node.topic === processed_topic) {
-            // No change or empty text, just re-render
             this._render_multiline_node(element, node);
         } else {
-            // Text changed, update node
             this.jm.update_node(node.id, processed_topic);
         }
 
-        // Trigger layout recalculation
         this.recalculate_layout(node);
-
-        // Reset editing state
-        this.editing_node = null;
-
-        this.jm.view.editing_node = null;
-        this.multiline_editor = null;
-
-        // Return focus to panel
-        this.jm.view.e_panel.focus();
+        this._reset_editing_state();
     }
 
     /**
@@ -752,23 +741,11 @@ export class MultilineText {
         }
 
         const node = this.editing_node;
-        const view_data = node._data.view;
-        const element = view_data.element;
+        const element = node._data.view.element;
 
-        // Clean up editor
         this.cleanup_editor(element);
-
-        // Restore original content
         this._render_multiline_node(element, node);
-
-        // Reset editing state
-        this.editing_node = null;
-
-        this.jm.view.editing_node = null;
-        this.multiline_editor = null;
-
-        // Return focus to panel
-        this.jm.view.e_panel.focus();
+        this._reset_editing_state();
     }
 
     /**
@@ -803,24 +780,35 @@ export class MultilineText {
     }
 
     /**
-     * Re-render all existing nodes to apply multiline formatting.
+     * Re-render only nodes that contain multiline text for better performance.
      */
-    rerender_existing_nodes() {
+    rerender_multiline_nodes_only() {
         if (!this.jm.mind || !this.jm.mind.nodes) {
             return;
         }
 
-        // Re-render all nodes that have multiline text
+        let rerendered_count = 0;
         const nodes = this.jm.mind.nodes;
+
         for (const node_id in nodes) {
             const node = nodes[node_id];
             if (node.topic && node.topic.includes('\n')) {
                 const view_data = node._data.view;
                 if (view_data && view_data.element) {
                     this._render_multiline_node(view_data.element, node);
+                    rerendered_count++;
                 }
             }
         }
+
+        console.log(`Multiline text plugin: Re-rendered ${rerendered_count} multiline nodes`);
+    }
+
+    /**
+     * @deprecated Use rerender_multiline_nodes_only() for better performance
+     */
+    rerender_existing_nodes() {
+        this.rerender_multiline_nodes_only();
     }
 
     /**
@@ -857,10 +845,10 @@ export class MultilineText {
      * @param {object} [data] - Event data
      */
     jm_event_handle(type, data) {
-        // Handle events if needed
         if (type === jsMind.event_type.resize) {
-            // Handle resize events
+            // Handle resize events if needed
         }
+        void data; // Suppress unused parameter warning
     }
 }
 
