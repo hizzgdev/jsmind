@@ -1,12 +1,12 @@
 /**
  * @license BSD
- * @copyright 2014-2025 hizzgdev@163.com
+ * @copyright 2014-2025 UmbraCi
  *
  * Project Home:
- *   https://github.com/hizzgdev/jsmind/
+ *   https://github.com/UmbraCi/jsmind/
  */
 
-import jsMind from 'jsmind';
+import jsMind from '@umbraci/jsmind';
 
 if (!jsMind) {
     throw new Error('jsMind is not defined');
@@ -442,6 +442,98 @@ export class MultilineText {
                 }, 0);
             }
         }
+    }
+
+    /**
+     * Plugin instance method to render text content into an existing DOM element.
+     *
+     * This method automatically uses jsMind configuration settings (like support_html)
+     * and provides a convenient way to render multiline text within custom node renderers.
+     *
+     * @param {HTMLElement} element - Target DOM element to render text into
+     * @param {string} text - Text content to render (supports \n for line breaks)
+     * @param {Partial<TextRenderOptions>} [options={}] - Additional rendering options
+     * @returns {HTMLElement} The element with rendered text content
+     *
+     * @example
+     * // In a custom node render function
+     * customNodeRender(jm, element, node) {
+     *   const wrapper = document.createElement('div');
+     *   wrapper.style.backgroundColor = '#f0f0f0';
+     *   wrapper.style.padding = '4px';
+     *
+     *   const textElement = document.createElement('span');
+     *   jm.multiline_text.renderMultilineText(textElement, node.topic);
+     *
+     *   wrapper.appendChild(textElement);
+     *   element.appendChild(wrapper);
+     *   return true;
+     * }
+     */
+    renderMultilineText(element, text, options = {}) {
+        // Prepare options with jsMind configuration
+        const defaultOptions = {
+            supportHtml: this.jm.view.opts.support_html || false,
+        };
+
+        // Merge with provided options
+        const mergedOptions = {};
+        jsMind.util.json.merge(mergedOptions, defaultOptions);
+        jsMind.util.json.merge(mergedOptions, options);
+
+        // Use static function with merged options
+        return renderTextToElement(element, text, mergedOptions);
+    }
+
+    /**
+     * Plugin instance method to create a new DOM element with rendered text content.
+     *
+     * This method automatically uses jsMind configuration settings and creates a new
+     * element with properly rendered multiline text. Useful for building complex
+     * custom node structures.
+     *
+     * @param {string} text - Text content to render (supports \n for line breaks)
+     * @param {Partial<TextRenderOptions>} [options={}] - Additional rendering options
+     * @returns {HTMLElement} New DOM element with rendered text content
+     *
+     * @example
+     * // Create a text element for insertion into custom structure
+     * customNodeRender(jm, element, node) {
+     *   const container = document.createElement('div');
+     *   container.className = 'custom-node';
+     *
+     *   // Add priority indicator
+     *   if (node.data?.priority) {
+     *     const priority = document.createElement('span');
+     *     priority.className = 'priority-badge';
+     *     priority.textContent = node.data.priority;
+     *     container.appendChild(priority);
+     *   }
+     *
+     *   // Add multiline text content
+     *   const textElement = jm.multiline_text.createMultilineElement(node.topic, {
+     *     tagName: 'div',
+     *     customClasses: ['node-text']
+     *   });
+     *   container.appendChild(textElement);
+     *
+     *   element.appendChild(container);
+     *   return true;
+     * }
+     */
+    createMultilineElement(text, options = {}) {
+        // Prepare options with jsMind configuration
+        const defaultOptions = {
+            supportHtml: this.jm.view.opts.support_html || false,
+        };
+
+        // Merge with provided options
+        const mergedOptions = {};
+        jsMind.util.json.merge(mergedOptions, defaultOptions);
+        jsMind.util.json.merge(mergedOptions, options);
+
+        // Use static function with merged options
+        return createTextElement(text, mergedOptions);
     }
 
     /**
