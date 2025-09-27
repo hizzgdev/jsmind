@@ -81,5 +81,8 @@
     "jest": {
         "verbose": true,
         "testEnvironment": "jsdom"
-    }
+    },
+    "sideEffects": [
+        "./es6/*"
+    ]
 }
