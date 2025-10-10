@@ -20,6 +20,11 @@
             "require": "./es6/jsmind.screenshot.js",
             "types": "./types/generated/plugins/jsmind.screenshot.d.ts"
         },
+        "./multiline-text": {
+            "import": "./es6/jsmind.multiline-text.js",
+            "require": "./es6/jsmind.multiline-text.js",
+            "types": "./types/generated/plugins/jsmind.multiline-text.d.ts"
+        },
         "./style/jsmind.css": "./style/jsmind.css"
     },
     "directories": {
