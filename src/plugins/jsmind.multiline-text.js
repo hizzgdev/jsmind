@@ -185,12 +185,15 @@ function init(jm, options) {
         $.on(editor, 'keydown', e => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
+                e.stopPropagation(); // Prevent jsMind shortcut from triggering
                 view.edit_node_end();
             } else if (e.key === 'Escape') {
                 e.preventDefault();
+                e.stopPropagation();
                 cancel_editing();
             } else if (e.key === 'Tab') {
                 e.preventDefault();
+                e.stopPropagation();
                 view.edit_node_end();
             }
         });
