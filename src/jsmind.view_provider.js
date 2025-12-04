@@ -600,7 +600,7 @@ export class ViewProvider {
             return node.children.length > 99 ? '...' : node.children.length;
         }
         if (style === 'char') {
-            return node.expanded ? '-' : '+';
+            return node.expanded ? '−' : '+';
         }
     }
 
