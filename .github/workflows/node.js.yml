@@ -3,6 +3,9 @@
 
 name: Node.js CI
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ master ]
