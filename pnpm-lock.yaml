@@ -10,9 +10,6 @@ importers:
             '@rollup/plugin-terser':
                 specifier: ^0.4.4
                 version: 0.4.4(rollup@2.79.2)
-            cross-env:
-                specifier: ^10.0.0
-                version: 10.0.0
             http-server:
                 specifier: ^14.1.1
                 version: 14.1.1
@@ -298,12 +295,6 @@ packages:
         resolution:
             {
                 integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==,
-            }
-
-    '@epic-web/invariant@1.0.0':
-        resolution:
-            {
-                integrity: sha512-lrTPqgvfFQtR/eY/qkIzp98OGdNJu0m5ji3q/nJI8v3SXkRKEnWiOxMmbvcSoAIzv/cGiuvRy57k4suKQSAdwA==,
             }
 
     '@istanbuljs/load-nyc-config@1.1.0':
@@ -961,14 +952,6 @@ packages:
                 integrity: sha512-utCYNzRSQIZNPIcGZdQc92UVJYAhtGAteCFg0yRaFm8f0P+CPtyGyHXJcGXnffjCybUCEx3FQ2G7U3/o9eIkVQ==,
             }
         engines: { node: '>= 0.4.0' }
-
-    cross-env@10.0.0:
-        resolution:
-            {
-                integrity: sha512-aU8qlEK/nHYtVuN4p7UQgAwVljzMg8hB4YK5ThRqD2l/ziSnryncPNn7bMLt5cFYsKVKBh8HqLqyCoTupEUu7Q==,
-            }
-        engines: { node: '>=20' }
-        hasBin: true
 
     cross-spawn@7.0.6:
         resolution:
@@ -3040,8 +3023,6 @@ snapshots:
 
     '@bcoe/v8-coverage@0.2.3': {}
 
-    '@epic-web/invariant@1.0.0': {}
-
     '@istanbuljs/load-nyc-config@1.1.0':
         dependencies:
             camelcase: 5.3.1
@@ -3521,11 +3502,6 @@ snapshots:
     convert-source-map@2.0.0: {}
 
     corser@2.0.1: {}
-
-    cross-env@10.0.0:
-        dependencies:
-            '@epic-web/invariant': 1.0.0
-            cross-spawn: 7.0.6
 
     cross-spawn@7.0.6:
         dependencies:
