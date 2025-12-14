@@ -65,10 +65,14 @@ export class DraggableNode {
         this.jm = jm;
         /** @type {DraggableNodeOptions} */
         this.options = opts;
-        /** @type {HTMLCanvasElement|null} */
+        /** @type {boolean} */
+        this.is_svg_engine = jm.view.opts.engine === 'svg';
+        /** @type {HTMLCanvasElement|SVGSVGElement|null} */
         this.e_canvas = null;
         /** @type {CanvasRenderingContext2D|null} */
         this.canvas_ctx = null;
+        /** @type {SVGPathElement|null} */
+        this.helper_line = null;
         /** @type {HTMLElement|null} */
         this.shadow = null;
         /** @type {number} */
@@ -114,19 +118,43 @@ export class DraggableNode {
         this.create_shadow();
         this.event_bind();
     }
-    /** Resize canvas and shadow elements. */
+    /** Resize canvas/SVG and shadow elements. */
     resize() {
         this.jm.view.e_nodes.appendChild(this.shadow);
-        this.e_canvas.width = this.jm.view.size.w;
-        this.e_canvas.height = this.jm.view.size.h;
+        if (this.is_svg_engine) {
+            this.e_canvas.setAttribute('width', this.jm.view.size.w);
+            this.e_canvas.setAttribute('height', this.jm.view.size.h);
+        } else {
+            this.e_canvas.width = this.jm.view.size.w;
+            this.e_canvas.height = this.jm.view.size.h;
+        }
     }
-    /** Create canvas for drawing drag lines. */
+    /** Create canvas or SVG for drawing drag lines. */
     create_canvas() {
-        var c = $.c('canvas');
-        this.jm.view.e_panel.appendChild(c);
-        var ctx = c.getContext('2d');
-        this.e_canvas = c;
-        this.canvas_ctx = ctx;
+        if (this.is_svg_engine) {
+            // Create SVG element for helper lines
+            var svg = this._create_svg_element('svg');
+            svg.setAttribute('class', 'jsmind-draggable-helper');
+            svg.setAttribute('style', 'position: absolute; top: 0; left: 0; pointer-events: none;');
+            this.jm.view.e_panel.appendChild(svg);
+            this.e_canvas = svg;
+        } else {
+            // Create Canvas element for helper lines
+            var c = $.c('canvas');
+            this.jm.view.e_panel.appendChild(c);
+            var ctx = c.getContext('2d');
+            this.e_canvas = c;
+            this.canvas_ctx = ctx;
+        }
+    }
+    /**
+     * Create SVG element with proper namespace.
+     * @param {string} tag - SVG tag name
+     * @returns {SVGElement}
+     * @private
+     */
+    _create_svg_element(tag) {
+        return $.d.createElementNS('http://www.w3.org/2000/svg', tag);
     }
     create_shadow() {
         var s = $.c('jmnode');
@@ -171,20 +199,31 @@ export class DraggableNode {
      * @param {boolean} invalid - Whether current target is invalid
      */
     magnet_shadow(shadow_p, node_p, invalid) {
-        this.canvas_ctx.lineWidth = this.options.line_width;
-        this.canvas_ctx.strokeStyle = invalid
-            ? this.options.line_color_invalid
-            : this.options.line_color;
-        this.canvas_ctx.lineCap = 'round';
         this.clear_lines();
-        this.canvas_lineto(shadow_p.x, shadow_p.y, node_p.x, node_p.y);
+        var color = invalid ? this.options.line_color_invalid : this.options.line_color;
+
+        if (this.is_svg_engine) {
+            this.svg_draw_line(shadow_p.x, shadow_p.y, node_p.x, node_p.y, color);
+        } else {
+            this.canvas_ctx.lineWidth = this.options.line_width;
+            this.canvas_ctx.strokeStyle = color;
+            this.canvas_ctx.lineCap = 'round';
+            this.canvas_lineto(shadow_p.x, shadow_p.y, node_p.x, node_p.y);
+        }
     }
-    /** Clear helper lines from canvas. */
+    /** Clear helper lines from canvas or SVG. */
     clear_lines() {
-        this.canvas_ctx.clearRect(0, 0, this.jm.view.size.w, this.jm.view.size.h);
+        if (this.is_svg_engine) {
+            if (this.helper_line && this.helper_line.parentNode) {
+                this.e_canvas.removeChild(this.helper_line);
+                this.helper_line = null;
+            }
+        } else {
+            this.canvas_ctx.clearRect(0, 0, this.jm.view.size.w, this.jm.view.size.h);
+        }
     }
     /**
-     * Draw a straight helper line.
+     * Draw a straight helper line on canvas.
      * @param {number} x1
      * @param {number} y1
      * @param {number} x2
@@ -195,6 +234,60 @@ export class DraggableNode {
         this.canvas_ctx.moveTo(x1, y1);
         this.canvas_ctx.lineTo(x2, y2);
         this.canvas_ctx.stroke();
+    }
+    /**
+     * Draw a helper line on SVG using bezier curve.
+     * Reuses the line drawing logic from SvgGraph.
+     * @param {number} x1 - Start x coordinate
+     * @param {number} y1 - Start y coordinate
+     * @param {number} x2 - End x coordinate
+     * @param {number} y2 - End y coordinate
+     * @param {string} color - Line color
+     */
+    svg_draw_line(x1, y1, x2, y2, color) {
+        // Create SVG path element for helper line
+        this.helper_line = this._create_svg_element('path');
+        this.helper_line.setAttribute('stroke', color);
+        this.helper_line.setAttribute('stroke-width', this.options.line_width);
+        this.helper_line.setAttribute('fill', 'transparent');
+        this.helper_line.setAttribute('stroke-linecap', 'round');
+
+        // Draw bezier curve (same as SvgGraph._bezier_to)
+        this._svg_bezier_to(this.helper_line, x1, y1, x2, y2);
+
+        // Add to SVG container
+        this.e_canvas.appendChild(this.helper_line);
+    }
+    /**
+     * Draw bezier curve to SVG path element.
+     * Reuses logic from SvgGraph._bezier_to.
+     * @param {SVGPathElement} path - SVG path element
+     * @param {number} x1 - Start x coordinate
+     * @param {number} y1 - Start y coordinate
+     * @param {number} x2 - End x coordinate
+     * @param {number} y2 - End y coordinate
+     * @private
+     */
+    _svg_bezier_to(path, x1, y1, x2, y2) {
+        path.setAttribute(
+            'd',
+            'M ' +
+                x1 +
+                ' ' +
+                y1 +
+                ' C ' +
+                (x1 + ((x2 - x1) * 2) / 3) +
+                ' ' +
+                y1 +
+                ', ' +
+                x1 +
+                ' ' +
+                y2 +
+                ', ' +
+                x2 +
+                ' ' +
+                y2
+        );
     }
     /** Bind mouse/touch events for dragging. */
     event_bind() {
