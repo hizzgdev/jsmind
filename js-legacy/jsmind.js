@@ -994,6 +994,9 @@
             },
             merge: function (b, a) {
                 for (var o in a) {
+                    if (o === '__proto__' || o === 'constructor' || o === 'prototype') {
+                        continue;
+                    }
                     if (o in b) {
                         if (typeof b[o] === 'object' &&
                             Object.prototype.toString.call(b[o]).toLowerCase() == '[object object]' &&
