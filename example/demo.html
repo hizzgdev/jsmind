@@ -22,6 +22,7 @@
         <div id="jsmind_container"></div>
         <script type="text/javascript" src="../es6/jsmind.js"></script>
         <script type="text/javascript" src="../es6/jsmind.draggable-node.js"></script>
+        <script type="text/javascript" src="../es6/jsmind.multiline-text.js"></script>
         <script type="text/javascript" src="../features/jsmind.shell.js"></script>
         <script type="text/javascript">
             var _jm = null;
@@ -36,14 +37,14 @@
                     data: [
                         { id: 'root', isroot: true, topic: 'jsMind' },
 
-                        { id: 'sub1', parentid: 'root', topic: 'sub1' },
-                        { id: 'sub11', parentid: 'sub1', topic: 'sub11' },
+                        { id: 'sub1', parentid: 'root', topic: 'Multiline Text\nSupport' },
+                        { id: 'sub11', parentid: 'sub1', topic: 'Line 1\nLine 2\nLine 3' },
                         { id: 'sub12', parentid: 'sub1', topic: 'sub12' },
                         { id: 'sub13', parentid: 'sub1', topic: 'sub13' },
 
-                        { id: 'sub2', parentid: 'root', topic: 'sub2' },
+                        { id: 'sub2', parentid: 'root', topic: 'Features\n- Display\n- Edit' },
                         { id: 'sub21', parentid: 'sub2', topic: 'sub21' },
-                        { id: 'sub22', parentid: 'sub2', topic: 'sub22' },
+                        { id: 'sub22', parentid: 'sub2', topic: 'Auto\nExpand\nHeight' },
 
                         { id: 'sub3', parentid: 'root', topic: 'sub3' },
                     ],
@@ -65,6 +66,16 @@
                     },
                     view: {
                         expander_style: 'char',
+                        custom_node_render: jsMindMultilineText.createMultilineRender({
+                            text_width: 200,
+                            line_height: '1.5',
+                        }),
+                    },
+                    plugin: {
+                        multiline_text: {
+                            text_width: 200,
+                            line_height: '1.5',
+                        },
                     },
                 };
                 _jm = new jsMind(options);

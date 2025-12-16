@@ -73,4 +73,29 @@ export default [
             }),
         ],
     },
+    {
+        input: 'src/plugins/jsmind.multiline-text.js',
+        output: {
+            name: 'jsMindMultilineText',
+            file: 'es6/jsmind.multiline-text.js',
+            format: 'umd',
+            banner: '/**\n* @license BSD-3-Clause\n* @copyright 2014-2025 hizzgdev@163.com\n*\n* Project Home:\n*   https://github.com/hizzgdev/jsmind/\n*/',
+            sourcemap: true,
+            globals: {
+                jsmind: 'jsMind',
+            },
+            exports: 'named',
+        },
+        external: ['jsmind'],
+        plugins: [
+            cleanup({
+                comments: 'none',
+            }),
+            terser({
+                output: {
+                    comments: 'all',
+                },
+            }),
+        ],
+    },
 ];
