@@ -73,7 +73,7 @@
         "jest": "^28.1.0",
         "jest-environment-jsdom": "^28.1.0",
         "prettier": "2.6.2",
-        "rollup": "2.79.2",
+        "rollup": "2.80.0",
         "rollup-plugin-cleanup": "^3.2.1",
         "typescript": "^5.9.2"
     },

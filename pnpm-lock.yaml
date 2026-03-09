@@ -9,7 +9,7 @@ importers:
         devDependencies:
             '@rollup/plugin-terser':
                 specifier: ^0.4.4
-                version: 0.4.4(rollup@2.79.2)
+                version: 0.4.4(rollup@2.80.0)
             http-server:
                 specifier: ^14.1.1
                 version: 14.1.1
@@ -23,11 +23,11 @@ importers:
                 specifier: 2.6.2
                 version: 2.6.2
             rollup:
-                specifier: 2.79.2
-                version: 2.79.2
+                specifier: 2.80.0
+                version: 2.80.0
             rollup-plugin-cleanup:
                 specifier: ^3.2.1
-                version: 3.2.1(rollup@2.79.2)
+                version: 3.2.1(rollup@2.80.0)
             typescript:
                 specifier: ^5.9.2
                 version: 5.9.2
@@ -1255,7 +1255,7 @@ packages:
             {
                 integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==,
             }
-        deprecated: Glob versions prior to v9 are no longer supported
+        deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
     gopd@1.2.0:
         resolution:
@@ -2163,10 +2163,10 @@ packages:
                 integrity: sha512-EEp9NhnUkwY8aif6bxgovPHMoMoNr2FulJziTndpt5H9RdwC47GSGuII9XxpSdzVGM0GWrNPHV6ie1LTNJPaLQ==,
             }
 
-    rollup@2.79.2:
+    rollup@2.80.0:
         resolution:
             {
-                integrity: sha512-fS6iqSPZDs3dr/y7Od6y5nha8dW1YnbgtsyotCVvoFGKbERG++CVRFv1meyGDE1SNItQA8BrnCw7ScdAhRJ3XQ==,
+                integrity: sha512-cIFJOD1DESzpjOBl763Kp1AH7UE/0fcdHe6rZXUdQ9c50uvgigvW97u3IcSeBwOkgqL/PXPBktBCh0KEu5L8XQ==,
             }
         engines: { node: '>=10.0.0' }
         hasBin: true
@@ -2564,6 +2564,7 @@ packages:
                 integrity: sha512-p41ogyeMUrw3jWclHWTQg1k05DSVXPLcVxRTYsXUk+ZooOCZLcoYgPZ/HL/D/N+uQPOtcp1me1WhBEaX02mhWg==,
             }
         engines: { node: '>=12' }
+        deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
 
     whatwg-mimetype@3.0.0:
         resolution:
@@ -3057,13 +3058,13 @@ snapshots:
             '@jridgewell/resolve-uri': 3.1.2
             '@jridgewell/sourcemap-codec': 1.5.5
 
-    '@rollup/plugin-terser@0.4.4(rollup@2.79.2)':
+    '@rollup/plugin-terser@0.4.4(rollup@2.80.0)':
         dependencies:
             serialize-javascript: 6.0.2
             smob: 1.5.0
             terser: 5.44.0
         optionalDependencies:
-            rollup: 2.79.2
+            rollup: 2.80.0
 
     '@sinclair/typebox@0.24.51': {}
 
@@ -4197,17 +4198,17 @@ snapshots:
         dependencies:
             glob: 7.2.3
 
-    rollup-plugin-cleanup@3.2.1(rollup@2.79.2):
+    rollup-plugin-cleanup@3.2.1(rollup@2.80.0):
         dependencies:
             js-cleanup: 1.2.0
-            rollup: 2.79.2
+            rollup: 2.80.0
             rollup-pluginutils: 2.8.2
 
     rollup-pluginutils@2.8.2:
         dependencies:
             estree-walker: 0.6.1
 
-    rollup@2.79.2:
+    rollup@2.80.0:
         optionalDependencies:
             fsevents: 2.3.3
 
