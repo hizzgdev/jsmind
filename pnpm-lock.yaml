@@ -8,8 +8,8 @@ importers:
     .:
         devDependencies:
             '@rollup/plugin-terser':
-                specifier: ^0.4.4
-                version: 0.4.4(rollup@2.80.0)
+                specifier: ^1.0.0
+                version: 1.0.0(rollup@2.80.0)
             http-server:
                 specifier: ^14.1.1
                 version: 14.1.1
@@ -453,12 +453,12 @@ packages:
                 integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==,
             }
 
-    '@rollup/plugin-terser@0.4.4':
+    '@rollup/plugin-terser@1.0.0':
         resolution:
             {
-                integrity: sha512-XHeJC5Bgvs8LfukDwWZp7yeqin6ns8RTl2B9avbejt6tZqsqvVoWI7ZTQrcNsfKEDWBTnTxM8nMDkO2IFFbd0A==,
+                integrity: sha512-FnCxhTBx6bMOYQrar6C8h3scPt8/JwIzw3+AJ2K++6guogH5fYaIFia+zZuhqv0eo1RN7W1Pz630SyvLbDjhtQ==,
             }
-        engines: { node: '>=14.0.0' }
+        engines: { node: '>=20.0.0' }
         peerDependencies:
             rollup: ^2.0.0||^3.0.0||^4.0.0
         peerDependenciesMeta:
@@ -614,10 +614,10 @@ packages:
         engines: { node: '>=0.4.0' }
         hasBin: true
 
-    acorn@8.15.0:
+    acorn@8.16.0:
         resolution:
             {
-                integrity: sha512-NZyJarBfL7nWwIq+FDL6Zp/yHEhePMNnnJ0y3qfieCrmNvYct8uvtiV41UvlSe6apAfk0fY1FbWx+NwfmpvtTg==,
+                integrity: sha512-UVJyE9MttOsBQIDKw1skb9nAwQuR5wuGD3+82K6JgJlm/Y+KI92oNsMNGZCYdDsVtRHSak0pcV5Dno5+4jh9sw==,
             }
         engines: { node: '>=0.4.0' }
         hasBin: true
@@ -2086,12 +2086,6 @@ packages:
                 integrity: sha512-FIqgj2EUvTa7R50u0rGsyTftzjYmv/a3hO345bZNrqabNqjtgiDMgmo4mkUjd+nzU5oF3dClKqFIPUKybUyqoQ==,
             }
 
-    randombytes@2.1.0:
-        resolution:
-            {
-                integrity: sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==,
-            }
-
     react-is@18.3.1:
         resolution:
             {
@@ -2177,12 +2171,6 @@ packages:
                 integrity: sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==,
             }
 
-    safe-buffer@5.2.1:
-        resolution:
-            {
-                integrity: sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==,
-            }
-
     safer-buffer@2.1.2:
         resolution:
             {
@@ -2217,11 +2205,12 @@ packages:
         engines: { node: '>=10' }
         hasBin: true
 
-    serialize-javascript@6.0.2:
+    serialize-javascript@7.0.4:
         resolution:
             {
-                integrity: sha512-Saa1xPByTTq2gdeFZYLLo+RFE35NHZkAbqZeWNd3BpzppeVisAqpDjcp8dyf6uIvEqJRd46jemmyA4iFIeVk8g==,
+                integrity: sha512-DuGdB+Po43Q5Jxwpzt1lhyFSYKryqoNjQSA9M92tyw0lyHIOur+XCalOUe0KTJpyqzT8+fQ5A0Jf7vCx/NKmIg==,
             }
+        engines: { node: '>=20.0.0' }
 
     shebang-command@2.0.0:
         resolution:
@@ -2291,11 +2280,12 @@ packages:
             }
         engines: { node: '>=8' }
 
-    smob@1.5.0:
+    smob@1.6.1:
         resolution:
             {
-                integrity: sha512-g6T+p7QO8npa+/hNx9ohv1E5pVCmWrVCUzUXJyLdMmftX6ER0oiWY/w9knEonLpnOp6b6FenKnMfR8gqwWdwig==,
+                integrity: sha512-KAkBqZl3c2GvNgNhcoyJae1aKldDW0LO279wF9bk1PnluRTETKBq0WyzRXxEhoQLk56yHaOY4JCBEKDuJIET5g==,
             }
+        engines: { node: '>=20.0.0' }
 
     source-map-support@0.5.13:
         resolution:
@@ -2419,10 +2409,10 @@ packages:
             }
         engines: { node: '>=8' }
 
-    terser@5.44.0:
+    terser@5.46.0:
         resolution:
             {
-                integrity: sha512-nIVck8DK+GM/0Frwd+nIhZ84pR/BX7rmXMfYwyg+Sri5oGVE99/E3KvXqpC2xHFxyqXyGHTKBSioxxplrO4I4w==,
+                integrity: sha512-jTwoImyr/QbOWFFso3YoU3ik0jBBDJ6JTOQiy/J2YxVJdZCc+5u7skhNwiOR3FQIygFqVUPHl7qbbxtjW2K3Qg==,
             }
         engines: { node: '>=10' }
         hasBin: true
@@ -3058,11 +3048,11 @@ snapshots:
             '@jridgewell/resolve-uri': 3.1.2
             '@jridgewell/sourcemap-codec': 1.5.5
 
-    '@rollup/plugin-terser@0.4.4(rollup@2.80.0)':
+    '@rollup/plugin-terser@1.0.0(rollup@2.80.0)':
         dependencies:
-            serialize-javascript: 6.0.2
-            smob: 1.5.0
-            terser: 5.44.0
+            serialize-javascript: 7.0.4
+            smob: 1.6.1
+            terser: 5.46.0
         optionalDependencies:
             rollup: 2.80.0
 
@@ -3148,7 +3138,7 @@ snapshots:
 
     acorn@7.4.1: {}
 
-    acorn@8.15.0: {}
+    acorn@8.16.0: {}
 
     agent-base@6.0.2:
         dependencies:
@@ -3978,7 +3968,7 @@ snapshots:
     jsdom@19.0.0:
         dependencies:
             abab: 2.0.6
-            acorn: 8.15.0
+            acorn: 8.16.0
             acorn-globals: 6.0.0
             cssom: 0.5.0
             cssstyle: 2.3.0
@@ -4170,10 +4160,6 @@ snapshots:
 
     querystringify@2.2.0: {}
 
-    randombytes@2.1.0:
-        dependencies:
-            safe-buffer: 5.2.1
-
     react-is@18.3.1: {}
 
     require-directory@2.1.1: {}
@@ -4214,8 +4200,6 @@ snapshots:
 
     safe-buffer@5.1.2: {}
 
-    safe-buffer@5.2.1: {}
-
     safer-buffer@2.1.2: {}
 
     saxes@5.0.1:
@@ -4228,9 +4212,7 @@ snapshots:
 
     semver@7.7.2: {}
 
-    serialize-javascript@6.0.2:
-        dependencies:
-            randombytes: 2.1.0
+    serialize-javascript@7.0.4: {}
 
     shebang-command@2.0.0:
         dependencies:
@@ -4274,7 +4256,7 @@ snapshots:
 
     slash@3.0.0: {}
 
-    smob@1.5.0: {}
+    smob@1.6.1: {}
 
     source-map-support@0.5.13:
         dependencies:
@@ -4339,10 +4321,10 @@ snapshots:
             ansi-escapes: 4.3.2
             supports-hyperlinks: 2.3.0
 
-    terser@5.44.0:
+    terser@5.46.0:
         dependencies:
             '@jridgewell/source-map': 0.3.11
-            acorn: 8.15.0
+            acorn: 8.16.0
             commander: 2.20.3
             source-map-support: 0.5.21
 
