@@ -446,7 +446,9 @@ export default class jsMind {
     _refresh_node_ui(parent_node) {
         this.layout.layout();
         this.view.show(false);
-        this.expand_node(parent_node);
+        if (!parent_node.expanded) {
+            this.expand_node(parent_node);
+        }
     }
 
     /**
