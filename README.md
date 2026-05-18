@@ -20,11 +20,11 @@ jsMind is mind map library built by javascript, it base on html5 canvas and svg.
         <link
             type="text/css"
             rel="stylesheet"
-            href="//cdn.jsdelivr.net/npm/jsmind@0.9.1/style/jsmind.css"
+            href="https://cdn.jsdelivr.net/npm/jsmind@0.9.1/style/jsmind.css"
         />
         <script
             type="text/javascript"
-            src="//cdn.jsdelivr.net/npm/jsmind@0.9.1/es6/jsmind.js"
+            src="https://cdn.jsdelivr.net/npm/jsmind@0.9.1/es6/jsmind.js"
         ></script>
     </head>
     <body>
@@ -32,8 +32,15 @@ jsMind is mind map library built by javascript, it base on html5 canvas and svg.
 
         <script type="text/javascript">
             var mind = {
+                meta: {
+                    name: 'jsMind-demo-tree',
+                    author: 'hizzgdev@163.com',
+                    version: '1.0',
+                },
                 // 3 data formats were supported ...
                 // see documents for more information
+                format: 'node_tree',
+                data: { id: 'root', topic: 'jsMind' },
             };
             var options = {
                 container: 'jsmind_container',
