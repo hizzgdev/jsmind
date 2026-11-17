@@ -8,4 +8,5 @@ node_modules
 screenshots
 LICENSE
 package-lock.json
+pnpm-lock.yaml
 types
